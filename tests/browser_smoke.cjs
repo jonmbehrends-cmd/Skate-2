@@ -66,7 +66,7 @@ const server=http.createServer((req,res)=>{
   const stick=await page.locator('#stick').boundingBox();
   assert(stick,'Mobile joystick must be visible');
   await page.mouse.move(stick.x+stick.width*.83,stick.y+stick.height*.5);
-  await page.mouse.down();await page.waitForTimeout(700);await page.mouse.up();
+  await page.mouse.down();await page.waitForFunction(()=>window.__SOL_DIAGNOSTICS__.state.dir>1.5,null,{timeout:8000});await page.mouse.up();
   const spin=await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__;return {yaw:d.state.dir,skaterYaw:d.skater.rotation.y,cameraYaw:d.cameraAnchor.rotation.y,grounded:d.state.grounded}});
   assert(!spin.grounded&&spin.yaw>1.5,'Touch joystick must rotate airborne skater: '+JSON.stringify(spin));
   assert(Math.abs(spin.skaterYaw-spin.yaw)<.2,'Rendered skater must follow airborne yaw');
