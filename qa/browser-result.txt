@@ -1,2 +1,6 @@
-FAIL: page.waitForFunction: Timeout 60000ms exceeded.
-    at /home/runner/work/Skate-2/Skate-2/tests/browser_smoke.cjs:20:14
+FAIL: Error: Cannot find module 'babylonjs'
+Require stack:
+- /home/runner/work/Skate-2/Skate-2/tests/browser_smoke.cjs
+    at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)
+    at Function.resolve (node:internal/modules/helpers:157:19)
+    at /home/runner/work/Skate-2/Skate-2/tests/browser_smoke.cjs:27:31
