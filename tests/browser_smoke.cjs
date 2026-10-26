@@ -78,6 +78,16 @@ const server=http.createServer((req,res)=>{
   const push=await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__,s=d.state;return {speed:s.speed,phase:s.pushPhase,grounded:s.grounded,onRamp:s.onRamp,grinding:s.grinding,bowlAir:!!s.bowlAir,burstUntil:s.pushBurstUntil,now:performance.now(),frame:d.scene.getFrameId(),y:s.y,z:s.z}});
   await page.locator('[data-t="push"]').dispatchEvent('pointerup',{pointerId:11});
   assert(push.speed>.05&&push.phase>0,'PUSH must animate foot and increase speed: '+JSON.stringify({push,errors}));
+  // Exercise the actual mobile boardslide button while it is visible.
+  await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__,s=d.state;
+   Object.assign(s,{x:0,z:19,y:0,groundY:0,dir:0,speed:5,travelSign:1,grounded:true,grinding:false,vy:0,grindCooldown:0,grindRequestType:null});
+  });
+  assert(await page.locator('[data-t="boardslide"]').count()===1,'Touch BOARD SLIDE control must exist');
+  await page.locator('[data-t="boardslide"]').click();
+  const boardInput=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
+   return {type:s.grindRequestType,airborne:!s.grounded,vy:s.vy}});
+  assert(boardInput.type==='boardslide'&&boardInput.airborne&&boardInput.vy>0,
+   'Touch boardslide must request a real ollie-assisted rail catch: '+JSON.stringify(boardInput));
   // Move into the real connected halfpipe and confirm actual travel.
   await page.locator('#halfpipe').click();
   assert(await page.evaluate(()=>window.__SOL_DIAGNOSTICS__.scene.activeCamera.name==='halfpipe arrival overview'),'HALFPIPE button must reveal a real 3D overview before riding');
@@ -106,15 +116,6 @@ const server=http.createServer((req,res)=>{
   assert(fs.statSync('test-artifacts/halfpipe-chromium.png').size>10000,'Halfpipe screenshot unexpectedly blank');
   // Boardslide is a real touch-triggered rail state with a 90-degree rendered
   // board stance, while physical travel continues lengthwise along the rail.
-  await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__,s=d.state;
-   Object.assign(s,{x:0,z:19,y:0,groundY:0,dir:0,speed:5,travelSign:1,grounded:true,grinding:false,vy:0,grindCooldown:0,grindRequestType:null});
-  });
-  assert(await page.locator('[data-t="boardslide"]').count()===1,'Touch BOARD SLIDE control must exist');
-  await page.locator('[data-t="boardslide"]').dispatchEvent('pointerdown',{pointerId:17});
-  const boardInput=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
-   return {type:s.grindRequestType,airborne:!s.grounded,vy:s.vy}});
-  assert(boardInput.type==='boardslide'&&boardInput.airborne&&boardInput.vy>0,
-   'Touch boardslide must request a real ollie-assisted rail catch: '+JSON.stringify(boardInput));
   await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__,s=d.state,B=window.BABYLON;
    Object.assign(s,{x:.1,z:19,y:1.24,groundY:0,dir:0,speed:5,travelSign:1,grounded:false,
     grinding:false,vy:-3,grindCooldown:0,grindVisualYaw:0,airVX:null,airVZ:null});
