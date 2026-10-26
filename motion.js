@@ -13,7 +13,7 @@ function step(state,steer,throttle,boost,dt){
   // In the air, the same left/right stick drives fast body-and-board yaw spins.
   // World-space travel velocity remains independent of facing direction.
   const steerRate=state.grinding?.11:state.grounded?.65+Math.min(1,speed/12):8.4;
-  state.dir+=turn*h*steerRate;
+  state.dir+=turn*h*steerRate*(state.grounded&&state.travelSign===-1?-1:1);
   if(state.grinding){
     // Rail friction and speed reduction belong to SOLGrind.advance.
     clearAir(state);
@@ -23,7 +23,7 @@ function step(state,steer,throttle,boost,dt){
     // RT delivers impulse only during the planted-foot half of each push.
     // Phase advances in simulation time, so physics and animation stay synchronized.
     state.pushPhase=Number.isFinite(state.pushPhase)?state.pushPhase:0;
-    const pushing=!!boost&&!state.onRamp&&speed<13;
+    const pushing=!!boost&&!state.onRamp&&state.travelSign!==-1&&speed<13;
     if(pushing)state.pushPhase=(state.pushPhase+h*6.5)%(Math.PI*2);
     else state.pushPhase=0;
     const contact=pushing?Math.max(0,Math.sin(state.pushPhase)):0;
@@ -49,7 +49,7 @@ function pump(state,previous,current,dt,active=false){
  if(!h||!state.grounded||state.grinding||!current||!current.ramp||!active){state.pumpIntensity=Math.max(0,(state.pumpIntensity||0)-h*3);return 0;}
  const slope=Number.isFinite(current.slope)?current.slope:0;
  const before=previous&&Number.isFinite(previous.slope)?previous.slope:slope;
- const forward=Math.cos(state.dir||0);
+ const forward=Math.cos(state.dir||0)*(state.travelSign===-1?-1:1);
  const speed=Number.isFinite(state.speed)?state.speed:0;
  // Compression while rolling into increasing transition curvature; no reverse-direction free thrust.
  const change=(slope-before)*forward;
@@ -62,22 +62,29 @@ function pump(state,previous,current,dt,active=false){
 // redirecting the centre of mass; there is no lateral jetpack steering.
 function beginAir(state){
   const speed=clamp(Number.isFinite(state.speed)?state.speed:0,0,17);
-  state.airVX=Math.sin(state.dir)*speed;
-  state.airVZ=Math.cos(state.dir)*speed;
+  const sign=state.travelSign===-1?-1:1;
+  state.airVX=Math.sin(state.dir)*speed*sign;
+  state.airVZ=Math.cos(state.dir)*speed*sign;
   return state;
 }
 function clearAir(state){state.airVX=null;state.airVZ=null;return state}
 function horizontal(state,dt){
   const h=clamp(Number.isFinite(dt)?dt:0,0,.05);
   const airborne=!state.grounded&&!state.grinding&&Number.isFinite(state.airVX)&&Number.isFinite(state.airVZ);
-  return {dx:(airborne?state.airVX:Math.sin(state.dir)*state.speed)*h,
-          dz:(airborne?state.airVZ:Math.cos(state.dir)*state.speed)*h};
+  const sign=state.travelSign===-1?-1:1;
+  return {dx:(airborne?state.airVX:Math.sin(state.dir)*state.speed*sign)*h,
+          dz:(airborne?state.airVZ:Math.cos(state.dir)*state.speed*sign)*h};
+}
+// A 180-degree spin can land rolling fakie instead of automatically bailing.
+function landingTravelSign(state){
+  if(!Number.isFinite(state.airVX)||!Number.isFinite(state.airVZ))return state.travelSign===-1?-1:1;
+  return Math.sin(state.dir)*state.airVX+Math.cos(state.dir)*state.airVZ<0?-1:1;
 }
 function landingAlignment(state){
   if(!Number.isFinite(state.airVX)||!Number.isFinite(state.airVZ))return 1;
   const speed=Math.hypot(state.airVX,state.airVZ);
   if(speed<.25)return 1;
-  return clamp((Math.sin(state.dir)*state.airVX+Math.cos(state.dir)*state.airVZ)/speed,-1,1);
+  return clamp(Math.abs(Math.sin(state.dir)*state.airVX+Math.cos(state.dir)*state.airVZ)/speed,0,1);
 }
 // Resolve world-space airborne velocity against solid collision normals.
 // Inward momentum is removed; tangential momentum is damped but preserved.
@@ -100,5 +107,5 @@ function collide(state,contacts){
   state.speed=clamp(Math.hypot(state.airVX,state.airVZ),0,17);
   return true;
 }
-root.SOLMotion={step,beginAir,clearAir,horizontal,landingAlignment,collide,pump};
+root.SOLMotion={step,beginAir,clearAir,horizontal,landingAlignment,landingTravelSign,collide,pump};
 })(typeof window!=='undefined'?window:globalThis);
