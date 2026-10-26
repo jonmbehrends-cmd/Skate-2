@@ -80,9 +80,10 @@ const server=http.createServer((req,res)=>{
   await page.screenshot({path:'test-artifacts/halfpipe-mobile.png',animations:'disabled'});
   // Dedicated side-on overview exposes the entire U profile, both coping lips
   // and the filled concrete sidewalls; this is the visual QA evidence.
+  await page.setViewportSize({width:960,height:540});
   await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__,B=window.BABYLON;
-   const c=new B.ArcRotateCamera('halfpipe QA overview',Math.PI/2,1.12,33,new B.Vector3(-36,1,-18.1),d.scene);
-   c.fov=1.03;d.scene.activeCamera=c;
+   const c=new B.ArcRotateCamera('halfpipe QA side elevation',0,1.27,31,new B.Vector3(-36,1,-18.1),d.scene);
+   c.fov=.86;d.scene.activeCamera=c;
    for(const id of ['hud','status','buttons','stick','restart','halfpipe','msg']){const el=document.getElementById(id);if(el)el.style.display='none'}
   });
   await page.waitForTimeout(500);
