@@ -19,3 +19,20 @@ assert.equal(deckToRamp,0,'Drop-in from a deck must not launch rider upward');
 const cheek=globalThis.SOLObstacles.rampSide(37,-54.2,39,-54.2,0,ramps);
 assert(cheek.hit&&cheek.x<38,'Raised halfpipe cheek must stop side penetration');
 console.log('PASS: safe deck drop-in and full-profile halfpipe side collision');
+
+require('../motion.js');
+const M=globalThis.SOLMotion;
+const rider={x:46,z:-46.1,dir:0,speed:5,travelSign:-1,grounded:true,grinding:false,onRamp:false};
+let turns=0,previous=rider.travelSign,minZ=Infinity,maxZ=-Infinity;
+for(let i=0;i<400;i++){
+ const dt=.016,old=T.sample(rider.x,rider.z,ramps);
+ rider.onRamp=!!old.ramp;M.step(rider,0,0,false,dt);
+ rider.z+=M.horizontal(rider,dt).dz;
+ const current=T.sample(rider.x,rider.z,ramps);
+ if(current.ramp)T.rollOnSlope(rider,current,dt);
+ if(rider.travelSign!==previous){turns++;previous=rider.travelSign}
+ minZ=Math.min(minZ,rider.z);maxZ=Math.max(maxZ,rider.z);
+}
+assert(turns>=1&&maxZ-minZ>4,'Skater must naturally roll backwards down transition and across flat');
+assert(T.launch(T.sample(46,-54.4,ramps),T.sample(46,-54.5,ramps),-54.5,0,8,-1)>0,'Fakie lip launch must work');
+console.log('PASS: wall rollback, cross-flat travel, and fakie lip launch');
