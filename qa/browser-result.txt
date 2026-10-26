@@ -1,2 +1,54 @@
-FAIL: AssertionError [ERR_ASSERTION]: PUSH must animate foot and increase speed: {"speed":0,"phase":0}
-    at /home/runner/work/Skate-2/Skate-2/tests/browser_smoke.cjs:77:3
+{
+  "result": "PASS",
+  "status": {
+    "rampCheeks": 26,
+    "cores": 13,
+    "skinCount": 13,
+    "skinMaterial": {
+      "alpha": 1,
+      "blend": false,
+      "transparency": 0,
+      "culled": false
+    },
+    "topPick": {
+      "hit": true,
+      "y": 2.3026619710825873
+    },
+    "opaqueCheeks": true,
+    "opaqueCores": true,
+    "connection": 1,
+    "bottom": [
+      -36,
+      -18.1
+    ],
+    "skater": true,
+    "rendered": true,
+    "canvasWidth": 390,
+    "independentCamera": true
+  },
+  "spin": {
+    "yaw": 4.826716031006992,
+    "skaterYaw": 4.826716031006992,
+    "cameraYaw": 0,
+    "grounded": false
+  },
+  "push": {
+    "speed": 3.094564786258514,
+    "phase": 1.6250000000000002,
+    "grounded": true,
+    "onRamp": false,
+    "grinding": false,
+    "bowlAir": false,
+    "burstUntil": 5353.599999999977,
+    "now": 4402.899999999965,
+    "frame": 18,
+    "y": 0,
+    "z": 0.3391496936709848
+  },
+  "riding": {
+    "x": -36.00005693767012,
+    "z": -19.815591550778187,
+    "y": 0,
+    "speed": 6.846091119086736
+  }
+}
