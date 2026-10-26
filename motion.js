@@ -13,7 +13,7 @@ function step(state,steer,throttle,boost,dt){
   // In the air, the same left/right stick drives fast body-and-board yaw spins.
   // World-space travel velocity remains independent of facing direction.
   const steerRate=state.grinding?.11:state.grounded?.65+Math.min(1,speed/12):12.0;
-  state.dir+=turn*h*steerRate*(state.grounded&&state.travelSign===-1?-1:1);
+  state.dir+=turn*h*steerRate;
   if(state.grinding){
     // Rail friction and speed reduction belong to SOLGrind.advance.
     clearAir(state);
