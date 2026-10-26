@@ -36,8 +36,15 @@ const server=http.createServer((req,res)=>{
     skater:!!d.skater,rendered:d.scene.getFrameId()>1,canvasWidth:d.engine.getRenderingCanvas().width,
     independentCamera:!!d.cameraAnchor&&d.camera.lockedTarget===d.cameraAnchor};
   });
-  assert.equal(status.rampCheeks,12,'Six ramps need two visible concrete sidewalls each');
-  assert.equal(status.cores,6,'Six ramps need merged concrete cores');
+  // The park is expanded frequently; derive expected cheeks/cores from the
+  // actual number of skatable ramp meshes rather than a stale six-ramp layout.
+  assert(status.skinCount>=6,'Expected a complete multi-ramp skatepark');
+  assert.equal(status.rampCheeks,status.skinCount*2,'Every ramp needs two solid concrete sidewalls');
+  assert.equal(status.cores,status.skinCount,'Every ramp needs one merged concrete core');
+  assert.equal(status.skinMaterial.alpha,1,'Riding skin must be opaque');
+  assert.equal(status.skinMaterial.blend,false,'Riding skin must not use alpha blending');
+  assert.equal(status.skinMaterial.culled,false,'Riding skin must render from both sides');
+  assert(status.topPick.hit&&Number.isFinite(status.topPick.y),'A ray must hit the halfpipe riding skin');
   assert(status.opaqueCheeks&&status.opaqueCores,'Ramp exterior and core materials must be opaque');
   assert.equal(status.connection,1,'Halfpipe must connect to park');
   assert.deepEqual(status.bottom,[-36,-18.1],'Halfpipe must be at current plaza coordinates');
