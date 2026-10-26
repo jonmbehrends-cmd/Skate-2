@@ -32,3 +32,22 @@ function beginAirTest(){
   assert(m.horizontal({...reverse,grounded:false},.05).dz<0,'Reverse takeoff preserves travel direction');
 }
 console.log('PASS: airborne velocity is independent of facing and landing alignment is validated');
+
+const impact=globalThis.SOLMotion.collide;
+const wall=s({grounded:false,speed:13,airVX:12,airVZ:5});
+assert(impact(wall,[{hit:true,normalX:-1,normalZ:0}]),'Wall collision must register');
+assert(Math.abs(wall.airVX)<1e-9,'Airborne wall impact must remove penetrating X velocity');
+assert(wall.airVZ>4&&wall.airVZ<5,'Airborne wall impact must preserve tangential sliding');
+assert(Math.abs(wall.speed-Math.hypot(wall.airVX,wall.airVZ))<1e-9,'Air speed must match actual travel');
+const away=s({grounded:false,speed:5,airVX:-3,airVZ:4});
+impact(away,[{hit:true,normalX:-1,normalZ:0}]);
+assert(away.airVX<0,'Impact must not remove velocity moving away from wall');
+const corner=s({grounded:false,speed:12,airVX:8,airVZ:9});
+impact(corner,[{hit:true,normalX:-1,normalZ:0},{hit:true,normalX:0,normalZ:-1}]);
+assert(Math.hypot(corner.airVX,corner.airVZ)<1e-9,'Corner collision must remove both penetrating components');
+const noHit=s({grounded:false,speed:10,airVX:6,airVZ:8});
+assert(!impact(noHit,[{hit:false}])&&noHit.airVX===6,'Clear path must preserve airborne velocity');
+const groundImpact=s({grounded:true,speed:10});
+impact(groundImpact,[{hit:true,normalX:-1,normalZ:0}]);
+assert.equal(groundImpact.speed,5.5,'Ground impact retains collision drag');
+console.log('PASS: airborne wall projection, glancing slide, corners, boundary normals, ground drag');

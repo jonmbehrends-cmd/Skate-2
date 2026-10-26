@@ -38,7 +38,7 @@ function sweep(px,pz,nx,nz,y,boxes,radius=.27){
   return {x,z,hit,normalX,normalZ};
 }
 function rampSide(px,pz,nx,nz,y,ramps,radius=.27){
-  let x=nx,hit=false;
+  let x=nx,hit=false,normalX=0;
   for(const r of ramps){
     const z=(pz+nz)/2;
     if(z<r.z-r.d/2||z>r.z+r.d/2)continue;
@@ -46,10 +46,10 @@ function rampSide(px,pz,nx,nz,y,ramps,radius=.27){
     const height=r.curve==='quarter'?r.h*t*t:r.h*t;
     if(y>=height-.13)continue;
     const left=r.x-r.w/2-radius,right=r.x+r.w/2+radius;
-    if(px<=left&&x>left){x=left;hit=true}
-    else if(px>=right&&x<right){x=right;hit=true}
+    if(px<=left&&x>left){x=left;hit=true;normalX=-1}
+    else if(px>=right&&x<right){x=right;hit=true;normalX=1}
   }
-  return {x,z:nz,hit};
+  return {x,z:nz,hit,normalX,normalZ:0};
 }
 root.SOLObstacles={surface,sweep,rampSide};
 })(typeof window!=='undefined'?window:globalThis);

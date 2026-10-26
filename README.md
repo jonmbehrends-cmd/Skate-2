@@ -1,6 +1,6 @@
 # SOL SKATE — WebGL 3D Alpha
 
-Galaxy-first skateboarding prototype using **Babylon.js/WebGL** with a third-person follow camera, 3D skateboard and skater, rideable banks and curved quarterpipe kickers with shared mesh/contact geometry and lip transfers, rails, ledges, frame-rate-independent 25 ms physics substeps, airborne tricks with acceleration-limited board rotation, landing-angle validation, height-gated rail grinds with bidirectional travel, speed loss and natural dismounts, swept side collisions with ledges/manual pads, elevated platform landings, walk-off drops, and combo scoring. The earlier 2D perspective prototype remains in `legacy.html`.
+Galaxy-first skateboarding prototype using **Babylon.js/WebGL** with a third-person follow camera, 3D skateboard and skater, rideable banks and curved quarterpipe kickers with shared mesh/contact geometry and lip transfers, rails, ledges, frame-rate-independent 25 ms physics substeps, airborne tricks with acceleration-limited board rotation, landing-angle validation, height-gated rail grinds with bidirectional travel, speed loss and natural dismounts, swept side collisions with ledges/manual pads, airborne wall-normal momentum projection and tangential slides, elevated platform landings, walk-off drops, and combo scoring. The earlier 2D perspective prototype remains in `legacy.html`.
 
 ## Play
 
@@ -23,6 +23,7 @@ Pair the controller with Android before launching. Some Android browser/controll
 - Entry point: `index.html`, with `controller.js`, `landing.js`, `terrain.js`, `obstacles.js` `grind.js` and `motion.js` loaded before the inline Babylon game logic.
 - `landing.js` advances roll and yaw angles with bounded angular acceleration and speed. A trick must actually finish its rotations before touchdown; insufficient airtime now bails. Rail attachments require a stable board, and restart resets angular state.
 - `motion.js` applies ground-only pushing and throttle, carving drag, low-power aerial steering, and prevents midair RT acceleration; grinding retains its own friction model. Takeoff now locks world-space horizontal velocity, so turning the board in midair does not redirect its trajectory. Sideways landings bail when heading and travel disagree by more than roughly 60 degrees.
+- `motion.js` also resolves sidewall, obstacle, and park-boundary impacts against world-space airborne velocity, removing inward motion while retaining damped tangential slides.
 - `grind.js` detects rail-top crossing only while descending with a stable board, sufficient speed and parallel heading; constrains travel to the rail, applies friction and combo points, and releases the board naturally at the endpoint or low speed. Ollie/trick dismounts impose a reattachment cooldown.
 - Run `node --check controller.js && node --check landing.js && node --check terrain.js && node --check obstacles.js && node --check grind.js && node --check motion.js && node tests/controller.cjs && node tests/landing.cjs && node tests/terrain.cjs && node tests/obstacles.cjs && node tests/grind.cjs && node tests/motion.cjs && node tests/check_inline.cjs` for input, physics and integration syntax checks. The separate `SOL SKATE logic regression` GitHub Actions workflow runs these Node checks on each push.
 - Optional local Galaxy-sized Chromium touch emulation can exercise the physics module. This is not a physical Android/Xbox test.
@@ -31,7 +32,7 @@ Pair the controller with Android before launching. Some Android browser/controll
 
 ## Known limitations
 
-This is an early **true WebGL 3D** prototype, not console-grade graphics or a complete physics simulation. Ramp contact, curved kickers and lip launch follow the same analytical profile as rendered geometry, but bowls and full rigid-body wheel physics remain simplified, angular rotation is still kinematic rather than rigid-body physics, and obstacle collision and advanced park objectives remain incomplete. Physical Samsung Galaxy and Xbox Bluetooth hardware testing has **not** been performed by the automated workshop. Publishing the source does not by itself confirm a successful Pages deployment.
+This is an early **true WebGL 3D** prototype, not console-grade graphics or a complete physics simulation. Ramp contact, curved kickers and lip launch follow the same analytical profile as rendered geometry, but bowls and full rigid-body wheel physics remain simplified, angular rotation is still kinematic rather than rigid-body physics, and complex multi-contact rigid-body collisions and advanced park objectives remain incomplete. Physical Samsung Galaxy and Xbox Bluetooth hardware testing has **not** been performed by the automated workshop. Publishing the source does not by itself confirm a successful Pages deployment.
 
 ## Next milestones
 

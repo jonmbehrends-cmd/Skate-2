@@ -20,3 +20,6 @@ assert(rampSide(-6,12,-2,12,0,ramp).hit,'Ramp wall blocks low board entering fro
 assert(!rampSide(-6,12,-2,12,2,ramp).hit,'Airborne board clears side wall');
 assert(!rampSide(-6,5,-2,5,0,ramp).hit,'Flat ramp entrance has no side wall');
 console.log('PASS: obstacle sweep, sliding, elevated surfaces, ramp side contact');
+
+assert.equal(rampSide(-6,12,-2,12,0,ramp).normalX,-1,'Left ramp wall must report outward normal');
+assert.equal(rampSide(6,12,2,12,0,ramp).normalX,1,'Right ramp wall must report outward normal');

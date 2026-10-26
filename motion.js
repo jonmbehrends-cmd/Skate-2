@@ -54,5 +54,26 @@ function landingAlignment(state){
   if(speed<.25)return 1;
   return clamp((Math.sin(state.dir)*state.airVX+Math.cos(state.dir)*state.airVZ)/speed,-1,1);
 }
-root.SOLMotion={step,beginAir,clearAir,horizontal,landingAlignment};
+// Resolve world-space airborne velocity against solid collision normals.
+// Inward momentum is removed; tangential momentum is damped but preserved.
+function collide(state,contacts){
+  const hits=contacts.filter(c=>c&&c.hit);
+  if(!hits.length)return false;
+  if(state.grounded||state.grinding||!Number.isFinite(state.airVX)||!Number.isFinite(state.airVZ)){
+    state.speed=clamp((Number.isFinite(state.speed)?state.speed:0)*.55,0,17);
+    return true;
+  }
+  let vx=state.airVX,vz=state.airVZ;
+  for(const c of hits){
+    const nx=c.normalX||0,nz=c.normalZ||0,mag=Math.hypot(nx,nz);
+    if(mag>0){
+      const ux=nx/mag,uz=nz/mag,closing=vx*ux+vz*uz;
+      if(closing<0){vx-=closing*ux;vz-=closing*uz}
+    }else{vx*=.55;vz*=.55}
+  }
+  state.airVX=vx*.82;state.airVZ=vz*.82;
+  state.speed=clamp(Math.hypot(state.airVX,state.airVZ),0,17);
+  return true;
+}
+root.SOLMotion={step,beginAir,clearAir,horizontal,landingAlignment,collide};
 })(typeof window!=='undefined'?window:globalThis);
