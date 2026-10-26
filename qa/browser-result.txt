@@ -1,2 +1,2 @@
-FAIL: AssertionError [ERR_ASSERTION]: Boardslide must keep moving along the rail rather than strafing sideways: {"type":"boardslide","grinding":true,"yaw":1.5707963267948966,"x":0,"z":19,"speed":4.85,"score":459.99999999999886,"rail":"rail"}
-    at /home/runner/work/Skate-2/Skate-2/tests/browser_smoke.cjs:178:3
+FAIL: AssertionError [ERR_ASSERTION]: GRIND touch control must catch bowl coping without forcing ollie: {"grinding":false,"vy":3.530525626477267,"y":-0.07101662993021693}
+    at /home/runner/work/Skate-2/Skate-2/tests/browser_smoke.cjs:140:3
