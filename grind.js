@@ -9,6 +9,9 @@ function find(state,rails,dt,stable,assist=false){
  const nextY=state.y+(state.vy-GRAVITY*h)*h;
  let best=null,bestDist=Infinity;
  for(const rail of rails){
+  // Only bowl coping permits rising capture: standard rail/ledge catches
+  // remain descending-only, preserving the existing ollie/boardslide physics.
+  if(state.vy>0&&rail.kind!=='bowl-coping')continue;
   if(rail.kind==='bowl-coping'){
    const dx=state.x-rail.x,dz=state.z-rail.z,r=Math.hypot(dx,dz),radialError=Math.abs(r-rail.radius);
    if(radialError>(assist?2.0:.42)||state.y<rail.y-(assist?1.1:.3)||nextY>rail.y+(assist?2.5:.65)||r<.01)continue;
