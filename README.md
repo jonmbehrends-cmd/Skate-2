@@ -20,10 +20,11 @@ Pair the controller with Android before launching. Some Android browser/controll
 
 ## Development
 
-- Entry point: `index.html`, with `controller.js`, `landing.js`, `terrain.js`, `obstacles.js` and `grind.js` loaded before the inline Babylon game logic.
+- Entry point: `index.html`, with `controller.js`, `landing.js`, `terrain.js`, `obstacles.js` `grind.js` and `motion.js` loaded before the inline Babylon game logic.
 - `landing.js` advances roll and yaw angles with bounded angular acceleration and speed. A trick must actually finish its rotations before touchdown; insufficient airtime now bails. Rail attachments require a stable board, and restart resets angular state.
+- `motion.js` applies ground-only pushing and throttle, carving drag, low-power aerial steering, and prevents midair RT acceleration; grinding retains its own friction model.
 - `grind.js` detects rail-top crossing only while descending with a stable board, sufficient speed and parallel heading; constrains travel to the rail, applies friction and combo points, and releases the board naturally at the endpoint or low speed. Ollie/trick dismounts impose a reattachment cooldown.
-- Run `node --check controller.js && node --check landing.js && node --check terrain.js && node --check obstacles.js && node --check grind.js && node tests/controller.cjs && node tests/landing.cjs && node tests/terrain.cjs && node tests/obstacles.cjs && node tests/grind.cjs && node tests/check_inline.cjs` for input, physics and integration syntax checks. The separate `SOL SKATE logic regression` GitHub Actions workflow runs these Node checks on each push.
+- Run `node --check controller.js && node --check landing.js && node --check terrain.js && node --check obstacles.js && node --check grind.js && node --check motion.js && node tests/controller.cjs && node tests/landing.cjs && node tests/terrain.cjs && node tests/obstacles.cjs && node tests/grind.cjs && node tests/motion.cjs && node tests/check_inline.cjs` for input, physics and integration syntax checks. The separate `SOL SKATE logic regression` GitHub Actions workflow runs these Node checks on each push.
 - Optional local Galaxy-sized Chromium touch emulation can exercise the physics module. This is not a physical Android/Xbox test.
 - GitHub Actions workflow `.github/workflows/deploy.yml` publishes the repository on pushes to `main`, if Pages is configured for GitHub Actions.
 - `window.__SOL_DIAGNOSTICS__` exposes the Babylon scene and simulation state for browser testing.

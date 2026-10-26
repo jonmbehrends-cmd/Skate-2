@@ -11,6 +11,8 @@ assert(html.includes('src="landing.js"'), 'Landing module must load');
 assert(html.includes('src="terrain.js"'), 'Terrain module must load');
 assert(html.includes('src="obstacles.js"'), 'Obstacle module must load');
 assert(html.includes('src="grind.js"'), 'Rail grind module must load');
+assert(html.includes('src="motion.js"'), 'Momentum module must load');
+assert(html.includes('SOLMotion.step(state,steer,throttle,boost,dt)'), 'Ground/air controls must use deterministic motion module');
 assert(html.includes('SOLGrind.find('), 'Rail entry must use height-aware grind detection');
 assert(html.includes('SOLGrind.advance('), 'Rail travel must use constrained grind simulation');
 assert(html.includes('grindCooldown'), 'Rail dismount cooldown must be wired');
