@@ -127,8 +127,11 @@ for(const [word,x,y,color,angle] of [
  ctx.strokeText(word,0,0);ctx.fillStyle=color;ctx.fillText(word,0,0);ctx.restore();
 }
 paint.update();bowlConcrete.diffuseTexture=paint;
+// The 25-foot recessed floor receives little direct light. Give its artwork
+// a modest self-lit contribution while retaining directional concrete shading.
+bowlConcrete.emissiveTexture=paint;
 bowlConcrete.diffuseColor=new B.Color3(.96,.97,.97);
-bowlConcrete.emissiveColor=new B.Color3(.11,.115,.12);
+bowlConcrete.emissiveColor=new B.Color3(.62,.62,.62);
 
 m.material=bowlConcrete;m.receiveShadows=true;const path=[];for(let i=0;i<=N;i++){const a=i*2*Math.PI/N;path.push(new B.Vector3(bowl.x+bowl.radius*Math.cos(a),.09,bowl.z+bowl.radius*Math.sin(a)))}const apronPositions=[],apronIndices=[],apronUvs=[];for(let i=0;i<=N;i++){const a=i*2*Math.PI/N,ca=Math.cos(a),sa=Math.sin(a),outer=16.55/Math.max(Math.abs(ca),Math.abs(sa));for(const rad of [bowl.radius,outer]){const x=bowl.x+rad*ca,z=bowl.z+rad*sa;apronPositions.push(x,.008,z);apronUvs.push(x/4,z/4)}}for(let i=0;i<N;i++){const k=i*2;apronIndices.push(k,k+1,k+2,k+1,k+3,k+2)}const apron=new B.Mesh('flush concrete bowl rim apron',scene),av=new B.VertexData();av.positions=apronPositions;av.indices=apronIndices;av.uvs=apronUvs;av.normals=[];B.VertexData.ComputeNormals(av.positions,av.indices,av.normals);av.applyToMesh(apron);apron.material=concrete;apron.receiveShadows=true;// Architectural bowl finish: inset colored tile bands and radial cast-concrete joints.
 const bandMat=new B.StandardMaterial('bowl blue tile inlay',scene);
