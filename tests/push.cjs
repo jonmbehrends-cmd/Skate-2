@@ -26,3 +26,10 @@ assert.equal(pose({...base,grinding:true},true,250,0).pushing,false);
 assert.equal(pose({...base,speed:15},true,250,0).pushing,false);
 assert.equal(pose(base,false,250,0).backOffset,0);
 console.log('Skater stance, push cycle, air/grind gating and inline integration PASS');
+
+const rampPose=pose({...base,onRamp:true,pumpIntensity:.8},true,250,0);
+assert.equal(rampPose.pushing,false,'Ramp pumping must not trigger a foot push');
+assert(rampPose.crouch>ride.crouch,'Pumping compression must bend rider');
+assert(inline[0].includes('stanceRig.rotation.x=riding?boardPivot.rotation.x:0'),'Rider must follow board slope');
+assert(inline[0].includes('const snap=riding&&!state.wasVisualGrounded'),'Landing must snap board to grounded contact');
+console.log('PASS: rider follows slope, lands level, ramp compression distinct from foot pushing');
