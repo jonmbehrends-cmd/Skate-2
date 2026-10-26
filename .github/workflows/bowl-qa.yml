@@ -1,0 +1,34 @@
+name: SOL SKATE ten consecutive bowl airs
+on:
+  push:
+    branches: [main, fix/bowl-vert-air]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: bowl-qa
+  cancel-in-progress: false
+jobs:
+  bowl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node tests/bowl.cjs
+      - run: npm install --no-save playwright@1.55.1
+      - run: npx playwright install --with-deps chromium
+      - name: Ten uninterrupted airs in running WebGL game
+        id: bowl
+        continue-on-error: true
+        run: node tests/bowl_browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bowl-air-evidence
+          path: test-artifacts/bowl-*
+      - if: steps.bowl.outcome == 'failure'
+        run: exit 1
