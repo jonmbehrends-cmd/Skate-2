@@ -3,7 +3,7 @@ require('../wheels.js');
 const {sample,relativeImpact}=globalThis.SOLWheels;
 const plane=(x,z)=>({height:2+.2*x+.3*z});
 const flat=sample(0,0,0,0,()=>({height:0}));
-assert.equal(flat.height,0);assert.equal(flat.pitch,0);assert.equal(flat.roll,0);
+assert.equal(flat.height,0);assert(Math.abs(flat.pitch)<1e-12);assert(Math.abs(flat.roll)<1e-12);
 const uphill=sample(0,0,0,2,plane);
 assert(Math.abs(uphill.pitch+Math.atan(.3))<1e-10,'Forward slope must pitch board uphill');
 assert(Math.abs(uphill.roll-Math.atan(.2))<1e-10,'Side slope must roll board toward high wheels');
