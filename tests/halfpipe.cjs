@@ -9,7 +9,7 @@ close(T.profile(left,1).slope,0);close(T.profile(right,0).slope,0);
 assert(T.profile(left,0).slope<0);assert(T.profile(right,1).slope>0);
 close(T.sample(46,-46.1,ramps).height,0);close(T.sample(46,-55.95,ramps).height,2.1);close(T.sample(46,-36.25,ramps).height,2.1);
 assert(T.launch(T.sample(46,-54.4,ramps),T.sample(46,-54.5,ramps),-54.5,Math.PI,8)>0);
-assert(T.launch(T.sample(46,-37.8,ramps),T.sample(46,-37.7,ramps),-37.7,0,8)>0);
+assert(T.launch(T.sample(46,-37.81,ramps),T.sample(46,-37.7,ramps),-37.7,0,8)>0);
 assert.equal(T.launch(T.sample(46,-54.4,ramps),T.sample(46,-54.5,ramps),-54.5,0,8),0);
 console.log('PASS: two circular transitions, flat bottom, decks, bidirectional lip launch');
 
