@@ -10,8 +10,9 @@ function step(state,steer,throttle,boost,dt){
   const turn=clamp(Number.isFinite(steer)?steer:0,-1,1);
   const pedal=clamp(Number.isFinite(throttle)?throttle:0,-1,1);
   const speed=clamp(Number.isFinite(state.speed)?state.speed:0,0,17);
-  // Air steering changes facing only gently; aerial propulsion is unavailable.
-  const steerRate=state.grinding?.11:state.grounded?.65+Math.min(1,speed/12):.18;
+  // In the air, the same left/right stick drives fast body-and-board yaw spins.
+  // World-space travel velocity remains independent of facing direction.
+  const steerRate=state.grinding?.11:state.grounded?.65+Math.min(1,speed/12):4.8;
   state.dir+=turn*h*steerRate;
   if(state.grinding){
     // Rail friction and speed reduction belong to SOLGrind.advance.
