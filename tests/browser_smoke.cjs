@@ -103,7 +103,38 @@ const server=http.createServer((req,res)=>{
   await page.waitForTimeout(500);
   await page.screenshot({path:'test-artifacts/halfpipe-chromium.png',animations:'disabled'});
   assert(fs.statSync('test-artifacts/halfpipe-chromium.png').size>10000,'Halfpipe screenshot unexpectedly blank');
+  // Verify the recessed bowl is real pickable geometry, not a visual-only decal.
+  // Save a full 3D perspective for visual review of the 100-foot / 25-foot bowl.
+  const bowl=await page.evaluate(()=>{
+   const d=window.__SOL_DIAGNOSTICS__,B=window.BABYLON;
+   const m=d.scene.meshes.find(x=>x.name==='100 foot wide 25 foot deep sculpted concrete bowl');
+   const ray=new B.Ray(new B.Vector3(6.5,12,-106),new B.Vector3(0,-1,0),30);
+   const hit=d.scene.pickWithRay(ray,x=>x===m);
+   const sample=window.SOLBowl.sample(6.5,-106);
+   return {exists:!!m,indices:m?.getTotalIndices(),materialAlpha:m?.material?.alpha,
+    depthWrite:m?.material?.forceDepthWrite,blend:m?.material?.needAlphaBlending(),
+    rayHit:!!hit?.hit,rayY:hit?.pickedPoint?.y,surfaceY:sample?.height,
+    centerY:window.SOLBowl.sample(0,-106)?.height,
+    diameterMeters:window.SOLBowl.bowl.radius*2,depthMeters:window.SOLBowl.bowl.depth,
+    meshes:d.scene.meshes.length,fps:d.engine.getFps()};
+  });
+  assert(bowl.exists&&bowl.indices>30000,'Full tessellated bowl must exist');
+  assert.equal(bowl.materialAlpha,1,'Bowl concrete must be opaque');
+  assert.equal(bowl.blend,false,'Bowl surface must not alpha blend');
+  assert.equal(bowl.depthWrite,true,'Bowl must write to the depth buffer');
+  assert(bowl.rayHit&&Math.abs(bowl.rayY-bowl.surfaceY)<.15,'Visual bowl must match riding physics: '+JSON.stringify(bowl));
+  assert(Math.abs(bowl.centerY+7.62)<.01,'Bowl must be 25 feet deep');
+  assert(Math.abs(bowl.diameterMeters-30.48)<.01,'Bowl must be 100 feet across');
+  await page.evaluate(()=>{
+   const d=window.__SOL_DIAGNOSTICS__,B=window.BABYLON;
+   const c=new B.ArcRotateCamera('bowl QA architectural overview',.72,1.03,48,
+    new B.Vector3(0,-3.1,-106),d.scene);
+   c.fov=.96;d.scene.activeCamera=c;
+  });
+  await page.waitForTimeout(650);
+  await page.screenshot({path:'test-artifacts/bowl-chromium.png',animations:'disabled'});
+  assert(fs.statSync('test-artifacts/bowl-chromium.png').size>14000,'Bowl screenshot unexpectedly blank');
   assert.equal(errors.length,0,'Browser errors: '+errors.join('; '));
-  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',status,spin,push,riding},null,2));console.log('PASS Chromium WebGL geometry, visible independent aerial yaw, joystick, foot push, halfpipe riding, screenshots',status,spin,push,riding);
+  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',status,spin,push,riding,bowl},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
  }finally{await browser.close()}
 })().catch(e=>{fs.mkdirSync('test-artifacts',{recursive:true});fs.writeFileSync('test-artifacts/browser-result.txt','FAIL: '+(e&&e.stack||String(e)));console.error(e);process.exitCode=1}).finally(()=>server.close());
