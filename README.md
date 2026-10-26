@@ -1,24 +1,37 @@
-# SOL SKATE
+# SOL SKATE — WebGL 3D Alpha
 
-Galaxy-first browser skateboarding game. The current `index.html` is an early **2D canvas perspective prototype**, not a full 3D game. Its controls and physics need actual Android device validation.
+Galaxy-first skateboarding prototype using **Babylon.js/WebGL** with a third-person follow camera, 3D skateboard and skater, ramps, rails, ledges, airborne tricks, basic grinds, and combo scoring. The earlier 2D perspective prototype remains in `legacy.html`.
 
-## Controls
-- Left virtual stick: forward/backward acceleration and steering.
-- PUSH: gain speed.
-- OLLIE: jump.
-- KICK, HEEL, SHOVE, GRAB: airborne trick inputs; ground trick buttons currently trigger a basic jump.
+## Play
 
-## Development and publishing
-- Open `index.html` locally to inspect the prototype.
-- The `.github/workflows/deploy.yml` workflow is intended to deploy the static site on pushes to `main`.
-- In repository **Settings → Pages → Build and deployment**, set **Source** to **GitHub Actions** if it is not already selected.
-- Once deployment succeeds, check `https://jonmbehrends-cmd.github.io/Skate-2/`.
+Open the GitHub Pages build at https://jonmbehrends-cmd.github.io/Skate-2/ in Samsung Internet or Chrome. The page loads Babylon.js from its CDN, so internet access is required. If WebGL or the CDN fails, use the legacy prototype for troubleshooting.
 
-## Current limitations
-The environment and skater use canvas perspective drawing rather than WebGL 3D. Collision with obstacles, grinds, ramps, trick validation, landing failures, audio, and robust physics remain to be built. No real Galaxy performance measurements have been taken.
+## Xbox Bluetooth controller (Standard Gamepad mapping)
 
-## Next development steps
-1. Verify Pages workflow and test on Samsung Galaxy Chrome/Samsung Internet.
-2. Replace canvas pseudo-3D with a proper WebGL scene and follow camera.
-3. Add obstacle collisions, ramp launches, grind rails, trick rotations and landing detection.
-4. Add automated browser smoke tests, performance checks, and regression safeguards.
+- **Left stick**: steer (horizontal) and accelerate/brake (vertical).
+- **Right trigger (RT)**: hold to push/accelerate.
+- **A / X / B / Y**: ollie / kickflip / heelflip / shove-it.
+- **RB**: grab.
+- **Right stick flick**: up ollie, left kickflip, right heelflip, down shove-it. Re-center before the next flick.
+- **D-pad**: directional fallback.
+- **Touch**: left virtual stick plus trick buttons, including PUSH.
+
+Pair the controller with Android before launching. Some Android browser/controller combinations expose nonstandard axis mappings; these require device validation.
+
+## Development
+
+- Entry point: `index.html`, with `controller.js` loaded before the inline Babylon game logic.
+- Run `node --check controller.js && node tests/controller.cjs` to test controller input.
+- GitHub Actions workflow `.github/workflows/deploy.yml` publishes the repository on pushes to `main`, if Pages is configured for GitHub Actions.
+- `window.__SOL_DIAGNOSTICS__` exposes the Babylon scene and simulation state for browser testing.
+
+## Known limitations
+
+This is an early **true WebGL 3D** prototype, not console-grade graphics or a complete physics simulation. Ramp contacts and grind attachments are simplified, rotation/landing logic requires further refinement, and obstacle collision and advanced park objectives remain incomplete. Physical Samsung Galaxy and Xbox Bluetooth hardware testing has **not** been performed by the automated workshop. Publishing the source does not by itself confirm a successful Pages deployment.
+
+## Next milestones
+
+1. Validate live Pages deployment and Samsung Internet/Xbox mappings on hardware.
+2. Improve physical landings, rotation completion, ground contact, and obstacle collisions.
+3. Replace box ramps with curved quarterpipes/bowls and stable rail transitions.
+4. Add objectives, combo challenges, audio, performance budgets, and graphics improvements.
