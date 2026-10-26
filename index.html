@@ -22,10 +22,10 @@ for(const r of ramps){
  const lipZ=z+(r.curve==='halfpipe-left'?-1:1)*d/2;
  const coping=box('polished blue coping',w,.095,.19,x,h+.105,lipZ,metal);coping.receiveShadows=false;
  box('lip hazard marker',Math.max(1,w-.8),.012,.22,x,h+.055,lipZ+(r.curve==='halfpipe-left'?.36:-.36),edgeCream);
- for(const side of [-1,1]){
-  const cheek=box('ramp architectural edge',.11,Math.max(.16,h*.6),d,x+side*(w/2+.04),Math.max(.16,h*.3),z,edgeBlue);
-  cheek.visibility=.85;
- }
+ // Keep the already sculpted concrete side cheeks and narrow coping tubes.
+ // The former full-height cyan "architectural edge" boxes looked like
+ // freestanding walls from the approach and blocked sightlines across the park.
+ // Never add rectangular decorative walls beside rideable transitions.
  // Small paint marks, avoiding huge coplanar overlays.
  for(let j=0;j<4;j++){
   const t=.18+j*.19,p=SOLTerrain.profile(r,t);
