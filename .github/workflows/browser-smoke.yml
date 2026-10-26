@@ -21,7 +21,7 @@ jobs:
         with:
           path: ~/.cache/ms-playwright
           key: playwright-chromium-linux-1.55.1
-      - run: npm install --no-save playwright@1.55.1
+      - run: npm install --no-save playwright@1.55.1 babylonjs@8
       # Ubuntu hosted runners include Chromium's standard shared libraries;
       # avoid apt install-deps, which can stall under heavy CI load.
       - run: npx playwright install chromium
