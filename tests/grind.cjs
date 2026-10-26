@@ -52,4 +52,16 @@ assert(Math.abs(visualYaw(other)+Math.PI/2)<1e-9,'Opposite-side boardslides rota
 const ordinary=state({grindRequestType:'50-50'});
 assert(attach(ordinary,find(ordinary,rails,dt,true)));
 assert.equal(visualYaw(ordinary),0,'Standard 50-50 must remain lengthwise');
+// The 100-foot bowl has a single circular coping rail, not four straight rails.
+const bowlRail={x:0,z:-106,radius:15.24,y:.09,kind:'bowl-coping'};
+const bowlState=state({x:15.10,z:-106,y:.09,vy:0,dir:Math.PI/2,grounded:true,speed:8,grindCooldown:0,grindRequestType:'50-50'});
+const bowlHit=find(bowlState,[bowlRail],dt,true,true);
+assert(bowlHit&&bowlHit.rail===bowlRail,'Grounded GRIND button must find bowl coping on a radial approach');
+assert(attach(bowlState,bowlHit),'Bowl coping attachment must succeed without an ollie');
+assert.equal(bowlState.vy,0,'Bowl coping GRIND must not force an ollie');
+const bx=bowlState.x,bz=bowlState.z;
+for(let i=0;i<60;i++)advance(bowlState,1/60);
+assert(bowlState.grinding,'Circular coping should remain engaged for at least one second');
+assert(Math.hypot(bowlState.x-bx,bowlState.z-bz)>3,'Skater must travel around the coping');
+assert(Math.abs(Math.hypot(bowlState.x,bowlState.z+106)-bowlRail.radius)<.01,'Coping grind must follow the exact bowl radius');
 console.log('PASS: rail contact height, direction, speed, cooldown, board stability, traversal, and exit');
