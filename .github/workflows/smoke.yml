@@ -25,5 +25,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: sol-skate-browser-preview
-          path: sol-skate-browser.png
+          path: |
+            sol-skate-browser.png
+            sol-skate-portrait.png
           if-no-files-found: ignore
