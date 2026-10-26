@@ -38,18 +38,25 @@ function sweep(px,pz,nx,nz,y,boxes,radius=.27){
   return {x,z,hit,normalX,normalZ};
 }
 function rampSide(px,pz,nx,nz,y,ramps,radius=.27){
-  let x=nx,hit=false,normalX=0;
+  let x=nx,z=nz,hit=false,normalX=0,normalZ=0;
   for(const r of ramps){
-    const z=(pz+nz)/2;
-    if(z<r.z-r.d/2||z>r.z+r.d/2)continue;
-    const t=(z-(r.z-r.d/2))/r.d;
+    // Raised halfpipe decks are solid from all sides: don't teleport a skater
+    // standing on the ground through a 2.1m rear deck wall.
+    if(r.curve==='halfpipe-deck'&&y<r.h-.13&&px>=r.x-r.w/2-radius&&px<=r.x+r.w/2+radius){
+      const near=r.z-r.d/2-radius,far=r.z+r.d/2+radius;
+      if(pz<=near&&z>near){z=near;hit=true;normalZ=-1}
+      else if(pz>=far&&z<far){z=far;hit=true;normalZ=1}
+    }
+    const midZ=(pz+z)/2;
+    if(midZ<r.z-r.d/2||midZ>r.z+r.d/2)continue;
+    const t=(midZ-(r.z-r.d/2))/r.d;
     const height=root.SOLTerrain?root.SOLTerrain.profile(r,t).height:r.curve==='quarter'?r.h*t*t:r.h*t;
     if(y>=height-.13)continue;
     const left=r.x-r.w/2-radius,right=r.x+r.w/2+radius;
     if(px<=left&&x>left){x=left;hit=true;normalX=-1}
     else if(px>=right&&x<right){x=right;hit=true;normalX=1}
   }
-  return {x,z:nz,hit,normalX,normalZ:0};
+  return {x,z,hit,normalX,normalZ};
 }
 root.SOLObstacles={surface,sweep,rampSide};
 })(typeof window!=='undefined'?window:globalThis);
