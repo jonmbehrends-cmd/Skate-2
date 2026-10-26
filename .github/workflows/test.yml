@@ -13,9 +13,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node --check controller.js && node --check landing.js && node --check terrain.js && node --check obstacles.js
+      - run: node --check controller.js && node --check landing.js && node --check terrain.js && node --check obstacles.js && node --check grind.js
       - run: node tests/controller.cjs
       - run: node tests/terrain.cjs
       - run: node tests/obstacles.cjs
+      - run: node tests/grind.cjs
       - run: node tests/landing.cjs
       - run: node tests/check_inline.cjs
