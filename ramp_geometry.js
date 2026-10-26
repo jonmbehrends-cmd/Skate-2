@@ -42,7 +42,7 @@ function sideWall(r,profile,side,segments=40){
     const base=positions.length/3;
     positions.push(x,floor,za,x,ya,za,x,yb,zb,x,floor,zb);
     uvs.push(za/3,floor/3,za/3,ya/3,zb/3,yb/3,zb/3,floor/3);
-    if(side<0)indices.push(base,base+1,base+2,base,base+2,base+3);
+    if(side>0)indices.push(base,base+1,base+2,base,base+2,base+3);
     else indices.push(base+2,base+1,base,base+3,base+2,base);
   }
   return {positions,indices,uvs,segments:N};
