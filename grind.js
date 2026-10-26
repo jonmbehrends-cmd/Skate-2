@@ -25,10 +25,10 @@ function find(state,rails,dt,stable,assist=false){
 function attach(state,contact){
  if(!contact)return false;
  const rail=contact.rail,axis=rail.axis==='x'?'x':'z',cross=axis==='z'?'x':'z';
- state.grinding=true;state.grounded=false;state.grindRail=rail;state.grindTime=0;
+ state.grinding=true;state.grounded=false;state.grindRail=rail;state.grindTime=0;state.grindType=state.grindRequestType==='boardslide'?'boardslide':'50-50';
  state.y=contact.top;state.vy=0;state[cross]=rail[cross];
  state.dir=axis==='z'?(contact.direction>0?0:Math.PI):(contact.direction>0?Math.PI/2:-Math.PI/2);
- state.travelSign=1;state.speed*=.97;return true;
+ state.travelSign=1;state.speed*=.97;state.grindRequestType=null;return true;
 }
 function advance(state,dt){
  if(!state.grinding||!state.grindRail)return false;
@@ -37,7 +37,7 @@ function advance(state,dt){
  state.grindTime+=h;state[cross]=rail[cross];state.y=Number.isFinite(rail.y)?rail.y:1.1;
  state.vy=0;state.speed=Math.max(0,state.speed-1.35*h);state.combo+=110*h;
  const ended=Math.abs(state[axis]-rail[axis])>=rail.len/2-.12||state.speed<1.5||state.grindTime>4;
- if(ended){state.grinding=false;state.grindRail=null;state.grounded=false;state.grindCooldown=.5;state.rampCooldown=Math.max(state.rampCooldown||0,.4);state.y+=.01;state.vy=0}
+ if(ended){state.grinding=false;state.grindRail=null;state.grindType=null;state.grounded=false;state.grindCooldown=.5;state.rampCooldown=Math.max(state.rampCooldown||0,.4);state.y+=.01;state.vy=0}
  return ended;
 }
 root.SOLGrind={find,attach,advance};
