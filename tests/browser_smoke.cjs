@@ -34,7 +34,7 @@ const server=http.createServer((req,res)=>{
     connection:meshes.filter(m=>m.name==='HALFPIPE PARK CONNECTION').length,
     bottom:bottom?[bottom.position.x,bottom.position.z]:null,
     skater:!!d.skater,rendered:d.scene.getFrameId()>1,canvasWidth:d.engine.getRenderingCanvas().width,
-    independentCamera:!!d.cameraAnchor&&d.camera.lockedTarget===d.cameraAnchor};
+    independentCamera:!!d.cameraAnchor&&d.camera.lockedTarget===d.cameraAnchor,staticBatches:d.staticBatchReport};
   });
   // The park is expanded frequently; derive expected cheeks/cores from the
   // actual number of skatable ramp meshes rather than a stale six-ramp layout.
@@ -50,6 +50,7 @@ const server=http.createServer((req,res)=>{
   assert.deepEqual(status.bottom,[-36,-18.1],'Halfpipe must be at current plaza coordinates');
   assert(status.skater&&status.rendered&&status.canvasWidth>0,'WebGL scene must render');
   assert(status.independentCamera,'Camera must not rotate with rider during airborne spins');
+  assert(status.staticBatches?.merged>80&&status.staticBatches?.groups>=8,'Static park art must be batched to avoid hundreds of unnecessary mobile draw calls: '+JSON.stringify(status.staticBatches));
   // Exercise the actual mobile joystick: the board and skater must visibly yaw,
   // while the camera's orientation remains fixed during an aerial spin.
   await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
