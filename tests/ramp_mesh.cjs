@@ -42,3 +42,5 @@ console.log('PASS: sealed outward-facing bank and quarterpipe; manifold edges',b
 assert(html.includes("rampSurface.alpha=1"),'Ramp must be fully opaque');
 assert(html.includes('rampSurface.backFaceCulling=false'),'Ramp must be visible from both sides');
 assert(html.includes('MATERIAL_OPAQUE'),'Ramp must use opaque material rendering mode');
+
+assert(html.includes("solid ramp concrete infill"),'Ramps must have opaque concrete beneath riding skin');
