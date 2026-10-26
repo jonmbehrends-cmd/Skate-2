@@ -43,7 +43,7 @@ function rampSide(px,pz,nx,nz,y,ramps,radius=.27){
     const z=(pz+nz)/2;
     if(z<r.z-r.d/2||z>r.z+r.d/2)continue;
     const t=(z-(r.z-r.d/2))/r.d;
-    const height=r.curve==='quarter'?r.h*t*t:r.h*t;
+    const height=root.SOLTerrain?root.SOLTerrain.profile(r,t).height:r.curve==='quarter'?r.h*t*t:r.h*t;
     if(y>=height-.13)continue;
     const left=r.x-r.w/2-radius,right=r.x+r.w/2+radius;
     if(px<=left&&x>left){x=left;hit=true;normalX=-1}
