@@ -1,7 +1,5 @@
-name: SOL SKATE browser smoke test
+name: SOL SKATE manual browser diagnostics
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 permissions:
   contents: read
@@ -14,19 +12,20 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-linux-1.55.1
       - name: Install browser test tools
         run: |
-          npm install --no-save playwright
-          npx playwright install --with-deps chromium
-      - name: Validate source and browser startup
-        run: node tests/smoke.cjs
-      - name: Upload browser screenshot
+          npm install --no-save playwright@1.55.1
+          npx playwright install chromium
+      - name: Validate current WebGL game in Chromium
+        run: node tests/browser_smoke.cjs
+      - name: Upload browser screenshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: sol-skate-browser-preview
-          path: |
-            sol-skate-browser.png
-            sol-skate-ramp.png
-            sol-skate-portrait.png
-          if-no-files-found: ignore
+          name: sol-skate-manual-browser-preview
+          path: test-artifacts/
+          if-no-files-found: warn
