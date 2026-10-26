@@ -26,6 +26,9 @@ function attach(state,contact){
  if(!contact)return false;
  const rail=contact.rail,axis=rail.axis==='x'?'x':'z',cross=axis==='z'?'x':'z';
  state.grinding=true;state.grounded=false;state.grindRail=rail;state.grindTime=0;state.grindType=state.grindRequestType==='boardslide'?'boardslide':'50-50';
+ // Boardslides rotate the actual rider/board across the rail, not the
+ // movement heading. Store the approach side so the stance stays consistent.
+ state.grindSide=state[cross]>=rail[cross]?1:-1;
  state.y=contact.top;state.vy=0;state[cross]=rail[cross];
  state.dir=axis==='z'?(contact.direction>0?0:Math.PI):(contact.direction>0?Math.PI/2:-Math.PI/2);
  state.travelSign=1;state.speed*=.97;state.grindRequestType=null;return true;
@@ -35,10 +38,11 @@ function advance(state,dt){
  const rail=state.grindRail,axis=rail.axis==='x'?'x':'z',cross=axis==='z'?'x':'z';
  const h=Math.max(0,Math.min(.04,Number.isFinite(dt)?dt:0));
  state.grindTime+=h;state[cross]=rail[cross];state.y=Number.isFinite(rail.y)?rail.y:1.1;
- state.vy=0;state.speed=Math.max(0,state.speed-1.35*h);state.combo+=110*h;
+ state.vy=0;state.speed=Math.max(0,state.speed-1.35*h);state.combo+=(state.grindType==='boardslide'?170:110)*h;
  const ended=Math.abs(state[axis]-rail[axis])>=rail.len/2-.12||state.speed<1.5||state.grindTime>4;
- if(ended){state.grinding=false;state.grindRail=null;state.grindType=null;state.grounded=false;state.grindCooldown=.5;state.rampCooldown=Math.max(state.rampCooldown||0,.4);state.y+=.01;state.vy=0}
+ if(ended){state.grinding=false;state.grindRail=null;state.grindType=null;state.grindSide=null;state.grounded=false;state.grindCooldown=.5;state.rampCooldown=Math.max(state.rampCooldown||0,.4);state.y+=.01;state.vy=0}
  return ended;
 }
-root.SOLGrind={find,attach,advance};
+function visualYaw(state){return state.grinding&&state.grindType==='boardslide'?(state.grindSide===-1?-1:1)*Math.PI/2:0;}
+root.SOLGrind={find,attach,advance,visualYaw};
 })(typeof window!=='undefined'?window:globalThis);
