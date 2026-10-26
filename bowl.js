@@ -87,11 +87,15 @@ function land(state,contact){
  state.y=state.groundY=contact.height;state.vy=0;state.grounded=true;state.bowlAir=null;
  state.name='VERT REENTRY';state.bowlStats.landings++;return true;
 }
-function mesh(B,scene,concrete,metal){const N=128,R=72,positions=[],indices=[],uvs=[];for(let j=0;j<=R;j++){const u=j/R;const rad=bowl.radius*(1-Math.pow(1-u,2.1));for(let i=0;i<=N;i++){const a=i*2*Math.PI/N,x=bowl.x+rad*Math.cos(a),z=bowl.z+rad*Math.sin(a);positions.push(x,height(x,z)+.015,z);uvs.push(x/4,z/4)}}for(let j=0;j<R;j++)for(let i=0;i<N;i++){const a=j*(N+1)+i,b=a+N+1;indices.push(a,a+1,b,b,a+1,b+1)}const m=new B.Mesh('100 foot wide 25 foot deep sculpted concrete bowl',scene),v=new B.VertexData();v.positions=positions;v.indices=indices;v.uvs=uvs;v.normals=[];B.VertexData.ComputeNormals(positions,indices,v.normals);v.applyToMesh(m);const bowlConcrete=new B.StandardMaterial('warm pale skate bowl concrete',scene);
-bowlConcrete.diffuseColor=new B.Color3(.58,.63,.63);
-bowlConcrete.ambientColor=new B.Color3(.27,.29,.29);
+function mesh(B,scene,concrete,metal){const N=128,R=72,positions=[],indices=[],uvs=[];for(let j=0;j<=R;j++){const u=j/R;const rad=bowl.radius*(1-Math.pow(1-u,2.1));for(let i=0;i<=N;i++){const a=i*2*Math.PI/N,x=bowl.x+rad*Math.cos(a),z=bowl.z+rad*Math.sin(a);positions.push(x,height(x,z)+.015,z);uvs.push(x/4,z/4)}}for(let j=0;j<R;j++)for(let i=0;i<N;i++){const a=j*(N+1)+i,b=a+N+1;indices.push(a,a+1,b,b,a+1,b+1)}const m=new B.Mesh('100 foot wide 25 foot deep sculpted concrete bowl',scene),v=new B.VertexData();v.positions=positions;v.indices=indices;v.uvs=uvs;v.normals=[];B.VertexData.ComputeNormals(positions,indices,v.normals);v.applyToMesh(m);const bowlConcrete=concrete.clone('warm pale opaque textured bowl concrete');
+bowlConcrete.diffuseColor=new B.Color3(.86,.9,.9);
+bowlConcrete.emissiveColor=new B.Color3(.075,.085,.085);
 bowlConcrete.specularColor=new B.Color3(.09,.1,.1);
 bowlConcrete.specularPower=32;
+bowlConcrete.alpha=1;
+bowlConcrete.forceDepthWrite=true;
+bowlConcrete.transparencyMode=B.Material.MATERIAL_OPAQUE;
+bowlConcrete.useAlphaFromDiffuseTexture=false;
 bowlConcrete.backFaceCulling=false;
 m.material=bowlConcrete;m.receiveShadows=true;const path=[];for(let i=0;i<=N;i++){const a=i*2*Math.PI/N;path.push(new B.Vector3(bowl.x+bowl.radius*Math.cos(a),.09,bowl.z+bowl.radius*Math.sin(a)))}const apronPositions=[],apronIndices=[],apronUvs=[];for(let i=0;i<=N;i++){const a=i*2*Math.PI/N,ca=Math.cos(a),sa=Math.sin(a),outer=16/Math.max(Math.abs(ca),Math.abs(sa));for(const rad of [bowl.radius,outer]){const x=bowl.x+rad*ca,z=bowl.z+rad*sa;apronPositions.push(x,.008,z);apronUvs.push(x/4,z/4)}}for(let i=0;i<N;i++){const k=i*2;apronIndices.push(k,k+1,k+2,k+1,k+3,k+2)}const apron=new B.Mesh('flush concrete bowl rim apron',scene),av=new B.VertexData();av.positions=apronPositions;av.indices=apronIndices;av.uvs=apronUvs;av.normals=[];B.VertexData.ComputeNormals(av.positions,av.indices,av.normals);av.applyToMesh(apron);apron.material=concrete;apron.receiveShadows=true;// Architectural bowl finish: inset colored tile bands and radial cast-concrete joints.
 const bandMat=new B.StandardMaterial('bowl blue tile inlay',scene);
@@ -134,7 +138,7 @@ for(let k=0;k<24;k++){
 }
 artTex.hasAlpha=true;artTex.update();
 const artMat=new B.StandardMaterial('bowl wall art material',scene);
-artMat.diffuseTexture=artTex;artMat.opacityTexture=artTex;artMat.backFaceCulling=false;
+artMat.diffuseTexture=artTex;artMat.opacityTexture=null;artMat.backFaceCulling=false;artMat.transparencyMode=B.Material.MATERIAL_ALPHABLEND;
 artMat.useAlphaFromDiffuseTexture=true;artMat.disableLighting=true;
 const artPositions=[],artIndices=[],artUvs=[];
 const arcN=128,radialN=28;
