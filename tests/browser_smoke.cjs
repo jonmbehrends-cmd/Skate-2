@@ -120,6 +120,7 @@ const server=http.createServer((req,res)=>{
    Object.assign(s,{x:15.10,z:-106,y:.09,groundY:0,dir:Math.PI/2,speed:6,travelSign:1,
     grounded:true,grinding:false,vy:0,grindCooldown:0,grindRequestType:null});
   });
+  await page.evaluate(()=>{document.querySelector('#buttons').style.display='';});
   await page.locator('[data-t="grind"]').click();
   const touchCoping=await page.evaluate(()=>{
    const s=window.__SOL_DIAGNOSTICS__.state;
