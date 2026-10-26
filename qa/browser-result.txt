@@ -1,2 +1,2 @@
-FAIL: page.waitForFunction: Timeout 8000ms exceeded.
-    at /home/runner/work/Skate-2/Skate-2/tests/browser_smoke.cjs:127:14
+FAIL: page.waitForFunction: Timeout 60000ms exceeded.
+    at /home/runner/work/Skate-2/Skate-2/tests/browser_smoke.cjs:20:14
