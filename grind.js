@@ -45,7 +45,7 @@ function attach(state,contact){
  // movement heading. Store the approach side so the stance stays consistent.
  state.grindSide=state[cross]>=rail[cross]?1:-1;
  state.grindEntryY=rail.kind==='bowl-coping'?state.y:null;
- state.y=contact.top;state.vy=0;if(rail.kind==='bowl-coping'){const a=Math.atan2(state.z-rail.z,state.x-rail.x);state.grindAngle=a;state.x=rail.x+rail.radius*Math.cos(a);state.z=rail.z+rail.radius*Math.sin(a);state.dir=a+(contact.direction>0?Math.PI/2:-Math.PI/2);}else state[cross]=rail[cross];
+ state.y=rail.kind==='bowl-coping'?state.grindEntryY:contact.top;state.vy=0;if(rail.kind==='bowl-coping'){const a=Math.atan2(state.z-rail.z,state.x-rail.x);state.grindAngle=a;state.x=rail.x+rail.radius*Math.cos(a);state.z=rail.z+rail.radius*Math.sin(a);state.dir=a+(contact.direction>0?Math.PI/2:-Math.PI/2);}else state[cross]=rail[cross];
  if(rail.kind!=='bowl-coping')state.dir=axis==='z'?(contact.direction>0?0:Math.PI):(contact.direction>0?Math.PI/2:-Math.PI/2);
  state.travelSign=1;state.speed*=.97;state.grindRequestType=null;return true;
 }
