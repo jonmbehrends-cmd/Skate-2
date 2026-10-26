@@ -36,3 +36,9 @@ for(let i=0;i<400;i++){
 assert(turns>=1&&maxZ-minZ>4,'Skater must naturally roll backwards down transition and across flat');
 assert(T.launch(T.sample(46,-54.4,ramps),T.sample(46,-54.5,ramps),-54.5,0,8,-1)>0,'Fakie lip launch must work');
 console.log('PASS: wall rollback, cross-flat travel, and fakie lip launch');
+
+const deckWall=globalThis.SOLObstacles.rampSide(46,-33,46,-35,0,[dr]);
+assert(deckWall.hit&&deckWall.z>-35,'Ground-level skater must not pass through deck rear wall');
+const deckTop=globalThis.SOLObstacles.rampSide(46,-33,46,-35,2.1,[dr]);
+assert(!deckTop.hit&&deckTop.z===-35,'Skater at deck height may enter normally');
+console.log('PASS: elevated halfpipe deck rear-wall collision and valid top entry');
