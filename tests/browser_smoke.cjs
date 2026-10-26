@@ -126,16 +126,19 @@ const server=http.createServer((req,res)=>{
   await page.screenshot({path:'test-artifacts/halfpipe-chromium.png',animations:'disabled'});
   assert(fs.statSync('test-artifacts/halfpipe-chromium.png').size>10000,'Halfpipe screenshot unexpectedly blank');
   // The player's actual GRIND touch button must catch bowl coping without ollie.
-  await page.evaluate(()=>{
-   const s=window.__SOL_DIAGNOSTICS__.state;
-   Object.assign(s,{x:15.10,z:-106,y:.09,groundY:0,dir:Math.PI/2,speed:6,travelSign:1,
-    grounded:true,grinding:false,vy:0,grindCooldown:0,grindRequestType:null});
-  });
-  await page.evaluate(()=>{document.querySelector('#buttons').style.display='';});
-  await page.locator('[data-t="grind"]').click();
+  // Set a physically valid position on the steep bowl wall (not 1.3m
+  // above the concrete) and press the real button in the SAME browser frame.
+  // A Playwright click can wait for layout stability while the moving skater
+  // travels beyond the lip, making a correct grind falsely fail QA.
   const touchCoping=await page.evaluate(()=>{
    const s=window.__SOL_DIAGNOSTICS__.state;
-   return {grinding:s.grinding,kind:s.grindRail?.kind,vy:s.vy,y:s.y};
+   const wallY=window.SOLBowl.height(15.10,-106);
+   Object.assign(s,{x:15.10,z:-106,y:wallY,groundY:wallY,dir:Math.PI/2,speed:6,travelSign:1,
+    grounded:true,grinding:false,vy:0,grindCooldown:0,grindRequestType:null});
+   document.querySelector('#buttons').style.display='';
+   document.querySelector('[data-t="grind"]').dispatchEvent(
+    new PointerEvent('pointerdown',{bubbles:true,pointerId:31,pointerType:'touch'}));
+   return {grinding:s.grinding,kind:s.grindRail?.kind,vy:s.vy,y:s.y,wallY};
   });
   assert(touchCoping.grinding&&touchCoping.kind==='bowl-coping'&&touchCoping.vy===0,
    'GRIND touch control must catch bowl coping without forcing ollie: '+JSON.stringify(touchCoping));
