@@ -35,7 +35,8 @@ jobs:
         run: |
           mkdir -p qa
           printf '%s\n' "$GITHUB_SHA" > qa/tested-commit.txt
-          rm -f qa/halfpipe-chromium.png qa/halfpipe-mobile.png
+          # Preserve last successful screenshots if a new smoke fails early.
+          # qa/tested-commit.txt + browser-result.txt identify current status.
           for name in halfpipe-chromium.png halfpipe-mobile.png; do
             if test -f "test-artifacts/$name"; then cp "test-artifacts/$name" "qa/$name"; fi
           done
