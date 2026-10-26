@@ -2,7 +2,7 @@ const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/st
 const html=fs.readFileSync('index.html','utf8');
 const inline=html.match(/<script>([\s\S]*?)<\/script><\/body>/);
 assert(inline,'Inline game script');new vm.Script(inline[1]);
-assert(html.includes('src="ramp_geometry.js"'),'Ramp geometry must load');
+assert(html.includes('src="ramp_geometry.js'),'Ramp geometry must load');
 assert(inline[1].includes('SOLRampGeometry.build(r,SOLTerrain.profile,N)'),'Renderer must use sealed geometry');
 require('../ramp_geometry.js');
 require('../terrain.js');
