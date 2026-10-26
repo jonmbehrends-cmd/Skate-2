@@ -44,3 +44,17 @@ assert(html.includes('rampSurface.backFaceCulling=false'),'Ramp must be visible 
 assert(html.includes('MATERIAL_OPAQUE'),'Ramp must use opaque material rendering mode');
 
 assert(html.includes("solid ramp concrete infill"),'Ramps must have opaque concrete beneath riding skin');
+
+assert(html.includes('SOLRampGeometry.sideWall'),'Renderer must show closed concrete cheeks');
+assert(html.includes('Mesh.MergeMeshes(infill'),'Ramp infill should merge into one mesh for mobile rendering');
+for(const side of [-1,1]){
+ const r={x:46,z:-52,w:16,d:4.8,h:2.1,curve:'halfpipe-left'};
+ const wall=globalThis.SOLRampGeometry.sideWall(r,profile,side,40);
+ assert.equal(wall.indices.length,240,'Forty solid cheek quads');
+ for(let i=0;i<wall.indices.length;i+=3){
+  const [a,b,c]=wall.indices.slice(i,i+3).map(n=>wall.positions.slice(n*3,n*3+3));
+  const nx=(b[1]-a[1])*(c[2]-a[2])-(b[2]-a[2])*(c[1]-a[1]);
+  assert(nx*side>0,'Cheek surface normals must face outwards');
+ }
+}
+console.log('PASS: opaque exterior cheeks with outward normals and merged infill');
