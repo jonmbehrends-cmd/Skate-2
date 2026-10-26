@@ -1,0 +1,28 @@
+FAIL: locator.click: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator('#halfpipe')
+    - locator resolved to <button id="halfpipe" aria-label="Go to halfpipe">HALFPIPE</button>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <button id="restart" aria-label="Restart run">RESTART</button> intercepts pointer events
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <button id="restart" aria-label="Restart run">RESTART</button> intercepts pointer events
+    - retrying click action
+      - waiting 100ms
+    42 × waiting for element to be visible, enabled and stable
+       - element is visible, enabled and stable
+       - scrolling into view if needed
+       - done scrolling
+       - <button id="restart" aria-label="Restart run">RESTART</button> intercepts pointer events
+     - retrying click action
+       - waiting 500ms
+
+    at /home/runner/work/Skate-2/Skate-2/tests/browser_smoke.cjs:68:35
