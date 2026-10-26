@@ -35,7 +35,7 @@
     const b = pad.buttons;
     const pressed = i => read(b, i);
     // Xbox Standard mapping: A ollie, X kickflip, B heelflip, Y shove-it, RB grab.
-    for (const [i, action] of [[0, 'ollie'], [2, 'kick'], [1, 'heel'], [3, 'shove'], [5, 'grab'], [4, 'grind']]) {
+    for (const [i, action] of [[0, 'ollie'], [2, 'kick'], [1, 'heel'], [3, 'shove'], [5, 'grab'], [4, 'grind'], [11, 'boardslide']]) {
       if (pressed(i) && !lastButtons[i]) onTrick(action);
     }
     lastButtons = b.map(v => !!v.pressed);
@@ -56,7 +56,7 @@
     if (!y) y = (pressed(13) ? 1 : 0) - (pressed(12) ? 1 : 0);
     return {
       x, y, boost: pressed(7), grabHeld: pressed(5), connected: true,
-      status: '🎮 ' + (/xbox/i.test(pad.id || '') ? 'Xbox connected' : 'Controller connected') + ' · LS steer · RT push · LB grind · RB grab · RS flick'
+      status: '🎮 ' + (/xbox/i.test(pad.id || '') ? 'Xbox connected' : 'Controller connected') + ' · LS steer · RT push · LB grind · R3 boardslide · RB grab · RS flick'
     };
   }
   root.SOLPad = { poll, reset, deadzone };
