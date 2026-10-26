@@ -19,11 +19,20 @@ function step(state,steer,throttle,boost,dt){
     state.speed=speed;
   }else if(state.grounded){
     clearAir(state);
-    const thrust=(-pedal*8)+(boost?9:0);
+    // RT delivers impulse only during the planted-foot half of each push.
+    // Phase advances in simulation time, so physics and animation stay synchronized.
+    state.pushPhase=Number.isFinite(state.pushPhase)?state.pushPhase:0;
+    const pushing=!!boost&&speed<13;
+    const wasContact=Math.sin(state.pushPhase)>0;
+    if(pushing)state.pushPhase=(state.pushPhase+h*6.5)%(Math.PI*2);
+    else state.pushPhase=0;
+    const contact=pushing?Math.max(0,Math.sin(state.pushPhase)):0;
+    const thrust=(-pedal*8)+(pushing?18*contact:0);
     const rollingDrag=.16*speed;
     const carveDrag=.22*Math.abs(turn)*speed*Math.min(1,speed/12);
     state.speed=clamp(speed+(thrust-rollingDrag-carveDrag)*h,0,17);
   }else{
+    state.pushPhase=0;
     // RT and joystick cannot create forward momentum while airborne.
     if(Number.isFinite(state.airVX)&&Number.isFinite(state.airVZ)){
       const damping=Math.exp(-.018*h);
