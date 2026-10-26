@@ -44,6 +44,7 @@ function attach(state,contact){
  // Boardslides rotate the actual rider/board across the rail, not the
  // movement heading. Store the approach side so the stance stays consistent.
  state.grindSide=state[cross]>=rail[cross]?1:-1;
+ state.grindEntryY=rail.kind==='bowl-coping'?state.y:null;
  state.y=contact.top;state.vy=0;if(rail.kind==='bowl-coping'){const a=Math.atan2(state.z-rail.z,state.x-rail.x);state.grindAngle=a;state.x=rail.x+rail.radius*Math.cos(a);state.z=rail.z+rail.radius*Math.sin(a);state.dir=a+(contact.direction>0?Math.PI/2:-Math.PI/2);}else state[cross]=rail[cross];
  if(rail.kind!=='bowl-coping')state.dir=axis==='z'?(contact.direction>0?0:Math.PI):(contact.direction>0?Math.PI/2:-Math.PI/2);
  state.travelSign=1;state.speed*=.97;state.grindRequestType=null;return true;
@@ -52,10 +53,15 @@ function advance(state,dt){
  if(!state.grinding||!state.grindRail)return false;
  const rail=state.grindRail,axis=rail.axis==='x'?'x':'z',cross=axis==='z'?'x':'z';
  const h=Math.max(0,Math.min(.04,Number.isFinite(dt)?dt:0));
- state.grindTime+=h;if(rail.kind==='bowl-coping'){const direction=state.grindDirection||1;state.grindAngle+=direction*state.speed*h/rail.radius;state.x=rail.x+rail.radius*Math.cos(state.grindAngle);state.z=rail.z+rail.radius*Math.sin(state.grindAngle);state.dir=state.grindAngle+(direction>0?Math.PI/2:-Math.PI/2);}else state[cross]=rail[cross];state.y=Number.isFinite(rail.y)?rail.y:1.1;
+ state.grindTime+=h;if(rail.kind==='bowl-coping'){const direction=state.grindDirection||1;state.grindAngle+=direction*state.speed*h/rail.radius;state.x=rail.x+rail.radius*Math.cos(state.grindAngle);state.z=rail.z+rail.radius*Math.sin(state.grindAngle);state.dir=state.grindAngle+(direction>0?Math.PI/2:-Math.PI/2);}else state[cross]=rail[cross];const top=Number.isFinite(rail.y)?rail.y:1.1;
+ // Follow the coping while easing the board up from a steep wall. Instant
+ // vertical snapping at entry looked like teleporting through concrete.
+ const entry=Number.isFinite(state.grindEntryY)?state.grindEntryY:top;
+ const blend=rail.kind==='bowl-coping'?Math.max(0,1-state.grindTime/.22):0;
+ state.y=top+(entry-top)*blend;
  state.vy=0;state.speed=Math.max(0,state.speed-(rail.kind==='bowl-coping'?.75:1.35)*h);state.combo+=(state.grindType==='boardslide'?170:110)*h;
  const ended=(rail.kind!=='bowl-coping'&&Math.abs(state[axis]-rail[axis])>=rail.len/2-.12)||state.speed<1.5||state.grindTime>(rail.kind==='bowl-coping'?12:4);
- if(ended){state.grinding=false;state.grindRail=null;state.grindType=null;state.grindSide=null;state.grounded=false;state.grindCooldown=.5;state.rampCooldown=Math.max(state.rampCooldown||0,.4);state.y+=.01;state.vy=0}
+ if(ended){state.grinding=false;state.grindRail=null;state.grindType=null;state.grindSide=null;state.grindEntryY=null;state.grounded=false;state.grindCooldown=.5;state.rampCooldown=Math.max(state.rampCooldown||0,.4);state.y+=.01;state.vy=0}
  return ended;
 }
 function visualYaw(state){return state.grinding&&state.grindType==='boardslide'?(state.grindSide===-1?-1:1)*Math.PI/2:0;}
