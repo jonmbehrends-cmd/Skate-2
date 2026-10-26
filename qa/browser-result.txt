@@ -1,46 +1,5 @@
-{
-  "result": "PASS",
-  "status": {
-    "rampCheeks": 12,
-    "cores": 6,
-    "skinCount": 6,
-    "skinMaterial": {
-      "alpha": 1,
-      "blend": false,
-      "textureAlpha": false,
-      "transparency": 0,
-      "culled": false
-    },
-    "topPick": {
-      "hit": true,
-      "y": 2.3026619710825873
-    },
-    "opaqueCheeks": true,
-    "opaqueCores": true,
-    "connection": 1,
-    "bottom": [
-      -36,
-      -18.1
-    ],
-    "skater": true,
-    "rendered": true,
-    "canvasWidth": 390,
-    "independentCamera": true
-  },
-  "spin": {
-    "yaw": 6.214263633113597,
-    "skaterYaw": 6.214263633113597,
-    "cameraYaw": 0,
-    "grounded": false
-  },
-  "push": {
-    "speed": 4.582597205514468,
-    "phase": 2.2581000000001517
-  },
-  "riding": {
-    "x": -36.00017541278014,
-    "z": -23.18786540783928,
-    "y": 0.1257246401663803,
-    "speed": 5.9641085402545215
-  }
-}
+FAIL: AssertionError [ERR_ASSERTION]: Six ramps need two visible concrete sidewalls each
+
+26 !== 12
+
+    at /home/runner/work/Skate-2/Skate-2/tests/browser_smoke.cjs:39:10
