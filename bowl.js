@@ -15,22 +15,41 @@ function sample(x,z){const dx=x-bowl.x,dz=z-bowl.z,d=Math.hypot(dx,dz);if(d>=bow
 function roll(state,dt){const dx=state.x-bowl.x,dz=state.z-bowl.z,d=Math.hypot(dx,dz);if(d>=bowl.radius||d<.001)return;const gradient=Math.min(7,(height(bowl.x+Math.min(bowl.radius-.03,d+.06),bowl.z)-height(bowl.x+Math.max(0,d-.06),bowl.z))/.12);const dir=(Math.sin(state.dir)*dx+Math.cos(state.dir)*dz)/d;const sign=state.travelSign===-1?-1:1;const v=sign*state.speed-9.81*gradient*dir*Math.min(.05,dt);state.travelSign=v<0?-1:1;state.speed=Math.min(17,Math.abs(v))}
 function vertLaunch(state,previous,contact){
  const dx=state.x-bowl.x,dz=state.z-bowl.z,d=Math.hypot(dx,dz);
- if(!previous.bowl||d<bowl.radius*.94||d>bowl.radius+1.2||state.speed<5.5)return false;
  const outward=(Math.sin(state.dir)*dx+Math.cos(state.dir)*dz)/Math.max(.01,d)*(state.travelSign===-1?-1:1);
- if(outward<.38)return false;
+ if(!previous.bowl||d<bowl.radius*.89||d>bowl.radius+1.25||state.speed<5||outward<.2||state.rampCooldown>0)return false;
  const speed=state.speed;
+ const nx=dx/Math.max(.01,d),nz=dz/Math.max(.01,d);
  state.grounded=false;
- state.y=Math.max(state.y,previous.height)+.12;
- state.vy=Math.min(14,6+speed*.36);
- state.airTime=0;
- state.rampCooldown=.55;
- state.name='VERT BOWL AIR';
- state.combo=(state.combo||0)+200;
- state.count=(state.count||0)+1;
- // Reduce horizontal drift so the skater returns into the transition.
- state.speed=Math.max(2.5,speed*.38);
- state.bowlAir=true;
+ state.x=bowl.x+nx*(bowl.radius-.75);
+ state.z=bowl.z+nz*(bowl.radius-.75);
+ state.y=Math.max(state.y,height(state.x,state.z))+.12;
+ state.vy=Math.min(15,8.5+speed*.32);
+ state.airTime=0;state.rampCooldown=.7;
+ state.name='VERT BOWL AIR';state.combo=(state.combo||0)+200;state.count=(state.count||0)+1;
+ // Hold the launch at the lip and then carry the rider inward over the transition.
+ state.speed=Math.min(3,Math.max(1.5,speed*.16));
+ state.bowlAir={nx,nz,elapsed:0,phase:'rise'};
  return true;
+}
+function guideAir(state,dt){
+ const air=state.bowlAir;
+ if(!air||state.grounded||state.grinding)return;
+ air.elapsed+=dt;
+ const d=Math.hypot(state.x-bowl.x,state.z-bowl.z);
+ // Aerial momentum turns inward at the apex instead of continuing over the deck.
+ if(state.vy<2||air.elapsed>.48)air.phase='return';
+ if(air.phase==='return'){
+  const target=bowl.radius-Math.min(5.2,1.1+Math.max(0,-state.vy)*.2);
+  const next=d+(target-d)*Math.min(1,dt*3.5);
+  state.x=bowl.x+air.nx*Math.max(bowl.radius*.35,next);
+  state.z=bowl.z+air.nz*Math.max(bowl.radius*.35,next);
+  state.speed=Math.min(state.speed,2.4);
+ }else{
+  const next=Math.min(d,bowl.radius-.45);
+  state.x=bowl.x+air.nx*next;
+  state.z=bowl.z+air.nz*next;
+ }
+ if(state.grounded||air.elapsed>3)state.bowlAir=null;
 }
 function mesh(B,scene,concrete,metal){const N=128,R=72,positions=[],indices=[],uvs=[];for(let j=0;j<=R;j++){const u=j/R;const rad=bowl.radius*(1-Math.pow(1-u,2.1));for(let i=0;i<=N;i++){const a=i*2*Math.PI/N,x=bowl.x+rad*Math.cos(a),z=bowl.z+rad*Math.sin(a);positions.push(x,height(x,z)+.015,z);uvs.push(x/4,z/4)}}for(let j=0;j<R;j++)for(let i=0;i<N;i++){const a=j*(N+1)+i,b=a+N+1;indices.push(a,a+1,b,b,a+1,b+1)}const m=new B.Mesh('100 foot wide 25 foot deep sculpted concrete bowl',scene),v=new B.VertexData();v.positions=positions;v.indices=indices;v.uvs=uvs;v.normals=[];B.VertexData.ComputeNormals(positions,indices,v.normals);v.applyToMesh(m);const bowlConcrete=new B.StandardMaterial('warm pale skate bowl concrete',scene);
 bowlConcrete.diffuseColor=new B.Color3(.58,.63,.63);
@@ -99,5 +118,5 @@ const artMesh=new B.Mesh('curved bowl graffiti and sticker decals',scene);
 const artData=new B.VertexData();artData.positions=artPositions;artData.indices=artIndices;artData.uvs=artUvs;artData.normals=[];
 B.VertexData.ComputeNormals(artPositions,artIndices,artData.normals);artData.applyToMesh(artMesh);artMesh.material=artMat;
 const coping=B.MeshBuilder.CreateTube('bowl continuous steel coping',{path,radius:.09,tessellation:10},scene);coping.material=metal;return m}
-root.SOLBowl={bowl,height,sample,roll,vertLaunch,mesh};
+root.SOLBowl={bowl,height,sample,roll,vertLaunch,guideAir,mesh};
 })(typeof window!=='undefined'?window:globalThis);
