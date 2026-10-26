@@ -50,6 +50,14 @@ const server=http.createServer((req,res)=>{
   assert.deepEqual(status.bottom,[-36,-18.1],'Halfpipe must be at current plaza coordinates');
   assert(status.skater&&status.rendered&&status.canvasWidth>0,'WebGL scene must render');
   assert(status.independentCamera,'Camera must not rotate with rider during airborne spins');
+  fs.mkdirSync('test-artifacts',{recursive:true});
+  await page.setViewportSize({width:960,height:640});
+  await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__,B=BABYLON;window.__visualCamera=new B.ArcRotateCamera('rider detail QA',.6,1.35,4.1,new B.Vector3(0,1.2,0),d.scene);d.scene.activeCamera=window.__visualCamera});
+  await page.waitForTimeout(700);await page.screenshot({path:'test-artifacts/rider-detail.png'});
+  await page.evaluate(()=>{const c=window.__visualCamera;c.setTarget(new BABYLON.Vector3(0,-1,-76));c.alpha=-.9;c.beta=.75;c.radius=95});
+  await page.waitForTimeout(700);await page.screenshot({path:'test-artifacts/park-overview.png'});
+  await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__;d.scene.activeCamera=d.camera;window.__visualCamera.dispose()});
+  await page.setViewportSize({width:390,height:844});
   // Exercise the actual mobile joystick: the board and skater must visibly yaw,
   // while the camera's orientation remains fixed during an aerial spin.
   await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
