@@ -4,17 +4,19 @@
 (function(root){'use strict';
 const GRAVITY=19;
 function find(state,rails,dt,stable,assist=false){
- if(!stable||state.grinding||state.speed<1.3||state.grindCooldown>0||(!assist&&state.grounded)||state.vy>0)return null;
+ if(!stable||state.grinding||state.speed<1.3||state.grindCooldown>0||(!assist&&state.grounded)||state.vy>0&&!assist)return null;
  const h=Math.max(0,Math.min(.04,Number.isFinite(dt)?dt:0));
  const nextY=state.y+(state.vy-GRAVITY*h)*h;
  let best=null,bestDist=Infinity;
  for(const rail of rails){
   if(rail.kind==='bowl-coping'){
    const dx=state.x-rail.x,dz=state.z-rail.z,r=Math.hypot(dx,dz),radialError=Math.abs(r-rail.radius);
-   if(radialError>(assist?1.4:.42)||state.y<rail.y-(assist?.8:.3)||nextY>rail.y+(assist?1.8:.65)||r<.01)continue;
+   if(radialError>(assist?2.0:.42)||state.y<rail.y-(assist?1.1:.3)||nextY>rail.y+(assist?2.5:.65)||r<.01)continue;
    const tangentX=-dz/r,tangentZ=dx/r,travel=state.travelSign===-1?-1:1;
    const tangentHeading=(Math.sin(state.dir)*tangentX+Math.cos(state.dir)*tangentZ)*travel;
-   if(Math.abs(tangentHeading)<(assist?.08:.25))continue;
+   // The rider often approaches the lip radially; allow an assisted
+   // stall/grind entry and choose a consistent tangent direction.
+   if(Math.abs(tangentHeading)<(assist?0:.25))continue;
    const distance=radialError+Math.abs(state.y-rail.y)*.3;
    if(distance<bestDist){best={rail,top:rail.y,direction:tangentHeading>=0?1:-1};bestDist=distance}
    continue;
