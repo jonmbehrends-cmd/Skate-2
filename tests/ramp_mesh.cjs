@@ -1,0 +1,12 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const html=fs.readFileSync('index.html','utf8');
+const inline=html.match(/<script>([\s\S]*?)<\/script><\/body>/);
+assert(inline,'Inline game script');new vm.Script(inline[1]);
+const mesh=inline[1].slice(inline[1].indexOf('function rampMesh(r)'),inline[1].indexOf('for(const r of ramps)rampMesh(r)'));
+assert(mesh.includes("solid skatable concrete ramp"),'Solid ramp mesh expected');
+assert(mesh.includes('rampMat.backFaceCulling=false'),'Ramp must be visible from both sides');
+assert(mesh.includes('quad([l,floor,za]'),'Left and bottom faces must close volume');
+assert(mesh.includes('quad([rr,ya,za]'),'Right side must close volume');
+assert(mesh.includes('profile(1)+.012'),'Rear vertical wall must be present');
+assert(mesh.includes('VertexData.ComputeNormals'),'Normals must be regenerated');
+console.log('PASS: sealed ramp mesh, visible faces, side walls, rear face, normals and inline syntax');
