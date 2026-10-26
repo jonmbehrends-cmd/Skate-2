@@ -172,6 +172,11 @@ const server=http.createServer((req,res)=>{
   await page.waitForFunction(()=>{const d=window.__SOL_DIAGNOSTICS__;
    return d.state.grinding&&Math.abs(d.skater.rotation.y-d.state.dir)>.9;
   },null,{timeout:8000});
+  // Rotation is visible on the attachment frame; translation needs at
+  // least one subsequent physics frame, especially under software WebGL.
+  await page.waitForFunction(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
+   return s.grinding&&s.z>19.25;
+  },null,{timeout:10000});
   const boardslide=await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__,s=d.state;
    return {type:s.grindType,grinding:s.grinding,yaw:d.skater.rotation.y-s.dir,
     x:s.x,z:s.z,speed:s.speed,score:s.combo,rail:s.grindRail?.kind};
