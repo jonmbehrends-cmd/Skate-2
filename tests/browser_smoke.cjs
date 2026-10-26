@@ -51,6 +51,14 @@ const server=http.createServer((req,res)=>{
   assert(status.skater&&status.rendered&&status.canvasWidth>0,'WebGL scene must render');
   assert(status.independentCamera,'Camera must not rotate with rider during airborne spins');
   assert(status.staticBatches?.merged>80&&status.staticBatches?.groups>=8,'Static park art must be batched to avoid hundreds of unnecessary mobile draw calls: '+JSON.stringify(status.staticBatches));
+  fs.mkdirSync('test-artifacts',{recursive:true});
+  await page.setViewportSize({width:960,height:640});
+  await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__,B=BABYLON;window.__visualCamera=new B.ArcRotateCamera('rider detail QA',.6,1.35,4.1,new B.Vector3(0,1.2,0),d.scene);d.scene.activeCamera=window.__visualCamera});
+  await page.waitForTimeout(700);await page.screenshot({path:'test-artifacts/rider-detail.png'});
+  await page.evaluate(()=>{const c=window.__visualCamera;c.setTarget(new BABYLON.Vector3(0,-1,-76));c.alpha=-.9;c.beta=.75;c.radius=95});
+  await page.waitForTimeout(700);await page.screenshot({path:'test-artifacts/park-overview.png'});
+  await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__;d.scene.activeCamera=d.camera;window.__visualCamera.dispose()});
+  await page.setViewportSize({width:390,height:844});
   // Exercise the actual mobile joystick: the board and skater must visibly yaw,
   // while the camera's orientation remains fixed during an aerial spin.
   await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
@@ -58,7 +66,7 @@ const server=http.createServer((req,res)=>{
   const stick=await page.locator('#stick').boundingBox();
   assert(stick,'Mobile joystick must be visible');
   await page.mouse.move(stick.x+stick.width*.83,stick.y+stick.height*.5);
-  await page.mouse.down();await page.waitForTimeout(700);await page.mouse.up();
+  await page.mouse.down();await page.waitForFunction(()=>window.__SOL_DIAGNOSTICS__.state.dir>1.5,null,{timeout:8000});await page.mouse.up();
   const spin=await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__;return {yaw:d.state.dir,skaterYaw:d.skater.rotation.y,cameraYaw:d.cameraAnchor.rotation.y,grounded:d.state.grounded}});
   assert(!spin.grounded&&spin.yaw>1.5,'Touch joystick must rotate airborne skater: '+JSON.stringify(spin));
   assert(Math.abs(spin.skaterYaw-spin.yaw)<.2,'Rendered skater must follow airborne yaw');
