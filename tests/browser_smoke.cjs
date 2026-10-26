@@ -24,7 +24,11 @@ const server=http.createServer((req,res)=>{
    const cheeks=meshes.filter(m=>m.name==='SOLID RAMP SIDE WALL');
    const cores=meshes.filter(m=>m.name==='SOLID RAMP CONCRETE CORE');
    const bottom=meshes.find(m=>m.name==='HALFPIPE FLAT BOTTOM');
-   return {rampCheeks:cheeks.length,cores:cores.length,
+   const skins=meshes.filter(m=>m.name==='solid skatable concrete ramp');
+   const skinMaterial=skins[0]?.material;
+   const topRay=new window.BABYLON.Ray(new window.BABYLON.Vector3(-36,12,-28),new window.BABYLON.Vector3(0,-1,0),20);
+   const topPick=d.scene.pickWithRay(topRay,m=>m.name==='solid skatable concrete ramp');
+   return {rampCheeks:cheeks.length,cores:cores.length,skinCount:skins.length,skinMaterial:{alpha:skinMaterial?.alpha,blend:skinMaterial?.needAlphaBlending(),textureAlpha:skinMaterial?.diffuseTexture?.hasAlpha,transparency:skinMaterial?.transparencyMode,culled:skinMaterial?.backFaceCulling},topPick:{hit:topPick?.hit,y:topPick?.pickedPoint?.y},
     opaqueCheeks:cheeks.every(m=>m.material&&m.material.alpha===1&&m.material.backFaceCulling===false&&m.getTotalIndices()>0),
     opaqueCores:cores.every(m=>m.material&&m.material.alpha===1),
     connection:meshes.filter(m=>m.name==='HALFPIPE PARK CONNECTION').length,
