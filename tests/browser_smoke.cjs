@@ -114,11 +114,28 @@ const server=http.createServer((req,res)=>{
   await page.waitForTimeout(500);
   await page.screenshot({path:'test-artifacts/halfpipe-chromium.png',animations:'disabled'});
   assert(fs.statSync('test-artifacts/halfpipe-chromium.png').size>10000,'Halfpipe screenshot unexpectedly blank');
+  // Validate circular bowl coping capture and actual curved movement, not only rendering.
+  const coping=await page.evaluate(()=>{
+   const s=window.__SOL_DIAGNOSTICS__.state;
+   const rail={x:0,z:-106,radius:15.24,y:.09,kind:'bowl-coping'};
+   Object.assign(s,{x:15.10,z:-106,y:.09,dir:Math.PI/2,speed:6,travelSign:1,
+    grounded:true,grinding:false,vy:0,grindCooldown:0,grindRequestType:'50-50'});
+   const c=window.SOLGrind.find(s,[rail],.016,true,true);
+   if(!c)return {found:false};
+   window.SOLGrind.attach(s,c);
+   const start={x:s.x,z:s.z};
+   for(let i=0;i<60;i++)window.SOLGrind.advance(s,1/60);
+   return {found:true,kind:s.grindRail?.kind,grinding:s.grinding,delta:Math.hypot(s.x-start.x,s.z-start.z),
+    radius:Math.hypot(s.x-rail.x,s.z-rail.z),speed:s.speed};
+  });
+  assert(coping.found&&coping.grinding&&coping.kind==='bowl-coping'&&coping.delta>2&&Math.abs(coping.radius-15.24)<.03,
+   'Bowl coping must attach and travel around its circular rail: '+JSON.stringify(coping));
+  await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;s.grinding=false;s.grindRail=null;s.grindCooldown=0});
   // Boardslide is a real touch-triggered rail state with a 90-degree rendered
   // board stance, while physical travel continues lengthwise along the rail.
   await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__,s=d.state,B=window.BABYLON;
    Object.assign(s,{x:.1,z:19,y:1.24,groundY:0,dir:0,speed:5,travelSign:1,grounded:false,
-    grinding:false,vy:-3,grindCooldown:0,grindVisualYaw:0,airVX:null,airVZ:null});
+    grinding:false,vy:-3,grindCooldown:0,grindRequestType:'boardslide',grindVisualYaw:0,airVX:null,airVZ:null});
    const rail={x:0,z:19,len:14,y:1.1,axis:'z',kind:'rail'};
    const contact=window.SOLGrind.find(s,[rail],.025,true,true);
    if(!contact||!window.SOLGrind.attach(s,contact))throw Error('Boardslide did not attach to rail');
@@ -205,6 +222,6 @@ const server=http.createServer((req,res)=>{
   assert(fs.statSync('test-artifacts/park-chromium.png').size>14000,'Park overview screenshot unexpectedly blank');
 
   assert.equal(errors.length,0,'Browser errors: '+errors.join('; '));
-  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',status,spin,push,riding,boardInput,boardslide,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
+  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',status,spin,push,riding,boardInput,boardslide,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
  }finally{await browser.close()}
 })().catch(e=>{fs.mkdirSync('test-artifacts',{recursive:true});fs.writeFileSync('test-artifacts/browser-result.txt','FAIL: '+(e&&e.stack||String(e)));console.error(e);process.exitCode=1}).finally(()=>server.close());
