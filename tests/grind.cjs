@@ -66,4 +66,7 @@ for(let i=0;i<60;i++)advance(bowlState,1/60);
 assert(bowlState.grinding,'Circular coping should remain engaged for at least one second');
 assert(Math.hypot(bowlState.x-bx,bowlState.z-bz)>3,'Skater must travel around the coping');
 assert(Math.abs(Math.hypot(bowlState.x,bowlState.z+106)-bowlRail.radius)<.01,'Coping grind must follow the exact bowl radius');
+for(let i=0;i<420;i++)advance(bowlState,1/60);
+assert(bowlState.grinding&&bowlState.grindTime>7.9,
+ 'Bowl coping should support extended carving grinds rather than ending at straight-rail four-second limit');
 console.log('PASS: rail contact height, direction, speed, cooldown, board stability, traversal, and exit');
