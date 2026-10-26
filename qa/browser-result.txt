@@ -1,2 +1,2 @@
-FAIL: AssertionError [ERR_ASSERTION]: Touch boardslide must request a real ollie-assisted rail catch: {"type":"boardslide","airborne":false,"vy":0,"y":0}
-    at /home/runner/work/Skate-2/Skate-2/tests/browser_smoke.cjs:89:3
+FAIL: page.waitForFunction: Timeout 8000ms exceeded.
+    at /home/runner/work/Skate-2/Skate-2/tests/browser_smoke.cjs:127:14
