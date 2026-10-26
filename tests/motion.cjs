@@ -82,5 +82,6 @@ assert(motion.landingAlignment(fakie)>.99,'180 landing should align while rollin
 assert.equal(motion.landingTravelSign(fakie),1,'180 landing changes rolling stance to forward');
 const backwards=s({speed:4,travelSign:-1});
 assert(motion.horizontal(backwards,.05).dz<0,'Grounded fakie must move backwards without snapping heading');
-step(backwards,1,0,false,.025);assert(backwards.dir<0,'Fakie steering should reverse carve direction');
-console.log('PASS: backward rolling, switch landings and reversed fakie steering');
+step(backwards,1,0,false,.025);assert(backwards.dir>0,'Fakie stick yaw stays camera-consistent');
+assert(motion.horizontal(backwards,.05).dx<0,'Fakie travel curves relative to the reversed chase camera');
+console.log('PASS: backward rolling, switch landings and camera-consistent fakie steering');
