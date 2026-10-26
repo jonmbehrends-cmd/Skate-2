@@ -19,7 +19,7 @@ const server=http.createServer((req,res)=>{
   const page=await browser.newPage({viewport:{width:390,height:844},deviceScaleFactor:1,hasTouch:true,isMobile:true});
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto('http://127.0.0.1:'+server.address().port+'/',{waitUntil:'domcontentloaded',timeout:30000});
-  await page.waitForFunction(()=>!!window.__SOL_DIAGNOSTICS__,{timeout:60000});
+  await page.waitForFunction(()=>!!window.__SOL_DIAGNOSTICS__,null,{timeout:60000});
   await page.waitForTimeout(1400);
   const status=await page.evaluate(()=>{
    const d=window.__SOL_DIAGNOSTICS__,meshes=d.scene.meshes;
