@@ -2,6 +2,11 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),http=require('node:http'),path=require('node:path');
 const {chromium}=require('playwright');
+const vm=require('node:vm');
+// Catch malformed inline game JavaScript before opening a browser.
+for(const match of fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8').matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)){
+ if(match[1].trim())new vm.Script(match[1],{filename:'index.html:inline'});
+}
 const root=path.resolve(__dirname,'..');
 const types={'.html':'text/html; charset=utf-8','.js':'application/javascript; charset=utf-8','.css':'text/css; charset=utf-8'};
 const server=http.createServer((req,res)=>{
@@ -16,8 +21,14 @@ const server=http.createServer((req,res)=>{
  try{
   const page=await browser.newPage({viewport:{width:390,height:844},deviceScaleFactor:1,hasTouch:true,isMobile:true});
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  // The live game uses a Babylon CDN, but CI must not fail just because
+  // that remote CDN is unreachable from a GitHub runner. Serve the exact
+  // installed Babylon UMD bundle locally during browser verification.
+  const babylonBundle=require.resolve('babylonjs');
+  await page.route('https://cdn.babylonjs.com/babylon.js',route=>route.fulfill({path:babylonBundle,contentType:'application/javascript'}));
   await page.goto('http://127.0.0.1:'+server.address().port+'/',{waitUntil:'domcontentloaded',timeout:30000});
-  await page.waitForFunction(()=>!!window.__SOL_DIAGNOSTICS__,null,{timeout:60000});
+  try{await page.waitForFunction(()=>!!window.__SOL_DIAGNOSTICS__,null,{timeout:30000});}
+  catch(e){const startup=await page.evaluate(()=>({error:document.querySelector('#error')?.textContent,babylon:!!window.BABYLON,grind:!!window.SOLGrind,html:document.readyState}));throw Error('Game startup failed: '+JSON.stringify({startup,errors,cause:String(e)}));}
   await page.waitForTimeout(1200);
   const status=await page.evaluate(()=>{
    const d=window.__SOL_DIAGNOSTICS__,meshes=d.scene.meshes;
