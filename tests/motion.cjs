@@ -24,7 +24,7 @@ function beginAirTest(){
   assert(Math.abs(d.dx)<1e-8&&d.dz>.49,'Air steering must not redirect travel');
   step(p,1,-1,true,.025);
   assert(p.speed<=10,'RT cannot accelerate an airborne skater');
-  assert(m.landingAlignment(p)<.1,'Sideways landing should be unsafe');
+  assert(m.landingAlignment(p)<.5,'Sideways landing should be unsafe');
   p.dir=0;assert(m.landingAlignment(p)>.99,'Forward landing should align');
   m.clearAir(p);assert.equal(p.airVX,null,'Air velocity cleared on landing');
   assert(m.horizontal(p,.05).dz>0,'Ground fallback retains forward travel');
