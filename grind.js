@@ -10,13 +10,13 @@ function find(state,rails,dt,stable,assist=false){
  let best=null,bestDist=Infinity;
  for(const rail of rails){
   const top=Number.isFinite(rail.y)?rail.y:1.1;
-  if(state.y<top-(assist?.55:.28)||nextY>top+(assist?1.15:.65))continue;
+  if(state.y<top-(assist?.8:.28)||nextY>top+(assist?1.8:.65))continue;
   const axis=rail.axis==='x'?'x':'z',cross=axis==='z'?'x':'z';
   const crossDist=Math.abs(state[cross]-rail[cross]);
   const alongDist=Math.abs(state[axis]-rail[axis]);
-  if(crossDist>(assist?1.35:1.05)||alongDist>rail.len/2+.1)continue;
+  if(crossDist>(assist?1.7:1.05)||alongDist>rail.len/2+.35)continue;
   const heading=axis==='z'?Math.cos(state.dir):Math.sin(state.dir);
-  if(Math.abs(heading)<(assist?.12:.3))continue;
+  if(Math.abs(heading)<(assist?.05:.3))continue;
   const distance=crossDist+Math.abs(state.y-top)*.3;
   if(distance<bestDist){best={rail,top,direction:heading*(state.travelSign===-1?-1:1)>=0?1:-1};bestDist=distance}
  }
