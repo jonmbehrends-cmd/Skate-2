@@ -3,6 +3,18 @@
   "status": {
     "rampCheeks": 12,
     "cores": 6,
+    "skinCount": 6,
+    "skinMaterial": {
+      "alpha": 1,
+      "blend": false,
+      "textureAlpha": false,
+      "transparency": 0,
+      "culled": false
+    },
+    "topPick": {
+      "hit": true,
+      "y": 2.3026619710825873
+    },
     "opaqueCheeks": true,
     "opaqueCores": true,
     "connection": 1,
@@ -16,19 +28,19 @@
     "independentCamera": true
   },
   "spin": {
-    "yaw": 5.499884277631032,
-    "skaterYaw": 5.499884277631032,
+    "yaw": 6.214263633113597,
+    "skaterYaw": 6.214263633113597,
     "cameraYaw": 0,
     "grounded": false
   },
   "push": {
-    "speed": 2.125118265195233,
-    "phase": 1.27075
+    "speed": 4.582597205514468,
+    "phase": 2.2581000000001517
   },
   "riding": {
-    "x": -36.0000323655229,
-    "z": -23.246362272021916,
-    "y": 0.13522269112649354,
-    "speed": 5.938368227786585
+    "x": -36.00017541278014,
+    "z": -23.18786540783928,
+    "y": 0.1257246401663803,
+    "speed": 5.9641085402545215
   }
 }
