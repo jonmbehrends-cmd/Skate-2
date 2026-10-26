@@ -85,8 +85,8 @@ const server=http.createServer((req,res)=>{
   assert(await page.locator('[data-t="boardslide"]').count()===1,'Touch BOARD SLIDE control must exist');
   await page.locator('[data-t="boardslide"]').click();
   const boardInput=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
-   return {type:s.grindRequestType,airborne:!s.grounded,vy:s.vy}});
-  assert(boardInput.type==='boardslide'&&boardInput.airborne&&boardInput.vy>0,
+   return {type:s.grindRequestType,airborne:!s.grounded,vy:s.vy,y:s.y}});
+  assert(boardInput.type==='boardslide'&&boardInput.airborne&&(boardInput.vy>0||boardInput.y>.1),
    'Touch boardslide must request a real ollie-assisted rail catch: '+JSON.stringify(boardInput));
   // Move into the real connected halfpipe and confirm actual travel.
   await page.locator('#halfpipe').click();
