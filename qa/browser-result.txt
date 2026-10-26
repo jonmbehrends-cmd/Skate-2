@@ -1,28 +1,34 @@
-FAIL: locator.click: Timeout 30000ms exceeded.
-Call log:
-  - waiting for locator('#halfpipe')
-    - locator resolved to <button id="halfpipe" aria-label="Go to halfpipe">HALFPIPE</button>
-  - attempting click action
-    2 × waiting for element to be visible, enabled and stable
-      - element is visible, enabled and stable
-      - scrolling into view if needed
-      - done scrolling
-      - <button id="restart" aria-label="Restart run">RESTART</button> intercepts pointer events
-    - retrying click action
-    - waiting 20ms
-    2 × waiting for element to be visible, enabled and stable
-      - element is visible, enabled and stable
-      - scrolling into view if needed
-      - done scrolling
-      - <button id="restart" aria-label="Restart run">RESTART</button> intercepts pointer events
-    - retrying click action
-      - waiting 100ms
-    42 × waiting for element to be visible, enabled and stable
-       - element is visible, enabled and stable
-       - scrolling into view if needed
-       - done scrolling
-       - <button id="restart" aria-label="Restart run">RESTART</button> intercepts pointer events
-     - retrying click action
-       - waiting 500ms
-
-    at /home/runner/work/Skate-2/Skate-2/tests/browser_smoke.cjs:68:35
+{
+  "result": "PASS",
+  "status": {
+    "rampCheeks": 12,
+    "cores": 6,
+    "opaqueCheeks": true,
+    "opaqueCores": true,
+    "connection": 1,
+    "bottom": [
+      -36,
+      -18.1
+    ],
+    "skater": true,
+    "rendered": true,
+    "canvasWidth": 390,
+    "independentCamera": true
+  },
+  "spin": {
+    "yaw": 6.857403334731664,
+    "skaterYaw": 6.857403334731664,
+    "cameraYaw": 0,
+    "grounded": false
+  },
+  "push": {
+    "speed": 4.14257174121909,
+    "phase": 2.0475
+  },
+  "riding": {
+    "x": -35.99973143691576,
+    "z": -22.986326291124588,
+    "y": 0.14872276865192635,
+    "speed": 5.956733120524228
+  }
+}
