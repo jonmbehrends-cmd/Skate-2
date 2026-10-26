@@ -9,6 +9,11 @@ for(const source of scripts) new vm.Script(source,{filename:'index.html:inline'}
 assert(html.includes('src="controller.js"'), 'Controller module must load');
 assert(html.includes('src="landing.js"'), 'Landing module must load');
 assert(html.includes('src="terrain.js"'), 'Terrain module must load');
+assert(html.includes('src="obstacles.js"'), 'Obstacle module must load');
+assert(html.includes('SOLObstacles.sweep('), 'Swept collision must be integrated');
+assert(html.includes('SOLObstacles.surface('), 'Elevated platforms must be integrated');
+assert(html.includes('SOLObstacles.rampSide('), 'Ramp side collision must be integrated');
+assert(html.includes('previousContact.height>contact.height'), 'Platform edges must drop instead of snapping');
 assert(html.includes('SOLTerrain.sample('), 'Terrain sampling must be integrated');
 assert(html.includes('SOLTerrain.launch('), 'Lip launch must be integrated');
 assert(html.includes("CreateRibbon('bank'"), 'Ramps must render as curved ribbons');
