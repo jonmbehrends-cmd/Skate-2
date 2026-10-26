@@ -1,6 +1,6 @@
 # SOL SKATE — WebGL 3D Alpha
 
-Galaxy-first skateboarding prototype using **Babylon.js/WebGL** with a third-person follow camera, 3D skateboard and skater, rideable sloped banks with physical contact and lip transfers, rails, ledges, airborne tricks with acceleration-limited board rotation, landing-angle validation, basic grinds, and combo scoring. The earlier 2D perspective prototype remains in `legacy.html`.
+Galaxy-first skateboarding prototype using **Babylon.js/WebGL** with a third-person follow camera, 3D skateboard and skater, rideable banks and curved quarterpipe kickers with shared mesh/contact geometry and lip transfers, rails, ledges, airborne tricks with acceleration-limited board rotation, landing-angle validation, basic grinds, and combo scoring. The earlier 2D perspective prototype remains in `legacy.html`.
 
 ## Play
 
@@ -29,11 +29,11 @@ Pair the controller with Android before launching. Some Android browser/controll
 
 ## Known limitations
 
-This is an early **true WebGL 3D** prototype, not console-grade graphics or a complete physics simulation. Ramp surface contact and lip launch now follow bank slopes, but side collisions, curved transitions and grind attachments remain simplified, angular rotation is still kinematic rather than rigid-body physics, and obstacle collision and advanced park objectives remain incomplete. Physical Samsung Galaxy and Xbox Bluetooth hardware testing has **not** been performed by the automated workshop. Publishing the source does not by itself confirm a successful Pages deployment.
+This is an early **true WebGL 3D** prototype, not console-grade graphics or a complete physics simulation. Ramp contact, curved kickers and lip launch follow the same analytical profile as rendered geometry, but side collisions, bowls and grind attachments remain simplified, angular rotation is still kinematic rather than rigid-body physics, and obstacle collision and advanced park objectives remain incomplete. Physical Samsung Galaxy and Xbox Bluetooth hardware testing has **not** been performed by the automated workshop. Publishing the source does not by itself confirm a successful Pages deployment.
 
 ## Next milestones
 
 1. Validate live Pages deployment and Samsung Internet/Xbox mappings on hardware.
 2. Improve contact-aware landings, board/terrain collisions, and realistic airborne inertia beyond kinematic angular motion.
-3. Replace box ramps with curved quarterpipes/bowls and stable rail transitions.
+3. Add bowls, side collisions and stable rail transitions.
 4. Add objectives, combo challenges, audio, performance budgets, and graphics improvements.
