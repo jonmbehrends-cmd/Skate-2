@@ -13,10 +13,10 @@ function pose(state,boost,now,steer){
    // Body turns 90 degrees from forward-facing to a skateboard stance.
    torsoYaw:Math.PI/2,
    torsoLean:grounded?-.07-contact*.13:-.19,
-   frontHip:grounded?.12+crouch*.6:-.3,
-   backHip:pushing?-.42-contact*.28+recovery*.18:grounded?.12+crouch*.6:-.3,
-   frontKnee:grounded?.18+crouch*.8:.48,
-   backKnee:pushing?.12-contact*.25+recovery*.45:grounded?.18+crouch*.8:.48,
+   frontHip:grounded?.02+crouch*.12:-.06,
+   backHip:pushing?-.18-contact*.20+recovery*.12:grounded?.02+crouch*.12:-.06,
+   frontKnee:grounded?.10+crouch*.12:.14,
+   backKnee:pushing?.12-contact*.12+recovery*.18:grounded?.10+crouch*.12:.14,
    backOffset:pushing?contact*.08:0,
    armSwing:pushing?contact*.42-recovery*.22:Math.sin(now*.008)*.1
  };
