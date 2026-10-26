@@ -71,10 +71,12 @@ const server=http.createServer((req,res)=>{
   await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
    Object.assign(s,{x:0,z:0,y:0,groundY:0,vy:0,dir:0,speed:0,grounded:true,grinding:false,travelSign:1,pushPhase:0})});
   await page.locator('[data-t="push"]').dispatchEvent('pointerdown',{pointerId:11});
-  await page.waitForTimeout(350);
-  const push=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;return {speed:s.speed,phase:s.pushPhase}});
+  // SwiftShader CI can render slowly; wait for a simulated push frame rather
+  // than assuming 350ms wall time guarantees a game-loop tick.
+  await page.waitForFunction(()=>{const s=window.__SOL_DIAGNOSTICS__.state;return s.speed>.05&&s.pushPhase>0},null,{timeout:6000}).catch(()=>{});
+  const push=await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__,s=d.state;return {speed:s.speed,phase:s.pushPhase,grounded:s.grounded,onRamp:s.onRamp,grinding:s.grinding,bowlAir:!!s.bowlAir,burstUntil:s.pushBurstUntil,now:performance.now(),frame:d.scene.getFrameId(),y:s.y,z:s.z}});
   await page.locator('[data-t="push"]').dispatchEvent('pointerup',{pointerId:11});
-  assert(push.speed>.05&&push.phase>0,'PUSH must animate foot and increase speed: '+JSON.stringify(push));
+  assert(push.speed>.05&&push.phase>0,'PUSH must animate foot and increase speed: '+JSON.stringify({push,errors}));
   // Move into the real connected halfpipe and confirm actual travel.
   await page.locator('#halfpipe').click();
   assert(await page.evaluate(()=>window.__SOL_DIAGNOSTICS__.scene.activeCamera.name==='halfpipe arrival overview'),'HALFPIPE button must reveal a real 3D overview before riding');
