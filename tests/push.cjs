@@ -6,7 +6,7 @@ const inline=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].map
 assert.equal(inline.length,1);
 new vm.Script(inline[0]);
 assert(html.includes('src="skater.js"'));
-assert(inline[0].includes('SOLSkater.pose(state,boost,now,steer)'));
+assert(inline[0].includes('SOLSkater.pose(state,boost||pushHeld||now<(state.pushBurstUntil||0),now,steer)'));
 assert(inline[0].includes('body.rotation.y=pose.torsoYaw'));
 assert(inline[0].includes('legs[i].rotation.x=back?pose.backHip:pose.frontHip'));
 const context={};vm.runInNewContext(fs.readFileSync('skater.js','utf8'),context);
