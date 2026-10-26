@@ -7,6 +7,7 @@
     "skinMaterial": {
       "alpha": 1,
       "blend": false,
+      "textureAlpha": false,
       "transparency": 0,
       "culled": false
     },
@@ -27,28 +28,28 @@
     "independentCamera": true
   },
   "spin": {
-    "yaw": 1.9872192431809566,
-    "skaterYaw": 1.9872192431809566,
+    "yaw": 5.571137848603271,
+    "skaterYaw": 5.571137848603271,
     "cameraYaw": 0,
     "grounded": false
   },
   "push": {
-    "speed": 3.094636026540889,
-    "phase": 1.6250000000000002,
+    "speed": 2.085884603090032,
+    "phase": 1.253200000000019,
     "grounded": true,
     "onRamp": false,
     "grinding": false,
     "bowlAir": false,
-    "burstUntil": 4782,
-    "now": 3764.5999999999985,
-    "frame": 17,
+    "burstUntil": 4718.5,
+    "now": 3592.0999999999913,
+    "frame": 21,
     "y": 0,
-    "z": 0.33920853365835135
+    "z": 0.17658795584824413
   },
   "riding": {
-    "x": -36.00014335776291,
-    "z": -21.788585690023453,
-    "y": 0.001762520761202424,
-    "speed": 6.776892175149061
+    "x": -36.00185836071882,
+    "z": -23.59196276001625,
+    "y": 0.19858026556812014,
+    "speed": 6.6841466502964995
   }
 }
