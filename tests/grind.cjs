@@ -54,7 +54,9 @@ assert(attach(ordinary,find(ordinary,rails,dt,true)));
 assert.equal(visualYaw(ordinary),0,'Standard 50-50 must remain lengthwise');
 // The 100-foot bowl has a single circular coping rail, not four straight rails.
 const bowlRail={x:0,z:-106,radius:15.24,y:.09,kind:'bowl-coping'};
-const bowlState=state({x:15.10,z:-106,y:.09,vy:0,dir:Math.PI/2,grounded:true,speed:8,grindCooldown:0,grindRequestType:'50-50'});
+require('../bowl.js');
+const bowlWallY=globalThis.SOLBowl.height(15.10,-106);
+const bowlState=state({x:15.10,z:-106,y:bowlWallY,groundY:bowlWallY,vy:0,dir:Math.PI/2,grounded:true,speed:8,grindCooldown:0,grindRequestType:'50-50'});
 const bowlHit=find(bowlState,[bowlRail],dt,true,true);
 assert(bowlHit&&bowlHit.rail===bowlRail,'Grounded GRIND button must find bowl coping on a radial approach');
 assert(attach(bowlState,bowlHit),'Bowl coping attachment must succeed without an ollie');
