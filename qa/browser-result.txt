@@ -25,32 +25,38 @@
     "skater": true,
     "rendered": true,
     "canvasWidth": 390,
-    "independentCamera": true
+    "independentCamera": true,
+    "staticBatches": {
+      "before": 524,
+      "merged": 300,
+      "groups": 13,
+      "after": 224
+    }
   },
   "spin": {
-    "yaw": 6.939165005176217,
-    "skaterYaw": 6.939165005176217,
+    "yaw": 4.907096951392038,
+    "skaterYaw": 4.907096951392038,
     "cameraYaw": 0,
     "grounded": false
   },
   "push": {
-    "speed": 2.6173603945214303,
-    "phase": 1.4521000000001518,
+    "speed": 3.09456443462329,
+    "phase": 1.6250000000000002,
     "grounded": true,
     "onRamp": false,
     "grinding": false,
     "bowlAir": false,
-    "burstUntil": 4056,
-    "now": 3086.100000000006,
-    "frame": 30,
+    "burstUntil": 5039.299999999996,
+    "now": 4345.399999999994,
+    "frame": 20,
     "y": 0,
-    "z": 0.253195721429146
+    "z": 0.33914939326312543
   },
   "riding": {
-    "x": -36.00325396446066,
-    "z": -23.522474793058844,
-    "y": 0.1848401996710134,
-    "speed": 6.1204368460038365
+    "x": -36.001764988531335,
+    "z": -21.68966071128447,
+    "y": 0.0003983747200422272,
+    "speed": 6.421083579083001
   },
   "bowl": {
     "exists": true,
@@ -64,8 +70,8 @@
     "centerY": -7.62,
     "diameterMeters": 30.48,
     "depthMeters": 7.62,
-    "meshes": 562,
-    "fps": 10.923390620448494
+    "meshes": 262,
+    "fps": 4.821290820262274
   },
   "parkWalls": 0
 }

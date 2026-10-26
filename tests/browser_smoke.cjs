@@ -143,6 +143,26 @@ const server=http.createServer((req,res)=>{
   await page.waitForTimeout(650);
   await page.screenshot({path:'test-artifacts/bowl-chromium.png',animations:'disabled'});
   assert(fs.statSync('test-artifacts/bowl-chromium.png').size>14000,'Bowl screenshot unexpectedly blank');
+  // Diagnostic only: force an unmistakable unlit magenta surface for one frame.
+  // If the saved debug bowl remains green, the mesh is being occluded/culled,
+  // rather than merely shaded or textured incorrectly.
+  await page.evaluate(()=>{
+   const B=window.BABYLON,d=window.__SOL_DIAGNOSTICS__;
+   const m=d.scene.meshes.find(x=>x.name==='100 foot wide 25 foot deep sculpted concrete bowl');
+   const a=m.material;
+   window.__qaBowlOriginal={texture:a.diffuseTexture,diffuse:a.diffuseColor.clone(),
+    emissive:a.emissiveColor.clone(),unlit:a.disableLighting};
+   a.diffuseTexture=null;a.diffuseColor=new B.Color3(1,0,1);
+   a.emissiveColor=new B.Color3(1,0,1);a.disableLighting=true;
+  });
+  await page.waitForTimeout(400);
+  await page.screenshot({path:'test-artifacts/bowl-debug.png',animations:'disabled'});
+  await page.evaluate(()=>{
+   const d=window.__SOL_DIAGNOSTICS__,a=d.scene.meshes.find(x=>x.name==='100 foot wide 25 foot deep sculpted concrete bowl').material;
+   const p=window.__qaBowlOriginal;
+   a.diffuseTexture=p.texture;a.diffuseColor=p.diffuse;a.emissiveColor=p.emissive;a.disableLighting=p.unlit;
+  });
+
   // The old tall teal architectural-edge boxes obscured skating approaches.
   // Ensure the park shows sculpted riding surfaces rather than decorative walls.
   const parkWalls=await page.evaluate(()=>window.__SOL_DIAGNOSTICS__.scene.meshes.filter(m=>m.name==='ramp architectural edge').length);
