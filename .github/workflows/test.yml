@@ -23,3 +23,4 @@ jobs:
       - run: node tests/landing.cjs
       - run: node tests/check_inline.cjs
       - run: node tests/push.cjs
+      - run: node tests/ramp_mesh.cjs
