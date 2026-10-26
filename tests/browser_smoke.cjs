@@ -113,7 +113,7 @@ const server=http.createServer((req,res)=>{
    const hit=d.scene.pickWithRay(ray,x=>x===m);
    const sample=window.SOLBowl.sample(6.5,-106);
    return {exists:!!m,indices:m?.getTotalIndices(),materialAlpha:m?.material?.alpha,
-    depthWrite:m?.material?.forceDepthWrite,blend:m?.material?.needAlphaBlending(),
+    depthWrite:m?.material?.forceDepthWrite,blend:m?.material?.needAlphaBlending(),textureName:m?.material?.diffuseTexture?.name,
     rayHit:!!hit?.hit,rayY:hit?.pickedPoint?.y,surfaceY:sample?.height,
     centerY:window.SOLBowl.sample(0,-106)?.height,
     diameterMeters:window.SOLBowl.bowl.radius*2,depthMeters:window.SOLBowl.bowl.depth,
@@ -123,6 +123,7 @@ const server=http.createServer((req,res)=>{
   assert.equal(bowl.materialAlpha,1,'Bowl concrete must be opaque');
   assert.equal(bowl.blend,false,'Bowl surface must not alpha blend');
   assert.equal(bowl.depthWrite,true,'Bowl must write to the depth buffer');
+  assert.equal(bowl.textureName,'bowl painted concrete art','Bowl must use the baked nontransparent graphics rather than clipping decals');
   assert(bowl.rayHit&&Math.abs(bowl.rayY-bowl.surfaceY)<.15,'Visual bowl must match riding physics: '+JSON.stringify(bowl));
   assert(Math.abs(bowl.centerY+7.62)<.01,'Bowl must be 25 feet deep');
   assert(Math.abs(bowl.diameterMeters-30.48)<.01,'Bowl must be 100 feet across');
