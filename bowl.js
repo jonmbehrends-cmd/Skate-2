@@ -87,7 +87,7 @@ function land(state,contact){
  state.y=state.groundY=contact.height;state.vy=0;state.grounded=true;state.bowlAir=null;
  state.name='VERT REENTRY';state.bowlStats.landings++;return true;
 }
-function mesh(B,scene,concrete,metal){const N=128,R=72,positions=[],indices=[],uvs=[];for(let j=0;j<=R;j++){const u=j/R;const rad=bowl.radius*(1-Math.pow(1-u,2.1));for(let i=0;i<=N;i++){const a=i*2*Math.PI/N,x=bowl.x+rad*Math.cos(a),z=bowl.z+rad*Math.sin(a);positions.push(x,height(x,z)+.015,z);uvs.push(x/4,z/4)}}for(let j=0;j<R;j++)for(let i=0;i<N;i++){const a=j*(N+1)+i,b=a+N+1;indices.push(a,a+1,b,b,a+1,b+1)}const m=new B.Mesh('100 foot wide 25 foot deep sculpted concrete bowl',scene),v=new B.VertexData();v.positions=positions;v.indices=indices;v.uvs=uvs;v.normals=[];B.VertexData.ComputeNormals(positions,indices,v.normals);v.applyToMesh(m);const bowlConcrete=concrete.clone('warm pale opaque textured bowl concrete');
+function mesh(B,scene,concrete,metal){const N=128,R=72,positions=[],indices=[],uvs=[];for(let j=0;j<=R;j++){const u=j/R;const rad=bowl.radius*(1-Math.pow(1-u,2.1));for(let i=0;i<=N;i++){const a=i*2*Math.PI/N,x=bowl.x+rad*Math.cos(a),z=bowl.z+rad*Math.sin(a);positions.push(x,height(x,z)+.015,z);uvs.push((x-bowl.x)/(2*bowl.radius)+.5,(z-bowl.z)/(2*bowl.radius)+.5)}}for(let j=0;j<R;j++)for(let i=0;i<N;i++){const a=j*(N+1)+i,b=a+N+1;indices.push(a,a+1,b,b,a+1,b+1)}const m=new B.Mesh('100 foot wide 25 foot deep sculpted concrete bowl',scene),v=new B.VertexData();v.positions=positions;v.indices=indices;v.uvs=uvs;v.normals=[];B.VertexData.ComputeNormals(positions,indices,v.normals);v.applyToMesh(m);const bowlConcrete=concrete.clone('warm pale opaque textured bowl concrete');
 // The inherited plaza texture rendered green in actual Chromium bowl captures.
 // Use a neutral, dedicated concrete finish instead of sharing that texture.
 bowlConcrete.diffuseTexture=null;
@@ -100,6 +100,36 @@ bowlConcrete.forceDepthWrite=true;
 bowlConcrete.transparencyMode=B.Material.MATERIAL_OPAQUE;
 bowlConcrete.useAlphaFromDiffuseTexture=false;
 bowlConcrete.backFaceCulling=false;
+const paint=new B.DynamicTexture('bowl painted concrete art',{width:1024,height:1024},scene,false);
+const ctx=paint.getContext();
+ctx.fillStyle='#c2c9c8';ctx.fillRect(0,0,1024,1024);
+let seed=10260426;const rnd=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296};
+for(let i=0;i<16000;i++){
+ const v=95+Math.floor(rnd()*80),alpha=.015+rnd()*.055;
+ ctx.fillStyle='rgba('+v+','+v+','+v+','+alpha+')';
+ ctx.fillRect(rnd()*1024,rnd()*1024,1+rnd()*3,1+rnd()*3);
+}
+// Painted central bowl badge sits on the 25-foot-deep flat bottom.
+ctx.save();ctx.translate(512,512);ctx.rotate(-.12);
+ctx.fillStyle='#174957';ctx.strokeStyle='#f0e6c9';ctx.lineWidth=8;
+ctx.beginPath();ctx.ellipse(0,0,135,124,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+ctx.textAlign='center';ctx.textBaseline='middle';
+ctx.fillStyle='#f4ead3';ctx.font='900 83px sans-serif';ctx.fillText('SOL',0,-31);
+ctx.fillStyle='#efb54a';ctx.font='900 48px sans-serif';ctx.fillText('SKATE',0,46);
+ctx.restore();
+// Large clean lettering and colorful concrete markings on the transition.
+for(const [word,x,y,color,angle] of [
+ ['VERT',800,470,'#b64f43',.2],['RIDE',230,625,'#216a79',-.35],
+ ['FLOW',560,225,'#a85d9d',.12],['AIR',610,790,'#a77729',-.24]
+]){
+ ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.textAlign='center';
+ ctx.font='900 61px sans-serif';ctx.lineWidth=5;ctx.strokeStyle='#eae7dc';
+ ctx.strokeText(word,0,0);ctx.fillStyle=color;ctx.fillText(word,0,0);ctx.restore();
+}
+paint.update();bowlConcrete.diffuseTexture=paint;
+bowlConcrete.diffuseColor=new B.Color3(.96,.97,.97);
+bowlConcrete.emissiveColor=new B.Color3(.11,.115,.12);
+
 m.material=bowlConcrete;m.receiveShadows=true;const path=[];for(let i=0;i<=N;i++){const a=i*2*Math.PI/N;path.push(new B.Vector3(bowl.x+bowl.radius*Math.cos(a),.09,bowl.z+bowl.radius*Math.sin(a)))}const apronPositions=[],apronIndices=[],apronUvs=[];for(let i=0;i<=N;i++){const a=i*2*Math.PI/N,ca=Math.cos(a),sa=Math.sin(a),outer=16.55/Math.max(Math.abs(ca),Math.abs(sa));for(const rad of [bowl.radius,outer]){const x=bowl.x+rad*ca,z=bowl.z+rad*sa;apronPositions.push(x,.008,z);apronUvs.push(x/4,z/4)}}for(let i=0;i<N;i++){const k=i*2;apronIndices.push(k,k+1,k+2,k+1,k+3,k+2)}const apron=new B.Mesh('flush concrete bowl rim apron',scene),av=new B.VertexData();av.positions=apronPositions;av.indices=apronIndices;av.uvs=apronUvs;av.normals=[];B.VertexData.ComputeNormals(av.positions,av.indices,av.normals);av.applyToMesh(apron);apron.material=concrete;apron.receiveShadows=true;// Architectural bowl finish: inset colored tile bands and radial cast-concrete joints.
 const bandMat=new B.StandardMaterial('bowl blue tile inlay',scene);
 bandMat.diffuseColor=new B.Color3(.10,.37,.44);
@@ -126,40 +156,10 @@ for(let k=0;k<16;k++){
  joint.material=seamMat;
 }
 // Graffiti and stickers are drawn as decals conforming to the bowl's curved 3D surface.
-const artTex=new B.DynamicTexture('bowl graffiti and stickers', {width:1024,height:512},scene,true);
-const ctx=artTex.getContext();
-ctx.clearRect(0,0,1024,512);
-const sprays=[['SOL',180,145,'#e65a43',58,-.14],['SKATE',710,175,'#168f9b',54,.12],['VERT!',420,375,'#f3bb32',50,-.08],['RIDE',855,370,'#be65a9',48,.17]];
-for(const [word,x,y,color,size,tilt] of sprays){
- ctx.save();ctx.translate(x,y);ctx.rotate(tilt);ctx.font='900 '+size+'px sans-serif';ctx.textAlign='center';ctx.lineWidth=3;ctx.strokeStyle='#f4e9d4';ctx.strokeText(word,0,0);ctx.fillStyle=color;ctx.fillText(word,0,0);ctx.restore();
-}
-for(let k=0;k<24;k++){
- const x=(k*179+75)%1024,y=(k*113+57)%512;
- ctx.save();ctx.translate(x,y);ctx.rotate((k%7-3)*.16);
- ctx.fillStyle=['#f7e9cf','#e2aa41','#8ac4b2','#f19b8d'][k%4];
- ctx.fillRect(-19,-10,38,20);ctx.fillStyle='#253b40';ctx.font='bold 11px sans-serif';ctx.textAlign='center';ctx.fillText(['SOL','RC','AIR','SK8'][k%4],0,4);ctx.restore();
-}
-artTex.hasAlpha=true;artTex.update();
-const artMat=new B.StandardMaterial('bowl wall art material',scene);
-artMat.diffuseTexture=artTex;artMat.opacityTexture=null;artMat.backFaceCulling=false;artMat.transparencyMode=B.Material.MATERIAL_ALPHABLEND;
-artMat.useAlphaFromDiffuseTexture=true;artMat.disableLighting=true;artMat.zOffset=-3;
-const artPositions=[],artIndices=[],artUvs=[];
-const arcN=128,radialN=28;
-for(let j=0;j<=radialN;j++){
- const rad=bowl.radius*(.43+.53*j/radialN);
- for(let i=0;i<=arcN;i++){
-  const a=2*Math.PI*i/arcN,x=bowl.x+rad*Math.cos(a),z=bowl.z+rad*Math.sin(a);
-  artPositions.push(x,height(x,z)+.16,z);
-  artUvs.push(i/arcN,j/radialN);
- }
-}
-for(let j=0;j<radialN;j++)for(let i=0;i<arcN;i++){
- const a=j*(arcN+1)+i,b=a+arcN+1;
- artIndices.push(a,a+1,b,b,a+1,b+1);
-}
-const artMesh=new B.Mesh('curved bowl graffiti and sticker decals',scene);
-const artData=new B.VertexData();artData.positions=artPositions;artData.indices=artIndices;artData.uvs=artUvs;artData.normals=[];
-B.VertexData.ComputeNormals(artPositions,artIndices,artData.normals);artData.applyToMesh(artMesh);artMesh.material=artMat;
+// Bowl graphics are baked directly into the opaque concrete UV texture.
+// The previous transparent decal shell clipped into the curved surface and
+// produced black fragmented text in real Chromium screenshots.
+
 const coping=B.MeshBuilder.CreateTube('bowl continuous steel coping',{path,radius:.09,tessellation:10},scene);coping.material=metal;return m}
 root.SOLBowl={bowl,height,gradient,sample,groundTravel,roll,vertLaunch,guideAir,land,mesh};
 })(typeof window!=='undefined'?window:globalThis);
