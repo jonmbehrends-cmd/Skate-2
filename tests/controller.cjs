@@ -27,6 +27,13 @@ console.log('SOL SKATE controller regression checks passed');
 
 pad.connected=true;pad.buttons.forEach(b=>b.pressed=false);pad.axes=[0,0,0,0];poll(2500);
 pad.buttons[4].pressed=true;poll(2510);poll(2520);assert.equal(actions.at(-1),'grind');assert.equal(actions.filter(a=>a==='grind').length,1,'LB grind is edge-triggered');
+pad.buttons[11].pressed=true;poll(2525);poll(2526);
+assert.equal(actions.at(-1),'boardslide','R3 should trigger a boardslide');
+assert.equal(actions.filter(a=>a==='boardslide').length,1,'Holding R3 cannot spam boardslides');
+pad.buttons[11].pressed=false;poll(2527);
+pad.buttons[11].pressed=true;poll(2528);
+assert.equal(actions.filter(a=>a==='boardslide').length,2,'R3 must rearm after release');
+pad.buttons[11].pressed=false;poll(2529);
 pad.buttons[5].pressed=true;assert.equal(poll(2530).grabHeld,true);pad.buttons[5].pressed=false;assert.equal(poll(2540).grabHeld,false,'RB release ends hold');
 pad.connected=false;assert.equal(poll(2550).grabHeld,false,'Disconnect clears grab hold');
 console.log('PASS: Xbox LB grind, RB hold/release and disconnect');
