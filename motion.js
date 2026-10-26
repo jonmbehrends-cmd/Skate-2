@@ -22,7 +22,7 @@ function step(state,steer,throttle,boost,dt){
     // RT delivers impulse only during the planted-foot half of each push.
     // Phase advances in simulation time, so physics and animation stay synchronized.
     state.pushPhase=Number.isFinite(state.pushPhase)?state.pushPhase:0;
-    const pushing=!!boost&&speed<13;
+    const pushing=!!boost&&!state.onRamp&&speed<13;
     if(pushing)state.pushPhase=(state.pushPhase+h*6.5)%(Math.PI*2);
     else state.pushPhase=0;
     const contact=pushing?Math.max(0,Math.sin(state.pushPhase)):0;
@@ -43,9 +43,9 @@ function step(state,steer,throttle,boost,dt){
 }
 // Ramp pumping converts a timed crouch/extension into tangential acceleration.
 // Never creates speed on flat ground or while airborne/grinding.
-function pump(state,previous,current,dt){
+function pump(state,previous,current,dt,active=false){
  const h=clamp(Number.isFinite(dt)?dt:0,0,.05);
- if(!h||!state.grounded||state.grinding||!current||!current.ramp)return 0;
+ if(!h||!state.grounded||state.grinding||!current||!current.ramp||!active){state.pumpIntensity=Math.max(0,(state.pumpIntensity||0)-h*3);return 0;}
  const slope=Number.isFinite(current.slope)?current.slope:0;
  const before=previous&&Number.isFinite(previous.slope)?previous.slope:slope;
  const forward=Math.cos(state.dir||0);
