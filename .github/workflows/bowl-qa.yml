@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: '22'
       - run: node tests/bowl.cjs
-      - run: npm install --no-save playwright@1.55.1
+      - run: npm install --no-save playwright@1.55.1 babylonjs@8
       - run: npx playwright install chromium
       - name: Mobile scene, joystick, push and halfpipe
         run: node tests/browser_smoke.cjs
