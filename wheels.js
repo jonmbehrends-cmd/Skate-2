@@ -22,9 +22,13 @@ function sample(x,z,dir,y,surface){
   const sideSlope=clamp((right-left)/(2*TRACK),-1.2,1.2);
   // Raise the rigid deck to the highest required support: no wheel samples
   // should penetrate a raised surface even at a ledge or ramp edge.
-  const height=Math.max(...points.map(p=>p.height-forwardSlope*p.forward-sideSlope*p.side));
-  return {height,pitch:-Math.atan(forwardSlope),roll:Math.atan(sideSlope),
-    forwardSlope,sideSlope,points};
+  // A rigid skateboard cannot instantaneously tip 50+ degrees because one
+  // wheel briefly overlaps a ledge. Cap bank/tilt and raise support instead.
+  const supportedForward=clamp(forwardSlope,-.85,.85);
+  const supportedSide=clamp(sideSlope,-.35,.35);
+  const height=Math.max(...points.map(p=>p.height-supportedForward*p.forward-supportedSide*p.side));
+  return {height,pitch:-Math.atan(supportedForward),roll:Math.atan(supportedSide),
+    forwardSlope:supportedForward,sideSlope:supportedSide,points};
 }
 function relativeImpact(state,slopeX=0,slopeZ=0){
   const vx=Number.isFinite(state.airVX)?state.airVX:Math.sin(state.dir)*state.speed;
