@@ -20,19 +20,20 @@ Pair the controller with Android before launching. Some Android browser/controll
 
 ## Development
 
-- Entry point: `index.html`, with `controller.js`, `landing.js`, `terrain.js`, `obstacles.js` `grind.js` and `motion.js` loaded before the inline Babylon game logic.
+- Entry point: `index.html`, with `controller.js`, `landing.js`, `terrain.js`, `obstacles.js` `grind.js`, `motion.js`, and `wheels.js` loaded before the inline Babylon game logic.
 - `landing.js` advances roll and yaw angles with bounded angular acceleration and speed. A trick must actually finish its rotations before touchdown; insufficient airtime now bails. Rail attachments require a stable board, and restart resets angular state.
 - `motion.js` applies ground-only pushing and throttle, carving drag, low-power aerial steering, and prevents midair RT acceleration; grinding retains its own friction model. Takeoff now locks world-space horizontal velocity, so turning the board in midair does not redirect its trajectory. Sideways landings bail when heading and travel disagree by more than roughly 60 degrees.
 - `motion.js` also resolves sidewall, obstacle, and park-boundary impacts against world-space airborne velocity, removing inward motion while retaining damped tangential slides.
+- `wheels.js` samples all four truck/wheel contact points to tilt the board on curved ramps and uneven ledges, raises the visual deck to prevent wheel clipping, and computes landing impact relative to the slope using true world-space airborne velocity. This is not yet a full rigid-body suspension.
 - `grind.js` detects rail-top crossing only while descending with a stable board, sufficient speed and parallel heading; constrains travel to the rail, applies friction and combo points, and releases the board naturally at the endpoint or low speed. Ollie/trick dismounts impose a reattachment cooldown.
-- Run `node --check controller.js && node --check landing.js && node --check terrain.js && node --check obstacles.js && node --check grind.js && node --check motion.js && node tests/controller.cjs && node tests/landing.cjs && node tests/terrain.cjs && node tests/obstacles.cjs && node tests/grind.cjs && node tests/motion.cjs && node tests/check_inline.cjs` for input, physics and integration syntax checks. The separate `SOL SKATE logic regression` GitHub Actions workflow runs these Node checks on each push.
+- Run `node --check controller.js && node --check landing.js && node --check terrain.js && node --check obstacles.js && node --check grind.js && node --check motion.js && node --check wheels.js && node tests/controller.cjs && node tests/landing.cjs && node tests/terrain.cjs && node tests/obstacles.cjs && node tests/grind.cjs && node tests/motion.cjs && node tests/wheels.cjs && node tests/check_inline.cjs` for input, physics and integration syntax checks. The separate `SOL SKATE logic regression` GitHub Actions workflow runs these Node checks on each push.
 - Optional local Galaxy-sized Chromium touch emulation can exercise the physics module. This is not a physical Android/Xbox test.
 - GitHub Actions workflow `.github/workflows/deploy.yml` publishes the repository on pushes to `main`, if Pages is configured for GitHub Actions.
 - `window.__SOL_DIAGNOSTICS__` exposes the Babylon scene and simulation state for browser testing.
 
 ## Known limitations
 
-This is an early **true WebGL 3D** prototype, not console-grade graphics or a complete physics simulation. Ramp contact, curved kickers and lip launch follow the same analytical profile as rendered geometry, but bowls and full rigid-body wheel physics remain simplified, angular rotation is still kinematic rather than rigid-body physics, and complex multi-contact rigid-body collisions and advanced park objectives remain incomplete. Physical Samsung Galaxy and Xbox Bluetooth hardware testing has **not** been performed by the automated workshop. Publishing the source does not by itself confirm a successful Pages deployment.
+This is an early **true WebGL 3D** prototype, not console-grade graphics or a complete physics simulation. Ramp contact, curved kickers and lip launch follow the same analytical profile as rendered geometry, and four-wheel support now improves deck pose, but bowls and full rigid-body wheel physics remain simplified, angular rotation is still kinematic rather than rigid-body physics, and complex multi-contact rigid-body collisions and advanced park objectives remain incomplete. Physical Samsung Galaxy and Xbox Bluetooth hardware testing has **not** been performed by the automated workshop. Publishing the source does not by itself confirm a successful Pages deployment.
 
 ## Next milestones
 

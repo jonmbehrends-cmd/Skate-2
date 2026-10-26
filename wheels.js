@@ -1,0 +1,35 @@
+/* SOL SKATE — four-wheel terrain pose and relative touchdown speed.
+ * This is a contact-aware board pose, not a full rigid-body suspension.
+ * Coordinates: forward = (sin(dir),cos(dir)); right = (cos(dir),-sin(dir)).
+ */
+(function(root){'use strict';
+const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+const WB=.52,TRACK=.27;
+function sample(x,z,dir,y,surface){
+  const fX=Math.sin(dir),fZ=Math.cos(dir),rX=Math.cos(dir),rZ=-Math.sin(dir);
+  const points=[];
+  for(const forward of [-WB,WB])for(const side of [-TRACK,TRACK]){
+    const wx=x+fX*forward+rX*side,wz=z+fZ*forward+rZ*side;
+    const contact=surface(wx,wz,y);
+    const h=Number.isFinite(contact&&contact.height)?contact.height:0;
+    points.push({forward,side,height:h,x:wx,z:wz});
+  }
+  const back=(points[0].height+points[1].height)/2;
+  const front=(points[2].height+points[3].height)/2;
+  const left=(points[0].height+points[2].height)/2;
+  const right=(points[1].height+points[3].height)/2;
+  const forwardSlope=clamp((front-back)/(2*WB),-1.2,1.2);
+  const sideSlope=clamp((right-left)/(2*TRACK),-1.2,1.2);
+  // Raise the rigid deck to the highest required support: no wheel samples
+  // should penetrate a raised surface even at a ledge or ramp edge.
+  const height=Math.max(...points.map(p=>p.height-forwardSlope*p.forward-sideSlope*p.side));
+  return {height,pitch:-Math.atan(forwardSlope),roll:Math.atan(sideSlope),
+    forwardSlope,sideSlope,points};
+}
+function relativeImpact(state,slopeX=0,slopeZ=0){
+  const vx=Number.isFinite(state.airVX)?state.airVX:Math.sin(state.dir)*state.speed;
+  const vz=Number.isFinite(state.airVZ)?state.airVZ:Math.cos(state.dir)*state.speed;
+  return state.vy-vx*slopeX-vz*slopeZ;
+}
+root.SOLWheels={sample,relativeImpact};
+})(typeof window!=='undefined'?window:globalThis);
