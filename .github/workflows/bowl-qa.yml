@@ -1,7 +1,7 @@
-name: SOL SKATE ten consecutive bowl airs
+name: SOL SKATE gameplay acceptance
 on:
   push:
-    branches: [main, fix/bowl-vert-air]
+    branches: [main]
   pull_request:
   workflow_dispatch:
 permissions:
@@ -21,6 +21,10 @@ jobs:
       - run: node tests/bowl.cjs
       - run: npm install --no-save playwright@1.55.1
       - run: npx playwright install chromium
+      - name: Mobile scene, joystick, push and halfpipe
+        run: node tests/browser_smoke.cjs
+      - name: Input release and startup recovery
+        run: node tests/input_browser.cjs
       - name: Ten uninterrupted airs in running WebGL game
         id: bowl
         continue-on-error: true
@@ -29,6 +33,6 @@ jobs:
         if: always()
         with:
           name: bowl-air-evidence
-          path: test-artifacts/bowl-*
+          path: test-artifacts/
       - if: steps.bowl.outcome == 'failure'
         run: exit 1
