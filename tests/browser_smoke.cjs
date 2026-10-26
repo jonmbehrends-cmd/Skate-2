@@ -89,6 +89,6 @@ const server=http.createServer((req,res)=>{
   await page.screenshot({path:'test-artifacts/halfpipe-chromium.png',animations:'disabled'});
   assert(fs.statSync('test-artifacts/halfpipe-chromium.png').size>10000,'Halfpipe screenshot unexpectedly blank');
   assert.equal(errors.length,0,'Browser errors: '+errors.join('; '));
-  console.log('PASS Chromium WebGL geometry, visible independent aerial yaw, joystick, foot push, halfpipe riding, screenshots',status,spin,push,riding);
+  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',status,spin,push,riding},null,2));console.log('PASS Chromium WebGL geometry, visible independent aerial yaw, joystick, foot push, halfpipe riding, screenshots',status,spin,push,riding);
  }finally{await browser.close()}
-})().catch(e=>{console.error(e);process.exitCode=1}).finally(()=>server.close());
+})().catch(e=>{fs.mkdirSync('test-artifacts',{recursive:true});fs.writeFileSync('test-artifacts/browser-result.txt','FAIL: '+(e&&e.stack||String(e)));console.error(e);process.exitCode=1}).finally(()=>server.close());
