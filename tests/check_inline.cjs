@@ -7,6 +7,9 @@ const scripts = [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].
 assert.equal(scripts.length, 1, 'Expected exactly one inline game script');
 for(const source of scripts) new vm.Script(source,{filename:'index.html:inline'});
 assert(html.includes('src="controller.js"'), 'Controller module must load');
+assert(html.includes("camera.lockedTarget=cameraAnchor"),'Follow camera must use independent heading anchor, not spinning skater');
+assert(html.includes('cameraAnchor.rotation.y=Number.isFinite(state.airCameraHeading)?state.airCameraHeading:state.dir'),'Camera yaw must freeze through airborne rotations');
+assert(html.includes('skater.rotation.y=state.dir'),'Skater mesh must visibly rotate in air');
 assert(html.includes('src="landing.js"'), 'Landing module must load');
 assert(html.includes('src="terrain.js"'), 'Terrain module must load');
 assert(html.includes('src="ramp_geometry.js"'), 'Sealed ramp mesh module must load');
