@@ -114,6 +114,19 @@ const server=http.createServer((req,res)=>{
   await page.waitForTimeout(500);
   await page.screenshot({path:'test-artifacts/halfpipe-chromium.png',animations:'disabled'});
   assert(fs.statSync('test-artifacts/halfpipe-chromium.png').size>10000,'Halfpipe screenshot unexpectedly blank');
+  // The player's actual GRIND touch button must catch bowl coping without ollie.
+  await page.evaluate(()=>{
+   const s=window.__SOL_DIAGNOSTICS__.state;
+   Object.assign(s,{x:15.10,z:-106,y:.09,groundY:0,dir:Math.PI/2,speed:6,travelSign:1,
+    grounded:true,grinding:false,vy:0,grindCooldown:0,grindRequestType:null});
+  });
+  await page.locator('[data-t="grind"]').click();
+  const touchCoping=await page.evaluate(()=>{
+   const s=window.__SOL_DIAGNOSTICS__.state;
+   return {grinding:s.grinding,kind:s.grindRail?.kind,vy:s.vy,y:s.y};
+  });
+  assert(touchCoping.grinding&&touchCoping.kind==='bowl-coping'&&touchCoping.vy===0,
+   'GRIND touch control must catch bowl coping without forcing ollie: '+JSON.stringify(touchCoping));
   // Validate circular bowl coping capture and actual curved movement, not only rendering.
   const coping=await page.evaluate(()=>{
    const s=window.__SOL_DIAGNOSTICS__.state;
@@ -222,6 +235,6 @@ const server=http.createServer((req,res)=>{
   assert(fs.statSync('test-artifacts/park-chromium.png').size>14000,'Park overview screenshot unexpectedly blank');
 
   assert.equal(errors.length,0,'Browser errors: '+errors.join('; '));
-  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',status,spin,push,riding,boardInput,boardslide,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
+  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',status,spin,push,riding,boardInput,boardslide,touchCoping,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
  }finally{await browser.close()}
 })().catch(e=>{fs.mkdirSync('test-artifacts',{recursive:true});fs.writeFileSync('test-artifacts/browser-result.txt','FAIL: '+(e&&e.stack||String(e)));console.error(e);process.exitCode=1}).finally(()=>server.close());
