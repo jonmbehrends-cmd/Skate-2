@@ -142,6 +142,18 @@ const server=http.createServer((req,res)=>{
   });
   assert(touchCoping.grinding&&touchCoping.kind==='bowl-coping'&&touchCoping.vy===0,
    'GRIND touch control must catch bowl coping without forcing ollie: '+JSON.stringify(touchCoping));
+  // Coping capture from a near-vertical wall must not teleport the skater
+  // more than a metre upward in a single input frame. The board eases onto
+  // the lip over the first 0.22s while staying attached to the circular rail.
+  const copingEntry=await page.evaluate(()=>{
+   const s=window.__SOL_DIAGNOSTICS__.state;
+   const initialY=s.y,top=s.grindRail.y;
+   for(let i=0;i<15;i++)window.SOLGrind.advance(s,1/60);
+   return {initialY,top,finalY:s.y,grinding:s.grinding};
+  });
+  assert(Math.abs(copingEntry.initialY-touchCoping.wallY)<.05&&
+   Math.abs(copingEntry.finalY-copingEntry.top)<.02&&copingEntry.grinding,
+   'Coping must blend smoothly from the wall to the steel rim: '+JSON.stringify(copingEntry));
   // Validate circular bowl coping capture and actual curved movement, not only rendering.
   const coping=await page.evaluate(()=>{
    const s=window.__SOL_DIAGNOSTICS__.state;
@@ -255,6 +267,6 @@ const server=http.createServer((req,res)=>{
   assert(fs.statSync('test-artifacts/park-chromium.png').size>14000,'Park overview screenshot unexpectedly blank');
 
   assert.equal(errors.length,0,'Browser errors: '+errors.join('; '));
-  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',status,spin,push,riding,boardInput,boardslide,touchCoping,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
+  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',status,spin,push,riding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
  }finally{await browser.close()}
 })().catch(e=>{fs.mkdirSync('test-artifacts',{recursive:true});fs.writeFileSync('test-artifacts/browser-result.txt','FAIL: '+(e&&e.stack||String(e)));console.error(e);process.exitCode=1}).finally(()=>server.close());
