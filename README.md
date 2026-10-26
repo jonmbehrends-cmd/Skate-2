@@ -1,6 +1,6 @@
 # SOL SKATE — WebGL 3D Alpha
 
-Galaxy-first skateboarding prototype using **Babylon.js/WebGL** with a third-person follow camera, 3D skateboard and skater, rideable banks and curved quarterpipe kickers with shared mesh/contact geometry and lip transfers, rails, ledges, airborne tricks with acceleration-limited board rotation, landing-angle validation, basic grinds, and combo scoring. The earlier 2D perspective prototype remains in `legacy.html`.
+Galaxy-first skateboarding prototype using **Babylon.js/WebGL** with a third-person follow camera, 3D skateboard and skater, rideable banks and curved quarterpipe kickers with shared mesh/contact geometry and lip transfers, rails, ledges, frame-rate-independent 25 ms physics substeps, airborne tricks with acceleration-limited board rotation, landing-angle validation, basic grinds, and combo scoring. The earlier 2D perspective prototype remains in `legacy.html`.
 
 ## Play
 

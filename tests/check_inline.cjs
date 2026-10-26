@@ -13,6 +13,7 @@ assert(html.includes('SOLTerrain.sample('), 'Terrain sampling must be integrated
 assert(html.includes('SOLTerrain.launch('), 'Lip launch must be integrated');
 assert(html.includes("CreateRibbon('bank'"), 'Ramps must render as curved ribbons');
 assert(html.includes('SOLTerrain.profile(r,t)'), 'Mesh must share contact profile');
+assert(html.includes('Math.ceil(elapsed/.025)'), 'Simulation must substep slow frames');
 assert(html.indexOf('src="controller.js"') < html.indexOf('src="landing.js"'), 'Controller precedes landing module');
 assert(html.includes('SOLLanding.canLand(state,state.flip,state.spin)'), 'Landing physics must be integrated');
 assert(html.includes('legacy.html'), 'Legacy fallback must remain');
