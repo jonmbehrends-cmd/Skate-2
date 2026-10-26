@@ -1,0 +1,19 @@
+name: SOL SKATE logic regression
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check controller.js && node --check landing.js
+      - run: node tests/controller.cjs
+      - run: node tests/landing.cjs
+      - run: node tests/check_inline.cjs
