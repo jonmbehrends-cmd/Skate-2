@@ -69,7 +69,7 @@ console.log('PASS: ramp input gating and foot-push suppression');
 
 const spin=s({grounded:false,speed:9,dir:0,airVX:0,airVZ:9});
 for(let i=0;i<20;i++)step(spin,1,0,false,.025);
-assert(spin.dir>2.3&&spin.dir<2.5,'Half-second full stick should rotate around 135 degrees');
+assert(spin.dir>4.1&&spin.dir<4.3,'Half-second full stick should rotate around 240 degrees');
 assert(Math.abs(spin.airVX)<1e-8&&spin.airVZ>8.9,'Aerial spin must preserve original travel direction');
-const spinBack=s({grounded:false,speed:9,dir:0});step(spinBack,-1,0,false,.025);assert(spinBack.dir<-.11,'Left stick must spin in opposite direction');
+const spinBack=s({grounded:false,speed:9,dir:0});step(spinBack,-1,0,false,.025);assert(spinBack.dir<-.20,'Left stick must spin in opposite direction');
 console.log('PASS: fast right/left aerial spins and independent airborne momentum');
