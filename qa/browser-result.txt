@@ -28,28 +28,43 @@
     "independentCamera": true
   },
   "spin": {
-    "yaw": 4.826716031006992,
-    "skaterYaw": 4.826716031006992,
+    "yaw": 5.082507271236629,
+    "skaterYaw": 5.082507271236629,
     "cameraYaw": 0,
     "grounded": false
   },
   "push": {
-    "speed": 3.094564786258514,
-    "phase": 1.6250000000000002,
+    "speed": 2.9462695881780743,
+    "phase": 1.5723500000000092,
     "grounded": true,
     "onRamp": false,
     "grinding": false,
     "bowlAir": false,
-    "burstUntil": 4759.5999999999985,
-    "now": 3955.5999999999985,
-    "frame": 19,
+    "burstUntil": 4907.199999999997,
+    "now": 3798.2999999999956,
+    "frame": 22,
     "y": 0,
-    "z": 0.3391496936709848
+    "z": 0.310505404932033
   },
   "riding": {
-    "x": -36.00017577400112,
-    "z": -23.00421014900318,
-    "y": 0.09818865983567093,
-    "speed": 6.04165316292966
+    "x": -36.00235772503419,
+    "z": -23.548584599730845,
+    "y": 0.18994353260084829,
+    "speed": 6.41494804410656
+  },
+  "bowl": {
+    "exists": true,
+    "indices": 55296,
+    "materialAlpha": 1,
+    "depthWrite": true,
+    "blend": false,
+    "rayHit": true,
+    "rayY": -7.427122942059906,
+    "surfaceY": -7.442810543463304,
+    "centerY": -7.62,
+    "diameterMeters": 30.48,
+    "depthMeters": 7.62,
+    "meshes": 588,
+    "fps": 5.863497771870844
   }
 }
