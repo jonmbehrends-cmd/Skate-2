@@ -66,6 +66,7 @@ const server=http.createServer((req,res)=>{
   assert(push.speed>.05&&push.phase>0,'PUSH must animate foot and increase speed: '+JSON.stringify(push));
   // Move into the real connected halfpipe and confirm actual travel.
   await page.locator('#halfpipe').click();
+  assert(await page.evaluate(()=>window.__SOL_DIAGNOSTICS__.scene.activeCamera.name==='halfpipe arrival overview'),'HALFPIPE button must reveal a real 3D overview before riding');
   await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
    Object.assign(s,{x:-36,z:-18.1,y:0,groundY:0,dir:0,speed:7,travelSign:-1,grounded:true,grinding:false,vy:0})});
   await page.waitForTimeout(800);
