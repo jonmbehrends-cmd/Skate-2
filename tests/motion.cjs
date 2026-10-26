@@ -73,3 +73,14 @@ assert(spin.dir>4.1&&spin.dir<4.3,'Half-second full stick should rotate around 2
 assert(Math.abs(spin.airVX)<1e-8&&spin.airVZ>8.9,'Aerial spin must preserve original travel direction');
 const spinBack=s({grounded:false,speed:9,dir:0});step(spinBack,-1,0,false,.025);assert(spinBack.dir<-.20,'Left stick must spin in opposite direction');
 console.log('PASS: fast right/left aerial spins and independent airborne momentum');
+
+const fakie=s({speed:7,dir:0,travelSign:-1});
+const motion=globalThis.SOLMotion;motion.beginAir(fakie);
+assert(fakie.airVZ<0,'Fakie takeoff must preserve backward momentum');
+fakie.grounded=false;fakie.dir=Math.PI;
+assert(motion.landingAlignment(fakie)>.99,'180 landing should align while rolling switch');
+assert.equal(motion.landingTravelSign(fakie),1,'180 landing changes rolling stance to forward');
+const backwards=s({speed:4,travelSign:-1});
+assert(motion.horizontal(backwards,.05).dz<0,'Grounded fakie must move backwards without snapping heading');
+step(backwards,1,0,false,.025);assert(backwards.dir<0,'Fakie steering should reverse carve direction');
+console.log('PASS: backward rolling, switch landings and reversed fakie steering');
