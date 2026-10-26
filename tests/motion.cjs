@@ -11,3 +11,24 @@ let rail=s({grinding:true,speed:7});step(rail,1,-1,true,.025);assert.equal(rail.
 let bounded=s({speed:16});for(let i=0;i<200;i++)step(bounded,1,-1,true,.025);assert(bounded.speed<=17,'Speed cap');
 let invalid=s({speed:10});step(invalid,NaN,NaN,true,NaN);assert.equal(invalid.speed,10,'Invalid dt ignored');
 console.log('PASS: ground RT, no airborne acceleration, carving drag, air steering, grind speed, caps');
+
+let air=s({speed:10,dir:0,grounded:false});
+step(air,0,-1,true,.025); // Legacy air state still gets no propulsion.
+beginAirTest();
+function beginAirTest(){
+  const p=s({speed:10,dir:0,grounded:true});
+  const m=globalThis.SOLMotion;
+  m.beginAir(p);p.grounded=false;
+  p.dir=Math.PI/2;
+  const d=m.horizontal(p,.05);
+  assert(Math.abs(d.dx)<1e-8&&d.dz>.49,'Air steering must not redirect travel');
+  step(p,1,-1,true,.025);
+  assert(p.speed<=10,'RT cannot accelerate an airborne skater');
+  assert(m.landingAlignment(p)<.1,'Sideways landing should be unsafe');
+  p.dir=0;assert(m.landingAlignment(p)>.99,'Forward landing should align');
+  m.clearAir(p);assert.equal(p.airVX,null,'Air velocity cleared on landing');
+  assert(m.horizontal(p,.05).dz>0,'Ground fallback retains forward travel');
+  const reverse=s({speed:8,dir:Math.PI});m.beginAir(reverse);
+  assert(m.horizontal({...reverse,grounded:false},.05).dz<0,'Reverse takeoff preserves travel direction');
+}
+console.log('PASS: airborne velocity is independent of facing and landing alignment is validated');

@@ -15,17 +15,44 @@ function step(state,steer,throttle,boost,dt){
   state.dir+=turn*h*steerRate;
   if(state.grinding){
     // Rail friction and speed reduction belong to SOLGrind.advance.
+    clearAir(state);
     state.speed=speed;
   }else if(state.grounded){
+    clearAir(state);
     const thrust=(-pedal*8)+(boost?9:0);
     const rollingDrag=.16*speed;
     const carveDrag=.22*Math.abs(turn)*speed*Math.min(1,speed/12);
     state.speed=clamp(speed+(thrust-rollingDrag-carveDrag)*h,0,17);
   }else{
     // RT and joystick cannot create forward momentum while airborne.
-    state.speed=clamp(speed-speed*.018*h,0,17);
+    if(Number.isFinite(state.airVX)&&Number.isFinite(state.airVZ)){
+      const damping=Math.exp(-.018*h);
+      state.airVX*=damping;state.airVZ*=damping;
+      state.speed=clamp(Math.hypot(state.airVX,state.airVZ),0,17);
+    }else state.speed=clamp(speed-speed*.018*h,0,17);
   }
   return state;
 }
-root.SOLMotion={step};
+// Capture travel velocity at takeoff. Airborne facing can change without
+// redirecting the centre of mass; there is no lateral jetpack steering.
+function beginAir(state){
+  const speed=clamp(Number.isFinite(state.speed)?state.speed:0,0,17);
+  state.airVX=Math.sin(state.dir)*speed;
+  state.airVZ=Math.cos(state.dir)*speed;
+  return state;
+}
+function clearAir(state){state.airVX=null;state.airVZ=null;return state}
+function horizontal(state,dt){
+  const h=clamp(Number.isFinite(dt)?dt:0,0,.05);
+  const airborne=!state.grounded&&!state.grinding&&Number.isFinite(state.airVX)&&Number.isFinite(state.airVZ);
+  return {dx:(airborne?state.airVX:Math.sin(state.dir)*state.speed)*h,
+          dz:(airborne?state.airVZ:Math.cos(state.dir)*state.speed)*h};
+}
+function landingAlignment(state){
+  if(!Number.isFinite(state.airVX)||!Number.isFinite(state.airVZ))return 1;
+  const speed=Math.hypot(state.airVX,state.airVZ);
+  if(speed<.25)return 1;
+  return clamp((Math.sin(state.dir)*state.airVX+Math.cos(state.dir)*state.airVZ)/speed,-1,1);
+}
+root.SOLMotion={step,beginAir,clearAir,horizontal,landingAlignment};
 })(typeof window!=='undefined'?window:globalThis);
