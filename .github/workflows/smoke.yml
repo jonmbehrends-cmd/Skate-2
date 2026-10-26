@@ -27,5 +27,6 @@ jobs:
           name: sol-skate-browser-preview
           path: |
             sol-skate-browser.png
+            sol-skate-ramp.png
             sol-skate-portrait.png
           if-no-files-found: ignore
