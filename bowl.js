@@ -13,6 +13,25 @@ function height(x,z){
 }
 function sample(x,z){const dx=x-bowl.x,dz=z-bowl.z,d=Math.hypot(dx,dz);if(d>=bowl.radius)return null;const h=height(x,z),slope=(height(x,z+.1)-height(x,z-.1))/.2;return {height:h,slope,ramp:{curve:'bowl'},bowl:true}}
 function roll(state,dt){const dx=state.x-bowl.x,dz=state.z-bowl.z,d=Math.hypot(dx,dz);if(d>=bowl.radius||d<.001)return;const gradient=Math.min(7,(height(bowl.x+Math.min(bowl.radius-.03,d+.06),bowl.z)-height(bowl.x+Math.max(0,d-.06),bowl.z))/.12);const dir=(Math.sin(state.dir)*dx+Math.cos(state.dir)*dz)/d;const sign=state.travelSign===-1?-1:1;const v=sign*state.speed-9.81*gradient*dir*Math.min(.05,dt);state.travelSign=v<0?-1:1;state.speed=Math.min(17,Math.abs(v))}
+function vertLaunch(state,previous,contact){
+ const dx=state.x-bowl.x,dz=state.z-bowl.z,d=Math.hypot(dx,dz);
+ if(!previous.bowl||d<bowl.radius*.94||d>bowl.radius+1.2||state.speed<5.5)return false;
+ const outward=(Math.sin(state.dir)*dx+Math.cos(state.dir)*dz)/Math.max(.01,d)*(state.travelSign===-1?-1:1);
+ if(outward<.38)return false;
+ const speed=state.speed;
+ state.grounded=false;
+ state.y=Math.max(state.y,previous.height)+.12;
+ state.vy=Math.min(14,6+speed*.36);
+ state.airTime=0;
+ state.rampCooldown=.55;
+ state.name='VERT BOWL AIR';
+ state.combo=(state.combo||0)+200;
+ state.count=(state.count||0)+1;
+ // Reduce horizontal drift so the skater returns into the transition.
+ state.speed=Math.max(2.5,speed*.38);
+ state.bowlAir=true;
+ return true;
+}
 function mesh(B,scene,concrete,metal){const N=128,R=72,positions=[],indices=[],uvs=[];for(let j=0;j<=R;j++){const u=j/R;const rad=bowl.radius*(1-Math.pow(1-u,2.1));for(let i=0;i<=N;i++){const a=i*2*Math.PI/N,x=bowl.x+rad*Math.cos(a),z=bowl.z+rad*Math.sin(a);positions.push(x,height(x,z)+.015,z);uvs.push(x/4,z/4)}}for(let j=0;j<R;j++)for(let i=0;i<N;i++){const a=j*(N+1)+i,b=a+N+1;indices.push(a,a+1,b,b,a+1,b+1)}const m=new B.Mesh('100 foot wide 25 foot deep sculpted concrete bowl',scene),v=new B.VertexData();v.positions=positions;v.indices=indices;v.uvs=uvs;v.normals=[];B.VertexData.ComputeNormals(positions,indices,v.normals);v.applyToMesh(m);const bowlConcrete=new B.StandardMaterial('warm pale skate bowl concrete',scene);
 bowlConcrete.diffuseColor=new B.Color3(.58,.63,.63);
 bowlConcrete.ambientColor=new B.Color3(.27,.29,.29);
@@ -44,6 +63,41 @@ for(let k=0;k<16;k++){
  const joint=B.MeshBuilder.CreateTube('radial concrete pour joint '+k,{path,radius:.012,tessellation:4},scene);
  joint.material=seamMat;
 }
+// Graffiti and stickers are drawn as decals conforming to the bowl's curved 3D surface.
+const artTex=new B.DynamicTexture('bowl graffiti and stickers', {width:1024,height:512},scene,true);
+const ctx=artTex.getContext();
+ctx.clearRect(0,0,1024,512);
+const sprays=[['SOL',180,145,'#e65a43',95,-.14],['SKATE',710,175,'#168f9b',83,.12],['VERT!',420,375,'#f3bb32',75,-.08],['RIDE',855,370,'#be65a9',62,.17]];
+for(const [word,x,y,color,size,tilt] of sprays){
+ ctx.save();ctx.translate(x,y);ctx.rotate(tilt);ctx.font='900 '+size+'px sans-serif';ctx.textAlign='center';ctx.lineWidth=14;ctx.strokeStyle='#263943';ctx.strokeText(word,0,0);ctx.fillStyle=color;ctx.fillText(word,0,0);ctx.restore();
+}
+for(let k=0;k<24;k++){
+ const x=(k*179+75)%1024,y=(k*113+57)%512;
+ ctx.save();ctx.translate(x,y);ctx.rotate((k%7-3)*.16);
+ ctx.fillStyle=['#f7e9cf','#e2aa41','#8ac4b2','#f19b8d'][k%4];
+ ctx.fillRect(-19,-10,38,20);ctx.fillStyle='#253b40';ctx.font='bold 11px sans-serif';ctx.textAlign='center';ctx.fillText(['SOL','RC','AIR','SK8'][k%4],0,4);ctx.restore();
+}
+artTex.hasAlpha=true;artTex.update();
+const artMat=new B.StandardMaterial('bowl wall art material',scene);
+artMat.diffuseTexture=artTex;artMat.opacityTexture=artTex;artMat.backFaceCulling=false;
+artMat.useAlphaFromDiffuseTexture=true;artMat.disableLighting=true;
+const artPositions=[],artIndices=[],artUvs=[];
+const arcN=128,radialN=28;
+for(let j=0;j<=radialN;j++){
+ const rad=bowl.radius*(.43+.53*j/radialN);
+ for(let i=0;i<=arcN;i++){
+  const a=2*Math.PI*i/arcN,x=bowl.x+rad*Math.cos(a),z=bowl.z+rad*Math.sin(a);
+  artPositions.push(x,height(x,z)+.055,z);
+  artUvs.push(i/arcN,j/radialN);
+ }
+}
+for(let j=0;j<radialN;j++)for(let i=0;i<arcN;i++){
+ const a=j*(arcN+1)+i,b=a+arcN+1;
+ artIndices.push(a,a+1,b,b,a+1,b+1);
+}
+const artMesh=new B.Mesh('curved bowl graffiti and sticker decals',scene);
+const artData=new B.VertexData();artData.positions=artPositions;artData.indices=artIndices;artData.uvs=artUvs;artData.normals=[];
+B.VertexData.ComputeNormals(artPositions,artIndices,artData.normals);artData.applyToMesh(artMesh);artMesh.material=artMat;
 const coping=B.MeshBuilder.CreateTube('bowl continuous steel coping',{path,radius:.09,tessellation:10},scene);coping.material=metal;return m}
-root.SOLBowl={bowl,height,sample,roll,mesh};
+root.SOLBowl={bowl,height,sample,roll,vertLaunch,mesh};
 })(typeof window!=='undefined'?window:globalThis);
