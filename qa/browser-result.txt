@@ -34,29 +34,29 @@
     }
   },
   "spin": {
-    "yaw": 2.2736762063410922,
-    "skaterYaw": 2.2736762063410922,
+    "yaw": 6.0632585752573664,
+    "skaterYaw": 6.0632585752573664,
     "cameraYaw": 0,
     "grounded": false
   },
   "push": {
-    "speed": 3.0946188162141413,
-    "phase": 1.6250000000000002,
+    "speed": 1.9698472335438888,
+    "phase": 1.2116000000000096,
     "grounded": true,
     "onRamp": false,
     "grinding": false,
     "bowlAir": false,
-    "burstUntil": 4617.900000000009,
-    "now": 3701.4000000000087,
-    "frame": 17,
+    "burstUntil": 4525.300000000003,
+    "now": 3448.7000000000044,
+    "frame": 28,
     "y": 0,
-    "z": 0.33919468762796345
+    "z": 0.16065908980404475
   },
   "riding": {
-    "x": -36.00243414986324,
-    "z": -22.731790717034382,
-    "y": 0.06367715596416623,
-    "speed": 6.1415732632825675
+    "x": -36.02626454628856,
+    "z": -23.90216531858774,
+    "y": 0.2661446037774038,
+    "speed": 7.122039934321876
   },
   "bowl": {
     "exists": true,
@@ -64,6 +64,7 @@
     "materialAlpha": 1,
     "depthWrite": true,
     "blend": false,
+    "textureName": "bowl painted concrete art",
     "rayHit": true,
     "rayY": -7.427122942059906,
     "surfaceY": -7.442810543463304,
@@ -71,7 +72,7 @@
     "diameterMeters": 30.48,
     "depthMeters": 7.62,
     "meshes": 261,
-    "fps": 5.176429988784402
+    "fps": 10.45879235810904
   },
   "parkWalls": 0
 }
