@@ -4,7 +4,7 @@ const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 function pose(state,boost,now,steer){
  const grounded=!!state.grounded&&!state.grinding;
  const pushing=grounded&&!!boost&&state.speed<13;
- const phase=((now*.0065)%(Math.PI*2)+Math.PI*2)%(Math.PI*2);
+ const phase=Number.isFinite(state.pushPhase)?state.pushPhase:0;
  const contact=pushing?Math.max(0,Math.sin(phase)):0;
  const recovery=pushing?Math.max(0,-Math.sin(phase)):0;
  const carve=clamp(steer||0,-1,1);
