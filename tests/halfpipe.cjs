@@ -1,28 +1,36 @@
-const assert=require('node:assert/strict');require('../terrain.js');const T=globalThis.SOLTerrain;
-const left={x:46,z:-52,w:16,d:4.8,h:2.1,curve:'halfpipe-left'},right={x:46,z:-40.2,w:16,d:4.8,h:2.1,curve:'halfpipe-right'};
-const dl={x:46,z:-55.95,w:16,d:3.1,h:2.1,curve:'halfpipe-deck'},dr={x:46,z:-36.25,w:16,d:3.1,h:2.1,curve:'halfpipe-deck'};
-const ramps=[left,right,dl,dr];
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+require('../terrain.js');const T=globalThis.SOLTerrain;
+const html=fs.readFileSync('index.html','utf8');
+const match=html.match(/const ramps=(\[[^\n]*?\]);function groundContact/);
+assert(match,'Read the real skatepark ramp layout, not an obsolete fixture');
+const ramps=vm.runInNewContext(match[1]);
+const left=ramps.find(r=>r.curve==='halfpipe-left'),right=ramps.find(r=>r.curve==='halfpipe-right');
+const dl=ramps.find(r=>r.curve==='halfpipe-deck'&&r.z<left.z);
+const dr=ramps.find(r=>r.curve==='halfpipe-deck'&&r.z>right.z);
+assert(left&&right&&dl&&dr,'Halfpipe needs two transitions and two decks');
+assert.equal(left.x,-36,'Halfpipe must be in accessible main plaza');
+assert.equal(left.x,right.x,'Opposing halfpipe transitions must align');
+const middle=(left.z+left.d/2+right.z-right.d/2)/2;
 function close(a,b){assert(Math.abs(a-b)<.000001,`${a} != ${b}`)}
-close(T.profile(left,0).height,2.1);close(T.profile(left,1).height,0);
-close(T.profile(right,0).height,0);close(T.profile(right,1).height,2.1);
+close(T.profile(left,0).height,left.h);close(T.profile(left,1).height,0);
+close(T.profile(right,0).height,0);close(T.profile(right,1).height,right.h);
 close(T.profile(left,1).slope,0);close(T.profile(right,0).slope,0);
-assert(T.profile(left,0).slope<0);assert(T.profile(right,1).slope>0);
-close(T.sample(46,-46.1,ramps).height,0);close(T.sample(46,-55.95,ramps).height,2.1);close(T.sample(46,-36.25,ramps).height,2.1);
-assert(T.launch(T.sample(46,-54.4,ramps),T.sample(46,-54.5,ramps),-54.5,Math.PI,8)>0);
-assert(T.launch(T.sample(46,-37.81,ramps),T.sample(46,-37.7,ramps),-37.7,0,8)>0);
-assert.equal(T.launch(T.sample(46,-54.4,ramps),T.sample(46,-54.5,ramps),-54.5,0,8),0);
-console.log('PASS: two circular transitions, flat bottom, decks, bidirectional lip launch');
-
+assert(T.profile(left,0).slope<0&&T.profile(right,1).slope>0);
+close(T.sample(left.x,middle,ramps).height,0);
+close(T.sample(dl.x,dl.z,ramps).height,left.h);
+close(T.sample(dr.x,dr.z,ramps).height,right.h);
+const leftLip=left.z-left.d/2,rightLip=right.z+right.d/2;
+assert(T.launch(T.sample(left.x,leftLip,ramps),T.sample(left.x,leftLip-.1,ramps),leftLip-.1,Math.PI,8)>0);
+assert(T.launch(T.sample(right.x,rightLip,ramps),T.sample(right.x,rightLip+.1,ramps),rightLip+.1,0,8)>0);
+assert.equal(T.launch(T.sample(left.x,leftLip,ramps),T.sample(left.x,leftLip-.1,ramps),leftLip-.1,0,8),0);
+console.log('PASS: live plaza halfpipe coordinates, opposing transitions, flat bottom, decks, lip launches');
 require('../obstacles.js');
-const deckToRamp=globalThis.SOLTerrain.launch(T.sample(46,-55.9,ramps),T.sample(46,-54.3,ramps),-54.3,0,8);
-assert.equal(deckToRamp,0,'Drop-in from a deck must not launch rider upward');
-const cheek=globalThis.SOLObstacles.rampSide(37,-54.2,39,-54.2,0,ramps);
-assert(cheek.hit&&cheek.x<38,'Raised halfpipe cheek must stop side penetration');
-console.log('PASS: safe deck drop-in and full-profile halfpipe side collision');
-
-require('../motion.js');
-const M=globalThis.SOLMotion;
-const rider={x:46,z:-46.1,dir:0,speed:5,travelSign:-1,grounded:true,grinding:false,onRamp:false};
+assert.equal(T.launch(T.sample(dl.x,dl.z,ramps),T.sample(left.x,leftLip+.1,ramps),leftLip+.1,0,8),0,'Dropping in from a deck must not falsely launch');
+const cheek=globalThis.SOLObstacles.rampSide(left.x-left.w/2-1,left.z,left.x-left.w/2+1,left.z,0,ramps);
+assert(cheek.hit&&cheek.x<left.x-left.w/2,'Solid sidewall must stop ground-level penetration');
+console.log('PASS: safe drop-in and side collision against current geometry');
+require('../motion.js');const M=globalThis.SOLMotion;
+const rider={x:left.x,z:middle,dir:0,speed:5,travelSign:-1,grounded:true,grinding:false,onRamp:false};
 let turns=0,previous=rider.travelSign,minZ=Infinity,maxZ=-Infinity;
 for(let i=0;i<400;i++){
  const dt=.016,old=T.sample(rider.x,rider.z,ramps);
@@ -33,12 +41,13 @@ for(let i=0;i<400;i++){
  if(rider.travelSign!==previous){turns++;previous=rider.travelSign}
  minZ=Math.min(minZ,rider.z);maxZ=Math.max(maxZ,rider.z);
 }
-assert(turns>=1&&maxZ-minZ>4,'Skater must naturally roll backwards down transition and across flat');
-assert(T.launch(T.sample(46,-54.4,ramps),T.sample(46,-54.5,ramps),-54.5,0,8,-1)>0,'Fakie lip launch must work');
-console.log('PASS: wall rollback, cross-flat travel, and fakie lip launch');
-
-const deckWall=globalThis.SOLObstacles.rampSide(46,-33,46,-35,0,[dr]);
-assert(deckWall.hit&&deckWall.z>-35,'Ground-level skater must not pass through deck rear wall');
-const deckTop=globalThis.SOLObstacles.rampSide(46,-33,46,-35,2.1,[dr]);
-assert(!deckTop.hit&&deckTop.z===-35,'Skater at deck height may enter normally');
-console.log('PASS: elevated halfpipe deck rear-wall collision and valid top entry');
+assert(turns>=1&&maxZ-minZ>4,'Rider must naturally roll back downhill and cross the halfpipe flat');
+assert(T.launch(T.sample(left.x,leftLip,ramps),T.sample(left.x,leftLip-.1,ramps),leftLip-.1,0,8,-1)>0,'Fakie lip launch must work');
+console.log('PASS: real halfpipe wall rollback, cross-flat riding, and fakie lip launch');
+const deckRear=dr.z+dr.d/2;
+const deckWall=globalThis.SOLObstacles.rampSide(dr.x,deckRear+1.5,dr.x,deckRear-.5,0,[dr]);
+assert(deckWall.hit&&deckWall.z>deckRear-.5,'Ground-level rider must not enter elevated deck through rear wall');
+const deckTop=globalThis.SOLObstacles.rampSide(dr.x,deckRear+1.5,dr.x,deckRear-.5,dr.h,[dr]);
+assert(!deckTop.hit,'Rider at deck elevation must be able to enter');
+assert(html.includes('HALFPIPE PARK CONNECTION'),'Halfpipe must remain accessible from main park');
+console.log('PASS: raised deck rear-wall collision and connected park access');
