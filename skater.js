@@ -11,7 +11,7 @@ function pose(state,boost,now,steer){
  const crouch=!grounded?.17+Math.min(.12,Math.abs(state.vy||0)*.012):Math.min(.23,Math.abs(carve)*.07+Math.max(0,state.speed||0)*.004+(state.onRamp?Math.max(0,state.pumpIntensity||0)*.14:0));
  return {pushing,contact,recovery,crouch,
    // Body turns 90 degrees from forward-facing to a skateboard stance.
-   torsoYaw:.32,
+   torsoYaw:Math.PI/2,
    torsoLean:grounded?-.07-contact*.13:-.19,
    frontHip:grounded?.12+crouch*.6:-.3,
    backHip:pushing?-.42-contact*.28+recovery*.18:grounded?.12+crouch*.6:-.3,
