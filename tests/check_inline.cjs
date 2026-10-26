@@ -27,6 +27,10 @@ assert(html.includes('SOLMotion.beginAir(state)'), 'Takeoffs must lock horizonta
 assert(html.includes('SOLMotion.landingAlignment(state)'), 'Landing must validate heading versus velocity');
 assert(html.includes('SOLGrind.find('), 'Rail entry must use height-aware grind detection');
 assert(html.includes('SOLGrind.advance('), 'Rail travel must use constrained grind simulation');
+assert(html.includes('SOLGrind.visualYaw(state)'), 'Boardslide must visibly rotate skater across the rail');
+assert(html.includes('state.grindVisualYaw'), 'Boardslide yaw should ease in and out rather than snap');
+assert(html.includes('data-t="boardslide"'), 'Mobile boardslide button must remain present');
+assert(html.includes("[11,'boardslide']"), 'Fallback controller must retain R3 boardslide mapping');
 assert(html.includes('grindCooldown'), 'Rail dismount cooldown must be wired');
 assert(html.includes('SOLObstacles.sweep('), 'Swept collision must be integrated');
 assert(html.includes('SOLObstacles.surface('), 'Elevated platforms must be integrated');
