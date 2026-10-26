@@ -24,3 +24,11 @@ assert.equal(p.x,1);
 pad.connected=false;p=poll(2400);
 assert.equal(p.connected,false);assert.equal(p.x,0);
 console.log('SOL SKATE controller regression checks passed');
+
+pad.connected=true;pad.buttons.forEach(b=>b.pressed=false);pad.axes=[0,0,0,0];poll(2500);
+pad.buttons[4].pressed=true;poll(2510);poll(2520);assert.equal(actions.at(-1),'grind');assert.equal(actions.filter(a=>a==='grind').length,1,'LB grind is edge-triggered');
+pad.buttons[5].pressed=true;assert.equal(poll(2530).grabHeld,true);pad.buttons[5].pressed=false;assert.equal(poll(2540).grabHeld,false,'RB release ends hold');
+pad.connected=false;assert.equal(poll(2550).grabHeld,false,'Disconnect clears grab hold');
+console.log('PASS: Xbox LB grind, RB hold/release and disconnect');
+
+context.navigator.getGamepads=()=>{throw new Error('SecurityError: gamepad permission denied')};assert.equal(poll(2600).connected,false,'Denied Gamepad API must not crash touch gameplay');

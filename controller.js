@@ -18,12 +18,14 @@
   }
   function poll(onTrick, now) {
     const time = Number.isFinite(now) ? now : performance.now();
-    const pads = typeof navigator.getGamepads === 'function' ? navigator.getGamepads() : [];
+    // Embedded browsers may deny Gamepad API access. Touch/keyboard must keep running.
+    let pads=[];
+    try { pads = typeof navigator.getGamepads === 'function' ? (navigator.getGamepads() || []) : []; } catch (_) { pads=[]; }
     let pad = selected === null ? null : pads[selected];
     if (!pad || !pad.connected) pad = Array.from(pads).find(p => p && p.connected);
     if (!pad) {
       reset();
-      return { x: 0, y: 0, boost: false, connected: false, status: '🎮 Press a controller button' };
+      return { x: 0, y: 0, boost: false, grabHeld: false, connected: false, status: '🎮 Press a controller button' };
     }
     if (selected !== pad.index) {
       selected = pad.index;
@@ -33,7 +35,7 @@
     const b = pad.buttons;
     const pressed = i => read(b, i);
     // Xbox Standard mapping: A ollie, X kickflip, B heelflip, Y shove-it, RB grab.
-    for (const [i, action] of [[0, 'ollie'], [2, 'kick'], [1, 'heel'], [3, 'shove'], [5, 'grab']]) {
+    for (const [i, action] of [[0, 'ollie'], [2, 'kick'], [1, 'heel'], [3, 'shove'], [5, 'grab'], [4, 'grind']]) {
       if (pressed(i) && !lastButtons[i]) onTrick(action);
     }
     lastButtons = b.map(v => !!v.pressed);
@@ -53,8 +55,8 @@
     if (!x) x = (pressed(15) ? 1 : 0) - (pressed(14) ? 1 : 0);
     if (!y) y = (pressed(13) ? 1 : 0) - (pressed(12) ? 1 : 0);
     return {
-      x, y, boost: pressed(7), connected: true,
-      status: '🎮 ' + (/xbox/i.test(pad.id || '') ? 'Xbox connected' : 'Controller connected') + ' · LS steer · RT push · RS flick'
+      x, y, boost: pressed(7), grabHeld: pressed(5), connected: true,
+      status: '🎮 ' + (/xbox/i.test(pad.id || '') ? 'Xbox connected' : 'Controller connected') + ' · LS steer · RT push · LB grind · RB grab · RS flick'
     };
   }
   root.SOLPad = { poll, reset, deadzone };
