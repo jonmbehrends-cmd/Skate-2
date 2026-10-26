@@ -23,7 +23,7 @@ function step(state,steer,throttle,boost,dt){
     // RT delivers impulse only during the planted-foot half of each push.
     // Phase advances in simulation time, so physics and animation stay synchronized.
     state.pushPhase=Number.isFinite(state.pushPhase)?state.pushPhase:0;
-    const pushing=!!boost&&!state.onRamp&&state.travelSign!==-1&&speed<13;
+    const pushing=!!boost&&!state.onRamp&&state.travelSign!==-1&&speed<16;
     if(pushing)state.pushPhase=(state.pushPhase+h*6.5)%(Math.PI*2);
     else state.pushPhase=0;
     const contact=pushing?Math.max(0,Math.sin(state.pushPhase)):0;
