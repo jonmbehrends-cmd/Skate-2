@@ -3,47 +3,42 @@
  */
 (function(root){'use strict';
 const GRAVITY=19;
-function find(state,rails,dt,stable){
-  if(!stable||state.grinding||state.grounded||state.speed<1.5||state.vy>1.5||state.grindCooldown>0)return null;
-  const h=Math.max(0,Math.min(.04,Number.isFinite(dt)?dt:0));
-  if(!h)return null;
-  const nextY=state.y+(state.vy-GRAVITY*h)*h;
-  for(const rail of rails){
-    const top=Number.isFinite(rail.y)?rail.y:1.1;
-    // The trucks must cross the rail, not teleport onto it from far above.
-    if(state.y<top-.28||nextY>top+.65)continue;
-    if(Math.abs(state.x-rail.x)>1.15)continue;
-    if(Math.abs(state.z-rail.z)>rail.len/2-.12)continue;
-    if(Math.abs(Math.cos(state.dir))<.3)continue;
-    return {rail,top,direction:Math.cos(state.dir)>=0?1:-1};
-  }
-  return null;
+function find(state,rails,dt,stable,assist=false){
+ if(!stable||state.grinding||state.speed<1.3||state.grindCooldown>0||(!assist&&state.grounded)||state.vy>2)return null;
+ const h=Math.max(0,Math.min(.04,Number.isFinite(dt)?dt:0));
+ const nextY=state.y+(state.vy-GRAVITY*h)*h;
+ let best=null,bestDist=Infinity;
+ for(const rail of rails){
+  const top=Number.isFinite(rail.y)?rail.y:1.1;
+  if(state.y<top-(assist?.55:.28)||nextY>top+(assist?1.15:.65))continue;
+  const axis=rail.axis==='x'?'x':'z',cross=axis==='z'?'x':'z';
+  const crossDist=Math.abs(state[cross]-rail[cross]);
+  const alongDist=Math.abs(state[axis]-rail[axis]);
+  if(crossDist>(assist?1.35:1.05)||alongDist>rail.len/2+.1)continue;
+  const heading=axis==='z'?Math.cos(state.dir):Math.sin(state.dir);
+  if(Math.abs(heading)<(assist?.12:.3))continue;
+  const distance=crossDist+Math.abs(state.y-top)*.3;
+  if(distance<bestDist){best={rail,top,direction:heading*(state.travelSign===-1?-1:1)>=0?1:-1};bestDist=distance}
+ }
+ return best;
 }
 function attach(state,contact){
-  if(!contact)return false;
-  state.grinding=true;state.grounded=false;state.grindRail=contact.rail;
-  state.grindTime=0;state.y=contact.top;state.vy=0;
-  state.x=contact.rail.x;state.dir=contact.direction>0?0:Math.PI;state.travelSign=1;
-  state.speed*=.97;
-  return true;
+ if(!contact)return false;
+ const rail=contact.rail,axis=rail.axis==='x'?'x':'z',cross=axis==='z'?'x':'z';
+ state.grinding=true;state.grounded=false;state.grindRail=rail;state.grindTime=0;
+ state.y=contact.top;state.vy=0;state[cross]=rail[cross];
+ state.dir=axis==='z'?(contact.direction>0?0:Math.PI):(contact.direction>0?Math.PI/2:-Math.PI/2);
+ state.travelSign=1;state.speed*=.97;return true;
 }
 function advance(state,dt){
-  if(!state.grinding||!state.grindRail)return false;
-  const rail=state.grindRail;
-  const h=Math.max(0,Math.min(.04,Number.isFinite(dt)?dt:0));
-  state.grindTime+=h;
-  state.x=rail.x;
-  state.y=Number.isFinite(rail.y)?rail.y:1.1;state.dir=Math.cos(state.dir)>=0?0:Math.PI;
-  state.vy=0;
-  state.speed=Math.max(0,state.speed-1.35*h);
-  state.combo+=110*h;
-  const ended=Math.abs(state.z-rail.z)>=rail.len/2-.12||state.speed<1.5||state.grindTime>4;
-  if(ended){
-    state.grinding=false;state.grindRail=null;state.grounded=false;
-    state.grindCooldown=.5;state.rampCooldown=Math.max(state.rampCooldown||0,.4);
-    state.y+=.01;state.vy=0;
-  }
-  return ended;
+ if(!state.grinding||!state.grindRail)return false;
+ const rail=state.grindRail,axis=rail.axis==='x'?'x':'z',cross=axis==='z'?'x':'z';
+ const h=Math.max(0,Math.min(.04,Number.isFinite(dt)?dt:0));
+ state.grindTime+=h;state[cross]=rail[cross];state.y=Number.isFinite(rail.y)?rail.y:1.1;
+ state.vy=0;state.speed=Math.max(0,state.speed-1.35*h);state.combo+=110*h;
+ const ended=Math.abs(state[axis]-rail[axis])>=rail.len/2-.12||state.speed<1.5||state.grindTime>4;
+ if(ended){state.grinding=false;state.grindRail=null;state.grounded=false;state.grindCooldown=.5;state.rampCooldown=Math.max(state.rampCooldown||0,.4);state.y+=.01;state.vy=0}
+ return ended;
 }
 root.SOLGrind={find,attach,advance};
 })(typeof window!=='undefined'?window:globalThis);
