@@ -18,3 +18,9 @@ const moving={vy:-3,dir:Math.PI/2,speed:8,airVX:0,airVZ:10};
 assert.equal(relativeImpact(moving,0,.3),-6,'Landing impact uses actual travel, not facing');
 assert.equal(relativeImpact({...moving,airVX:null,airVZ:null},0,.3),-3,'Facing fallback for legacy state');
 console.log('PASS: four-wheel plane fit, rotated heading, ledge clearance, slope-relative landing');
+
+const stepEdge=sample(0,0,0,0,(x,z)=>({height:(x>.1||z>.1)?2:0}));
+assert(Math.abs(stepEdge.roll)<.35,'Abrupt ledge must not roll the deck near vertical');
+assert(Math.abs(stepEdge.pitch)<.71,'Abrupt ledge must not pitch the deck near vertical');
+for(const p of stepEdge.points)assert(stepEdge.height+stepEdge.forwardSlope*p.forward+stepEdge.sideSlope*p.side>=p.height-1e-9,'Tilt cap must retain wheel clearance');
+console.log('PASS: extreme ledge contact bounded pitch/bank without wheel penetration');
