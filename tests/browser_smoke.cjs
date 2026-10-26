@@ -104,6 +104,39 @@ const server=http.createServer((req,res)=>{
   await page.waitForTimeout(500);
   await page.screenshot({path:'test-artifacts/halfpipe-chromium.png',animations:'disabled'});
   assert(fs.statSync('test-artifacts/halfpipe-chromium.png').size>10000,'Halfpipe screenshot unexpectedly blank');
+  // Boardslide is a real touch-triggered rail state with a 90-degree rendered
+  // board stance, while physical travel continues lengthwise along the rail.
+  await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__,s=d.state;
+   Object.assign(s,{x:0,z:19,y:0,groundY:0,dir:0,speed:5,travelSign:1,grounded:true,grinding:false,vy:0,grindCooldown:0,grindRequestType:null});
+  });
+  assert(await page.locator('[data-t="boardslide"]').count()===1,'Touch BOARD SLIDE control must exist');
+  await page.locator('[data-t="boardslide"]').dispatchEvent('pointerdown',{pointerId:17});
+  const boardInput=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
+   return {type:s.grindRequestType,airborne:!s.grounded,vy:s.vy}});
+  assert(boardInput.type==='boardslide'&&boardInput.airborne&&boardInput.vy>0,
+   'Touch boardslide must request a real ollie-assisted rail catch: '+JSON.stringify(boardInput));
+  await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__,s=d.state,B=window.BABYLON;
+   Object.assign(s,{x:.1,z:19,y:1.24,groundY:0,dir:0,speed:5,travelSign:1,grounded:false,
+    grinding:false,vy:-3,grindCooldown:0,grindVisualYaw:0,airVX:null,airVZ:null});
+   const rail={x:0,z:19,len:14,y:1.1,axis:'z',kind:'rail'};
+   const contact=window.SOLGrind.find(s,[rail],.025,true,true);
+   if(!contact||!window.SOLGrind.attach(s,contact))throw Error('Boardslide did not attach to rail');
+   d.scene.activeCamera=new B.ArcRotateCamera('boardslide QA camera',.6,1.16,12,new B.Vector3(0,1.5,19),d.scene);
+  });
+  await page.waitForFunction(()=>{const d=window.__SOL_DIAGNOSTICS__;
+   return d.state.grinding&&Math.abs(d.skater.rotation.y-d.state.dir)>.9;
+  },null,{timeout:8000});
+  const boardslide=await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__,s=d.state;
+   return {type:s.grindType,grinding:s.grinding,yaw:d.skater.rotation.y-s.dir,
+    x:s.x,z:s.z,speed:s.speed,score:s.combo,rail:s.grindRail?.kind};
+  });
+  assert(boardslide.grinding&&boardslide.type==='boardslide'&&Math.abs(boardslide.yaw)>1,
+   'Rendered board and rider must turn across the rail: '+JSON.stringify(boardslide));
+  assert(Math.abs(boardslide.x)<.01&&boardslide.z>19&&boardslide.speed>1,
+   'Boardslide must keep moving along the rail rather than strafing sideways: '+JSON.stringify(boardslide));
+  await page.screenshot({path:'test-artifacts/boardslide-chromium.png',animations:'disabled'});
+  assert(fs.statSync('test-artifacts/boardslide-chromium.png').size>10000,
+   'Boardslide screenshot unexpectedly blank');
   // Verify the recessed bowl is real pickable geometry, not a visual-only decal.
   // Save a full 3D perspective for visual review of the 100-foot / 25-foot bowl.
   const bowl=await page.evaluate(()=>{
@@ -171,6 +204,6 @@ const server=http.createServer((req,res)=>{
   assert(fs.statSync('test-artifacts/park-chromium.png').size>14000,'Park overview screenshot unexpectedly blank');
 
   assert.equal(errors.length,0,'Browser errors: '+errors.join('; '));
-  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',status,spin,push,riding,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
+  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',status,spin,push,riding,boardInput,boardslide,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
  }finally{await browser.close()}
 })().catch(e=>{fs.mkdirSync('test-artifacts',{recursive:true});fs.writeFileSync('test-artifacts/browser-result.txt','FAIL: '+(e&&e.stack||String(e)));console.error(e);process.exitCode=1}).finally(()=>server.close());
