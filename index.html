@@ -71,6 +71,13 @@ const head=B.MeshBuilder.CreateSphere('head',{diameter:.4,segments:16},scene);he
 const hairCap=B.MeshBuilder.CreateSphere('hair cap',{diameter:.42,segments:16,slice:.55},scene);hairCap.parent=body;hairCap.position.set(0,2.27,.005);hairCap.material=hair;
 const helmet=B.MeshBuilder.CreateSphere('helmet',{diameter:.46,segments:16,slice:.55},scene);helmet.parent=body;helmet.position.set(0,2.31,0);helmet.material=pants;
 const brim=box('helmet brim',.32,.035,.17,0,2.29,.19,pants);brim.parent=body;
+// Low-cost skater identity details: geometry follows the animated torso and head.
+const helmetBand=mat('helmet accent paint','#f3a92e');
+const helmetStripe=box('helmet center stripe',.065,.025,.32,0,2.535,0,helmetBand);helmetStripe.parent=body;
+const jacketLogo=mat('jacket chest emblem','#f0d6a6');
+const chestPatch=box('jacket chest patch',.22,.13,.022,0,1.57,.304,jacketLogo);chestPatch.parent=body;
+const backpack=box('slim skate backpack',.39,.46,.16,0,1.53,-.32,pants);backpack.parent=body;
+const bagTrim=box('backpack reflective stripe',.28,.035,.015,0,1.59,-.407,helmetBand);bagTrim.parent=body;
 const legs=[],arms=[],knees=[],elbows=[],shoes=[];
 for(let i=0;i<2;i++){const side=i===0?-1:1;
 const hipJoint=new B.TransformNode('hip joint',scene);hipJoint.parent=hips;hipJoint.position.set(side*.28,-.03,0);legs.push(hipJoint);
