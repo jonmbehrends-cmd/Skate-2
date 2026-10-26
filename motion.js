@@ -41,6 +41,22 @@ function step(state,steer,throttle,boost,dt){
   }
   return state;
 }
+// Ramp pumping converts a timed crouch/extension into tangential acceleration.
+// Never creates speed on flat ground or while airborne/grinding.
+function pump(state,previous,current,dt){
+ const h=clamp(Number.isFinite(dt)?dt:0,0,.05);
+ if(!h||!state.grounded||state.grinding||!current||!current.ramp)return 0;
+ const slope=Number.isFinite(current.slope)?current.slope:0;
+ const before=previous&&Number.isFinite(previous.slope)?previous.slope:slope;
+ const forward=Math.cos(state.dir||0);
+ const speed=Number.isFinite(state.speed)?state.speed:0;
+ // Compression on an increasing transition slope; extension on decreasing slope.
+ const change=(slope-before)*forward;
+ const impulse=clamp(Math.abs(change)*Math.max(0,speed)*1.35,0,1.1);
+ if(impulse>.0001){state.speed=clamp(speed+impulse,0,17);state.pumpIntensity=clamp(impulse*2,0,1)}
+ else state.pumpIntensity=Math.max(0,(state.pumpIntensity||0)-h*3);
+ return impulse;
+}
 // Capture travel velocity at takeoff. Airborne facing can change without
 // redirecting the centre of mass; there is no lateral jetpack steering.
 function beginAir(state){
@@ -83,5 +99,5 @@ function collide(state,contacts){
   state.speed=clamp(Math.hypot(state.airVX,state.airVZ),0,17);
   return true;
 }
-root.SOLMotion={step,beginAir,clearAir,horizontal,landingAlignment,collide};
+root.SOLMotion={step,beginAir,clearAir,horizontal,landingAlignment,collide,pump};
 })(typeof window!=='undefined'?window:globalThis);
