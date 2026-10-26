@@ -22,7 +22,7 @@ assert(html.includes('SOLObstacles.rampSide('), 'Ramp side collision must be int
 assert(html.includes('previousContact.height>contact.height'), 'Platform edges must drop instead of snapping');
 assert(html.includes('SOLTerrain.sample('), 'Terrain sampling must be integrated');
 assert(html.includes('SOLTerrain.launch('), 'Lip launch must be integrated');
-assert(html.includes("CreateRibbon('bank'"), 'Ramps must render as curved ribbons');
+assert(html.includes("new B.Mesh('skatable curved concrete'") && html.includes('vd.applyToMesh(mesh)'), 'Ramps must render as shared-profile curved WebGL meshes');
 assert(html.includes('SOLTerrain.profile(r,t)'), 'Mesh must share contact profile');
 assert(html.includes('Math.ceil(elapsed/.025)'), 'Simulation must substep slow frames');
 assert(html.indexOf('src="controller.js"') < html.indexOf('src="landing.js"'), 'Controller precedes landing module');
