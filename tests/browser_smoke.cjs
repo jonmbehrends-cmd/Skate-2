@@ -134,7 +134,21 @@ const server=http.createServer((req,res)=>{
   await page.waitForTimeout(650);
   await page.screenshot({path:'test-artifacts/bowl-chromium.png',animations:'disabled'});
   assert(fs.statSync('test-artifacts/bowl-chromium.png').size>14000,'Bowl screenshot unexpectedly blank');
+  // The old tall teal architectural-edge boxes obscured skating approaches.
+  // Ensure the park shows sculpted riding surfaces rather than decorative walls.
+  const parkWalls=await page.evaluate(()=>window.__SOL_DIAGNOSTICS__.scene.meshes.filter(m=>m.name==='ramp architectural edge').length);
+  assert.equal(parkWalls,0,'Tall decorative ramp walls must not return');
+  await page.evaluate(()=>{
+   const d=window.__SOL_DIAGNOSTICS__,B=window.BABYLON;
+   const c=new B.ArcRotateCamera('park QA connected riding lines',.55,1.10,88,
+    new B.Vector3(4,1.3,42),d.scene);
+   c.fov=1.0;d.scene.activeCamera=c;
+  });
+  await page.waitForTimeout(550);
+  await page.screenshot({path:'test-artifacts/park-chromium.png',animations:'disabled'});
+  assert(fs.statSync('test-artifacts/park-chromium.png').size>14000,'Park overview screenshot unexpectedly blank');
+
   assert.equal(errors.length,0,'Browser errors: '+errors.join('; '));
-  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',status,spin,push,riding,bowl},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
+  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',status,spin,push,riding,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
  }finally{await browser.close()}
 })().catch(e=>{fs.mkdirSync('test-artifacts',{recursive:true});fs.writeFileSync('test-artifacts/browser-result.txt','FAIL: '+(e&&e.stack||String(e)));console.error(e);process.exitCode=1}).finally(()=>server.close());
