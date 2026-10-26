@@ -1,6 +1,6 @@
 const assert=require('node:assert/strict');
 require('../grind.js');
-const {find,attach,advance}=globalThis.SOLGrind;
+const {find,attach,advance,visualYaw}=globalThis.SOLGrind;
 const rails=[{x:0,z:10,len:8,y:1.1}];
 function state(overrides={}){return {x:0,z:10,y:1.19,vy:-5,dir:0,speed:8,grounded:false,grinding:false,grindCooldown:0,combo:100,grindTime:0,...overrides}}
 const dt=.025;
@@ -28,4 +28,28 @@ assert(!s.grinding&&!s.grounded&&s.grindRail===null&&s.grindCooldown>0);
 const reverse=state({dir:Math.PI}),back=find(reverse,rails,dt,true);
 assert(back&&back.direction===-1,'Reverse-direction grinds supported');
 attach(reverse,back);assert(Math.abs(reverse.dir-Math.PI)<1e-9);
+// A boardslide must put the deck sideways over the rail without rotating the
+// movement vector away from the rail, and must cleanly restore normal riding.
+const board=state({x:.1,grindRequestType:'boardslide'});
+const boardHit=find(board,rails,dt,true,true);
+assert(boardHit,'Assisted boardslide must catch a descending board');
+const boardDir=board.dir;
+assert(attach(board,boardHit),'Boardslide attachment should succeed');
+assert.equal(board.grindType,'boardslide');
+assert.equal(board.grindRequestType,null,'Boardslide request must be consumed');
+assert(Math.abs(visualYaw(board)-Math.PI/2)<1e-9,'Board must sit 90 degrees across the rail');
+assert.equal(board.dir,boardDir,'Physical travel direction must stay along the rail');
+const boardScore=board.combo;
+advance(board,.025);
+assert(board.combo>boardScore,'Boardslide must score during rail travel');
+board.z=13.95;
+assert.equal(advance(board,.025),true,'Boardslide releases at the rail endpoint');
+assert.equal(visualYaw(board),0,'Board rotation must reset after leaving rail');
+assert.equal(board.grindSide,null,'Approach-side state must be cleared');
+const other=state({x:-.1,grindRequestType:'boardslide'});
+assert(attach(other,find(other,rails,dt,true,true)));
+assert(Math.abs(visualYaw(other)+Math.PI/2)<1e-9,'Opposite-side boardslides rotate the other way');
+const ordinary=state({grindRequestType:'50-50'});
+assert(attach(ordinary,find(ordinary,rails,dt,true)));
+assert.equal(visualYaw(ordinary),0,'Standard 50-50 must remain lengthwise');
 console.log('PASS: rail contact height, direction, speed, cooldown, board stability, traversal, and exit');
