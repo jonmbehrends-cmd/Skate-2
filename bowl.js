@@ -102,7 +102,7 @@ const bandMat=new B.StandardMaterial('bowl blue tile inlay',scene);
 bandMat.diffuseColor=new B.Color3(.10,.37,.44);
 bandMat.specularColor=new B.Color3(.16,.22,.23);
 const seamMat=new B.StandardMaterial('bowl fine expansion joints',scene);
-seamMat.diffuseColor=new B.Color3(.33,.37,.38);
+seamMat.diffuseColor=new B.Color3(.43,.48,.48);
 for(const fraction of [.72,.78,.91]){
  const ring=[];
  for(let i=0;i<=N;i++){
@@ -126,9 +126,9 @@ for(let k=0;k<16;k++){
 const artTex=new B.DynamicTexture('bowl graffiti and stickers', {width:1024,height:512},scene,true);
 const ctx=artTex.getContext();
 ctx.clearRect(0,0,1024,512);
-const sprays=[['SOL',180,145,'#e65a43',95,-.14],['SKATE',710,175,'#168f9b',83,.12],['VERT!',420,375,'#f3bb32',75,-.08],['RIDE',855,370,'#be65a9',62,.17]];
+const sprays=[['SOL',180,145,'#e65a43',58,-.14],['SKATE',710,175,'#168f9b',54,.12],['VERT!',420,375,'#f3bb32',50,-.08],['RIDE',855,370,'#be65a9',48,.17]];
 for(const [word,x,y,color,size,tilt] of sprays){
- ctx.save();ctx.translate(x,y);ctx.rotate(tilt);ctx.font='900 '+size+'px sans-serif';ctx.textAlign='center';ctx.lineWidth=14;ctx.strokeStyle='#263943';ctx.strokeText(word,0,0);ctx.fillStyle=color;ctx.fillText(word,0,0);ctx.restore();
+ ctx.save();ctx.translate(x,y);ctx.rotate(tilt);ctx.font='900 '+size+'px sans-serif';ctx.textAlign='center';ctx.lineWidth=3;ctx.strokeStyle='#f4e9d4';ctx.strokeText(word,0,0);ctx.fillStyle=color;ctx.fillText(word,0,0);ctx.restore();
 }
 for(let k=0;k<24;k++){
  const x=(k*179+75)%1024,y=(k*113+57)%512;
