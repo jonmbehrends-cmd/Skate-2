@@ -16,7 +16,7 @@ assert(html.includes('src="motion.js"'), 'Momentum module must load');
 assert(html.includes('src="wheels.js"'), 'Wheel contact module must load');
 assert(html.includes('SOLWheels.sample(state.x,state.z,state.dir,state.y,groundContact)'), 'Four-wheel support must drive visual board pose');
 assert(html.includes('SOLWheels.relativeImpact(state,0,contact.slope)'), 'Slope-relative impact must use airborne velocity');
-assert(html.includes('SOLMotion.step(state,steer,throttle,boost,dt)'), 'Ground/air controls must use deterministic motion module');
+assert(html.includes('SOLMotion.step(state,steer,throttle,boost||pushHeld||now<(state.pushBurstUntil||0),dt)'), 'Ground/air controls must use deterministic motion module with push input');
 assert(html.includes('SOLMotion.horizontal(state,dt)'), 'Horizontal airborne velocity must be decoupled from facing');
 assert(html.includes('SOLMotion.collide(state,[swept,side,bounds])'), 'Obstacle and park-edge impacts must update airborne vector velocity');
 assert(html.includes('SOLMotion.beginAir(state)'), 'Takeoffs must lock horizontal velocity');
