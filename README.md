@@ -1,6 +1,6 @@
 # SOL SKATE — WebGL 3D Alpha
 
-Galaxy-first skateboarding prototype using **Babylon.js/WebGL** with a third-person follow camera, 3D skateboard and skater, ramps, rails, ledges, airborne tricks, basic grinds, and combo scoring. The earlier 2D perspective prototype remains in `legacy.html`.
+Galaxy-first skateboarding prototype using **Babylon.js/WebGL** with a third-person follow camera, 3D skateboard and skater, ramps, rails, ledges, airborne tricks with acceleration-limited board rotation, landing-angle validation, basic grinds, and combo scoring. The earlier 2D perspective prototype remains in `legacy.html`.
 
 ## Play
 
@@ -20,18 +20,20 @@ Pair the controller with Android before launching. Some Android browser/controll
 
 ## Development
 
-- Entry point: `index.html`, with `controller.js` loaded before the inline Babylon game logic.
-- Run `node --check controller.js && node tests/controller.cjs` to test controller input.
+- Entry point: `index.html`, with `controller.js` and `landing.js` loaded before the inline Babylon game logic.
+- `landing.js` advances roll and yaw angles with bounded angular acceleration and speed. A trick must actually finish its rotations before touchdown; insufficient airtime now bails. Rail attachments require a stable board, and restart resets angular state.
+- Run `node --check controller.js && node --check landing.js && node tests/controller.cjs && node tests/landing.cjs && node tests/check_inline.cjs` for input, physics and integration syntax checks. The separate `SOL SKATE logic regression` GitHub Actions workflow runs these Node checks on each push.
+- Optional local Galaxy-sized Chromium touch emulation can exercise the physics module. This is not a physical Android/Xbox test.
 - GitHub Actions workflow `.github/workflows/deploy.yml` publishes the repository on pushes to `main`, if Pages is configured for GitHub Actions.
 - `window.__SOL_DIAGNOSTICS__` exposes the Babylon scene and simulation state for browser testing.
 
 ## Known limitations
 
-This is an early **true WebGL 3D** prototype, not console-grade graphics or a complete physics simulation. Ramp contacts and grind attachments are simplified, rotation/landing logic requires further refinement, and obstacle collision and advanced park objectives remain incomplete. Physical Samsung Galaxy and Xbox Bluetooth hardware testing has **not** been performed by the automated workshop. Publishing the source does not by itself confirm a successful Pages deployment.
+This is an early **true WebGL 3D** prototype, not console-grade graphics or a complete physics simulation. Ramp contacts and grind attachments are simplified, angular rotation is still kinematic rather than rigid-body physics, and obstacle collision and advanced park objectives remain incomplete. Physical Samsung Galaxy and Xbox Bluetooth hardware testing has **not** been performed by the automated workshop. Publishing the source does not by itself confirm a successful Pages deployment.
 
 ## Next milestones
 
 1. Validate live Pages deployment and Samsung Internet/Xbox mappings on hardware.
-2. Improve physical landings, rotation completion, ground contact, and obstacle collisions.
+2. Improve contact-aware landings, board/terrain collisions, and realistic airborne inertia beyond kinematic angular motion.
 3. Replace box ramps with curved quarterpipes/bowls and stable rail transitions.
 4. Add objectives, combo challenges, audio, performance budgets, and graphics improvements.
