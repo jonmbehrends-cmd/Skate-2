@@ -13,9 +13,9 @@ function step(state,steer,throttle,boost,dt){
   // In the air, the same left/right stick drives fast body-and-board yaw spins.
   // World-space travel velocity remains independent of facing direction.
   const steerRate=state.grinding?.11:state.grounded?.65+Math.min(1,speed/12):12.0;
-  // Steering is relative to the direction of rolling, including fakie.
-  // Reverse the board's yaw when rolling tail-first so LEFT still curves travel left.
-  state.dir+=turn*h*steerRate*(state.grounded&&state.travelSign===-1?-1:1);
+  // Chase camera follows travel heading; a second fakie steering inversion
+  // reverses the stick relative to the screen. Keep yaw input consistent.
+  state.dir+=turn*h*steerRate;
   if(state.grinding){
     // Rail friction and speed reduction belong to SOLGrind.advance.
     clearAir(state);
@@ -25,7 +25,7 @@ function step(state,steer,throttle,boost,dt){
     // RT delivers impulse only during the planted-foot half of each push.
     // Phase advances in simulation time, so physics and animation stay synchronized.
     state.pushPhase=Number.isFinite(state.pushPhase)?state.pushPhase:0;
-    const pushing=!!boost&&!state.onRamp&&state.travelSign!==-1&&speed<16;
+    const pushing=!!boost&&!state.onRamp&&speed<16;
     if(pushing)state.pushPhase=(state.pushPhase+h*6.5)%(Math.PI*2);
     else state.pushPhase=0;
     const contact=pushing?Math.max(0,Math.sin(state.pushPhase)):0;
