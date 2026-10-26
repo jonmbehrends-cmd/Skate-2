@@ -7,7 +7,7 @@ permissions:
   contents: write
 concurrency:
   group: sol-skate-browser-qa
-  cancel-in-progress: true
+  cancel-in-progress: false
 jobs:
   browser-smoke:
     runs-on: ubuntu-latest
