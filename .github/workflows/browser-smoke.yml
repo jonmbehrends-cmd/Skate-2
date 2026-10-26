@@ -4,11 +4,14 @@ on:
     branches: [main]
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
+concurrency:
+  group: sol-skate-browser-qa
+  cancel-in-progress: true
 jobs:
   browser-smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -16,10 +19,38 @@ jobs:
           node-version: '22'
       - run: npm install --no-save playwright@1.55.1
       - run: npx playwright install --with-deps chromium
-      - run: node tests/browser_smoke.cjs
+      - name: Test mobile Chromium WebGL gameplay
+        id: smoke
+        continue-on-error: true
+        run: node tests/browser_smoke.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: halfpipe-chromium-screenshot
-          path: test-artifacts/halfpipe-chromium.png
-          if-no-files-found: ignore
+          name: sol-skate-chromium-visual-evidence
+          path: test-artifacts/
+          if-no-files-found: warn
+      - name: Persist screenshot and test outcome for review
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p qa
+          rm -f qa/halfpipe-chromium.png qa/halfpipe-mobile.png
+          for name in halfpipe-chromium.png halfpipe-mobile.png; do
+            if test -f "test-artifacts/$name"; then cp "test-artifacts/$name" "qa/$name"; fi
+          done
+          if test -f test-artifacts/browser-result.txt; then
+            cp test-artifacts/browser-result.txt qa/browser-result.txt
+          else
+            echo 'FAIL: Chromium smoke did not produce a result (setup or startup failed)' > qa/browser-result.txt
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add qa/
+          if ! git diff --cached --quiet; then
+            git commit -m 'QA: update real Chromium screenshot evidence [skip ci]'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - name: Require Chromium gameplay smoke to pass
+        if: steps.smoke.outcome == 'failure'
+        run: exit 1
