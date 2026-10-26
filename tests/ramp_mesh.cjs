@@ -38,3 +38,7 @@ function test(r){
 const bank=test({x:1,z:2,w:8,d:10,h:1.5});
 const quarter=test({x:-12,z:15,w:10,d:8,h:2.4,curve:'quarter'});
 console.log('PASS: sealed outward-facing bank and quarterpipe; manifold edges',bank,quarter);
+
+assert(html.includes("rampSurface.alpha=1"),'Ramp must be fully opaque');
+assert(html.includes('rampSurface.backFaceCulling=false'),'Ramp must be visible from both sides');
+assert(html.includes('MATERIAL_OPAQUE'),'Ramp must use opaque material rendering mode');
