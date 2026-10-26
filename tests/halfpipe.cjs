@@ -12,3 +12,10 @@ assert(T.launch(T.sample(46,-54.4,ramps),T.sample(46,-54.5,ramps),-54.5,Math.PI,
 assert(T.launch(T.sample(46,-37.8,ramps),T.sample(46,-37.7,ramps),-37.7,0,8)>0);
 assert.equal(T.launch(T.sample(46,-54.4,ramps),T.sample(46,-54.5,ramps),-54.5,0,8),0);
 console.log('PASS: two circular transitions, flat bottom, decks, bidirectional lip launch');
+
+require('../obstacles.js');
+const deckToRamp=globalThis.SOLTerrain.launch(T.sample(46,-55.9,ramps),T.sample(46,-54.3,ramps),-54.3,0,8);
+assert.equal(deckToRamp,0,'Drop-in from a deck must not launch rider upward');
+const cheek=globalThis.SOLObstacles.rampSide(37,-54.2,39,-54.2,0,ramps);
+assert(cheek.hit&&cheek.x<38,'Raised halfpipe cheek must stop side penetration');
+console.log('PASS: safe deck drop-in and full-profile halfpipe side collision');
