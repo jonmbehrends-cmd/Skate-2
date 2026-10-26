@@ -51,3 +51,14 @@ const groundImpact=s({grounded:true,speed:10});
 impact(groundImpact,[{hit:true,normalX:-1,normalZ:0}]);
 assert.equal(groundImpact.speed,5.5,'Ground impact retains collision drag');
 console.log('PASS: airborne wall projection, glancing slide, corners, boundary normals, ground drag');
+
+// Ramp pumping must respond to slope changes without creating flat-ground or air thrust.
+const pump=globalThis.SOLMotion.pump;
+const slopeState=s({speed:8,grounded:true,dir:0});
+const slopeRamp={ramp:{},slope:.35};
+const gained=pump(slopeState,{ramp:{},slope:.1},slopeRamp,.025);
+assert(gained>0&&slopeState.speed>8&&slopeState.pumpIntensity>0,'Rising ramp should yield timed pump impulse');
+const flat=s({speed:8});assert.equal(pump(flat,{slope:0},{ramp:null,slope:0},.025),0);assert.equal(flat.speed,8);
+const airborne=s({speed:8,grounded:false});assert.equal(pump(airborne,{slope:.1},slopeRamp,.025),0);assert.equal(airborne.speed,8);
+const reverse=s({speed:8,dir:Math.PI});assert.equal(pump(reverse,{slope:.1},slopeRamp,.025),0,'Opposing slope direction should not pump');
+console.log('PASS: ramp pump impulse, flat/air guards, direction');
