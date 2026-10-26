@@ -1,2 +1,109 @@
-FAIL: AssertionError [ERR_ASSERTION]: GRIND touch control must catch bowl coping without forcing ollie: {"grinding":false,"vy":3.530525626477267,"y":-0.07101662993021693}
-    at /home/runner/work/Skate-2/Skate-2/tests/browser_smoke.cjs:140:3
+{
+  "result": "PASS",
+  "status": {
+    "rampCheeks": 26,
+    "cores": 13,
+    "skinCount": 13,
+    "skinMaterial": {
+      "alpha": 1,
+      "blend": false,
+      "textureAlpha": false,
+      "transparency": 0,
+      "culled": false
+    },
+    "topPick": {
+      "hit": true,
+      "y": 2.3026619710825873
+    },
+    "opaqueCheeks": true,
+    "opaqueCores": true,
+    "connection": 1,
+    "bottom": [
+      -36,
+      -18.1
+    ],
+    "skater": true,
+    "rendered": true,
+    "canvasWidth": 390,
+    "independentCamera": true,
+    "staticBatches": {
+      "before": 523,
+      "merged": 300,
+      "groups": 13,
+      "after": 223
+    }
+  },
+  "spin": {
+    "yaw": 7.16443229512095,
+    "skaterYaw": 7.16443229512095,
+    "cameraYaw": 0,
+    "grounded": false
+  },
+  "push": {
+    "speed": 0.6834837383636736,
+    "phase": 0.6435000000000001,
+    "grounded": true,
+    "onRamp": false,
+    "grinding": false,
+    "bowlAir": false,
+    "burstUntil": 4704.299999999999,
+    "now": 3641.2999999999993,
+    "frame": 26,
+    "y": 0,
+    "z": 0.03425432547163923
+  },
+  "riding": {
+    "x": -36.07102955252976,
+    "z": -25.5064622997594,
+    "y": 0.7869009303050785,
+    "speed": 10.199504004713823
+  },
+  "boardInput": {
+    "type": "boardslide",
+    "airborne": true,
+    "vy": 8,
+    "y": 0.01
+  },
+  "boardslide": {
+    "type": "boardslide",
+    "grinding": true,
+    "yaw": 1.536718755957831,
+    "x": 0,
+    "z": 19.779372714214293,
+    "speed": 4.628735000000001,
+    "score": 487.8629999999991,
+    "rail": "rail"
+  },
+  "touchCoping": {
+    "grinding": true,
+    "kind": "bowl-coping",
+    "vy": 0,
+    "y": 0.09,
+    "wallY": -1.2050621942870148
+  },
+  "coping": {
+    "found": true,
+    "kind": "bowl-coping",
+    "grinding": true,
+    "delta": 5.1316916451304815,
+    "radius": 15.240000000000004,
+    "speed": 4.470000000000002
+  },
+  "bowl": {
+    "exists": true,
+    "indices": 55296,
+    "materialAlpha": 1,
+    "depthWrite": true,
+    "blend": false,
+    "textureName": "bowl painted concrete art",
+    "rayHit": true,
+    "rayY": -7.427122942059906,
+    "surfaceY": -7.442810543463304,
+    "centerY": -7.62,
+    "diameterMeters": 30.48,
+    "depthMeters": 7.62,
+    "meshes": 265,
+    "fps": 6.985842026825633
+  },
+  "parkWalls": 0
+}
