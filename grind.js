@@ -4,17 +4,17 @@
 (function(root){'use strict';
 const GRAVITY=19;
 function find(state,rails,dt,stable){
-  if(!stable||state.grinding||state.grounded||state.speed<2.5||state.vy>=0||state.grindCooldown>0)return null;
+  if(!stable||state.grinding||state.grounded||state.speed<1.8||state.vy>1.0||state.grindCooldown>0)return null;
   const h=Math.max(0,Math.min(.04,Number.isFinite(dt)?dt:0));
   if(!h)return null;
   const nextY=state.y+(state.vy-GRAVITY*h)*h;
   for(const rail of rails){
     const top=Number.isFinite(rail.y)?rail.y:1.1;
     // The trucks must cross the rail, not teleport onto it from far above.
-    if(state.y<top-.02||nextY>top+.035)continue;
-    if(Math.abs(state.x-rail.x)>.38)continue;
-    if(Math.abs(state.z-rail.z)>rail.len/2-.22)continue;
-    if(Math.abs(Math.cos(state.dir))<.72)continue;
+    if(state.y<top-.18||nextY>top+.22)continue;
+    if(Math.abs(state.x-rail.x)>.7)continue;
+    if(Math.abs(state.z-rail.z)>rail.len/2-.12)continue;
+    if(Math.abs(Math.cos(state.dir))<.4)continue;
     return {rail,top,direction:Math.cos(state.dir)>=0?1:-1};
   }
   return null;
