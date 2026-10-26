@@ -4,7 +4,7 @@
 (function(root){'use strict';
 const GRAVITY=19;
 function find(state,rails,dt,stable,assist=false){
- if(!stable||state.grinding||state.speed<1.3||state.grindCooldown>0||(!assist&&state.grounded)||state.vy>2)return null;
+ if(!stable||state.grinding||state.speed<1.3||state.grindCooldown>0||(!assist&&state.grounded)||state.vy>0)return null;
  const h=Math.max(0,Math.min(.04,Number.isFinite(dt)?dt:0));
  const nextY=state.y+(state.vy-GRAVITY*h)*h;
  let best=null,bestDist=Infinity;
@@ -14,7 +14,7 @@ function find(state,rails,dt,stable,assist=false){
   const axis=rail.axis==='x'?'x':'z',cross=axis==='z'?'x':'z';
   const crossDist=Math.abs(state[cross]-rail[cross]);
   const alongDist=Math.abs(state[axis]-rail[axis]);
-  if(crossDist>(assist?1.7:1.05)||alongDist>rail.len/2+.35)continue;
+  if(crossDist>(assist?1.7:.35)||alongDist>rail.len/2+(assist?.35:-.001))continue;
   const heading=axis==='z'?Math.cos(state.dir):Math.sin(state.dir);
   if(Math.abs(heading)<(assist?.05:.3))continue;
   const distance=crossDist+Math.abs(state.y-top)*.3;
