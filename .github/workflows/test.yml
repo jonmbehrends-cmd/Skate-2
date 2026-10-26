@@ -13,7 +13,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node --check controller.js && node --check landing.js && node --check terrain.js && node --check obstacles.js && node --check grind.js && node --check motion.js && node --check wheels.js && node --check skater.js
+      - run: node --check controller.js && node --check landing.js && node --check terrain.js && node --check ramp_geometry.js && node --check obstacles.js && node --check grind.js && node --check motion.js && node --check wheels.js && node --check skater.js
       - run: node tests/controller.cjs
       - run: node tests/terrain.cjs
       - run: node tests/obstacles.cjs
