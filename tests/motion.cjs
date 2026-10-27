@@ -47,10 +47,18 @@ impact(corner,[{hit:true,normalX:-1,normalZ:0},{hit:true,normalX:0,normalZ:-1}])
 assert(Math.hypot(corner.airVX,corner.airVZ)<1e-9,'Corner collision must remove both penetrating components');
 const noHit=s({grounded:false,speed:10,airVX:6,airVZ:8});
 assert(!impact(noHit,[{hit:false}])&&noHit.airVX===6,'Clear path must preserve airborne velocity');
-const groundImpact=s({grounded:true,speed:10});
-impact(groundImpact,[{hit:true,normalX:-1,normalZ:0}]);
-assert.equal(groundImpact.speed,5.5,'Ground impact retains collision drag');
-console.log('PASS: airborne wall projection, glancing slide, corners, boundary normals, ground drag');
+const groundGlance=s({grounded:true,speed:10,dir:Math.PI/4});
+impact(groundGlance,[{hit:true,normalX:-1,normalZ:0}]);
+assert(groundGlance.speed>6.7&&groundGlance.speed<7.1,'Ground glancing contact must preserve wall-parallel speed');
+assert(Math.abs(Math.sin(groundGlance.dir))<1e-8,'Ground glancing contact must align travel with wall tangent');
+const groundHeadOn=s({grounded:true,speed:10,dir:Math.PI/2});
+impact(groundHeadOn,[{hit:true,normalX:-1,normalZ:0}]);
+assert.equal(groundHeadOn.speed,0,'Head-on wall collision must stop grounded travel');
+const groundFakie=s({grounded:true,speed:10,dir:Math.PI/4,travelSign:-1});
+impact(groundFakie,[{hit:true,normalX:1,normalZ:0}]);
+assert(groundFakie.speed>6.7&&groundFakie.speed<7.1,'Fakie glancing wall slide retains tangent');
+assert(Math.abs(Math.sin(groundFakie.dir))<1e-8,'Fakie slide keeps heading consistent with travel sign');
+console.log('PASS: airborne wall projection, ground glancing slide, head-on stop, corners, fakie');
 
 // Ramp pumping must respond to slope changes without creating flat-ground or air thrust.
 const pump=globalThis.SOLMotion.pump;
