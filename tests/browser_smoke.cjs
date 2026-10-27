@@ -531,7 +531,7 @@ const server=http.createServer((req,res)=>{
   ollieEvidence.originalAssertion.passed=!xboxOllie.grounded&&xboxOllie.vy>0;
   ollieEvidence.originalAssertion.snapshotAt350Ms=xboxOllie;
   fs.mkdirSync('test-artifacts',{recursive:true});
-  fs.writeFileSync('test-artifacts/xbox-a-ollie-timeline.json',JSON.stringify(ollieEvidence,null,2)+'\\n');
+  fs.writeFileSync('test-artifacts/xbox-a-ollie-timeline.json',JSON.stringify(ollieEvidence,null,2)+'\n');
   assert(!xboxOllie.grounded&&xboxOllie.vy>0,
     'Emulated Xbox A button must launch an actual ollie: '+JSON.stringify(xboxOllie));
   await page.evaluate(()=>{window.__qaPad.connected=false});
