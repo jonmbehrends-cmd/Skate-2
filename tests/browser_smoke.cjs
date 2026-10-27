@@ -457,7 +457,45 @@ const server=http.createServer((req,res)=>{
   await page.screenshot({path:'test-artifacts/park-chromium.png',animations:'disabled'});
   await checkSceneScreenshot('test-artifacts/park-chromium.png','park');
 
+
+  // End-to-end controller path: emulate the Standard Gamepad API inside
+  // actual Chromium/WebGL. This tests the render-loop wiring as well as the
+  // isolated adapter, without claiming a physical Bluetooth test.
+  await page.evaluate(()=>{
+    document.querySelector('#restart').click();
+    const buttons=Array.from({length:17},()=>({pressed:false,value:0}));
+    window.__qaPad={index:0,id:'Xbox Wireless Controller',connected:true,mapping:'standard',axes:[0,0,0,0],buttons};
+    Object.defineProperty(navigator,'getGamepads',{configurable:true,value:()=>[window.__qaPad]});
+    buttons[7].value=.8; // Some browsers report analog RT without pressed=true.
+  });
+  await page.waitForTimeout(850);
+  const xboxPush=await page.evaluate(()=>({
+    speed:window.__SOL_DIAGNOSTICS__.state.speed,
+    status:document.querySelector('#status').textContent
+  }));
+  assert(xboxPush.speed>.3&&xboxPush.status.includes('Xbox connected'),
+    'Emulated Xbox analog RT must actually accelerate the skater: '+JSON.stringify(xboxPush));
+  await page.evaluate(()=>{
+    window.__qaPad.buttons[7].value=0;
+    window.__qaPad.buttons[0].pressed=true;
+    window.__qaPad.buttons[0].value=1;
+  });
+  await page.waitForTimeout(350);
+  const xboxOllie=await page.evaluate(()=>({
+    grounded:window.__SOL_DIAGNOSTICS__.state.grounded,
+    vy:window.__SOL_DIAGNOSTICS__.state.vy,
+    name:window.__SOL_DIAGNOSTICS__.state.name
+  }));
+  assert(!xboxOllie.grounded&&xboxOllie.vy>0,
+    'Emulated Xbox A button must launch an actual ollie: '+JSON.stringify(xboxOllie));
+  await page.evaluate(()=>{window.__qaPad.connected=false});
+  await page.waitForTimeout(250);
+  const xboxDisconnect=await page.locator('#status').textContent();
+  assert(xboxDisconnect.includes('Press a controller button'),
+    'Disconnect must return to touch-friendly input status: '+xboxDisconnect);
+  const gamepadIntegration={result:'PASS',xboxPush,xboxOllie,xboxDisconnect};
+
   assert.equal(errors.length,0,'Browser errors: '+errors.join('; '));
-  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',controllerQA,spawnView,spawnPixels,cheekNormals,rampGravity,screenshotQA,status,spin,push,touchTricks,clickFallback,riding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
+  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',controllerQA,gamepadIntegration,spawnView,spawnPixels,cheekNormals,rampGravity,screenshotQA,status,spin,push,touchTricks,clickFallback,riding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
  }finally{await browser.close()}
 })().catch(e=>{fs.mkdirSync('test-artifacts',{recursive:true});fs.writeFileSync('test-artifacts/browser-result.txt','FAIL: '+(e&&e.stack||String(e)));console.error(e);process.exitCode=1}).finally(()=>server.close());
