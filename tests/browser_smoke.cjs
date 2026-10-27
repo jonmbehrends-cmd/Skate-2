@@ -223,6 +223,8 @@ const server=http.createServer((req,res)=>{
   }
   // Programmatic click is a separate accessibility/fallback path: it must
   // still work when a pointerdown event was not dispatched.
+  // Wait beyond the pointer de-duplication window before exercising fallback.
+  await page.waitForTimeout(500);
   await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
    Object.assign(s,{grounded:true,grinding:false,y:0,groundY:0,vy:0,
     flip:0,spin:0,count:0,combo:0,grabUntil:0,grabHeld:false});
