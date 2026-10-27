@@ -18,6 +18,8 @@ assert(html.includes('src="obstacles.js'), 'Obstacle module must load');
 assert(html.includes('src="grind.js'), 'Rail grind module must load');
 assert(html.includes('src="motion.js'), 'Momentum module must load');
 assert(html.includes('src="wheels.js'), 'Wheel contact module must load');
+assert(html.includes('src="board_geometry.js'), 'Sculpted skateboard module must load');
+assert(html.includes('SOLBoardGeometry.build()'), 'Skateboard must use curved mesh geometry');
 assert(html.includes('SOLWheels.sample(state.x,state.z,state.dir,state.y,groundContact)'), 'Four-wheel support must drive visual board pose');
 assert(html.includes('SOLWheels.relativeImpact(state,0,contact.slope)'), 'Slope-relative impact must use airborne velocity');
 assert(html.includes('SOLMotion.step(state,steer,throttle,boost||pushHeld||now<(state.pushBurstUntil||0),dt)'), 'Ground/air controls must use deterministic motion module with push input');

@@ -268,6 +268,18 @@ const server=http.createServer((req,res)=>{
   assert(Math.abs(status.bottomSurface.top)<.025,'Halfpipe floor must meet the two transition toes near ground level');
   assert(status.bottomSurface.emissive[0]>=.2,'Wooden transitions need enough fill light to remain visible on mobile');
   assert(status.skater&&status.rendered&&status.canvasWidth>0,'WebGL scene must render');
+  // Confirm the actual WebGL scene uses the sculpted nose/tail and curved grip,
+  // not a rectangular placeholder deck. These meshes remain skater children.
+  const deckVisual=await page.evaluate(()=>{
+   const scene=window.__SOL_DIAGNOSTICS__.scene;
+   const deck=scene.meshes.find(m=>m.name==='deck');
+   const grip=scene.meshes.find(m=>m.name==='grip tape');
+   return {deckVertices:deck?.getTotalVertices(),gripVertices:grip?.getTotalVertices(),
+    samePivot:!!deck?.parent&&deck.parent===grip?.parent,
+    visible:!!deck?.isVisible&&!!grip?.isVisible};
+  });
+  assert(deckVisual.deckVertices>=160&&deckVisual.gripVertices>=80&&deckVisual.samePivot&&deckVisual.visible,
+   'Actual skater must render sculpted board and grip attached to one animated pivot: '+JSON.stringify(deckVisual));
   assert(status.independentCamera,'Camera must not rotate with rider during airborne spins');
   assert(status.staticBatches?.merged>80&&status.staticBatches?.groups>=8,'Static park art must be batched to avoid hundreds of unnecessary mobile draw calls: '+JSON.stringify(status.staticBatches));
   // Exercise the actual mobile joystick: the board and skater must visibly yaw,
