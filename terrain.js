@@ -9,7 +9,7 @@ function rollOnSlope(state,contact,dt){
  if(!contact||!Number.isFinite(contact.slope)||!Number.isFinite(dt)||dt<=0)return state;
  const sign=state.travelSign===-1?-1:1;
  const speed=Number.isFinite(state.speed)?Math.max(0,state.speed):0;
- const velocity=sign*speed-9.81*contact.slope*Math.cos(state.dir||0)*Math.min(.05,dt);
+ // Gravity projected along the riding surface. The raw slope is a rise/run\n // ratio, not a force multiplier; using it directly could exceed gravity\n // on steep halfpipe transitions and reverse the skater in one frame.\n const grade=Number.isFinite(contact.slope)?contact.slope:0;\n const along=grade/Math.hypot(1,grade);\n const velocity=sign*speed-9.81*along*Math.cos(state.dir||0)*Math.min(.05,dt);
  state.travelSign=velocity<0?-1:1;
  state.speed=Math.min(17,Math.abs(velocity));
  return state;
