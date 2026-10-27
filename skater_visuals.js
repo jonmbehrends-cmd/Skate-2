@@ -89,6 +89,38 @@ function attach(B,scene,body,elbows,knees,materials){
   ellipsoid('shoe layered outsole',knees[i],0,-.45,.195,.27,.055,.27,sole);
   ellipsoid('shoe heel reinforcement',knees[i],0,-.39,-.035,.22,.13,.12,toe);
  }
+
+ // Extra geometry is silhouette-focused rather than tiny decorative marks.
+ // Every attachment follows the existing body/elbow/knee animation hierarchy.
+ const fabricDark=paint('deep garment occlusion','#733b30',.035);
+ const fabricEdge=paint('cloth edge highlight','#da8960',.055);
+ const grip=paint('worn skate shoe upper','#343f45',.08);
+ const gum=paint('rubber shoe foxing','#b7ab8f',.06);
+ const hair=paint('hair under helmet','#272222',.03);
+ // Rounded chest and abdominal volumes soften the rigid jacket outline.
+ ellipsoid('hoodie rounded upper chest',body,0,1.67,.085,.46,.37,.31,materials.jacket);
+ ellipsoid('hoodie relaxed abdomen',body,0,1.37,.105,.43,.27,.31,materials.jacket);
+ ellipsoid('hoodie lower hem ribbing',body,0,1.19,.085,.43,.09,.29,fabricDark);
+ ellipsoid('hoodie shoulder left',body,-.36,1.78,.005,.23,.23,.27,materials.jacket);
+ ellipsoid('hoodie shoulder right',body,.36,1.78,.005,.23,.23,.27,materials.jacket);
+ // Subtle fabric contouring at the outer shoulder.
+ for(const side of [-1,1]){
+  ellipsoid('shoulder fabric ridge',body,side*.365,1.75,.16,.12,.19,.075,fabricEdge);
+  ellipsoid('hood drawstring',body,side*.11,1.77,.345,.022,.24,.025,sole);
+  ellipsoid('hair at temple',body,side*.17,2.29,-.01,.09,.06,.12,hair);
+  ellipsoid('jaw side contour',body,side*.135,2.035,.15,.10,.15,.105,materials.skin);
+ }
+ // Trouser silhouettes and layered skate shoes retain the original knee rig.
+ for(let i=0;i<2;i++){
+  const k=knees[i],e=elbows[i];
+  ellipsoid('denim tapered lower leg',k,0,-.17,.01,.205,.29,.18,materials.denim);
+  ellipsoid('denim cuff',k,0,-.34,.04,.215,.075,.20,fabricDark);
+  ellipsoid('skate shoe upper',k,0,-.397,.19,.245,.115,.30,grip);
+  ellipsoid('skate shoe toe bumper',k,0,-.415,.36,.235,.075,.11,gum);
+  ellipsoid('skate shoe sidewall',k,0,-.465,.20,.26,.045,.30,sole);
+  ellipsoid('hoodie sleeve volume',e,0,.08,0,.19,.30,.18,materials.jacket);
+  ellipsoid('hoodie elbow fold',e,0,-.10,.09,.20,.075,.17,fabricDark);
+ }
  return {meshes:made,count:made.length};
 }
 root.SOLSkaterVisuals={attach};
