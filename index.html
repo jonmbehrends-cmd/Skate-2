@@ -127,7 +127,9 @@ stick.addEventListener('pointermove',e=>{if(joy.id===e.pointerId)move(e)});
 function release(e){if(joy.id!==e.pointerId)return;joy.id=null;joy.x=joy.y=0;nub.style.transform=''}
 for(const evt of ['pointerup','pointercancel','lostpointercapture'])stick.addEventListener(evt,release);
 document.querySelectorAll('#buttons button').forEach(b=>{
- b.addEventListener('pointerdown',e=>{e.preventDefault();if(e.isTrusted)b.setPointerCapture(e.pointerId);if(b.dataset.t==='push'){pushHeld=true;state.pushBurstUntil=performance.now()+1150}else{if(b.dataset.t==='grab')state.touchGrabHeld=true;trick(b.dataset.t)}});
+ let lastPointerAction=-Infinity;
+ b.addEventListener('click',()=>{if(performance.now()-lastPointerAction>450&&b.dataset.t!=='push')trick(b.dataset.t)});
+ b.addEventListener('pointerdown',e=>{lastPointerAction=performance.now();e.preventDefault();if(e.isTrusted)b.setPointerCapture(e.pointerId);if(b.dataset.t==='push'){pushHeld=true;state.pushBurstUntil=performance.now()+1150}else{if(b.dataset.t==='grab')state.touchGrabHeld=true;trick(b.dataset.t)}});
  for(const evt of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(evt,()=>{if(b.dataset.t==='push')pushHeld=false;if(b.dataset.t==='grab'){state.touchGrabHeld=false;state.grabHeld=!!state.padGrabHeld;if(!state.grabHeld)state.grabUntil=0}});
 });
 function releaseInputs(){keys.clear();keyboard.x=keyboard.y=0;joy.x=joy.y=0;joy.id=null;pushHeld=boost=false;gpX=gpY=0;state.touchGrabHeld=state.padGrabHeld=state.grabHeld=false;state.grabUntil=state.pushBurstUntil=state.grindRequestUntil=0;state.controlSteer=state.controlThrottle=0;if(window.SOLPad)SOLPad.reset();const n=document.querySelector('#nub');if(n)n.style.transform=''}
