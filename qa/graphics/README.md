@@ -62,6 +62,10 @@ Install `playwright@1.55.1` and `babylonjs@8.56.2`, then install Playwright Chro
 The coping smoke assertion now samples the initial capture and advances its
 blend in one browser task, retaining the same height/smoothness assertions.
 This avoids observing an already-completed blend after a slow browser round trip.
+The wall-slide test also latches contact and first exit inside the production
+collision step (forwarding the original function unchanged). It retains the
+position, grounding and speed requirements and confirms a real wall normal,
+instead of sampling a later position after ordinary rolling friction.
 
 The visual acceptance workflow uploads the generated PNGs and JSON from
 `test-artifacts/visuals/`. `visual-result.json` records the local browser result.
