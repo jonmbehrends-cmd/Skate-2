@@ -326,6 +326,32 @@ const server=http.createServer((req,res)=>{
   await page.waitForTimeout(800);
   const riding=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;return {x:s.x,z:s.z,y:s.y,speed:s.speed}});
   assert(Math.abs(riding.z+18.1)>1.2,'Halfpipe riding must advance across its flat bottom: '+JSON.stringify(riding));
+  // Reproduce the actual left coping launch through the live physics loop.
+  // A high bank without vert-air can pass geometry-only tests, so assert the
+  // skater really leaves the lip upward and moves back into the halfpipe.
+  const vertStart=await page.evaluate(()=>{
+   const s=window.__SOL_DIAGNOSTICS__.state;
+   const r={x:-36,z:-25.8,w:38,d:8.4,h:4.5,curve:'halfpipe-left'};
+   const z=-29.76,ground=window.SOLTerrain.profile(r,(z-(r.z-r.d/2))/r.d).height;
+   Object.assign(s,{x:-36,z,y:ground,groundY:ground,dir:Math.PI,
+    speed:8,travelSign:1,grounded:true,grinding:false,vy:0,
+    rampCooldown:0,grindCooldown:0,flip:0,spin:0});
+   return {z,ground};
+  });
+  await page.waitForFunction(()=>{
+   const s=window.__SOL_DIAGNOSTICS__.state;
+   return s.name==='HALFPIPE VERT AIR'&&!s.grounded;
+  },null,{timeout:6000});
+  const vertAir=await page.evaluate(()=>{
+   const s=window.__SOL_DIAGNOSTICS__.state;
+   return {name:s.name,grounded:s.grounded,y:s.y,vy:s.vy,
+    airVZ:s.airVZ,airVX:s.airVX,z:s.z,speed:s.speed};
+  });
+  assert(vertAir.name==='HALFPIPE VERT AIR'&&!vertAir.grounded&&
+   vertAir.y>=4.5&&vertAir.vy>0&&vertAir.airVZ>0&&
+   Math.abs(vertAir.airVX)<1,
+   'Halfpipe must launch vertically above left coping and return inward: '+
+    JSON.stringify({vertStart,vertAir}));
   // Preserve a screenshot of the real in-game mobile camera.
   await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__,s=d.state;
    Object.assign(s,{x:-36,z:-18.1,y:0,groundY:0,dir:0,speed:0,travelSign:1,grounded:true,grinding:false,vy:0});
@@ -529,6 +555,6 @@ const server=http.createServer((req,res)=>{
   const gamepadIntegration={result:'PASS',xboxPush,xboxOllie,xboxDisconnect};
 
   assert.equal(errors.length,0,'Browser errors: '+errors.join('; '));
-  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',controllerQA,gamepadIntegration,spawnView,spawnPixels,cheekNormals,rampGravity,screenshotQA,status,spin,push,touchTricks,clickFallback,riding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
+  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',controllerQA,gamepadIntegration,spawnView,spawnPixels,cheekNormals,rampGravity,screenshotQA,status,spin,push,touchTricks,clickFallback,riding,vertStart,vertAir,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
  }finally{await browser.close()}
 })().catch(e=>{fs.mkdirSync('test-artifacts',{recursive:true});fs.writeFileSync('test-artifacts/browser-result.txt','FAIL: '+(e&&e.stack||String(e)));console.error(e);process.exitCode=1}).finally(()=>server.close());
