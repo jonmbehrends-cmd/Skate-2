@@ -612,7 +612,30 @@ const server=http.createServer((req,res)=>{
     'Disconnect must return to touch-friendly input status: '+xboxDisconnect);
   const gamepadIntegration={result:'PASS',xboxPush,xboxOllie,xboxDisconnect};
 
+  // Real WebGL render-loop acceptance for the reported Samsung bug:
+  // approach the left wall of the ledge at (5,39) diagonally, slide past
+  // its far end, and retain enough momentum to continue skating.
+  await page.evaluate(()=>{
+    document.querySelector('#restart').click();
+    const s=window.__SOL_DIAGNOSTICS__.state;
+    Object.assign(s,{x:-1,z:39,y:0,groundY:0,vy:0,dir:Math.PI/4,
+      speed:9,travelSign:1,grounded:true,grinding:false,grindRail:null,
+      grindCooldown:1,rampCooldown:1,airVX:null,airVZ:null,onRamp:false,
+      controlSteer:0,controlThrottle:0,halfpipePreviewUntil:0});
+  });
+  await page.waitForFunction(()=>{
+    const s=window.__SOL_DIAGNOSTICS__.state;
+    return s.z>43;
+  },null,{timeout:5500});
+  const wallSlide=await page.evaluate(()=>{
+    const s=window.__SOL_DIAGNOSTICS__.state;
+    return {x:s.x,z:s.z,speed:s.speed,grounded:s.grounded};
+  });
+  assert(wallSlide.x<=.74&&wallSlide.speed>3&&wallSlide.grounded,
+    'Live WebGL skater must slide past ledge without penetrating or getting stuck: '+JSON.stringify(wallSlide));
+  await page.screenshot({path:'test-artifacts/ledge-wall-slide.png',animations:'disabled'});
+
   assert.equal(errors.length,0,'Browser errors: '+errors.join('; '));
-  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',controllerQA,gamepadIntegration,spawnView,spawnPixels,cheekNormals,impactNormals,rampGravity,screenshotQA,status,spin,push,touchTricks,clickFallback,riding,vertStart,vertAir,vertLanding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
+  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',controllerQA,gamepadIntegration,wallSlide,spawnView,spawnPixels,cheekNormals,impactNormals,rampGravity,screenshotQA,status,spin,push,touchTricks,clickFallback,riding,vertStart,vertAir,vertLanding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
  }finally{await browser.close()}
 })().catch(e=>{fs.mkdirSync('test-artifacts',{recursive:true});fs.writeFileSync('test-artifacts/browser-result.txt','FAIL: '+(e&&e.stack||String(e)));console.error(e);process.exitCode=1}).finally(()=>server.close());
