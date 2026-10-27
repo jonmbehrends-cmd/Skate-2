@@ -17,7 +17,21 @@ function sweep(px,pz,nx,nz,y,boxes,radius=.27){
       const minX=b.x-b.w/2-radius,maxX=b.x+b.w/2+radius;
       const minZ=b.z-b.d/2-radius,maxZ=b.z+b.d/2+radius;
       // If a test starts inside an expanded footprint, do not trap it: allow an exit.
-      if(x>minX+EPS&&x<maxX-EPS&&z>minZ+EPS&&z<maxZ-EPS)continue;
+      if(x>minX+EPS&&x<maxX-EPS&&z>minZ+EPS&&z<maxZ-EPS){
+        // Recover from a footprint overlap (spawn, numerical penetration,
+        // or another moving collision). Previously this skipped the box
+        // forever, letting the skater remain embedded in a wall.
+        const escape=[
+          {dist:x-minX,axis:'x',value:minX-EPS,normal:-1},
+          {dist:maxX-x,axis:'x',value:maxX+EPS,normal:1},
+          {dist:z-minZ,axis:'z',value:minZ-EPS,normal:-1},
+          {dist:maxZ-z,axis:'z',value:maxZ+EPS,normal:1}
+        ].sort((a,b)=>a.dist-b.dist)[0];
+        if(escape.axis==='x'){x=escape.value;normalX=escape.normal;dx=0}
+        else{z=escape.value;normalZ=escape.normal;dz=0}
+        hit=true;
+        continue;
+      }
       let tx0=-Infinity,tx1=Infinity,tz0=-Infinity,tz1=Infinity;
       if(Math.abs(dx)<1e-10){if(x<minX||x>maxX)continue}
       else{const a=(minX-x)/dx,c=(maxX-x)/dx;tx0=Math.min(a,c);tx1=Math.max(a,c)}
