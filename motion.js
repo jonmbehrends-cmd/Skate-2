@@ -55,7 +55,12 @@ function pump(state,previous,current,dt,active=false){
  const speed=Number.isFinite(state.speed)?state.speed:0;
  // Compression while rolling into increasing transition curvature; no reverse-direction free thrust.
  const change=(slope-before)*forward;
- const impulse=clamp(Math.max(0,change)*Math.max(0,speed)*1.35,0,1.1);
+ const transition=(current.ramp.curve==='halfpipe-left'||current.ramp.curve==='halfpipe-right'||current.ramp.curve==='bowl');
+ // A held pump supplies modest continuous drive through a curved transition;
+ // curvature change adds a short compression impulse. Scale by elapsed time
+ // so refresh rate does not alter the energy gained per wall.
+ const drive=transition&&speed>.8?clamp((.85+Math.min(1.3,Math.abs(slope)*.24))*h,0,.12):0;
+ const impulse=clamp(Math.max(0,change)*Math.max(0,speed)*1.35,0,1.1)+drive;
  if(impulse>.0001){state.speed=clamp(speed+impulse,0,17);state.pumpIntensity=clamp(impulse*2,0,1)}
  else state.pumpIntensity=Math.max(0,(state.pumpIntensity||0)-h*3);
  return impulse;
