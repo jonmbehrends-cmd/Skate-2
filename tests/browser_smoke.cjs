@@ -187,6 +187,19 @@ const server=http.createServer((req,res)=>{
    halfpipeProfile[4].left.height<.03&&
    halfpipeProfile[6].left.height<.001,
    'Halfpipe must have near-vertical coping and smooth level floor: '+JSON.stringify(halfpipeProfile));
+  // Landing impact is the signed velocity along the normalized ramp
+  // normal, not an unbounded grade-weighted vertical speed.
+  const impactNormals=await page.evaluate(()=>{
+   const f=window.SOLWheels.relativeImpact;
+   const state={dir:0,speed:0,vy:-10,airVX:0,airVZ:0};
+   return {flat:f(state,0,0),steep:f(state,0,3),
+    side:f(state,4,0),uphill:f({...state,airVZ:2},0,3)};
+  });
+  assert(Math.abs(impactNormals.flat+10)<.0001&&
+   Math.abs(impactNormals.steep+10/Math.sqrt(10))<.0001&&
+   Math.abs(impactNormals.side+10/Math.sqrt(17))<.0001&&
+   Math.abs(impactNormals.uphill+16/Math.sqrt(10))<.0001,
+   'Ramp touchdown must use normalized contact speed: '+JSON.stringify(impactNormals));
   // Steep ramp gravity must be physically bounded. The old raw-slope force
   // exceeded 9.81 m/s² on the halfpipe and caused instant fakie reversals.
   const rampGravity=await page.evaluate(()=>{
@@ -362,10 +375,10 @@ const server=http.createServer((req,res)=>{
    const s=window.__SOL_DIAGNOSTICS__.state;
    const r={x:-36,z:-25.8,w:38,d:8.4,h:4.5,curve:'halfpipe-left'};
    const expected=window.SOLTerrain.profile(r,(s.z-(r.z-r.d/2))/r.d).height;
-   return {grounded:s.grounded,z:s.z,y:s.y,expected,speed:s.speed,travelSign:s.travelSign};
+   return {grounded:s.grounded,z:s.z,y:s.y,expected,speed:s.speed,travelSign:s.travelSign,message:document.querySelector('#msg').textContent};
   });
   assert(vertLanding.grounded&&Math.abs(vertLanding.y-vertLanding.expected)<.15&&
-   vertLanding.speed>.1,
+   vertLanding.speed>.65&&!vertLanding.message.includes('BAIL'),
    'Halfpipe vert air must land on the physical transition with rolling momentum: '+
     JSON.stringify({vertStart,vertAir,vertLanding}));
   // Preserve a screenshot of the real in-game mobile camera.
@@ -571,6 +584,6 @@ const server=http.createServer((req,res)=>{
   const gamepadIntegration={result:'PASS',xboxPush,xboxOllie,xboxDisconnect};
 
   assert.equal(errors.length,0,'Browser errors: '+errors.join('; '));
-  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',controllerQA,gamepadIntegration,spawnView,spawnPixels,cheekNormals,rampGravity,screenshotQA,status,spin,push,touchTricks,clickFallback,riding,vertStart,vertAir,vertLanding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
+  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',controllerQA,gamepadIntegration,spawnView,spawnPixels,cheekNormals,impactNormals,rampGravity,screenshotQA,status,spin,push,touchTricks,clickFallback,riding,vertStart,vertAir,vertLanding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
  }finally{await browser.close()}
 })().catch(e=>{fs.mkdirSync('test-artifacts',{recursive:true});fs.writeFileSync('test-artifacts/browser-result.txt','FAIL: '+(e&&e.stack||String(e)));console.error(e);process.exitCode=1}).finally(()=>server.close());
