@@ -631,8 +631,12 @@ const server=http.createServer((req,res)=>{
     const s=window.__SOL_DIAGNOSTICS__.state;
     return {x:s.x,z:s.z,speed:s.speed,grounded:s.grounded};
   });
-  assert(wallSlide.x<=.74&&wallSlide.speed>3&&wallSlide.grounded,
-    'Live WebGL skater must slide past ledge without penetrating or getting stuck: '+JSON.stringify(wallSlide));
+  // Require actual side contact: an unobstructed rider could also cross z=43,
+  // so checking only the far-end position would be a false-positive.
+  // The ledge begins at x=1; with the board's .27m collision radius its
+  // left wall is x=.73. A successful slide remains beside that wall.
+  assert(wallSlide.x>=.65&&wallSlide.x<=.74&&wallSlide.speed>3&&wallSlide.grounded,
+    'Live WebGL skater must contact and slide along ledge, then escape without penetration: '+JSON.stringify(wallSlide));
   await page.screenshot({path:'test-artifacts/ledge-wall-slide.png',animations:'disabled'});
 
   assert.equal(errors.length,0,'Browser errors: '+errors.join('; '));
