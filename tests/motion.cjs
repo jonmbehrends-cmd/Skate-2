@@ -55,15 +55,16 @@ console.log('PASS: airborne wall projection, glancing slide, corners, boundary n
 // Ramp pumping must respond to slope changes without creating flat-ground or air thrust.
 const pump=globalThis.SOLMotion.pump;
 const slopeState=s({speed:8,grounded:true,dir:0});
-const slopeRamp={ramp:{},slope:.35};
-const gained=pump(slopeState,{ramp:{},slope:.1},slopeRamp,.025,true);
+const sharedPumpRamp={};
+const slopeRamp={ramp:sharedPumpRamp,slope:.35};
+const gained=pump(slopeState,{ramp:sharedPumpRamp,slope:.1},slopeRamp,.025,true);
 assert(gained>0&&slopeState.speed>8&&slopeState.pumpIntensity>0,'Rising ramp should yield timed pump impulse');
 const flat=s({speed:8});assert.equal(pump(flat,{slope:0},{ramp:null,slope:0},.025),0);assert.equal(flat.speed,8);
-const airborne=s({speed:8,grounded:false});assert.equal(pump(airborne,{slope:.1},slopeRamp,.025),0);assert.equal(airborne.speed,8);
-const reverse=s({speed:8,dir:Math.PI});assert.equal(pump(reverse,{slope:.1},slopeRamp,.025,true),0,'Opposing slope direction should not pump');
+const airborne=s({speed:8,grounded:false});assert.equal(pump(airborne,{ramp:sharedPumpRamp,slope:.1},slopeRamp,.025),0);assert.equal(airborne.speed,8);
+const reverse=s({speed:8,dir:Math.PI});assert.equal(pump(reverse,{ramp:sharedPumpRamp,slope:.1},slopeRamp,.025,true),0,'Opposing slope direction should not pump');
 console.log('PASS: ramp pump impulse, flat/air guards, direction');
 
-const idleRamp=s({speed:8});assert.equal(pump(idleRamp,{slope:.1},slopeRamp,.025,false),0,'Ramp must not accelerate without pumping input');
+const idleRamp=s({speed:8});assert.equal(pump(idleRamp,{ramp:sharedPumpRamp,slope:.1},slopeRamp,.025,false),0,'Ramp must not accelerate without pumping input');
 const pushRamp=s({speed:4,onRamp:true,pushPhase:0});step(pushRamp,0,0,true,.025);assert.equal(pushRamp.speed<4.1,true,'RT on ramp must not behave as a ground push');
 console.log('PASS: ramp input gating and foot-push suppression');
 
