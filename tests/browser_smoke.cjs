@@ -8,6 +8,48 @@ for(const match of fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8'
  if(match[1].trim())new vm.Script(match[1],{filename:'index.html:inline'});
 }
 const root=path.resolve(__dirname,'..');
+
+const controllerQA=(()=>{
+  // Exercise the production controller adapter deterministically, without
+  // relying on a physical Bluetooth controller on the CI runner.
+  let time=1000,pads=[];
+  const context={window:{},navigator:{getGamepads:()=>pads},performance:{now:()=>time}};
+  vm.runInNewContext(fs.readFileSync(path.join(root,'controller.js'),'utf8'),context,{filename:'controller.js'});
+  const api=context.window.SOLPad,actions=[];
+  const poll=()=>api.poll(action=>actions.push(action),time);
+  assert.equal(poll().connected,false,'No controller must leave touch play usable');
+  const buttons=Array.from({length:17},()=>({pressed:false,value:0}));
+  const pad={index:0,id:'Xbox Wireless Controller',connected:true,axes:[0,0,0,0],buttons};
+  pads=[pad];
+  assert.equal(poll().connected,true,'Xbox controller should connect');
+  assert.equal(actions.length,0,'Connecting with held buttons must not fire tricks');
+  pad.axes[0]=.5;pad.axes[1]=-.5;
+  let state=poll();
+  assert(state.x>.35&&state.y<-.35,'Left stick should steer and throttle with deadzone');
+  buttons[7].value=.65;buttons[7].pressed=false;
+  assert.equal(poll().boost,true,'Analog right trigger should push even without pressed flag');
+  buttons[7].value=0;
+  buttons[0].pressed=true;poll();poll();
+  assert.deepEqual(actions,['ollie'],'A button should trigger one ollie per press');
+  buttons[0].pressed=false;poll();buttons[0].pressed=true;poll();
+  assert.deepEqual(actions,['ollie','ollie'],'Re-pressing A should trigger another ollie');
+  buttons[0].pressed=false;poll();
+  pad.axes[2]=-1;time+=300;poll();poll();
+  assert.equal(actions.at(-1),'kick','Right-stick left flick should kickflip');
+  const before=actions.length;
+  poll();assert.equal(actions.length,before,'Held right stick must not repeat tricks');
+  pad.axes[2]=0;poll();time+=300;pad.axes[2]=1;poll();
+  assert.equal(actions.at(-1),'heel','Right stick must re-arm after recentering');
+  pad.axes=[0,0,0,0];buttons[15].pressed=true;
+  state=poll();assert.equal(state.x,1,'D-pad right should steer if left stick is neutral');
+  pad.connected=false;state=poll();
+  assert.equal(state.connected,false,'Disconnect must release controller inputs');
+  assert.equal(state.boost,false,'Disconnect must release PUSH');
+  context.navigator.getGamepads=()=>{throw Error('Gamepad permission denied')};
+  assert.equal(poll().connected,false,'Denied Gamepad API must not crash the game');
+  return {result:'PASS',analogTrigger:true,faceButtonEdge:true,rightStickFlick:true,dpadFallback:true,disconnect:true,apiDenied:true};
+})();
+
 const types={'.html':'text/html; charset=utf-8','.js':'application/javascript; charset=utf-8','.css':'text/css; charset=utf-8'};
 const server=http.createServer((req,res)=>{
  const pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);
@@ -416,6 +458,6 @@ const server=http.createServer((req,res)=>{
   await checkSceneScreenshot('test-artifacts/park-chromium.png','park');
 
   assert.equal(errors.length,0,'Browser errors: '+errors.join('; '));
-  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',spawnView,spawnPixels,cheekNormals,rampGravity,screenshotQA,status,spin,push,touchTricks,clickFallback,riding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
+  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',controllerQA,spawnView,spawnPixels,cheekNormals,rampGravity,screenshotQA,status,spin,push,touchTricks,clickFallback,riding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
  }finally{await browser.close()}
 })().catch(e=>{fs.mkdirSync('test-artifacts',{recursive:true});fs.writeFileSync('test-artifacts/browser-result.txt','FAIL: '+(e&&e.stack||String(e)));console.error(e);process.exitCode=1}).finally(()=>server.close());
