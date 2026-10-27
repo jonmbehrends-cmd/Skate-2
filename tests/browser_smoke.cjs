@@ -135,6 +135,25 @@ const server=http.createServer((req,res)=>{
   assert.equal(visualQA.laceCount,6,'Both animated shoes must have laces');
   for(const key of ['pickable','collidable','detached','transparent'])
    assert.deepEqual(visualQA[key],[],key+' skater details must be empty');
+  // Background realism must remain one shared atlas with batched rooftop
+  // detail, not dozens of individually drawn windows or physics colliders.
+  const facadeQA=await page.evaluate(()=>{
+    const scene=window.__SOL_DIAGNOSTICS__.scene;
+    const mat=scene.getMaterialByName('weathered urban facade');
+    const texture=mat?.diffuseTexture;
+    const roof=scene.meshes.filter(m=>m.name==='STATIC ART BATCH background roof parapet');
+    const buildings=scene.meshes.filter(m=>m.name==='STATIC ART BATCH background building');
+    return {atlas:!!texture&&texture.isReady(),width:texture?.getSize().width,
+      height:texture?.getSize().height,roofBatches:roof.length,
+      buildingBatches:buildings.length,
+      collidable:roof.concat(buildings).filter(m=>m.checkCollisions).map(m=>m.name)};
+  });
+  assert(facadeQA.atlas,'The skyline facade atlas must be loaded in WebGL');
+  assert.equal(facadeQA.width,256,'Facade atlas width must stay mobile-friendly');
+  assert.equal(facadeQA.height,512,'Facade atlas height must stay mobile-friendly');
+  assert.equal(facadeQA.roofBatches,1,'Roof parapets must batch into one mesh');
+  assert.equal(facadeQA.buildingBatches,1,'Building facades must batch into one mesh');
+  assert.deepEqual(facadeQA.collidable,[],'Background facades cannot affect physics');
   // Reproduce the player's exact initial mobile camera, not only a scenic
   // overview. Record the mesh underneath the dark diagonal visible in user
   // screenshots so we can distinguish a wall, shadow, or missing riding skin.
@@ -711,6 +730,6 @@ const server=http.createServer((req,res)=>{
   await page.screenshot({path:'test-artifacts/ledge-wall-slide.png',animations:'disabled'});
 
   assert.equal(errors.length,0,'Browser errors: '+errors.join('; '));
-  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',controllerQA,gamepadIntegration,visualQA,wallContact,wallSlide,spawnView,spawnPixels,cheekNormals,impactNormals,rampGravity,screenshotQA,status,spin,push,touchTricks,clickFallback,riding,vertStart,vertAir,vertLanding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
+  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',controllerQA,gamepadIntegration,visualQA,facadeQA,wallContact,wallSlide,spawnView,spawnPixels,cheekNormals,impactNormals,rampGravity,screenshotQA,status,spin,push,touchTricks,clickFallback,riding,vertStart,vertAir,vertLanding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
  }finally{await browser.close()}
 })().catch(e=>{fs.mkdirSync('test-artifacts',{recursive:true});fs.writeFileSync('test-artifacts/browser-result.txt','FAIL: '+(e&&e.stack||String(e)));console.error(e);process.exitCode=1}).finally(()=>server.close());
