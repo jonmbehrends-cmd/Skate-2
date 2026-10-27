@@ -98,7 +98,26 @@ function collide(state,contacts){
   const hits=contacts.filter(c=>c&&c.hit);
   if(!hits.length)return false;
   if(state.grounded||state.grinding||!Number.isFinite(state.airVX)||!Number.isFinite(state.airVZ)){
-    state.speed=clamp((Number.isFinite(state.speed)?state.speed:0)*.55,0,17);
+    // Project ground travel onto the wall tangent rather than halving speed
+    // on every frame of contact. Repeated glancing hits otherwise pin the
+    // skater against rails, ledges and ramp cheeks.
+    const sign=state.travelSign===-1?-1:1;
+    const speed=clamp(Number.isFinite(state.speed)?state.speed:0,0,17);
+    let vx=Math.sin(state.dir||0)*speed*sign;
+    let vz=Math.cos(state.dir||0)*speed*sign;
+    for(const c of hits){
+      const nx=c.normalX||0,nz=c.normalZ||0,mag=Math.hypot(nx,nz);
+      if(mag<.5)continue;
+      const ux=nx/mag,uz=nz/mag,closing=vx*ux+vz*uz;
+      if(closing<0){vx-=closing*ux;vz-=closing*uz}
+    }
+    const remaining=Math.hypot(vx,vz);
+    if(remaining>.12){
+      // Align heading with the safe tangent, retaining the existing fakie
+      // direction; the next physics step can continue around the obstacle.
+      state.dir=Math.atan2(vx*sign,vz*sign);
+      state.speed=clamp(remaining*.97,0,17);
+    }else state.speed=0;
     return true;
   }
   let vx=state.airVX,vz=state.airVZ;
