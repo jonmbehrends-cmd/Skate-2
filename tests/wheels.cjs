@@ -15,8 +15,11 @@ const ledge=sample(0,0,0,0,(x)=>({height:x>.2?.7:0}));
 assert(ledge.roll>0,'Single-sided ledge must bank board');
 for(const p of ledge.points)assert(ledge.height+ledge.forwardSlope*p.forward+ledge.sideSlope*p.side>=p.height-1e-9,'Rigid support must not penetrate wheel surface');
 const moving={vy:-3,dir:Math.PI/2,speed:8,airVX:0,airVZ:10};
-assert.equal(relativeImpact(moving,0,.3),-6,'Landing impact uses actual travel, not facing');
-assert.equal(relativeImpact({...moving,airVX:null,airVZ:null},0,.3),-3,'Facing fallback for legacy state');
+// Contact impact is measured along the UNIT ramp normal, not the
+// unnormalised slope vector. These expectations predate that physics fix.
+const normalLength=Math.hypot(1,0,.3);
+assert(Math.abs(relativeImpact(moving,0,.3)-(-6/normalLength))<1e-12,'Landing impact uses actual travel, not facing');
+assert(Math.abs(relativeImpact({...moving,airVX:null,airVZ:null},0,.3)-(-3/normalLength))<1e-12,'Facing fallback for legacy state');
 console.log('PASS: four-wheel plane fit, rotated heading, ledge clearance, slope-relative landing');
 
 const stepEdge=sample(0,0,0,0,(x,z)=>({height:(x>.1||z>.1)?2:0}));

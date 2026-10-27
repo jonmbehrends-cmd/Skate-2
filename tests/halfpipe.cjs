@@ -26,8 +26,13 @@ assert.equal(T.launch(T.sample(left.x,leftLip,ramps),T.sample(left.x,leftLip-.1,
 console.log('PASS: live plaza halfpipe coordinates, opposing transitions, flat bottom, decks, lip launches');
 require('../obstacles.js');
 assert.equal(T.launch(T.sample(dl.x,dl.z,ramps),T.sample(left.x,leftLip+.1,ramps),leftLip+.1,0,8),0,'Dropping in from a deck must not falsely launch');
-const cheek=globalThis.SOLObstacles.rampSide(left.x-left.w/2-1,left.z,left.x-left.w/2+1,left.z,0,ramps);
-assert(cheek.hit&&cheek.x<left.x-left.w/2,'Solid sidewall must stop ground-level penetration');
+// With the new quarter-circle transition, the middle of this wall is
+// nearly flush with the ground. Test the actual raised section near coping
+// rather than assuming the obsolete shallow arc was tall at its midpoint.
+const raisedZ=leftLip+.35;
+assert(T.sample(left.x,raisedZ,ramps).height>1,'Raised cheek fixture must have a real wall');
+const cheek=globalThis.SOLObstacles.rampSide(left.x-left.w/2-1,raisedZ,left.x-left.w/2+1,raisedZ,0,ramps);
+assert(cheek.hit&&cheek.x<left.x-left.w/2,'Raised solid sidewall must stop ground-level penetration');
 console.log('PASS: safe drop-in and side collision against current geometry');
 require('../motion.js');const M=globalThis.SOLMotion;
 const rider={x:left.x,z:middle,dir:0,speed:5,travelSign:-1,grounded:true,grinding:false,onRamp:false};
