@@ -74,6 +74,21 @@ const head=B.MeshBuilder.CreateSphere('head',{diameter:.4,segments:16},scene);he
 const hairCap=B.MeshBuilder.CreateSphere('hair cap',{diameter:.42,segments:16,slice:.55},scene);hairCap.parent=body;hairCap.position.set(0,2.27,.005);hairCap.material=hair;
 const helmet=B.MeshBuilder.CreateSphere('helmet',{diameter:.46,segments:16,slice:.55},scene);helmet.parent=body;helmet.position.set(0,2.31,0);helmet.material=pants;
 const brim=box('helmet brim',.32,.035,.17,0,2.29,.19,pants);brim.parent=body;
+// Lightweight skater silhouette details, parented to the animated body.
+// No collision or trick logic is changed; each part follows the existing pose.
+const helmetVentMat=mat('helmet vent recess','#151e29');
+for(const side of [-1,1])for(const zz of [-.095,.095]){
+ const vent=box('helmet side vent',.018,.043,.092,side*.216,2.35,zz,helmetVentMat);
+ vent.parent=body;
+}
+const eyeMat=mat('skater eye detail','#29221d');
+for(const side of [-1,1]){
+ const eye=B.MeshBuilder.CreateSphere('skater eye',{diameter:.026,segments:8},scene);
+ eye.parent=body;eye.position.set(side*.087,2.165,.195);eye.material=eyeMat;
+}
+const nose=B.MeshBuilder.CreateSphere('skater nose',{diameter:.055,segments:10},scene);
+nose.parent=body;nose.position.set(0,2.104,.208);nose.scaling.set(.7,1,1.1);nose.material=skin;
+
 // Low-cost skater identity details: geometry follows the animated torso and head.
 const helmetBand=mat('helmet accent paint','#f3a92e');
 const helmetStripe=box('helmet center stripe',.065,.025,.32,0,2.535,0,helmetBand);helmetStripe.parent=body;
