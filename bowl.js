@@ -139,6 +139,9 @@ bandMat.diffuseColor=new B.Color3(.10,.37,.44);
 bandMat.specularColor=new B.Color3(.16,.22,.23);
 const seamMat=new B.StandardMaterial('bowl fine expansion joints',scene);
 seamMat.diffuseColor=new B.Color3(.43,.48,.48);
+// Decorative seams share one material; batching prevents 18 independent
+// tube draw calls on mobile while preserving their actual 3D geometry.
+const seamMeshes=[];
 for(const fraction of [.72,.78,.91]){
  const ring=[];
  for(let i=0;i<=N;i++){
@@ -148,6 +151,7 @@ for(const fraction of [.72,.78,.91]){
  }
  const band=B.MeshBuilder.CreateTube('inset bowl tile ring '+fraction,{path:ring,radius:fraction===.78?.055:.028,tessellation:6},scene);
  band.material=fraction===.78?bandMat:seamMat;
+ if(fraction!==.78)seamMeshes.push(band);
 }
 for(let k=0;k<16;k++){
  const a=k*2*Math.PI/16,path=[];
@@ -156,8 +160,12 @@ for(let k=0;k<16;k++){
   path.push(new B.Vector3(x,height(x,z)+.024,z));
  }
  const joint=B.MeshBuilder.CreateTube('radial concrete pour joint '+k,{path,radius:.012,tessellation:4},scene);
- joint.material=seamMat;
+ joint.material=seamMat;seamMeshes.push(joint);
 }
+// Merge only the 18 static seam tubes, never the skateable bowl surface,
+// its pickable coping, or the contrasting blue inlay ring.
+const mergedSeams=B.Mesh.MergeMeshes(seamMeshes,true,true,undefined,false,false);
+if(mergedSeams){mergedSeams.name='BOWL BATCHED CONCRETE SEAMS';mergedSeams.material=seamMat;mergedSeams.isPickable=false;}
 // Graffiti and stickers are drawn as decals conforming to the bowl's curved 3D surface.
 // Bowl graphics are baked directly into the opaque concrete UV texture.
 // The previous transparent decal shell clipped into the curved surface and

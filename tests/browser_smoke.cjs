@@ -496,7 +496,11 @@ const server=http.createServer((req,res)=>{
    const ray=new B.Ray(new B.Vector3(6.5,12,-106),new B.Vector3(0,-1,0),30);
    const hit=d.scene.pickWithRay(ray,x=>x===m);
    const sample=window.SOLBowl.sample(6.5,-106);
-   return {exists:!!m,indices:m?.getTotalIndices(),materialAlpha:m?.material?.alpha,
+   const seams=d.scene.meshes.filter(x=>x.name==='BOWL BATCHED CONCRETE SEAMS');
+   const oldSeams=d.scene.meshes.filter(x=>x.name.startsWith('radial concrete pour joint ')||x.name==='inset bowl tile ring 0.72'||x.name==='inset bowl tile ring 0.91');
+   const blueInlay=d.scene.meshes.filter(x=>x.name==='inset bowl tile ring 0.78');
+   return {seamBatchCount:seams.length,seamIndices:seams[0]?.getTotalIndices(),unbatchedSeamCount:oldSeams.length,blueInlayCount:blueInlay.length,
+    exists:!!m,indices:m?.getTotalIndices(),materialAlpha:m?.material?.alpha,
     depthWrite:m?.material?.forceDepthWrite,blend:m?.material?.needAlphaBlending(),textureName:m?.material?.diffuseTexture?.name,
     rayHit:!!hit?.hit,rayY:hit?.pickedPoint?.y,surfaceY:sample?.height,
     centerY:window.SOLBowl.sample(0,-106)?.height,
@@ -504,6 +508,8 @@ const server=http.createServer((req,res)=>{
     meshes:d.scene.meshes.length,fps:d.engine.getFps()};
   });
   assert(bowl.exists&&bowl.indices>30000,'Full tessellated bowl must exist');
+  assert(bowl.seamBatchCount===1&&bowl.seamIndices>1000&&bowl.unbatchedSeamCount===0&&bowl.blueInlayCount===1,
+   'Decorative bowl seams must render as one batched mesh while retaining the contrasting blue inlay: '+JSON.stringify(bowl));
   assert.equal(bowl.materialAlpha,1,'Bowl concrete must be opaque');
   assert.equal(bowl.blend,false,'Bowl surface must not alpha blend');
   assert.equal(bowl.depthWrite,true,'Bowl must write to the depth buffer');
