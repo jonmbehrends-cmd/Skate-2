@@ -23,3 +23,30 @@ console.log('PASS: obstacle sweep, sliding, elevated surfaces, ramp side contact
 
 assert.equal(rampSide(-6,12,-2,12,0,ramp).normalX,-1,'Left ramp wall must report outward normal');
 assert.equal(rampSide(6,12,2,12,0,ramp).normalX,1,'Right ramp wall must report outward normal');
+
+ // Regression: if a board spawns or lands just inside an expanded solid
+ // footprint, sweep must recover to a safe edge instead of leaving it stuck.
+const overlap=sweep(0,0,0,1,0,boxes);
+assert(overlap.hit,'Starting inside a wall must report a collision');
+assert(Math.abs(overlap.x)>=2.27||Math.abs(overlap.z)>=2.27,'Overlapping board must be pushed outside expanded solid');
+const highOverlap=sweep(0,0,1,1,1,boxes);
+assert(!highOverlap.hit&&highOverlap.x===1&&highOverlap.z===1,'Above-height travel must remain unrestricted');
+
+// End-to-end regression: repeated grounded contact should slide along a
+// ledge, retain usable speed, and leave the wall instead of becoming pinned.
+require('../motion.js');
+const motion=globalThis.SOLMotion;
+const rider={x:-4,z:-1,dir:Math.PI/4,speed:10,grounded:true,grinding:false,travelSign:1};
+let wallContacts=0;
+for(let i=0;i<14;i++){
+  const move=motion.horizontal(rider,.1);
+  const hit=sweep(rider.x,rider.z,rider.x+move.dx,rider.z+move.dz,0,boxes);
+  rider.x=hit.x;rider.z=hit.z;
+  if(hit.hit){wallContacts++;motion.collide(rider,[hit])}
+  if(rider.z>=-2.27&&rider.z<=2.27)
+    assert(rider.x<=-2.269,'Rider must not penetrate ledge during repeated wall slides');
+}
+assert(wallContacts>=1,'Repeated-slide scenario must actually contact wall');
+assert(rider.z>2.27,'Rider should escape the end of the ledge');
+assert(rider.speed>5,'Wall-parallel momentum must survive repeated contacts');
+console.log('PASS: overlap recovery, elevated clearance, repeated ground wall-slide escape');

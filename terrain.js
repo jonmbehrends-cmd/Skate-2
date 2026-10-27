@@ -21,7 +21,19 @@ function profile(ramp,t){
  }
  return ramp.curve==='quarter'?{height:ramp.h*u*u,slope:2*ramp.h*u/ramp.d}:{height:ramp.h*u,slope:ramp.h/ramp.d};
 }
-function sample(x,z,ramps){for(const ramp of ramps){if(Math.abs(x-ramp.x)>ramp.w/2||z<ramp.z-ramp.d/2||z>ramp.z+ramp.d/2)continue;const p=profile(ramp,(z-(ramp.z-ramp.d/2))/ramp.d);return {height:p.height,slope:p.slope,ramp}}return {height:0,slope:0,ramp:null}}
+function sample(x,z,ramps,y=Infinity){
+ for(const ramp of ramps){
+  if(Math.abs(x-ramp.x)>ramp.w/2||z<ramp.z-ramp.d/2||z>ramp.z+ramp.d/2)continue;
+  // Raised halfpipe decks are overhead solids, not ramps rising from the
+  // ground. A ground-level rider must never snap 4.5m upward just because
+  // their X/Z enters the deck footprint (e.g. after overlap recovery).
+  // Landing from above still uses the deck as a rideable surface.
+  if(ramp.curve==='halfpipe-deck'&&y<ramp.h-.16)continue;
+  const p=profile(ramp,(z-(ramp.z-ramp.d/2))/ramp.d);
+  return {height:p.height,slope:p.slope,ramp};
+ }
+ return {height:0,slope:0,ramp:null};
+}
 function launch(previous,current,z,heading,speed,travelSign=1){if(!previous.ramp||previous.ramp.curve==='halfpipe-deck'||current.ramp===previous.ramp||speed<3||Math.cos(heading)*(travelSign===-1?-1:1)*(previous.ramp.curve==='halfpipe-left'?-1:1)<.35)return 0;const left=previous.ramp.curve==='halfpipe-left';const lip=previous.ramp.z+(left?-1:1)*previous.ramp.d/2;if((left?z>lip:z<lip)||Math.abs(z-lip)>Math.max(.8,speed*.05))return 0;const direction=Math.cos(heading)*(travelSign===-1?-1:1)*(left?-1:1);if(direction<.35)return 0;return Math.max(2.5,speed*direction*Math.abs(previous.slope)+1.3)}
 // Signed gravity allows natural halfpipe rollbacks: a skater who runs out of
 // uphill momentum starts rolling fakie downhill without a fake 180-degree snap.

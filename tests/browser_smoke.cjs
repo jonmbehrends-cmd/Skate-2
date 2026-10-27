@@ -221,6 +221,21 @@ const server=http.createServer((req,res)=>{
    halfpipeProfile[4].left.height<.03&&
    halfpipeProfile[6].left.height<.001,
    'Halfpipe must have near-vertical coping and smooth level floor: '+JSON.stringify(halfpipeProfile));
+  // A ground-level board inside a raised halfpipe deck's footprint must not
+  // teleport onto its 4.5m top during a real gameplay frame.
+  const deckGroundQA=await page.evaluate(async()=>{
+   const state=window.__SOL_DIAGNOSTICS__.state;
+   Object.assign(state,{x:-36,z:-31.55,y:0,groundY:0,vy:0,dir:0,speed:0,
+    grounded:true,grinding:false,travelSign:1,controlSteer:0,controlThrottle:0,
+    pushBurstUntil:0,rampCooldown:0,airVX:null,airVZ:null});
+   await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+   const result={y:state.y,groundY:state.groundY,grounded:state.grounded};
+   Object.assign(state,{x:0,z:0,y:0,groundY:0,vy:0,dir:0,speed:0,
+    grounded:true,grinding:false,travelSign:1,controlSteer:0,controlThrottle:0});
+   return result;
+  });
+  assert(deckGroundQA.grounded&&Math.abs(deckGroundQA.y)<.15,
+   'Ground rider must not teleport to elevated halfpipe deck: '+JSON.stringify(deckGroundQA));
   // Landing impact is the signed velocity along the normalized ramp
   // normal, not an unbounded grade-weighted vertical speed.
   const impactNormals=await page.evaluate(()=>{
@@ -459,9 +474,8 @@ const server=http.createServer((req,res)=>{
    document.querySelector('[data-t="grind"]').dispatchEvent(
     new PointerEvent('pointerdown',{bubbles:true,pointerId:31,pointerType:'touch'}));
    const captured={grinding:s.grinding,kind:s.grindRail?.kind,vy:s.vy,y:s.y,wallY};
-   // Observe entry and advance the blend in this same browser task. A second
-   // evaluate can arrive after the live loop has already completed the blend
-   // on slow software WebGL, losing the actual initial wall height.
+   // Sample capture and blend in one browser task, before the live loop
+   // can finish the transition between separate browser round trips.
    const entry={initialY:s.y,top:s.grindRail?.y};
    for(let i=0;i<15;i++)window.SOLGrind.advance(s,1/60);
    entry.finalY=s.y;entry.grinding=s.grinding;captured.entry=entry;
@@ -655,7 +669,43 @@ const server=http.createServer((req,res)=>{
    const d=window.__SOL_DIAGNOSTICS__;
    d.scene.activeCamera=d.camera;d.detailCamera.dispose();delete d.detailCamera;
   });
+  // Real WebGL render-loop acceptance for the reported Samsung bug:
+  // approach the left wall of the ledge at (5,39) diagonally, slide past
+  // its far end, and retain enough momentum to continue skating.
+  await page.evaluate(()=>{
+    document.querySelector('#restart').click();
+    const s=window.__SOL_DIAGNOSTICS__.state;
+    Object.assign(s,{x:-1,z:39,y:0,groundY:0,vy:0,dir:Math.PI/4,
+      speed:9,travelSign:1,grounded:true,grinding:false,grindRail:null,
+      grindCooldown:1,rampCooldown:1,airVX:null,airVZ:null,onRamp:false,
+      controlSteer:0,controlThrottle:0,halfpipePreviewUntil:0});
+  });
+  // Prove contact while still alongside the solid, not just at its far end.
+  // This prevents a false positive from a rider who simply crosses z=43
+  // without ever touching the wall. Sample live game state during rendering.
+  await page.waitForFunction(()=>{
+    const s=window.__SOL_DIAGNOSTICS__.state;
+    return s.z>39&&s.z<42&&s.x>=.65&&s.x<=.74&&s.grounded;
+  },null,{timeout:2400});
+  const wallContact=await page.evaluate(()=>{
+    const s=window.__SOL_DIAGNOSTICS__.state;
+    return {x:s.x,z:s.z,speed:s.speed,grounded:s.grounded};
+  });
+  assert(wallContact.speed>3,'Wall contact must retain useful momentum: '+JSON.stringify(wallContact));
+  await page.screenshot({path:'test-artifacts/ledge-wall-contact.png',animations:'disabled'});
+  await page.waitForFunction(()=>{
+    const s=window.__SOL_DIAGNOSTICS__.state;
+    return s.z>43;
+  },null,{timeout:5500});
+  const wallSlide=await page.evaluate(()=>{
+    const s=window.__SOL_DIAGNOSTICS__.state;
+    return {x:s.x,z:s.z,speed:s.speed,grounded:s.grounded};
+  });
+  assert(wallSlide.x>=.65&&wallSlide.x<=.74&&wallSlide.speed>3&&wallSlide.grounded,
+    'Live WebGL skater must slide past ledge end without penetration: '+JSON.stringify(wallSlide));
+  await page.screenshot({path:'test-artifacts/ledge-wall-slide.png',animations:'disabled'});
+
   assert.equal(errors.length,0,'Browser errors: '+errors.join('; '));
-  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',controllerQA,gamepadIntegration,visualQA,spawnView,spawnPixels,cheekNormals,impactNormals,rampGravity,screenshotQA,status,spin,push,touchTricks,clickFallback,riding,vertStart,vertAir,vertLanding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
+  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',controllerQA,gamepadIntegration,visualQA,wallContact,wallSlide,spawnView,spawnPixels,cheekNormals,impactNormals,rampGravity,screenshotQA,status,spin,push,touchTricks,clickFallback,riding,vertStart,vertAir,vertLanding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
  }finally{await browser.close()}
 })().catch(e=>{fs.mkdirSync('test-artifacts',{recursive:true});fs.writeFileSync('test-artifacts/browser-result.txt','FAIL: '+(e&&e.stack||String(e)));console.error(e);process.exitCode=1}).finally(()=>server.close());

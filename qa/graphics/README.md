@@ -1,6 +1,6 @@
 # Ramp, board and rider verification
 
-Base: `1cc0c744e7e82553f390e0398641306e90dd9c44` (main inspected again after it advanced during development).
+Base: `40b6346c16ef89005b4b60da8bdafe480774bf4d` (main inspected again after it advanced during development).
 
 ## Reproduced defect
 
