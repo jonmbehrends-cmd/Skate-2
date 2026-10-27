@@ -57,7 +57,7 @@ jobs:
               fi
             fi
             printf '%s\n' "$GITHUB_SHA" > qa/tested-commit.txt
-            for name in halfpipe-chromium.png halfpipe-mobile.png boardslide-chromium.png bowl-chromium.png bowl-debug.png park-chromium.png; do
+            for name in spawn-mobile.png halfpipe-chromium.png halfpipe-mobile.png boardslide-chromium.png bowl-chromium.png bowl-debug.png park-chromium.png; do
               if test -f "test-artifacts/$name"; then cp "test-artifacts/$name" "qa/$name"; fi
             done
             if test -f test-artifacts/browser-result.txt; then
