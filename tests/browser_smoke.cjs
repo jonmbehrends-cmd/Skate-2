@@ -475,6 +475,29 @@ const server=http.createServer((req,res)=>{
   }));
   assert(xboxPush.speed>.3&&xboxPush.status.includes('Xbox connected'),
     'Emulated Xbox analog RT must actually accelerate the skater: '+JSON.stringify(xboxPush));
+  // Diagnostic-only: collect small samples in memory; retain original 350ms assertion.
+  await page.evaluate(()=>{
+    const samples=[],events=[],start=performance.now();
+    const state=()=>window.__SOL_DIAGNOSTICS__.state;
+    let previous=null,sequence=0,active=true;
+    const capture=()=>{
+      if(!active)return;
+      const q=state(),a=!!window.__qaPad?.buttons?.[0]?.pressed;
+      const sample={sequence:sequence++,elapsedMs:performance.now()-start,simulationFrame:q.frame??null,
+        grounded:q.grounded,y:q.y??null,vy:q.vy,trickName:q.name,
+        rawA:a,previousA:previous?.rawA??false,risingEdgeA:a&&!(previous?.rawA??false),
+        controllerConnected:!!window.__qaPad?.connected,grinding:q.grinding??null,
+        onRamp:q.onRamp??null,bowlAir:q.bowlAir??null};
+      if(sample.risingEdgeA)events.push({event:'raw-a-rising-edge',sequence:sample.sequence,elapsedMs:sample.elapsedMs});
+      if(previous&&sample.trickName==='OLLIE'&&previous.trickName!=='OLLIE')events.push({event:'ollie-registration-observed',sequence:sample.sequence,elapsedMs:sample.elapsedMs});
+      if(previous&&sample.vy>0&&previous.vy<=0)events.push({event:'positive-vy-observed',sequence:sample.sequence,elapsedMs:sample.elapsedMs});
+      if(previous&&previous.grounded&&!sample.grounded)events.push({event:'first-airborne',sequence:sample.sequence,elapsedMs:sample.elapsedMs});
+      samples.push(sample);previous=sample;
+      requestAnimationFrame(capture);
+    };
+    window.__ollieTimeline={samples,events,stop:()=>{active=false},start};
+    capture();
+  });
   await page.evaluate(()=>{
     window.__qaPad.buttons[7].value=0;
     window.__qaPad.buttons[0].pressed=true;
@@ -486,6 +509,29 @@ const server=http.createServer((req,res)=>{
     vy:window.__SOL_DIAGNOSTICS__.state.vy,
     name:window.__SOL_DIAGNOSTICS__.state.name
   }));
+  await page.evaluate(()=>{window.__qaPad.buttons[0].pressed=false;window.__qaPad.buttons[0].value=0});
+  await page.waitForTimeout(100);
+  const ollieEvidence=await page.evaluate(()=>{
+    const t=window.__ollieTimeline;t.stop();
+    const before=t.samples[0]||null;
+    const maxVy=Math.max(...t.samples.map(x=>x.vy).filter(Number.isFinite),-Infinity);
+    const ys=t.samples.map(x=>x.y).filter(Number.isFinite);
+    return {schema:'sol-skate-ollie-timeline/v1',
+      failedBaseline:{workflowRun:'40444454686',testedCheckout:'527d8aaa622a4f27b05677eeb0dc71b37e1f4a61'},
+      precondition:before,timeline:t.samples,events:t.events,
+      derived:{aRisingEdgeObserved:t.samples.some(x=>x.risingEdgeA),
+        ollieRegistrationObserved:t.samples.some(x=>x.trickName==='OLLIE'),
+        positiveVyObserved:t.samples.some(x=>x.vy>0),
+        leftGroundObserved:t.samples.some((x,i)=>i>0&&t.samples[i-1].grounded&&!x.grounded),
+        upwardDisplacementObserved:Number.isFinite(before?.y)&&ys.some(y=>y>before.y),
+        maximumVy:maxVy,maximumY:ys.length?Math.max(...ys):null},
+      originalAssertion:{preserved:true,passed:!window.__SOL_DIAGNOSTICS__.state.grounded&&window.__SOL_DIAGNOSTICS__.state.vy>0,
+        snapshotAt350Ms:window.__ollieOriginalSnapshot},classification:'unclassified'};
+  });
+  ollieEvidence.originalAssertion.passed=!xboxOllie.grounded&&xboxOllie.vy>0;
+  ollieEvidence.originalAssertion.snapshotAt350Ms=xboxOllie;
+  fs.mkdirSync('test-artifacts',{recursive:true});
+  fs.writeFileSync('test-artifacts/xbox-a-ollie-timeline.json',JSON.stringify(ollieEvidence,null,2)+'\\n');
   assert(!xboxOllie.grounded&&xboxOllie.vy>0,
     'Emulated Xbox A button must launch an actual ollie: '+JSON.stringify(xboxOllie));
   await page.evaluate(()=>{window.__qaPad.connected=false});
