@@ -54,7 +54,13 @@ function pump(state,previous,current,dt,active=false){
  const forward=Math.cos(state.dir||0)*(state.travelSign===-1?-1:1);
  const speed=Number.isFinite(state.speed)?state.speed:0;
  // Compression while rolling into increasing transition curvature; no reverse-direction free thrust.
- const change=(slope-before)*forward;
+ const travelSign=state.travelSign===-1?-1:1;
+ const alongSlope=(contact)=>{
+  const sz=Number.isFinite(contact?.slope)?contact.slope:0;
+  const sx=Number.isFinite(contact?.slopeX)?contact.slopeX:0;
+  return (sz*Math.cos(state.dir||0)+sx*Math.sin(state.dir||0))*travelSign;
+ };
+ const change=alongSlope(current)-alongSlope(previous||current);
  const transition=(current.ramp.curve==='halfpipe-left'||current.ramp.curve==='halfpipe-right'||current.ramp.curve==='bowl');
  // A held pump supplies modest continuous drive through a curved transition;
  // curvature change adds a short compression impulse. Scale by elapsed time
