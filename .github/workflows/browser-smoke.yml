@@ -2,6 +2,8 @@ name: SOL SKATE Chromium visual smoke
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 permissions:
   contents: write
@@ -25,6 +27,8 @@ jobs:
       # Ubuntu hosted runners include Chromium's standard shared libraries;
       # avoid apt install-deps, which can stall under heavy CI load.
       - run: npx playwright install chromium
+      - name: Verify deterministic halfpipe pump physics
+        run: node tests/pump_physics.cjs
       - name: Test mobile Chromium WebGL gameplay
         id: smoke
         continue-on-error: true
@@ -36,7 +40,8 @@ jobs:
           path: test-artifacts/
           if-no-files-found: warn
       - name: Persist screenshot and test outcome for review
-        if: always()
+        # PRs must never write unverified QA artifacts onto main.
+        if: always() && github.event_name != 'pull_request'
         shell: bash
         run: |
           # Source code can advance during Chromium testing. Never rebase a
