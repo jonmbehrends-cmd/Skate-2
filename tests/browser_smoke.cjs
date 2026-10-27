@@ -200,6 +200,39 @@ const server=http.createServer((req,res)=>{
   const push=await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__,s=d.state;return {speed:s.speed,phase:s.pushPhase,grounded:s.grounded,onRamp:s.onRamp,grinding:s.grinding,bowlAir:!!s.bowlAir,burstUntil:s.pushBurstUntil,now:performance.now(),frame:d.scene.getFrameId(),y:s.y,z:s.z}});
   await page.locator('[data-t="push"]').dispatchEvent('pointerup',{pointerId:11});
   assert(push.speed>.05&&push.phase>0,'PUSH must animate foot and increase speed: '+JSON.stringify({push,errors}));
+  // Verify every mobile trick button through real pointer events. The click
+  // fallback must not trigger a second trick after pointerdown.
+  const touchTricks=[];
+  for(const [name,expectedFlip,expectedSpin,expectedCount] of [
+   ['ollie',0,0,1],['kick',1,0,1],['heel',-1,0,1],
+   ['shove',0,1,1],['grab',0,0,2]
+  ]){
+   await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
+    Object.assign(s,{x:0,z:0,y:0,groundY:0,vy:0,dir:0,speed:0,
+     grounded:true,grinding:false,travelSign:1,flip:0,spin:0,count:0,
+     combo:0,grabUntil:0,grabHeld:false,touchGrabHeld:false,grindCooldown:0});
+   });
+   await page.locator('[data-t="'+name+'"]').click();
+   const outcome=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
+    return {airborne:!s.grounded,vy:s.vy,flip:s.flip,spin:s.spin,
+     count:s.count,name:s.name};});
+   assert(outcome.airborne&&outcome.vy>0&&outcome.flip===expectedFlip&&
+    outcome.spin===expectedSpin&&outcome.count===expectedCount,
+    'Mobile '+name+' must activate once with correct physics: '+JSON.stringify(outcome));
+   touchTricks.push({button:name,...outcome});
+  }
+  // Programmatic click is a separate accessibility/fallback path: it must
+  // still work when a pointerdown event was not dispatched.
+  await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
+   Object.assign(s,{grounded:true,grinding:false,y:0,groundY:0,vy:0,
+    flip:0,spin:0,count:0,combo:0,grabUntil:0,grabHeld:false});
+   document.querySelector('[data-t="ollie"]').click();
+  });
+  const clickFallback=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
+   return {airborne:!s.grounded,count:s.count,vy:s.vy};});
+  assert(clickFallback.airborne&&clickFallback.count===1&&clickFallback.vy>0,
+   'Mobile click fallback must activate OLLIE once: '+JSON.stringify(clickFallback));
+  await page.locator('#restart').click();
   // Exercise the actual mobile boardslide button while it is visible.
   await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__,s=d.state;
    Object.assign(s,{x:0,z:19,y:0,groundY:0,dir:0,speed:5,travelSign:1,grounded:true,grinding:false,vy:0,grindCooldown:0,grindRequestType:null});
@@ -381,6 +414,6 @@ const server=http.createServer((req,res)=>{
   await checkSceneScreenshot('test-artifacts/park-chromium.png','park');
 
   assert.equal(errors.length,0,'Browser errors: '+errors.join('; '));
-  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',spawnView,spawnPixels,cheekNormals,rampGravity,screenshotQA,status,spin,push,riding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
+  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',spawnView,spawnPixels,cheekNormals,rampGravity,screenshotQA,status,spin,push,touchTricks,clickFallback,riding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
  }finally{await browser.close()}
 })().catch(e=>{fs.mkdirSync('test-artifacts',{recursive:true});fs.writeFileSync('test-artifacts/browser-result.txt','FAIL: '+(e&&e.stack||String(e)));console.error(e);process.exitCode=1}).finally(()=>server.close());
