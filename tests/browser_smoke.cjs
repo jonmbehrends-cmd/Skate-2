@@ -135,6 +135,28 @@ const server=http.createServer((req,res)=>{
   assert.equal(visualQA.laceCount,6,'Both animated shoes must have laces');
   for(const key of ['pickable','collidable','detached','transparent'])
    assert.deepEqual(visualQA[key],[],key+' skater details must be empty');
+  // The skater must use rounded, animated geometry rather than box primitives.
+  // This is geometry QA, not just a screenshot or material-name check.
+  const silhouetteQA=await page.evaluate(()=>{
+    const scene=window.__SOL_DIAGNOSTICS__.scene;
+    const one=name=>scene.meshes.find(m=>m.name===name);
+    const all=name=>scene.meshes.filter(m=>m.name===name);
+    return {torsoVertices:one('torso')?.getTotalVertices(),
+      backpackVertices:one('slim skate backpack')?.getTotalVertices(),
+      shoeVertices:all('shoe').map(m=>m.getTotalVertices()),
+      soleVertices:all('sole').map(m=>m.getTotalVertices()),
+      shoeParents:all('shoe').map(m=>m.parent?.name),
+      toeCaps:all('skater rubber toe cap').map(m=>m.getTotalVertices())};
+  });
+  assert.ok(silhouetteQA.torsoVertices>80,'Torso must have a smooth silhouette');
+  assert.ok(silhouetteQA.backpackVertices>80,'Backpack must have rounded geometry');
+  assert.equal(silhouetteQA.shoeVertices.length,2,'Both animated feet must have shoes');
+  assert.equal(silhouetteQA.soleVertices.length,2,'Both shoes must have separate outsoles');
+  assert.ok(silhouetteQA.shoeVertices.every(v=>v>80),'Shoes must be rounded, not boxes');
+  assert.ok(silhouetteQA.soleVertices.every(v=>v>80),'Outsoles must be rounded, not boxes');
+  assert.ok(silhouetteQA.shoeParents.every(n=>n==='knee joint'),'Shoes must follow the animated rig');
+  assert.ok(silhouetteQA.toeCaps.every(v=>v>80)&&silhouetteQA.toeCaps.length===2,
+    'Both rounded toe caps must follow the shoes');
   // Background realism must remain one shared atlas with batched rooftop
   // detail, not dozens of individually drawn windows or physics colliders.
   const facadeQA=await page.evaluate(()=>{
