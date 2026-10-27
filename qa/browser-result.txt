@@ -1,2 +1,8 @@
-FAIL: AssertionError [ERR_ASSERTION]: Halfpipe screenshot unexpectedly blank
-    at /home/runner/work/Skate-2/Skate-2/tests/browser_smoke.cjs:195:3
+FAIL: page.evaluate: ReferenceError: velocity is not defined
+    at Object.rollOnSlope (http://127.0.0.1:42881/terrain.js?v=grind-r4:13:19)
+    at eval (eval at evaluate (:291:30), <anonymous>:5:23)
+    at Array.map (<anonymous>)
+    at eval (eval at evaluate (:291:30), <anonymous>:4:17)
+    at UtilityScript.evaluate (<anonymous>:293:16)
+    at UtilityScript.<anonymous> (<anonymous>:1:44)
+    at /home/runner/work/Skate-2/Skate-2/tests/browser_smoke.cjs:98:32
