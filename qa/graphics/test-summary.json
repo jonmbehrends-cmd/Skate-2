@@ -1,0 +1,31 @@
+{
+  "base": "1cc0c744e7e82553f390e0398641306e90dd9c44",
+  "logicSuites": [
+    "controller",
+    "terrain",
+    "obstacles",
+    "grind",
+    "motion",
+    "wheels",
+    "landing",
+    "check_inline",
+    "push",
+    "ramp_mesh",
+    "halfpipe",
+    "input",
+    "bowl",
+    "board_geometry",
+    "pump_physics",
+    "board_v2"
+  ],
+  "browserSuites": [
+    "visuals_browser",
+    "browser_smoke",
+    "input_browser",
+    "bowl_browser"
+  ],
+  "result": "PASS",
+  "physicalHardwareTested": false,
+  "merged": false,
+  "deployed": false
+}

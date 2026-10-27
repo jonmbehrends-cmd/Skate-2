@@ -1,0 +1,12 @@
+{
+  "result": "PASS",
+  "checks": [
+    "keyboard chords",
+    "outside pointer release",
+    "Xbox LB grind",
+    "RB release",
+    "Gamepad permission denial",
+    "WebGL recovery",
+    "playable compatibility mode"
+  ]
+}

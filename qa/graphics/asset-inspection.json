@@ -1,0 +1,190 @@
+[
+  {
+    "file": "skateboard_v2.glb",
+    "sha256": "ce479260ac516b817093a47714526fbe1412cc7c26d0e4854a09b58a486504c2",
+    "bytes": 120340,
+    "meshes": 27,
+    "primitives": 27,
+    "vertices": 3136,
+    "triangles": 5400,
+    "bones": 0,
+    "animations": [],
+    "materials": [
+      {
+        "name": "Mat_BearingShield",
+        "alphaMode": "OPAQUE",
+        "metallic": 0.75,
+        "roughness": 0.25
+      },
+      {
+        "name": "Mat_SteelHardware",
+        "alphaMode": "OPAQUE",
+        "metallic": 0.9599999785423279,
+        "roughness": 0.18000000715255737
+      },
+      {
+        "name": "Mat_DeckGraphic",
+        "alphaMode": "OPAQUE",
+        "metallic": 0.019999999552965164,
+        "roughness": 0.3499999940395355
+      },
+      {
+        "name": "Mat_GripTape",
+        "alphaMode": "OPAQUE",
+        "metallic": 0,
+        "roughness": 0.9599999785423279
+      },
+      {
+        "name": "Mat_MapleEdge",
+        "alphaMode": "OPAQUE",
+        "metallic": 0,
+        "roughness": 0.41999998688697815
+      },
+      {
+        "name": "Mat_TruckAluminum",
+        "alphaMode": "OPAQUE",
+        "metallic": 0.8799999952316284,
+        "roughness": 0.3199999928474426
+      },
+      {
+        "name": "Mat_UrethaneBushing",
+        "alphaMode": "OPAQUE",
+        "metallic": 0,
+        "roughness": 0.3799999952316284
+      },
+      {
+        "name": "Mat_WheelUrethane",
+        "alphaMode": "OPAQUE",
+        "metallic": 0,
+        "roughness": 0.36000001430511475
+      }
+    ],
+    "embeddedImages": 0
+  },
+  {
+    "file": "skater_v2.glb",
+    "sha256": "e58e6009bca16a39a79a0d275445d9470f704e6aa5467a224eca4611bb8b638c",
+    "bytes": 101020,
+    "meshes": 1,
+    "primitives": 9,
+    "vertices": 1324,
+    "triangles": 2138,
+    "bones": 20,
+    "animations": [
+      "SOL_PushLoop"
+    ],
+    "materials": [
+      {
+        "name": "Mat_HoodieTeal",
+        "alphaMode": "OPAQUE",
+        "metallic": 0,
+        "roughness": 0.8199999928474426
+      },
+      {
+        "name": "Mat_HoodieCord",
+        "alphaMode": "OPAQUE",
+        "metallic": 0,
+        "roughness": 0.7200000286102295
+      },
+      {
+        "name": "Mat_SkinTone",
+        "alphaMode": "OPAQUE",
+        "metallic": 0,
+        "roughness": 0.6200000047683716
+      },
+      {
+        "name": "Mat_SkateHelmet",
+        "alphaMode": "OPAQUE",
+        "metallic": 0.07999999821186066,
+        "roughness": 0.2800000011920929
+      },
+      {
+        "name": "Mat_NylonStrap",
+        "alphaMode": "OPAQUE",
+        "metallic": 0,
+        "roughness": 0.9200000166893005
+      },
+      {
+        "name": "Mat_DenimIndigo",
+        "alphaMode": "OPAQUE",
+        "metallic": 0,
+        "roughness": 0.8799999952316284
+      },
+      {
+        "name": "Mat_VulcanizedRubber",
+        "alphaMode": "OPAQUE",
+        "metallic": 0,
+        "roughness": 0.44999998807907104
+      },
+      {
+        "name": "Mat_ShoeBlack",
+        "alphaMode": "OPAQUE",
+        "metallic": 0,
+        "roughness": 0.75
+      },
+      {
+        "name": "Mat_ShoeLace",
+        "alphaMode": "OPAQUE",
+        "metallic": 0,
+        "roughness": 0.6499999761581421
+      }
+    ],
+    "embeddedImages": 0
+  },
+  {
+    "file": "skatepark_v2.glb",
+    "sha256": "2b2c4c5ca15f6786fd3cb84ef43c6f0538436f8ad353be0c79fe6d163bc0193b",
+    "bytes": 826912,
+    "meshes": 133,
+    "primitives": 133,
+    "vertices": 26146,
+    "triangles": 25480,
+    "bones": 0,
+    "animations": [],
+    "materials": [
+      {
+        "name": "Mat_BowlConcrete",
+        "alphaMode": "OPAQUE",
+        "metallic": 0,
+        "roughness": 0.6800000071525574
+      },
+      {
+        "name": "Mat_GalvanizedSteel",
+        "alphaMode": "OPAQUE",
+        "metallic": 0.949999988079071,
+        "roughness": 0.23999999463558197
+      },
+      {
+        "name": "Mat_PoolTileBlue",
+        "alphaMode": "OPAQUE",
+        "metallic": 0.019999999552965164,
+        "roughness": 0.18000000715255737
+      },
+      {
+        "name": "Mat_PlazaConcrete",
+        "alphaMode": "OPAQUE",
+        "metallic": 0,
+        "roughness": 0.7400000095367432
+      },
+      {
+        "name": "Mat_WeatheredAsphalt",
+        "alphaMode": "OPAQUE",
+        "metallic": 0,
+        "roughness": 0.9200000166893005
+      },
+      {
+        "name": "Mat_RampPlywood",
+        "alphaMode": "OPAQUE",
+        "metallic": 0,
+        "roughness": 0.47999998927116394
+      },
+      {
+        "name": "Mat_UrbanBrick",
+        "alphaMode": "OPAQUE",
+        "metallic": 0,
+        "roughness": 0.8799999952316284
+      }
+    ],
+    "embeddedImages": 0
+  }
+]
