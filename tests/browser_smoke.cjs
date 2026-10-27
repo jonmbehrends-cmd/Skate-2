@@ -112,6 +112,29 @@ const server=http.createServer((req,res)=>{
   try{await page.waitForFunction(()=>!!window.__SOL_DIAGNOSTICS__,null,{timeout:30000});}
   catch(e){const startup=await page.evaluate(()=>({error:document.querySelector('#error')?.textContent,babylon:!!window.BABYLON,grind:!!window.SOLGrind,html:document.readyState}));throw Error('Game startup failed: '+JSON.stringify({startup,errors,cause:String(e)}));}
   await page.waitForTimeout(1200);
+  // Apparel is visual-only: all 24 details must be attached to animated joints
+  // and must not intercept ramp raycasts or alter collision behavior.
+  const visualQA=await page.evaluate(()=>{
+   const d=window.__SOL_DIAGNOSTICS__;
+   const names=['skater smoked glasses lens','skater ear','skater helmet vent',
+    'skater jacket seam','skater glasses bridge','skater nose',
+    'skater jacket zipper','skater hoodie pocket','skater sleeve cuff',
+    'skater knee fabric panel','skater rubber toe cap','skater shoe lace'];
+   const meshes=d.scene.meshes.filter(m=>names.includes(m.name));
+   return {declared:d.visualDetailCount,count:meshes.length,
+    pickable:meshes.filter(m=>m.isPickable).map(m=>m.name),
+    collidable:meshes.filter(m=>m.checkCollisions).map(m=>m.name),
+    detached:meshes.filter(m=>!m.parent).map(m=>m.name),
+    transparent:meshes.filter(m=>m.material?.alpha!==1).map(m=>m.name),
+    lensCount:meshes.filter(m=>m.name==='skater smoked glasses lens').length,
+    laceCount:meshes.filter(m=>m.name==='skater shoe lace').length};
+  });
+  assert.equal(visualQA.declared,24,'Skater visual detail module must attach 24 meshes');
+  assert.equal(visualQA.count,24,'Every skater detail must exist in the rendered scene');
+  assert.equal(visualQA.lensCount,2,'Both protective lenses must be visible');
+  assert.equal(visualQA.laceCount,6,'Both animated shoes must have laces');
+  for(const key of ['pickable','collidable','detached','transparent'])
+   assert.deepEqual(visualQA[key],[],key+' skater details must be empty');
   // Reproduce the player's exact initial mobile camera, not only a scenic
   // overview. Record the mesh underneath the dark diagonal visible in user
   // screenshots so we can distinguish a wall, shadow, or missing riding skin.
@@ -613,6 +636,6 @@ const server=http.createServer((req,res)=>{
   const gamepadIntegration={result:'PASS',xboxPush,xboxOllie,xboxDisconnect};
 
   assert.equal(errors.length,0,'Browser errors: '+errors.join('; '));
-  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',controllerQA,gamepadIntegration,spawnView,spawnPixels,cheekNormals,impactNormals,rampGravity,screenshotQA,status,spin,push,touchTricks,clickFallback,riding,vertStart,vertAir,vertLanding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
+  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',controllerQA,gamepadIntegration,visualQA,spawnView,spawnPixels,cheekNormals,impactNormals,rampGravity,screenshotQA,status,spin,push,touchTricks,clickFallback,riding,vertStart,vertAir,vertLanding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
  }finally{await browser.close()}
 })().catch(e=>{fs.mkdirSync('test-artifacts',{recursive:true});fs.writeFileSync('test-artifacts/browser-result.txt','FAIL: '+(e&&e.stack||String(e)));console.error(e);process.exitCode=1}).finally(()=>server.close());
