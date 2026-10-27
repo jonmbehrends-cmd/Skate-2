@@ -49,6 +49,17 @@ const server=http.createServer((req,res)=>{
       diffuse:material?.diffuseColor?.asArray()||null};
     })};
   });
+  // A pickable opaque cheek can still render as a black wedge. Decode the
+  // *actual captured Chromium screenshot* and check exposed sidewall pixels.
+  // The earlier QA only inspected mesh/material metadata, which missed this.
+  const spawnPixels=await page.evaluate(async encoded=>{
+   const img=new Image();img.src='data:image/png;base64,'+encoded;await img.decode();
+   const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;
+   const ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,0,0);
+   const points=[[200,210],[240,210]];
+   return points.map(([x,y])=>{const p=Array.from(ctx.getImageData(x,y,1,1).data);return {x,y,rgb:p.slice(0,3),luma:Math.round(.2126*p[0]+.7152*p[1]+.0722*p[2])}});
+  },fs.readFileSync('test-artifacts/spawn-mobile.png').toString('base64'));
+  assert(spawnPixels.every(p=>p.luma>=45),'Spawn-view ramp cheek still renders as a near-black wedge: '+JSON.stringify(spawnPixels));
   const status=await page.evaluate(()=>{
    const d=window.__SOL_DIAGNOSTICS__,meshes=d.scene.meshes;
    const cheeks=meshes.filter(m=>m.name==='SOLID RAMP SIDE WALL');
@@ -291,6 +302,6 @@ const server=http.createServer((req,res)=>{
   assert(fs.statSync('test-artifacts/park-chromium.png').size>14000,'Park overview screenshot unexpectedly blank');
 
   assert.equal(errors.length,0,'Browser errors: '+errors.join('; '));
-  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',spawnView,status,spin,push,riding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
+  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',spawnView,spawnPixels,status,spin,push,riding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
  }finally{await browser.close()}
 })().catch(e=>{fs.mkdirSync('test-artifacts',{recursive:true});fs.writeFileSync('test-artifacts/browser-result.txt','FAIL: '+(e&&e.stack||String(e)));console.error(e);process.exitCode=1}).finally(()=>server.close());
