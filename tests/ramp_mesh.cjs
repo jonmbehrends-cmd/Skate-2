@@ -43,10 +43,10 @@ assert(html.includes("rampSurface.alpha=1"),'Ramp must be fully opaque');
 assert(html.includes('rampSurface.backFaceCulling=false'),'Ramp must be visible from both sides');
 assert(html.includes('MATERIAL_OPAQUE'),'Ramp must use opaque material rendering mode');
 
-assert(html.includes("continuous solid ramp understructure"),'Ramps must have opaque concrete beneath riding skin');
+assert(!html.includes("box('continuous solid ramp understructure'"),'Do not stack overlapping core boxes inside sealed ramps');
 
 assert(html.includes('SOLRampGeometry.sideWall'),'Renderer must show closed concrete cheeks');
-assert(html.includes('Mesh.MergeMeshes(infill'),'Ramp infill should merge into one mesh for mobile rendering');
+assert(!html.includes('Mesh.MergeMeshes(infill'),'Sealed ramps must not contain overlapping infill meshes');
 for(const side of [-1,1]){
  const r={x:46,z:-52,w:16,d:4.8,h:2.1,curve:'halfpipe-left'};
  const wall=globalThis.SOLRampGeometry.sideWall(r,profile,side,40);
