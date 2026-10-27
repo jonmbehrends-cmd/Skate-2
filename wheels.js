@@ -33,7 +33,11 @@ function sample(x,z,dir,y,surface){
 function relativeImpact(state,slopeX=0,slopeZ=0){
   const vx=Number.isFinite(state.airVX)?state.airVX:Math.sin(state.dir)*state.speed;
   const vz=Number.isFinite(state.airVZ)?state.airVZ:Math.cos(state.dir)*state.speed;
-  return state.vy-vx*slopeX-vz*slopeZ;
+  // Contact severity is the velocity along the UNIT surface normal.
+  // The unnormalised dot product exaggerated steep halfpipe impacts and
+  // incorrectly marked clean vert returns as bails, destroying momentum.
+  const sx=Number.isFinite(slopeX)?slopeX:0,sz=Number.isFinite(slopeZ)?slopeZ:0;
+  return (state.vy-vx*sx-vz*sz)/Math.hypot(1,sx,sz);
 }
 root.SOLWheels={sample,relativeImpact};
 })(typeof window!=='undefined'?window:globalThis);
