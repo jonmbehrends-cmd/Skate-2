@@ -9,7 +9,9 @@
     const v = Number.isFinite(value) ? value : 0;
     return Math.abs(v) < .16 ? 0 : Math.sign(v) * Math.min(1, (Math.abs(v) - .16) / .84);
   };
-  const read = (buttons, index) => !!(buttons[index] && buttons[index].pressed);
+  // Some Android/Bluetooth Gamepad implementations expose a valid analog value
+  // without updating the `pressed` flag. Treat >= 0.5 as a button press.
+  const read = (buttons, index) => !!(buttons[index] && (buttons[index].pressed || Number(buttons[index].value) >= .5));
   function reset() {
     selected = null;
     lastButtons = [];
@@ -29,7 +31,7 @@
     }
     if (selected !== pad.index) {
       selected = pad.index;
-      lastButtons = pad.buttons.map(b => !!b.pressed);
+      lastButtons = pad.buttons.map((_, i) => read(pad.buttons, i));
       rightArmed = false; // Prevent a trick firing immediately on reconnection.
     }
     const b = pad.buttons;
@@ -38,7 +40,7 @@
     for (const [i, action] of [[0, 'ollie'], [2, 'kick'], [1, 'heel'], [3, 'shove'], [5, 'grab'], [4, 'grind'], [11, 'boardslide']]) {
       if (pressed(i) && !lastButtons[i]) onTrick(action);
     }
-    lastButtons = b.map(v => !!v.pressed);
+    lastButtons = b.map((_, i) => read(b, i));
     // Optional right-stick flick: up=ollie, left=kickflip, right=heelflip,
     // down=shove-it. Re-center before the next flick. Face buttons remain usable.
     const rx = deadzone(pad.axes[2] || 0), ry = deadzone(pad.axes[3] || 0);
