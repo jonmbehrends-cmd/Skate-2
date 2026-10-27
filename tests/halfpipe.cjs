@@ -70,3 +70,6 @@ for(const [ramp,heading,sign] of [[left,Math.PI,1],[right,0,1],[left,0,-1],[righ
  assert(!takeoff({...sk,dir:heading+Math.PI,travelSign:sign},T.sample(sk.x,sk.z,ramps)),'No launch traveling downhill');
 }
 console.log('PASS: coping release on both walls, regular/fakie, speed and direction guards');
+
+assert(html.includes('state.y<=landingContact.height&&state.vy<=0'), 'Rising skater must never snap to the elevated halfpipe deck');
+console.log('PASS: halfpipe air landing waits for descending motion');
