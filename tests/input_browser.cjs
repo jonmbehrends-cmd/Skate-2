@@ -9,6 +9,10 @@ let browser;
  const page=await browser.newPage({viewport:{width:390,height:844},hasTouch:true,isMobile:true}),errors=[];
  page.on('pageerror',e=>errors.push(e.message));
  const url='http://127.0.0.1:'+server.address().port+'/';
+ // Keep the real WebGL test deterministic when GitHub runners cannot reach Babylon CDN.
+ // Serve the same installed Babylon UMD bundle as tests/browser_smoke.cjs.
+ const babylonBundle=require.resolve('babylonjs');
+ await page.route('https://cdn.babylonjs.com/babylon.js',route=>route.fulfill({path:babylonBundle,contentType:'application/javascript'}));
  await page.goto(url);await page.waitForFunction(()=>window.__SOL_DIAGNOSTICS__,null,{timeout:60000});
  await page.keyboard.down('w');await page.keyboard.down('a');await page.keyboard.up('a');
  await page.waitForFunction(()=>window.__SOL_DIAGNOSTICS__.state.controlThrottle<-.8);
@@ -27,6 +31,7 @@ let browser;
  // Real page startup with unavailable WebGL: recovery must be clickable and playable.
  const recovery=await browser.newPage({viewport:{width:390,height:844}});
  await recovery.addInitScript(()=>{const get=HTMLCanvasElement.prototype.getContext;HTMLCanvasElement.prototype.getContext=function(type,...args){return /webgl/i.test(type)?null:get.call(this,type,...args)}});
+ await recovery.route('https://cdn.babylonjs.com/babylon.js',route=>route.fulfill({path:babylonBundle,contentType:'application/javascript'}));
  await recovery.goto(url);await recovery.getByRole('link',{name:'PLAY COMPATIBILITY VERSION'}).waitFor();await recovery.screenshot({path:path.join(out,'startup-recovery.png')});
  await recovery.getByRole('link',{name:'PLAY COMPATIBILITY VERSION'}).click();await recovery.waitForURL('**/legacy.html?compat=1');
  await recovery.locator('[data-t="push"]').click();await recovery.waitForFunction(()=>Number(document.querySelector('#speed').textContent.replace(/\D/g,''))>0);
