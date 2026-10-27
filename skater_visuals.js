@@ -49,7 +49,7 @@ function attach(B,scene,body,elbows,knees,materials){
   const cuff=B.MeshBuilder.CreateCylinder('skater sleeve cuff',{height:.07,diameter:.205,tessellation:12},scene);
   cuff.position.set(0,-.015,0);finish(cuff,elbow,materials.jacket);
   ellipsoid('skater knee fabric panel',knee,0,-.015,.115,.20,.17,.065,materials.denim);
-  box('skater rubber toe cap',knee,0,-.385,.323,.262,.12,.105,toe);
+  ellipsoid('skater rubber toe cap',knee,0,-.387,.313,.245,.085,.085,toe);
   for(let j=0;j<3;j++){
    box('skater shoe lace',knee,0,-.313,.075+j*.072,.17,.012,.013,laces);
   }

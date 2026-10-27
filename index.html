@@ -99,7 +99,8 @@ const jacket=mat('jacket fabric','#b94b2c'),trim=mat('jacket trim','#e3d6bf'),de
 function capsulePart(name,parent,from,to,radius,material){const delta=to.subtract(from),mesh=B.MeshBuilder.CreateCapsule(name,{height:delta.length()+radius*2,radius,tessellation:12,subdivisions:2},scene);mesh.parent=parent;mesh.position=from.add(to).scale(.5);mesh.rotation.z=Math.atan2(-delta.x,delta.y);mesh.rotation.x=Math.atan2(delta.z,Math.hypot(delta.x,delta.y));mesh.material=material;return mesh}
 const hips=new B.TransformNode('hips',scene);hips.parent=body;hips.position.y=1.19;
 const pelvis=B.MeshBuilder.CreateSphere('pelvis',{diameter:.49,segments:12},scene);pelvis.parent=hips;pelvis.scaling.set(1,.62,.72);pelvis.material=denim;
-const torso=B.MeshBuilder.CreateCylinder('torso',{height:.72,diameterTop:.61,diameterBottom:.48,tessellation:16},scene);torso.parent=body;torso.position.set(0,1.46,0);torso.material=jacket;
+// Rounded hoodie silhouette instead of the hard-edged cone torso.
+const torso=B.MeshBuilder.CreateCapsule('torso',{height:.76,radius:.285,tessellation:20,subdivisions:3},scene);torso.parent=body;torso.position.set(0,1.46,0);torso.scaling.z=.86;torso.material=jacket;
 const shoulder=B.MeshBuilder.CreateSphere('shoulders',{diameter:.58,segments:12},scene);shoulder.parent=body;shoulder.position.set(0,1.77,0);shoulder.scaling.set(1,.35,.66);shoulder.material=jacket;
 const collar=B.MeshBuilder.CreateCylinder('collar',{height:.09,diameter:.32,tessellation:16},scene);collar.parent=body;collar.position.set(0,1.84,0);collar.material=trim;
 const neck=B.MeshBuilder.CreateCylinder('neck',{height:.18,diameter:.19,tessellation:12},scene);neck.parent=body;neck.position.set(0,1.91,0);neck.material=skin;
@@ -112,8 +113,9 @@ const helmetBand=mat('helmet accent paint','#f3a92e');
 const helmetStripe=box('helmet center stripe',.065,.025,.32,0,2.535,0,helmetBand);helmetStripe.parent=body;
 const jacketLogo=mat('jacket chest emblem','#f0d6a6');
 const chestPatch=box('jacket chest patch',.22,.13,.022,0,1.57,.304,jacketLogo);chestPatch.parent=body;
-const backpack=box('slim skate backpack',.39,.46,.16,0,1.53,-.32,pants);backpack.parent=body;
-const bagTrim=box('backpack reflective stripe',.28,.035,.015,0,1.59,-.407,helmetBand);bagTrim.parent=body;
+// Soft rounded daypack with no sharp cuboid corners.
+const backpack=B.MeshBuilder.CreateCapsule('slim skate backpack',{height:.49,radius:.19,tessellation:16,subdivisions:3},scene);backpack.parent=body;backpack.position.set(0,1.53,-.32);backpack.scaling.z=.54;backpack.material=pants;
+const bagTrim=box('backpack reflective stripe',.28,.035,.015,0,1.59,-.428,helmetBand);bagTrim.parent=body;
 const legs=[],arms=[],knees=[],elbows=[],shoes=[];
 for(let i=0;i<2;i++){const side=i===0?-1:1;
 const hipJoint=new B.TransformNode('hip joint',scene);hipJoint.parent=hips;hipJoint.position.set(side*.28,-.03,0);legs.push(hipJoint);
@@ -121,7 +123,9 @@ capsulePart('thigh',hipJoint,new B.Vector3(0,0,0),new B.Vector3(0,-.4,.025),.125
 const knee=new B.TransformNode('knee joint',scene);knee.parent=hipJoint;knee.position.set(0,-.4,.025);knees.push(knee);
 const kneeCap=B.MeshBuilder.CreateSphere('knee',{diameter:.23,segments:12},scene);kneeCap.parent=knee;kneeCap.material=denim;
 capsulePart('shin',knee,new B.Vector3(0,0,0),new B.Vector3(0,-.36,-.02),.105,denim);
-const shoe=box('shoe',.26,.14,.45,0,-.39,.13,wheel);shoe.parent=knee;shoes.push(shoe);const sole=box('sole',.27,.035,.46,0,-.47,.13,rubber);sole.parent=knee;
+// Rounded skate shoes and separate rubber outsoles; remain children of the animated knees.
+const shoe=B.MeshBuilder.CreateCapsule('shoe',{height:.45,radius:.13,tessellation:16,subdivisions:3},scene);shoe.parent=knee;shoe.position.set(0,-.39,.13);shoe.rotation.x=Math.PI/2;shoe.scaling.z=.55;shoe.material=wheel;shoes.push(shoe);
+const sole=B.MeshBuilder.CreateCapsule('sole',{height:.46,radius:.136,tessellation:16,subdivisions:3},scene);sole.parent=knee;sole.position.set(0,-.47,.13);sole.rotation.x=Math.PI/2;sole.scaling.z=.17;sole.material=rubber;
 const shoulderJoint=new B.TransformNode('shoulder joint',scene);shoulderJoint.parent=body;shoulderJoint.position.set(side*.35,1.73,0);arms.push(shoulderJoint);
 capsulePart('upper arm',shoulderJoint,new B.Vector3(0,0,0),new B.Vector3(side*.07,-.34,0),.1,jacket);
 const elbow=new B.TransformNode('elbow joint',scene);elbow.parent=shoulderJoint;elbow.position.set(side*.07,-.34,0);elbows.push(elbow);
