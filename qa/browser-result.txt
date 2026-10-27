@@ -1,2 +1,2 @@
-FAIL: AssertionError [ERR_ASSERTION]: Spawn-view ramp cheek still renders as a near-black wedge: [{"x":200,"y":210,"rgb":[16,19,21],"luma":19},{"x":240,"y":210,"rgb":[126,134,139],"luma":133}]
-    at /home/runner/work/Skate-2/Skate-2/tests/browser_smoke.cjs:62:3
+FAIL: AssertionError [ERR_ASSERTION]: Spawn-view ramp cheek still renders as a near-black wedge: {"spawnPixels":[{"x":200,"y":210,"rgb":[16,19,21],"luma":19},{"x":240,"y":210,"rgb":[126,134,139],"luma":133}],"darkPixelIsolation":[{"hidden":"SOLID RAMP SIDE WALL","color":[113,147,167]},{"hidden":"SOLID RAMP CONCRETE CORE","color":[125,135,140]},{"hidden":"ramp side foundation","color":[125,135,140]},{"hidden":"solid skatable concrete ramp","color":[125,135,141]}]}
+    at /home/runner/work/Skate-2/Skate-2/tests/browser_smoke.cjs:82:3
