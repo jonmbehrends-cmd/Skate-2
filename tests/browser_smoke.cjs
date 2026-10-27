@@ -59,7 +59,27 @@ const server=http.createServer((req,res)=>{
    const points=[[200,210],[240,210]];
    return points.map(([x,y])=>{const p=Array.from(ctx.getImageData(x,y,1,1).data);return {x,y,rgb:p.slice(0,3),luma:Math.round(.2126*p[0]+.7152*p[1]+.0722*p[2])}});
   },fs.readFileSync('test-artifacts/spawn-mobile.png').toString('base64'));
-  assert(spawnPixels.every(p=>p.luma>=45),'Spawn-view ramp cheek still renders as a near-black wedge: '+JSON.stringify(spawnPixels));
+  // If the pixel is dark, isolate whether it comes from the cheek, core,
+  // foundation, or a separate occluding mesh. Keep these experiments out of
+  // the player's game; only the CI browser scene is temporarily modified.
+  let darkPixelIsolation=null;
+  if(spawnPixels.some(p=>p.luma<45)){
+   darkPixelIsolation=[];
+   for(const target of ['SOLID RAMP SIDE WALL','SOLID RAMP CONCRETE CORE','ramp side foundation','solid skatable concrete ramp']){
+    await page.evaluate(name=>window.__SOL_DIAGNOSTICS__.scene.meshes.filter(m=>m.name===name).forEach(m=>m.setEnabled(false)),target);
+    await page.waitForTimeout(70);
+    const png=await page.screenshot({animations:'disabled'});
+    const color=await page.evaluate(async encoded=>{
+     const img=new Image();img.src='data:image/png;base64,'+encoded;await img.decode();
+     const c=document.createElement('canvas');c.width=img.width;c.height=img.height;
+     const ctx=c.getContext('2d');ctx.drawImage(img,0,0);
+     return Array.from(ctx.getImageData(200,210,1,1).data).slice(0,3);
+    },png.toString('base64'));
+    darkPixelIsolation.push({hidden:target,color});
+    await page.evaluate(name=>window.__SOL_DIAGNOSTICS__.scene.meshes.filter(m=>m.name===name).forEach(m=>m.setEnabled(true)),target);
+   }
+  }
+  assert(spawnPixels.every(p=>p.luma>=45),'Spawn-view ramp cheek still renders as a near-black wedge: '+JSON.stringify({spawnPixels,darkPixelIsolation}));
   // Validate triangle winding, not merely backFaceCulling=false. A mirrored
   // cheek with inward normals can be opaque yet render almost black.
   const cheekNormals=await page.evaluate(()=>{
