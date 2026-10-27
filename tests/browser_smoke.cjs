@@ -183,6 +183,9 @@ const server=http.createServer((req,res)=>{
    const cheeks=meshes.filter(m=>m.name==='SOLID RAMP SIDE WALL');
    const cores=meshes.filter(m=>m.name==='SOLID RAMP CONCRETE CORE');
    const bottom=meshes.find(m=>m.name==='HALFPIPE FLAT BOTTOM');
+   const B=window.BABYLON;
+   const bottomRay=new B.Ray(new B.Vector3(-36,4,-18.1),new B.Vector3(0,-1,0),8);
+   const bottomPick=d.scene.pickWithRay(bottomRay,m=>m.name==='HALFPIPE FLAT BOTTOM');
    const skins=meshes.filter(m=>m.name==='solid skatable concrete ramp');
    const skinMaterial=skins[0]?.material;
    const topRay=new window.BABYLON.Ray(new window.BABYLON.Vector3(-36,12,-28),new window.BABYLON.Vector3(0,-1,0),20);
@@ -194,6 +197,7 @@ const server=http.createServer((req,res)=>{
     bankCheekAlbedo:cheeks.filter(m=>m.material?.name?.includes(' -12 15')).map(m=>m.material.diffuseColor.asArray()),
     connection:meshes.filter(m=>m.name==='HALFPIPE PARK CONNECTION').length,
     bottom:bottom?[bottom.position.x,bottom.position.z]:null,
+    bottomSurface:bottom?{material:bottom.material?.name,alpha:bottom.material?.alpha,blend:bottom.material?.needAlphaBlending(),emissive:bottom.material?.emissiveColor?.asArray(),top:bottom.getBoundingInfo().boundingBox.maximumWorld.y,rayHit:bottomPick?.hit}:null,
     skater:!!d.skater,rendered:d.scene.getFrameId()>1,canvasWidth:d.engine.getRenderingCanvas().width,
     independentCamera:!!d.cameraAnchor&&d.camera.lockedTarget===d.cameraAnchor,staticBatches:d.staticBatchReport};
   });
@@ -212,6 +216,10 @@ const server=http.createServer((req,res)=>{
   assert(status.bankCheekAlbedo.every(c=>c.every(v=>v>=.65)),'Starting ramp exterior must be daylight-bright rather than black wedge');
   assert.equal(status.connection,1,'Halfpipe must connect to park');
   assert.deepEqual(status.bottom,[-36,-18.1],'Halfpipe must be at current plaza coordinates');
+  assert.equal(status.bottomSurface?.material,'sealed birch skate ramp plywood','Halfpipe flat bottom must continue the wooden riding surface instead of exposing gray plaza concrete');
+  assert(status.bottomSurface?.alpha===1&&!status.bottomSurface?.blend&&status.bottomSurface?.rayHit,'Halfpipe floor must be opaque, ray-pickable solid geometry');
+  assert(Math.abs(status.bottomSurface.top)<.025,'Halfpipe floor must meet the two transition toes near ground level');
+  assert(status.bottomSurface.emissive[0]>=.2,'Wooden transitions need enough fill light to remain visible on mobile');
   assert(status.skater&&status.rendered&&status.canvasWidth>0,'WebGL scene must render');
   assert(status.independentCamera,'Camera must not rotate with rider during airborne spins');
   assert(status.staticBatches?.merged>80&&status.staticBatches?.groups>=8,'Static park art must be batched to avoid hundreds of unnecessary mobile draw calls: '+JSON.stringify(status.staticBatches));
