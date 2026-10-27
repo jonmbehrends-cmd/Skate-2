@@ -159,12 +159,12 @@ const server=http.createServer((req,res)=>{
   // actual number of skatable ramp meshes rather than a stale six-ramp layout.
   assert(status.skinCount>=6,'Expected a complete multi-ramp skatepark');
   assert.equal(status.rampCheeks,status.skinCount*2,'Every ramp needs two solid concrete sidewalls');
-  assert.equal(status.cores,status.skinCount,'Every ramp needs one merged concrete core');
+  assert.equal(status.cores,0,'Sealed ramp bodies must not contain overlapping concrete infill cores');
   assert.equal(status.skinMaterial.alpha,1,'Riding skin must be opaque');
   assert.equal(status.skinMaterial.blend,false,'Riding skin must not use alpha blending');
   assert.equal(status.skinMaterial.culled,false,'Riding skin must render from both sides');
   assert(status.topPick.hit&&Number.isFinite(status.topPick.y),'A ray must hit the halfpipe riding skin');
-  assert(status.opaqueCheeks&&status.opaqueCores,'Ramp exterior and core materials must be opaque');
+  assert(status.opaqueCheeks,'Ramp exterior sidewall materials must be opaque');
   assert(status.minCheekThickness>=.22,'Ramp sidewalls must be thick, capped 3D geometry rather than flat triangles');
   assert.equal(status.bankCheekAlbedo.length,2,'Starting ramp must have both exterior cheeks');
   assert(status.bankCheekAlbedo.every(c=>c.every(v=>v>=.65)),'Starting ramp exterior must be daylight-bright rather than black wedge');
