@@ -51,5 +51,13 @@ function rollOnSlope(state,contact,dt){
  state.speed=Math.min(17,Math.abs(velocity));
  return state;
 }
-root.SOLTerrain={profile,sample,launch,rollOnSlope};
+// Preserve vertical position at vert takeoff. The previous game loop snapped
+// the rider from the steep transition directly to coping height, producing
+// a visible 1m+ teleport. Give the upward arc enough energy to clear the lip
+// instead; the frame loop must never directly raise y on takeoff.
+function vertTakeoffVelocity(y,lipHeight,travelSpeed){
+ const climb=Math.max(.35,lipHeight+.35-(Number.isFinite(y)?y:lipHeight));
+ return Math.min(12,Math.max(5.8,Math.max(0,travelSpeed)*.94,Math.sqrt(2*19*climb)));
+}
+root.SOLTerrain={profile,sample,launch,rollOnSlope,vertTakeoffVelocity};
 })(typeof window!=='undefined'?window:globalThis);
