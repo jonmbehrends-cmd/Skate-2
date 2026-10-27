@@ -73,3 +73,7 @@ console.log('PASS: coping release on both walls, regular/fakie, speed and direct
 
 assert(html.includes('state.y<=landingContact.height&&state.vy<=0'), 'Rising skater must never snap to the elevated halfpipe deck');
 console.log('PASS: halfpipe air landing waits for descending motion');
+
+assert(html.includes('lipVelocity>0&&hpSide===0'), 'Halfpipe must not use the generic bank-transfer launch');
+assert(html.includes('state.grindCooldown=Math.max(state.grindCooldown||0,.65)'), 'Fresh halfpipe vert air must not snap into a coping grind');
+console.log('PASS: halfpipe vert launch is isolated from bank transfers and automatic coping capture');
