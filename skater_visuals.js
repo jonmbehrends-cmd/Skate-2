@@ -54,6 +54,41 @@ function attach(B,scene,body,elbows,knees,materials){
    box('skater shoe lace',knee,0,-.313,.075+j*.072,.17,.012,.013,laces);
   }
  }
+
+ // Layered garment and anatomy details remain visual-only, parented to the
+ // existing animated rig; no physics or collision surfaces are introduced.
+ const fold=paint('hoodie fabric folds','#a94d33',.05);
+ const trim=paint('hoodie raised stitching','#cf7953',.06);
+ const lining=paint('hood lining','#283039',.04);
+ const sole=paint('shoe outsole','#d4cab1',.07);
+ const hardware=paint('backpack hardware','#667781',.3);
+ ellipsoid('hood drape',body,0,1.94,-.16,.42,.36,.26,materials.jacket);
+ ellipsoid('hood lining shadow',body,0,2.015,-.035,.32,.22,.20,lining);
+ ellipsoid('fabric neck collar',body,0,1.91,.09,.35,.15,.24,fold);
+ for(const [x,y,z,sx,sy,sz,m] of [
+  [-.20,1.56,.24,.10,.30,.045,fold],
+  [.18,1.37,.26,.11,.21,.043,trim],
+  [-.08,1.19,.23,.25,.07,.055,fold],
+  [.07,1.75,.25,.10,.17,.035,trim],
+  [-.21,1.29,.22,.075,.15,.04,fold]
+ ])ellipsoid('sculpted hoodie fold',body,x,y,z,sx,sy,sz,m);
+ ellipsoid('helmet rim',body,0,2.34,.015,.38,.085,.34,helmetVent);
+ ellipsoid('helmet crown',body,0,2.49,-.018,.35,.18,.33,materials.helmet||helmetVent);
+ ellipsoid('helmet brim',body,0,2.36,.29,.31,.035,.17,helmetVent);
+ ellipsoid('chin contour',body,0,1.997,.169,.17,.11,.13,materials.skin);
+ ellipsoid('mouth',body,0,2.045,.273,.10,.012,.014,lining);
+ for(const side of [-1,1]){
+  ellipsoid('backpack shoulder strap',body,side*.27,1.72,.18,.085,.34,.065,lining);
+  ellipsoid('strap buckle',body,side*.27,1.47,.24,.06,.045,.035,hardware);
+ }
+ for(let i=0;i<2;i++){
+  for(let j=0;j<3;j++){
+   ellipsoid('sleeve gathered fold',elbows[i],0,.08+j*.062,.075,.145,.025,.14,j===1?trim:fold);
+   ellipsoid('denim knee fold',knees[i],0,.12+j*.06,.137,.19,.025,.105,materials.denim);
+  }
+  ellipsoid('shoe layered outsole',knees[i],0,-.45,.195,.27,.055,.27,sole);
+  ellipsoid('shoe heel reinforcement',knees[i],0,-.39,-.035,.22,.13,.12,toe);
+ }
  return {meshes:made,count:made.length};
 }
 root.SOLSkaterVisuals={attach};
