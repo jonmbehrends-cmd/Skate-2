@@ -55,7 +55,7 @@
     if (!x) x = (pressed(15) ? 1 : 0) - (pressed(14) ? 1 : 0);
     if (!y) y = (pressed(13) ? 1 : 0) - (pressed(12) ? 1 : 0);
     return {
-      x, y, boost: pressed(7), grabHeld: pressed(5), connected: true,
+      x, y, boost: pressed(7) || Number(b[7]?.value || 0) >= .2, grabHeld: pressed(5), connected: true,
       status: '🎮 ' + (/xbox/i.test(pad.id || '') ? 'Xbox connected' : 'Controller connected') + ' · LS steer · RT push · LB grind · R3 boardslide · RB grab · RS flick'
     };
   }

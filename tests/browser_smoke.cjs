@@ -8,6 +8,48 @@ for(const match of fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8'
  if(match[1].trim())new vm.Script(match[1],{filename:'index.html:inline'});
 }
 const root=path.resolve(__dirname,'..');
+
+const controllerQA=(()=>{
+  // Exercise the production controller adapter deterministically, without
+  // relying on a physical Bluetooth controller on the CI runner.
+  let time=1000,pads=[];
+  const context={window:{},navigator:{getGamepads:()=>pads},performance:{now:()=>time}};
+  vm.runInNewContext(fs.readFileSync(path.join(root,'controller.js'),'utf8'),context,{filename:'controller.js'});
+  const api=context.window.SOLPad,actions=[];
+  const poll=()=>api.poll(action=>actions.push(action),time);
+  assert.equal(poll().connected,false,'No controller must leave touch play usable');
+  const buttons=Array.from({length:17},()=>({pressed:false,value:0}));
+  const pad={index:0,id:'Xbox Wireless Controller',connected:true,axes:[0,0,0,0],buttons};
+  pads=[pad];
+  assert.equal(poll().connected,true,'Xbox controller should connect');
+  assert.equal(actions.length,0,'Connecting with held buttons must not fire tricks');
+  pad.axes[0]=.5;pad.axes[1]=-.5;
+  let state=poll();
+  assert(state.x>.35&&state.y<-.35,'Left stick should steer and throttle with deadzone');
+  buttons[7].value=.65;buttons[7].pressed=false;
+  assert.equal(poll().boost,true,'Analog right trigger should push even without pressed flag');
+  buttons[7].value=0;
+  buttons[0].pressed=true;poll();poll();
+  assert.deepEqual(actions,['ollie'],'A button should trigger one ollie per press');
+  buttons[0].pressed=false;poll();buttons[0].pressed=true;poll();
+  assert.deepEqual(actions,['ollie','ollie'],'Re-pressing A should trigger another ollie');
+  buttons[0].pressed=false;poll();
+  pad.axes[2]=-1;time+=300;poll();poll();
+  assert.equal(actions.at(-1),'kick','Right-stick left flick should kickflip');
+  const before=actions.length;
+  poll();assert.equal(actions.length,before,'Held right stick must not repeat tricks');
+  pad.axes[2]=0;poll();time+=300;pad.axes[2]=1;poll();
+  assert.equal(actions.at(-1),'heel','Right stick must re-arm after recentering');
+  pad.axes=[0,0,0,0];buttons[15].pressed=true;
+  state=poll();assert.equal(state.x,1,'D-pad right should steer if left stick is neutral');
+  pad.connected=false;state=poll();
+  assert.equal(state.connected,false,'Disconnect must release controller inputs');
+  assert.equal(state.boost,false,'Disconnect must release PUSH');
+  context.navigator.getGamepads=()=>{throw Error('Gamepad permission denied')};
+  assert.equal(poll().connected,false,'Denied Gamepad API must not crash the game');
+  return {result:'PASS',analogTrigger:true,faceButtonEdge:true,rightStickFlick:true,dpadFallback:true,disconnect:true,apiDenied:true};
+})();
+
 const types={'.html':'text/html; charset=utf-8','.js':'application/javascript; charset=utf-8','.css':'text/css; charset=utf-8'};
 const server=http.createServer((req,res)=>{
  const pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);
@@ -415,7 +457,91 @@ const server=http.createServer((req,res)=>{
   await page.screenshot({path:'test-artifacts/park-chromium.png',animations:'disabled'});
   await checkSceneScreenshot('test-artifacts/park-chromium.png','park');
 
+
+  // End-to-end controller path: emulate the Standard Gamepad API inside
+  // actual Chromium/WebGL. This tests the render-loop wiring as well as the
+  // isolated adapter, without claiming a physical Bluetooth test.
+  await page.evaluate(()=>{
+    document.querySelector('#restart').click();
+    const buttons=Array.from({length:17},()=>({pressed:false,value:0}));
+    window.__qaPad={index:0,id:'Xbox Wireless Controller',connected:true,mapping:'standard',axes:[0,0,0,0],buttons};
+    Object.defineProperty(navigator,'getGamepads',{configurable:true,value:()=>[window.__qaPad]});
+    buttons[7].value=.8; // Some browsers report analog RT without pressed=true.
+  });
+  await page.waitForTimeout(850);
+  const xboxPush=await page.evaluate(()=>({
+    speed:window.__SOL_DIAGNOSTICS__.state.speed,
+    status:document.querySelector('#status').textContent
+  }));
+  assert(xboxPush.speed>.3&&xboxPush.status.includes('Xbox connected'),
+    'Emulated Xbox analog RT must actually accelerate the skater: '+JSON.stringify(xboxPush));
+  // Diagnostic-only: collect small samples in memory; retain original 350ms assertion.
+  await page.evaluate(()=>{
+    const samples=[],events=[],start=performance.now();
+    const state=()=>window.__SOL_DIAGNOSTICS__.state;
+    let previous=null,sequence=0,active=true;
+    const capture=()=>{
+      if(!active)return;
+      const q=state(),a=!!window.__qaPad?.buttons?.[0]?.pressed;
+      const sample={sequence:sequence++,elapsedMs:performance.now()-start,simulationFrame:q.frame??null,
+        grounded:q.grounded,y:q.y??null,vy:q.vy,trickName:q.name,
+        rawA:a,previousA:previous?.rawA??false,risingEdgeA:a&&!(previous?.rawA??false),
+        controllerConnected:!!window.__qaPad?.connected,grinding:q.grinding??null,
+        onRamp:q.onRamp??null,bowlAir:q.bowlAir??null};
+      if(sample.risingEdgeA)events.push({event:'raw-a-rising-edge',sequence:sample.sequence,elapsedMs:sample.elapsedMs});
+      if(previous&&sample.trickName==='OLLIE'&&previous.trickName!=='OLLIE')events.push({event:'ollie-registration-observed',sequence:sample.sequence,elapsedMs:sample.elapsedMs});
+      if(previous&&sample.vy>0&&previous.vy<=0)events.push({event:'positive-vy-observed',sequence:sample.sequence,elapsedMs:sample.elapsedMs});
+      if(previous&&previous.grounded&&!sample.grounded)events.push({event:'first-airborne',sequence:sample.sequence,elapsedMs:sample.elapsedMs});
+      samples.push(sample);previous=sample;
+      requestAnimationFrame(capture);
+    };
+    window.__ollieTimeline={samples,events,stop:()=>{active=false},start};
+    capture();
+  });
+  await page.evaluate(()=>{
+    window.__qaPad.buttons[7].value=0;
+    window.__qaPad.buttons[0].pressed=true;
+    window.__qaPad.buttons[0].value=1;
+  });
+  await page.waitForTimeout(350);
+  const xboxOllie=await page.evaluate(()=>({
+    grounded:window.__SOL_DIAGNOSTICS__.state.grounded,
+    vy:window.__SOL_DIAGNOSTICS__.state.vy,
+    name:window.__SOL_DIAGNOSTICS__.state.name
+  }));
+  await page.evaluate(()=>{window.__qaPad.buttons[0].pressed=false;window.__qaPad.buttons[0].value=0});
+  await page.waitForTimeout(100);
+  const ollieEvidence=await page.evaluate(()=>{
+    const t=window.__ollieTimeline;t.stop();
+    const before=t.samples[0]||null;
+    const maxVy=Math.max(...t.samples.map(x=>x.vy).filter(Number.isFinite),-Infinity);
+    const ys=t.samples.map(x=>x.y).filter(Number.isFinite);
+    return {schema:'sol-skate-ollie-timeline/v1',
+      failedBaseline:{workflowRun:'40444454686',testedCheckout:'527d8aaa622a4f27b05677eeb0dc71b37e1f4a61'},
+      precondition:before,timeline:t.samples,events:t.events,
+      derived:{aRisingEdgeObserved:t.samples.some(x=>x.risingEdgeA),
+        ollieRegistrationObserved:t.samples.some(x=>x.trickName==='OLLIE'),
+        positiveVyObserved:t.samples.some(x=>x.vy>0),
+        leftGroundObserved:t.samples.some((x,i)=>i>0&&t.samples[i-1].grounded&&!x.grounded),
+        upwardDisplacementObserved:Number.isFinite(before?.y)&&ys.some(y=>y>before.y),
+        maximumVy:maxVy,maximumY:ys.length?Math.max(...ys):null},
+      originalAssertion:{preserved:true,passed:!window.__SOL_DIAGNOSTICS__.state.grounded&&window.__SOL_DIAGNOSTICS__.state.vy>0,
+        snapshotAt350Ms:window.__ollieOriginalSnapshot},classification:'unclassified'};
+  });
+  ollieEvidence.originalAssertion.passed=!xboxOllie.grounded&&xboxOllie.vy>0;
+  ollieEvidence.originalAssertion.snapshotAt350Ms=xboxOllie;
+  fs.mkdirSync('test-artifacts',{recursive:true});
+  fs.writeFileSync('test-artifacts/xbox-a-ollie-timeline.json',JSON.stringify(ollieEvidence,null,2)+'\n');
+  assert(!xboxOllie.grounded&&xboxOllie.vy>0,
+    'Emulated Xbox A button must launch an actual ollie: '+JSON.stringify(xboxOllie));
+  await page.evaluate(()=>{window.__qaPad.connected=false});
+  await page.waitForTimeout(250);
+  const xboxDisconnect=await page.locator('#status').textContent();
+  assert(xboxDisconnect.includes('Press a controller button'),
+    'Disconnect must return to touch-friendly input status: '+xboxDisconnect);
+  const gamepadIntegration={result:'PASS',xboxPush,xboxOllie,xboxDisconnect};
+
   assert.equal(errors.length,0,'Browser errors: '+errors.join('; '));
-  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',spawnView,spawnPixels,cheekNormals,rampGravity,screenshotQA,status,spin,push,touchTricks,clickFallback,riding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
+  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',controllerQA,gamepadIntegration,spawnView,spawnPixels,cheekNormals,rampGravity,screenshotQA,status,spin,push,touchTricks,clickFallback,riding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
  }finally{await browser.close()}
 })().catch(e=>{fs.mkdirSync('test-artifacts',{recursive:true});fs.writeFileSync('test-artifacts/browser-result.txt','FAIL: '+(e&&e.stack||String(e)));console.error(e);process.exitCode=1}).finally(()=>server.close());
