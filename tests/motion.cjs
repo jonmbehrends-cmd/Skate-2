@@ -85,3 +85,18 @@ assert(motion.horizontal(backwards,.05).dz<0,'Grounded fakie must move backwards
 step(backwards,1,0,false,.025);assert(backwards.dir>0,'Fakie stick yaw stays camera-consistent');
 assert(motion.horizontal(backwards,.05).dx<0,'Fakie travel curves relative to the reversed chase camera');
 console.log('PASS: backward rolling, switch landings and camera-consistent fakie steering');
+
+for(const curve of ['halfpipe-left','halfpipe-right','bowl']){
+ const rider=s({speed:6,grounded:true});
+ const surface={ramp:{curve},slope:curve==='halfpipe-left'?-1:1};
+ const gained=pump(rider,surface,surface,.02,true);
+ assert(gained>0,curve+' should gain momentum when actively pumping');
+ const idle=s({speed:6,grounded:true});
+ assert.equal(pump(idle,surface,surface,.02,false),0,curve+' must not gain speed without input');
+}
+const fpsA=s({speed:6,grounded:true}),fpsB=s({speed:6,grounded:true});
+const curve={ramp:{curve:'halfpipe-left'},slope:-.7};
+for(let i=0;i<50;i++)pump(fpsA,curve,curve,.02,true);
+for(let i=0;i<100;i++)pump(fpsB,curve,curve,.01,true);
+assert(Math.abs(fpsA.speed-fpsB.speed)<.02,'Pumping must remain stable across 50 and 100 Hz');
+console.log('PASS: both halfpipe walls and bowl pump consistently across frame rates');
