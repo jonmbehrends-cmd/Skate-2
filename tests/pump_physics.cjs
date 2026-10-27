@@ -6,7 +6,8 @@ const sandbox={window:{}};
 vm.runInNewContext(fs.readFileSync(path.join(__dirname,'..','motion.js'),'utf8'),sandbox,{filename:'motion.js'});
 const pump=sandbox.window.SOLMotion.pump;
 const state=(extra={})=>({grounded:true,grinding:false,dir:0,travelSign:1,speed:8,pumpIntensity:0,...extra});
-const contact=slope=>({slope,ramp:{}});
+const sharedRamp={curve:'halfpipe-left'};
+const contact=(slope,ramp=sharedRamp)=>({slope,ramp});
 const EPS=1e-8;
 {
  const s=state(),dt=1/60;
@@ -27,6 +28,19 @@ const EPS=1e-8;
 {
  const s=state({dir:0,travelSign:-1});
  assert(pump(s,contact(2),contact(-2),1/60,true)>0,'Fakie pumping must use actual travel direction');
+}
+{
+ // The first sample on a ramp and a transfer between disconnected ramps
+ // can have a discontinuous slope, but neither represents pumpable curvature.
+ const entering=state(),transferring=state(),continuous=state();
+ assert.equal(pump(entering,{slope:0,ramp:null},contact(100),1/60,true),0,
+  'Entering a ramp from flat ground must not create free pump speed');
+ assert.equal(pump(transferring,contact(-100,{curve:'quarter'}),contact(100),1/60,true),0,
+  'Switching ramp objects must not create a fake curvature impulse');
+ assert.equal(entering.speed,8);
+ assert.equal(transferring.speed,8);
+ assert(pump(continuous,contact(0),contact(100),1/60,true)>0,
+  'Continuous contact with the same ramp must still allow pumping');
 }
 for(const overrides of [{grounded:false},{grinding:true}]){
  const s=state(overrides);
@@ -51,4 +65,4 @@ const at60=simulate(60),at30=simulate(30);
 assert(at60>8&&at30>8,'Pumping through a transition must provide useful acceleration');
 assert(at60<=11.2+EPS&&at30<=11.2+EPS,'One second of pumping cannot create more than the time-based budget');
 assert(Math.abs(at60-at30)<.35,'Pump energy must be reasonably frame-rate independent: '+JSON.stringify({at60,at30}));
-console.log('PASS pump curvature, vert cap, fakie, gating, top speed, 30/60 FPS',JSON.stringify({at60,at30}));
+console.log('PASS pump curvature, contact continuity, vert cap, fakie, gating, top speed, 30/60 FPS',JSON.stringify({at60,at30}));
