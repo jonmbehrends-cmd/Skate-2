@@ -635,6 +635,24 @@ const server=http.createServer((req,res)=>{
     'Disconnect must return to touch-friendly input status: '+xboxDisconnect);
   const gamepadIntegration={result:'PASS',xboxPush,xboxOllie,xboxDisconnect};
 
+  // Render a close-up of the actual animated skater so visual regressions
+  // are reviewable instead of relying on distant park screenshots alone.
+  await page.evaluate(()=>{
+   const d=window.__SOL_DIAGNOSTICS__,B=window.BABYLON;
+   Object.assign(d.state,{x:0,z:0,y:0,vy:0,speed:0,grounded:true,
+    grinding:false,halfpipePreviewUntil:0});
+   const cam=new B.ArcRotateCamera('QA skater closeup',.15,1.23,4.2,
+    new B.Vector3(0,1.25,0),d.scene);
+   cam.fov=.75;cam.minZ=.1;d.scene.activeCamera=cam;d.detailCamera=cam;
+  });
+  await page.setViewportSize({width:960,height:540});
+  await page.waitForTimeout(600);
+  await page.screenshot({path:'test-artifacts/skater-closeup-chromium.png',animations:'disabled'});
+  await checkSceneScreenshot('test-artifacts/skater-closeup-chromium.png','skater');
+  await page.evaluate(()=>{
+   const d=window.__SOL_DIAGNOSTICS__;
+   d.scene.activeCamera=d.camera;d.detailCamera.dispose();delete d.detailCamera;
+  });
   assert.equal(errors.length,0,'Browser errors: '+errors.join('; '));
   fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',controllerQA,gamepadIntegration,visualQA,spawnView,spawnPixels,cheekNormals,impactNormals,rampGravity,screenshotQA,status,spin,push,touchTricks,clickFallback,riding,vertStart,vertAir,vertLanding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
  }finally{await browser.close()}
