@@ -24,3 +24,15 @@ assert.equal(q1.height,3);assert.equal(q1.slope,.6);
 for(let i=0;i<=24;i++){const t=i/24,p=globalThis.SOLTerrain.profile(quarter,t),c=sample(12,15+10*t,[quarter]);assert(Math.abs(p.height-c.height)<1e-9,'Render and contact profile must match');}
 assert(launch(q1,sample(12,25.1,[quarter]),25.1,0,12)>0);
 console.log('SOL SKATE curved quarterpipe tests passed');
+
+ // Elevated deck is solid above the skater, not a teleporting ground surface.
+const deck={x:-36,z:-31.55,w:38,d:3.1,h:4.5,curve:'halfpipe-deck'};
+const transition={x:-36,z:-25.8,w:38,d:8.4,h:4.5,curve:'halfpipe-left'};
+const deckGround=sample(-36,-31.55,[deck],0);
+assert.equal(deckGround.height,0,'Ground-level skater below halfpipe deck must remain on ground');
+assert.equal(deckGround.ramp,null,'Ground-level skater must not be classified as riding raised deck');
+assert.equal(sample(-36,-31.55,[deck],4.0).height,0,'Jump below deck cannot teleport onto its surface');
+assert.equal(sample(-36,-31.55,[deck],4.5).height,4.5,'Board at deck height must be able to land on top');
+assert.equal(sample(-36,-31.55,[deck],5.5).height,4.5,'Airborne rider above deck can land on it');
+assert.equal(sample(-36,-29.76,[transition],3.05).ramp,transition,'Halfpipe curved transition remains rideable');
+console.log('PASS: elevated halfpipe deck height gating and transition continuity');
