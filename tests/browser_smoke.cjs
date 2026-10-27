@@ -29,6 +29,10 @@ const controllerQA=(()=>{
   buttons[7].value=.65;buttons[7].pressed=false;
   assert.equal(poll().boost,true,'Analog right trigger should push even without pressed flag');
   buttons[7].value=0;
+  // Android Gamepad APIs sometimes provide a button value without `pressed`.
+  buttons[0].value=.85;buttons[0].pressed=false;poll();poll();
+  assert.deepEqual(actions,['ollie'],'Analog A must trigger once even if pressed=false');
+  buttons[0].value=0;poll();actions.length=0;
   buttons[0].pressed=true;poll();poll();
   assert.deepEqual(actions,['ollie'],'A button should trigger one ollie per press');
   buttons[0].pressed=false;poll();buttons[0].pressed=true;poll();
@@ -40,14 +44,21 @@ const controllerQA=(()=>{
   poll();assert.equal(actions.length,before,'Held right stick must not repeat tricks');
   pad.axes[2]=0;poll();time+=300;pad.axes[2]=1;poll();
   assert.equal(actions.at(-1),'heel','Right stick must re-arm after recentering');
-  pad.axes=[0,0,0,0];buttons[15].pressed=true;
-  state=poll();assert.equal(state.x,1,'D-pad right should steer if left stick is neutral');
+  pad.axes=[0,0,0,0];buttons[15].value=.9;buttons[15].pressed=false;
+  state=poll();assert.equal(state.x,1,'Analog D-pad right should steer if left stick is neutral');
   pad.connected=false;state=poll();
   assert.equal(state.connected,false,'Disconnect must release controller inputs');
   assert.equal(state.boost,false,'Disconnect must release PUSH');
+  // Reconnection with an already-held analog face button must not auto-trick.
+  const beforeReconnect=actions.length;
+  pad.connected=true;buttons[0].value=.9;poll();
+  assert.equal(actions.length,beforeReconnect,'Held analog A on reconnect must not fire');
+  buttons[0].value=0;poll();buttons[0].value=.9;poll();
+  assert.equal(actions.length,beforeReconnect+1,'Analog A must fire after release and re-press');
+  pad.connected=false;poll();
   context.navigator.getGamepads=()=>{throw Error('Gamepad permission denied')};
   assert.equal(poll().connected,false,'Denied Gamepad API must not crash the game');
-  return {result:'PASS',analogTrigger:true,faceButtonEdge:true,rightStickFlick:true,dpadFallback:true,disconnect:true,apiDenied:true};
+  return {result:'PASS',analogTrigger:true,analogFaceButtons:true,analogDpad:true,reconnectEdge:true,faceButtonEdge:true,rightStickFlick:true,dpadFallback:true,disconnect:true,apiDenied:true};
 })();
 
 const types={'.html':'text/html; charset=utf-8','.js':'application/javascript; charset=utf-8','.css':'text/css; charset=utf-8'};
