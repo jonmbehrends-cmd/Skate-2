@@ -58,6 +58,10 @@ function sideWall(r,profile,side,segments=40){
   const low=profile(r,0).height+.02,high=profile(r,1).height+.02;
   quad([inner,floor,front],[inner,low,front],[outer,low,front],[outer,floor,front],'end');
   quad([outer,floor,back],[outer,high,back],[inner,high,back],[inner,floor,back],'end');
+  // The negative-X cheek mirrors the positive-X cheek. Reverse its triangle
+  // winding so its outward face normals point toward -X, its top points +Y,
+  // and its front/back end caps face outward instead of into the ramp.
+  if(side<0)for(let i=0;i<indices.length;i+=3){const t=indices[i+1];indices[i+1]=indices[i+2];indices[i+2]=t;}
   return {positions,indices,uvs,segments:N};
 }
 root.SOLRampGeometry={build,sideWall};
