@@ -164,6 +164,29 @@ const server=http.createServer((req,res)=>{
    });
   });
   assert(cheekNormals.every(n=>n.side*n.nx>0),'Exterior ramp cheek triangle normals must point outward: '+JSON.stringify(cheekNormals));
+  // The halfpipe must be genuinely vert at both lips, not a shallow
+  // circular bank. Both visual meshes and wheel contact share this profile.
+  const halfpipeProfile=await page.evaluate(()=>{
+   const p=window.SOLTerrain.profile;
+   const left={x:-36,z:-25.8,w:38,d:8.4,h:4.5,curve:'halfpipe-left'};
+   const right={x:-36,z:-10.4,w:38,d:8.4,h:4.5,curve:'halfpipe-right'};
+   return [0,.0025,.05,.25,.5,.75,1].map(t=>({
+    t,left:p(left,t),right:p(right,1-t)
+   }));
+  });
+  assert(halfpipeProfile.every(v=>
+   Number.isFinite(v.left.height)&&Number.isFinite(v.left.slope)&&
+   Number.isFinite(v.right.height)&&Number.isFinite(v.right.slope)&&
+   v.left.height>=-.0001&&v.left.height<=4.5001&&
+   Math.abs(v.left.height-v.right.height)<.0001&&
+   Math.abs(v.left.slope+v.right.slope)<.0001),
+   'Halfpipe transitions must be finite, mirrored and within floor/coping heights: '+JSON.stringify(halfpipeProfile));
+  assert(Math.abs(halfpipeProfile[0].left.height-4.5)<.001&&
+   halfpipeProfile[1].left.slope< -5&&
+   halfpipeProfile[1].right.slope>5&&
+   halfpipeProfile[4].left.height<.03&&
+   halfpipeProfile[6].left.height<.001,
+   'Halfpipe must have near-vertical coping and smooth level floor: '+JSON.stringify(halfpipeProfile));
   // Steep ramp gravity must be physically bounded. The old raw-slope force
   // exceeded 9.81 m/s² on the halfpipe and caused instant fakie reversals.
   const rampGravity=await page.evaluate(()=>{
