@@ -29,22 +29,35 @@ function build(r,profile,segments=40){
   quad([rr,floor,back],[rr,high,back],[l,high,back],[l,floor,back]);
   return {positions,indices,uvs,segments:N};
 }
-// Independent exterior cast-concrete cheeks. These follow the exact same
-// sampled profile as wheel contact and visually close the ramp from either side.
+// Opaque, genuinely three-dimensional cast-concrete cheeks. The previous
+// single zero-thickness triangle was correctly pickable but read as a black
+// hole from the player's starting camera. Extrude both sides of each cheek,
+// including its top, bottom, and front/back end caps.
 function sideWall(r,profile,side,segments=40){
   if(side!==-1&&side!==1)throw Error('Side must be -1 or 1');
   const N=Math.max(2,Math.min(160,Math.floor(segments)||40));
-  const x=r.x+side*(r.w/2+.016),floor=-.046;
-  const positions=[],indices=[],uvs=[];
+  const inner=r.x+side*(r.w/2-.035),outer=r.x+side*(r.w/2+.22);
+  const floor=-.32,positions=[],indices=[],uvs=[];
+  function quad(a,b,c,d,mode){
+    const n=positions.length/3;
+    for(const p of [a,b,c,d]){
+      positions.push(...p);
+      uvs.push(mode==='end'?p[0]/3:p[2]/3,mode==='end'?p[1]/3:p[1]/3);
+    }
+    indices.push(n,n+1,n+2,n,n+2,n+3);
+  }
   for(let i=0;i<N;i++){
     const za=r.z-r.d/2+r.d*i/N,zb=r.z-r.d/2+r.d*(i+1)/N;
-    const ya=profile(r,i/N).height+.014,yb=profile(r,(i+1)/N).height+.014;
-    const base=positions.length/3;
-    positions.push(x,floor,za,x,ya,za,x,yb,zb,x,floor,zb);
-    uvs.push(za/3,floor/3,za/3,ya/3,zb/3,yb/3,zb/3,floor/3);
-    if(side>0)indices.push(base,base+1,base+2,base,base+2,base+3);
-    else indices.push(base+2,base+1,base,base+3,base+2,base);
+    const ya=profile(r,i/N).height+.02,yb=profile(r,(i+1)/N).height+.02;
+    quad([outer,floor,za],[outer,ya,za],[outer,yb,zb],[outer,floor,zb]);
+    quad([inner,floor,zb],[inner,yb,zb],[inner,ya,za],[inner,floor,za]);
+    quad([inner,ya,za],[inner,yb,zb],[outer,yb,zb],[outer,ya,za]);
+    quad([inner,floor,za],[outer,floor,za],[outer,floor,zb],[inner,floor,zb]);
   }
+  const front=r.z-r.d/2,back=r.z+r.d/2;
+  const low=profile(r,0).height+.02,high=profile(r,1).height+.02;
+  quad([inner,floor,front],[inner,low,front],[outer,low,front],[outer,floor,front],'end');
+  quad([outer,floor,back],[outer,high,back],[inner,high,back],[inner,floor,back],'end');
   return {positions,indices,uvs,segments:N};
 }
 root.SOLRampGeometry={build,sideWall};
