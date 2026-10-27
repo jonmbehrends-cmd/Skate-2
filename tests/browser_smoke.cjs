@@ -21,6 +21,35 @@ const server=http.createServer((req,res)=>{
  try{
   const page=await browser.newPage({viewport:{width:390,height:844},deviceScaleFactor:1,hasTouch:true,isMobile:true});
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  // PNG byte length is not a visual quality metric: an efficiently compressed
+  // but valid render can be smaller than an arbitrary 10 KB threshold.
+  // Check actual rendered pixel diversity in the clean, HUD-free QA views.
+  const screenshotQA={};
+  async function checkSceneScreenshot(file,label){
+   const png=fs.readFileSync(file);
+   const stats=await page.evaluate(async encoded=>{
+    const img=new Image();img.src='data:image/png;base64,'+encoded;await img.decode();
+    const canvas=document.createElement('canvas');
+    canvas.width=img.naturalWidth;canvas.height=img.naturalHeight;
+    const ctx=canvas.getContext('2d',{willReadFrequently:true});
+    ctx.drawImage(img,0,0);
+    const pixels=ctx.getImageData(0,0,canvas.width,canvas.height).data;
+    const colors=new Set();let minLuma=255,maxLuma=0;
+    for(let iy=1;iy<11;iy++)for(let ix=1;ix<19;ix++){
+     const x=Math.floor(ix*canvas.width/20),y=Math.floor(iy*canvas.height/12);
+     const k=(y*canvas.width+x)*4,r=pixels[k],g=pixels[k+1],b=pixels[k+2];
+     colors.add((r>>4)+','+(g>>4)+','+(b>>4));
+     const luma=.2126*r+.7152*g+.0722*b;
+     minLuma=Math.min(minLuma,luma);maxLuma=Math.max(maxLuma,luma);
+    }
+    return {width:canvas.width,height:canvas.height,colors:colors.size,
+      lumaRange:Math.round(maxLuma-minLuma)};
+   },png.toString('base64'));
+   screenshotQA[label]=stats;
+   assert(stats.width>=390&&stats.height>=390&&stats.colors>=8&&stats.lumaRange>=35,
+    label+' screenshot appears visually blank or unrendered: '+JSON.stringify(stats));
+  }
+
   // The live game uses a Babylon CDN, but CI must not fail just because
   // that remote CDN is unreachable from a GitHub runner. Serve the exact
   // installed Babylon UMD bundle locally during browser verification.
@@ -206,7 +235,7 @@ const server=http.createServer((req,res)=>{
   });
   await page.waitForTimeout(500);
   await page.screenshot({path:'test-artifacts/halfpipe-chromium.png',animations:'disabled'});
-  assert(fs.statSync('test-artifacts/halfpipe-chromium.png').size>10000,'Halfpipe screenshot unexpectedly blank');
+  await checkSceneScreenshot('test-artifacts/halfpipe-chromium.png','halfpipe');
   // The player's actual GRIND touch button must catch bowl coping without ollie.
   // Set a physically valid position on the steep bowl wall (not 1.3m
   // above the concrete) and press the real button in the SAME browser frame.
@@ -349,9 +378,9 @@ const server=http.createServer((req,res)=>{
   });
   await page.waitForTimeout(550);
   await page.screenshot({path:'test-artifacts/park-chromium.png',animations:'disabled'});
-  assert(fs.statSync('test-artifacts/park-chromium.png').size>14000,'Park overview screenshot unexpectedly blank');
+  await checkSceneScreenshot('test-artifacts/park-chromium.png','park');
 
   assert.equal(errors.length,0,'Browser errors: '+errors.join('; '));
-  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',spawnView,spawnPixels,cheekNormals,rampGravity,status,spin,push,riding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
+  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',spawnView,spawnPixels,cheekNormals,rampGravity,screenshotQA,status,spin,push,riding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
  }finally{await browser.close()}
 })().catch(e=>{fs.mkdirSync('test-artifacts',{recursive:true});fs.writeFileSync('test-artifacts/browser-result.txt','FAIL: '+(e&&e.stack||String(e)));console.error(e);process.exitCode=1}).finally(()=>server.close());
