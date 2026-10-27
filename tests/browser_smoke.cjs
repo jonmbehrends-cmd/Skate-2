@@ -30,6 +30,25 @@ const server=http.createServer((req,res)=>{
   try{await page.waitForFunction(()=>!!window.__SOL_DIAGNOSTICS__,null,{timeout:30000});}
   catch(e){const startup=await page.evaluate(()=>({error:document.querySelector('#error')?.textContent,babylon:!!window.BABYLON,grind:!!window.SOLGrind,html:document.readyState}));throw Error('Game startup failed: '+JSON.stringify({startup,errors,cause:String(e)}));}
   await page.waitForTimeout(1200);
+  // Reproduce the player's exact initial mobile camera, not only a scenic
+  // overview. Record the mesh underneath the dark diagonal visible in user
+  // screenshots so we can distinguish a wall, shadow, or missing riding skin.
+  fs.mkdirSync('test-artifacts',{recursive:true});
+  await page.screenshot({path:'test-artifacts/spawn-mobile.png',animations:'disabled'});
+  const spawnView=await page.evaluate(()=>{
+   const d=window.__SOL_DIAGNOSTICS__,scene=d.scene;
+   const pts=[[120,170],[160,170],[200,170],[240,170],[280,170],
+    [120,210],[160,210],[200,210],[240,210],[280,210],
+    [120,250],[160,250],[200,250],[240,250],[280,250]];
+   return {camera:{position:d.camera.position.asArray(),rotationOffset:d.camera.rotationOffset},
+    picks:pts.map(([x,y])=>{
+     const hit=scene.pick(x,y,m=>m.isVisible&&m.isEnabled()&&m.isPickable);
+     const mesh=hit?.pickedMesh,material=mesh?.material;
+     return {x,y,name:mesh?.name||null,point:hit?.pickedPoint?.asArray()||null,
+      material:material?.name||null,alpha:material?.alpha||null,
+      diffuse:material?.diffuseColor?.asArray()||null};
+    })};
+  });
   const status=await page.evaluate(()=>{
    const d=window.__SOL_DIAGNOSTICS__,meshes=d.scene.meshes;
    const cheeks=meshes.filter(m=>m.name==='SOLID RAMP SIDE WALL');
@@ -267,6 +286,6 @@ const server=http.createServer((req,res)=>{
   assert(fs.statSync('test-artifacts/park-chromium.png').size>14000,'Park overview screenshot unexpectedly blank');
 
   assert.equal(errors.length,0,'Browser errors: '+errors.join('; '));
-  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',status,spin,push,riding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
+  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',spawnView,status,spin,push,riding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
  }finally{await browser.close()}
 })().catch(e=>{fs.mkdirSync('test-artifacts',{recursive:true});fs.writeFileSync('test-artifacts/browser-result.txt','FAIL: '+(e&&e.stack||String(e)));console.error(e);process.exitCode=1}).finally(()=>server.close());
