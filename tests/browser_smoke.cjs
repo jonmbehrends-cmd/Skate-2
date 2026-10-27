@@ -61,6 +61,8 @@ const server=http.createServer((req,res)=>{
    return {rampCheeks:cheeks.length,cores:cores.length,skinCount:skins.length,skinMaterial:{alpha:skinMaterial?.alpha,blend:skinMaterial?.needAlphaBlending(),textureAlpha:skinMaterial?.diffuseTexture?.hasAlpha,transparency:skinMaterial?.transparencyMode,culled:skinMaterial?.backFaceCulling},topPick:{hit:topPick?.hit,y:topPick?.pickedPoint?.y},
     opaqueCheeks:cheeks.every(m=>m.material&&m.material.alpha===1&&m.material.backFaceCulling===false&&m.getTotalIndices()>0),
     opaqueCores:cores.every(m=>m.material&&m.material.alpha===1),
+    minCheekThickness:Math.min(...cheeks.map(m=>m.getBoundingInfo().boundingBox.maximumWorld.x-m.getBoundingInfo().boundingBox.minimumWorld.x)),
+    bankCheekAlbedo:cheeks.filter(m=>m.material?.name?.includes(' -12 15')).map(m=>m.material.diffuseColor.asArray()),
     connection:meshes.filter(m=>m.name==='HALFPIPE PARK CONNECTION').length,
     bottom:bottom?[bottom.position.x,bottom.position.z]:null,
     skater:!!d.skater,rendered:d.scene.getFrameId()>1,canvasWidth:d.engine.getRenderingCanvas().width,
@@ -76,6 +78,9 @@ const server=http.createServer((req,res)=>{
   assert.equal(status.skinMaterial.culled,false,'Riding skin must render from both sides');
   assert(status.topPick.hit&&Number.isFinite(status.topPick.y),'A ray must hit the halfpipe riding skin');
   assert(status.opaqueCheeks&&status.opaqueCores,'Ramp exterior and core materials must be opaque');
+  assert(status.minCheekThickness>=.22,'Ramp sidewalls must be thick, capped 3D geometry rather than flat triangles');
+  assert.equal(status.bankCheekAlbedo.length,2,'Starting ramp must have both exterior cheeks');
+  assert(status.bankCheekAlbedo.every(c=>c.every(v=>v>=.65)),'Starting ramp exterior must be daylight-bright rather than black wedge');
   assert.equal(status.connection,1,'Halfpipe must connect to park');
   assert.deepEqual(status.bottom,[-36,-18.1],'Halfpipe must be at current plaza coordinates');
   assert(status.skater&&status.rendered&&status.canvasWidth>0,'WebGL scene must render');
