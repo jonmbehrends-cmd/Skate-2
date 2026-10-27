@@ -1,0 +1,346 @@
+{
+  "before": {
+    "ramps": [
+      {
+        "name": "solid opaque textured ramp concrete -12 15",
+        "topNormalY": -0.9924377623710297,
+        "alpha": 1,
+        "blending": false,
+        "textureAlpha": false,
+        "textureReady": false
+      },
+      {
+        "name": "solid opaque textured ramp concrete 17 24",
+        "topNormalY": -0.9910387361242573,
+        "alpha": 1,
+        "blending": false,
+        "textureAlpha": false,
+        "textureReady": false
+      },
+      {
+        "name": "solid opaque textured ramp concrete -22 54",
+        "topNormalY": -0.9999818235924706,
+        "alpha": 1,
+        "blending": false,
+        "textureAlpha": false,
+        "textureReady": false
+      },
+      {
+        "name": "solid opaque textured ramp concrete 15 67",
+        "topNormalY": -0.9999800559983227,
+        "alpha": 1,
+        "blending": false,
+        "textureAlpha": false,
+        "textureReady": false
+      },
+      {
+        "name": "sealed birch skate ramp plywood",
+        "topNormalY": -0.1527525231651953,
+        "alpha": 1,
+        "blending": false,
+        "textureAlpha": false,
+        "textureReady": true
+      },
+      {
+        "name": "sealed birch skate ramp plywood",
+        "topNormalY": -1,
+        "alpha": 1,
+        "blending": false,
+        "textureAlpha": false,
+        "textureReady": true
+      },
+      {
+        "name": "solid opaque textured ramp concrete 69 -83",
+        "topNormalY": -0.9999854203188568,
+        "alpha": 1,
+        "blending": false,
+        "textureAlpha": false,
+        "textureReady": false
+      },
+      {
+        "name": "solid opaque textured ramp concrete 68 -39",
+        "topNormalY": -0.9909161083213731,
+        "alpha": 1,
+        "blending": false,
+        "textureAlpha": false,
+        "textureReady": false
+      },
+      {
+        "name": "solid opaque textured ramp concrete 75 65",
+        "topNormalY": -0.9999883196490935,
+        "alpha": 1,
+        "blending": false,
+        "textureAlpha": false,
+        "textureReady": false
+      },
+      {
+        "name": "solid opaque textured ramp concrete 0 113",
+        "topNormalY": -0.9999879588937548,
+        "alpha": 1,
+        "blending": false,
+        "textureAlpha": false,
+        "textureReady": false
+      },
+      {
+        "name": "solid opaque textured ramp concrete -75 111",
+        "topNormalY": -0.9999865571983659,
+        "alpha": 1,
+        "blending": false,
+        "textureAlpha": false,
+        "textureReady": false
+      },
+      {
+        "name": "solid opaque textured ramp concrete 71 119",
+        "topNormalY": -0.985030467155704,
+        "alpha": 1,
+        "blending": false,
+        "textureAlpha": false,
+        "textureReady": false
+      },
+      {
+        "name": "solid opaque textured ramp concrete -77 -80",
+        "topNormalY": -0.9999875002343701,
+        "alpha": 1,
+        "blending": false,
+        "textureAlpha": false,
+        "textureReady": false
+      }
+    ],
+    "board": true,
+    "v2Vertices": 164,
+    "v2Hash": "ce479260ac516b817093a47714526fbe1412cc7c26d0e4854a09b58a486504c2",
+    "meshCount": 259,
+    "surfacePixels": [
+      {
+        "x": 600,
+        "y": 480,
+        "rgb": [
+          129,
+          136,
+          138
+        ],
+        "luma": 134.65619999999998
+      },
+      {
+        "x": 650,
+        "y": 550,
+        "rgb": [
+          128,
+          134,
+          137
+        ],
+        "luma": 132.941
+      },
+      {
+        "x": 500,
+        "y": 440,
+        "rgb": [
+          128,
+          135,
+          138
+        ],
+        "luma": 133.7284
+      }
+    ]
+  },
+  "after": {
+    "ramps": [
+      {
+        "name": "solid opaque textured ramp concrete -12 15",
+        "topNormalY": 0.9924377623710297,
+        "alpha": 1,
+        "blending": false,
+        "textureAlpha": false,
+        "textureReady": true
+      },
+      {
+        "name": "solid opaque textured ramp concrete 17 24",
+        "topNormalY": 0.9910387361242573,
+        "alpha": 1,
+        "blending": false,
+        "textureAlpha": false,
+        "textureReady": true
+      },
+      {
+        "name": "solid opaque textured ramp concrete -22 54",
+        "topNormalY": 0.9999818235924706,
+        "alpha": 1,
+        "blending": false,
+        "textureAlpha": false,
+        "textureReady": true
+      },
+      {
+        "name": "solid opaque textured ramp concrete 15 67",
+        "topNormalY": 0.9999800559983227,
+        "alpha": 1,
+        "blending": false,
+        "textureAlpha": false,
+        "textureReady": true
+      },
+      {
+        "name": "sealed birch skate ramp plywood",
+        "topNormalY": 0.1527525231651953,
+        "alpha": 1,
+        "blending": false,
+        "textureAlpha": false,
+        "textureReady": true
+      },
+      {
+        "name": "sealed birch skate ramp plywood",
+        "topNormalY": 1,
+        "alpha": 1,
+        "blending": false,
+        "textureAlpha": false,
+        "textureReady": true
+      },
+      {
+        "name": "solid opaque textured ramp concrete 69 -83",
+        "topNormalY": 0.9999854203188568,
+        "alpha": 1,
+        "blending": false,
+        "textureAlpha": false,
+        "textureReady": true
+      },
+      {
+        "name": "solid opaque textured ramp concrete 68 -39",
+        "topNormalY": 0.9909161083213731,
+        "alpha": 1,
+        "blending": false,
+        "textureAlpha": false,
+        "textureReady": true
+      },
+      {
+        "name": "solid opaque textured ramp concrete 75 65",
+        "topNormalY": 0.9999883196490935,
+        "alpha": 1,
+        "blending": false,
+        "textureAlpha": false,
+        "textureReady": true
+      },
+      {
+        "name": "solid opaque textured ramp concrete 0 113",
+        "topNormalY": 0.9999879588937548,
+        "alpha": 1,
+        "blending": false,
+        "textureAlpha": false,
+        "textureReady": true
+      },
+      {
+        "name": "solid opaque textured ramp concrete -75 111",
+        "topNormalY": 0.9999865571983659,
+        "alpha": 1,
+        "blending": false,
+        "textureAlpha": false,
+        "textureReady": true
+      },
+      {
+        "name": "solid opaque textured ramp concrete 71 119",
+        "topNormalY": 0.985030467155704,
+        "alpha": 1,
+        "blending": false,
+        "textureAlpha": false,
+        "textureReady": true
+      },
+      {
+        "name": "solid opaque textured ramp concrete -77 -80",
+        "topNormalY": 0.9999875002343701,
+        "alpha": 1,
+        "blending": false,
+        "textureAlpha": false,
+        "textureReady": true
+      }
+    ],
+    "board": true,
+    "v2Vertices": 1110,
+    "v2Hash": "ce479260ac516b817093a47714526fbe1412cc7c26d0e4854a09b58a486504c2",
+    "meshCount": 267,
+    "surfacePixels": [
+      {
+        "x": 600,
+        "y": 480,
+        "rgb": [
+          176,
+          176,
+          169
+        ],
+        "luma": 175.4946
+      },
+      {
+        "x": 650,
+        "y": 550,
+        "rgb": [
+          175,
+          175,
+          167
+        ],
+        "luma": 174.4224
+      },
+      {
+        "x": 500,
+        "y": 440,
+        "rgb": [
+          176,
+          176,
+          168
+        ],
+        "luma": 175.4224
+      }
+    ]
+  },
+  "gameplay": {
+    "ollie": {
+      "launch": {
+        "grounded": false,
+        "y": 0.9431757689398346,
+        "vy": 5.220300000905992,
+        "name": "OLLIE",
+        "roll": 0,
+        "yaw": 0,
+        "score": 0
+      },
+      "maxHeight": 1.5854089749341496,
+      "landed": true
+    },
+    "kick": {
+      "launch": {
+        "grounded": false,
+        "y": 0.88800625,
+        "vy": 5.434999999999999,
+        "name": "KICK",
+        "roll": 1.4681250000000003,
+        "yaw": 0,
+        "score": 0
+      },
+      "maxHeight": 1.5699959586340106,
+      "landed": true
+    },
+    "heel": {
+      "launch": {
+        "grounded": false,
+        "y": 1.0233035714285719,
+        "vy": 4.912500000000003,
+        "name": "HEEL",
+        "roll": -1.96077806122449,
+        "yaw": 0,
+        "score": 0
+      },
+      "maxHeight": 1.5986532314786694,
+      "landed": true
+    },
+    "shove": {
+      "launch": {
+        "grounded": false,
+        "y": 1.03353042264631,
+        "vy": 4.868800000905991,
+        "name": "SHOVE",
+        "roll": 0,
+        "yaw": 2.0016809787400303,
+        "score": 0
+      },
+      "maxHeight": 1.5426759517582131,
+      "landed": true
+    },
+    "pushAndSteer": true
+  },
+  "result": "PASS"
+}

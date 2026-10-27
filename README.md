@@ -31,6 +31,31 @@ Pair the controller with Android before launching. Some Android browser/controll
 - GitHub Actions workflow `.github/workflows/deploy.yml` publishes the repository on pushes to `main`, if Pages is configured for GitHub Actions.
 - `window.__SOL_DIAGNOSTICS__` exposes the Babylon scene and simulation state for browser testing.
 
+## Ramp and rider graphics verification
+
+`visuals.js` is a presentation-only pass. It shares uploaded dynamic concrete
+textures explicitly: Babylon 8.56.2 material clones otherwise hold unready
+textures, causing opaque, pickable ramp tops and plaza slabs to be skipped by
+the renderer. It also computes outward lighting normals for the existing sealed
+ramp geometry. The terrain/contact profile, simulation, and animation rig are
+unchanged.
+
+The reviewed Gemini `skateboard_v2.glb` deck and grip are imported into
+`board_v2.js` by `tools/import_board_v2.cjs`, with a .043 m visual height offset
+to match the current stance. The existing board pivot, trucks, animated wheels,
+and contact physics remain. The detailed rider receives woven cloth and matte
+skin/apparel shading. The V2 skater has a 20-bone rig with one push animation;
+trick/grab/grind retargeting is still needed. Its park mesh is not substituted
+for shared analytical riding surfaces. See `qa/graphics/README.md` for findings.
+
+Run `npm install --no-save playwright@1.55.1 babylonjs@8.56.2`,
+`npx playwright install chromium`, then `node tests/visuals_browser.cjs`.
+The test uses real Chromium/WebGL, records before/after cameras, verifies
+texture readiness and captured surface pixels, and exercises touch tricks,
+push and keyboard steering with per-frame observations. Evidence is written to
+`test-artifacts/visuals/` and uploaded by the separate visual acceptance workflow.
+This is software-rendered browser QA, not physical Android/Xbox validation.
+
 ## Known limitations
 
 This is an early **true WebGL 3D** prototype, not console-grade graphics or a complete physics simulation. Ramp contact, curved kickers and lip launch follow the same analytical profile as rendered geometry, and four-wheel support now improves deck pose, but bowls and full rigid-body wheel physics remain simplified, angular rotation is still kinematic rather than rigid-body physics, and complex multi-contact rigid-body collisions and advanced park objectives remain incomplete. Physical Samsung Galaxy and Xbox Bluetooth hardware testing has **not** been performed by the automated workshop. Publishing the source does not by itself confirm a successful Pages deployment.

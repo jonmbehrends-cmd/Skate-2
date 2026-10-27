@@ -473,19 +473,20 @@ const server=http.createServer((req,res)=>{
    document.querySelector('#buttons').style.display='';
    document.querySelector('[data-t="grind"]').dispatchEvent(
     new PointerEvent('pointerdown',{bubbles:true,pointerId:31,pointerType:'touch'}));
-   return {grinding:s.grinding,kind:s.grindRail?.kind,vy:s.vy,y:s.y,wallY};
+   const captured={grinding:s.grinding,kind:s.grindRail?.kind,vy:s.vy,y:s.y,wallY};
+   // Sample capture and blend in one browser task, before the live loop
+   // can finish the transition between separate browser round trips.
+   const entry={initialY:s.y,top:s.grindRail?.y};
+   for(let i=0;i<15;i++)window.SOLGrind.advance(s,1/60);
+   entry.finalY=s.y;entry.grinding=s.grinding;captured.entry=entry;
+   return captured;
   });
   assert(touchCoping.grinding&&touchCoping.kind==='bowl-coping'&&touchCoping.vy===0,
    'GRIND touch control must catch bowl coping without forcing ollie: '+JSON.stringify(touchCoping));
   // Coping capture from a near-vertical wall must not teleport the skater
   // more than a metre upward in a single input frame. The board eases onto
   // the lip over the first 0.22s while staying attached to the circular rail.
-  const copingEntry=await page.evaluate(()=>{
-   const s=window.__SOL_DIAGNOSTICS__.state;
-   const initialY=s.y,top=s.grindRail.y;
-   for(let i=0;i<15;i++)window.SOLGrind.advance(s,1/60);
-   return {initialY,top,finalY:s.y,grinding:s.grinding};
-  });
+  const copingEntry=touchCoping.entry;
   assert(Math.abs(copingEntry.initialY-touchCoping.wallY)<.05&&
    Math.abs(copingEntry.finalY-copingEntry.top)<.02&&copingEntry.grinding,
    'Coping must blend smoothly from the wall to the steel rim: '+JSON.stringify(copingEntry));
@@ -644,7 +645,9 @@ const server=http.createServer((req,res)=>{
   assert(!xboxOllie.grounded&&xboxOllie.name==='OLLIE',
     'Emulated Xbox A button must launch an actual ollie: '+JSON.stringify(xboxOllie));
   await page.evaluate(()=>{window.__qaPad.connected=false});
-  await page.waitForTimeout(250);
+  // Observe the render-loop update instead of assuming a frame fits in 250ms.
+  // Keep a bounded failure if controller disconnect never reaches the UI.
+  await page.waitForFunction(()=>document.querySelector('#status').textContent.includes('Press a controller button'),null,{timeout:5000});
   const xboxDisconnect=await page.locator('#status').textContent();
   assert(xboxDisconnect.includes('Press a controller button'),
     'Disconnect must return to touch-friendly input status: '+xboxDisconnect);
@@ -674,6 +677,21 @@ const server=http.createServer((req,res)=>{
   await page.evaluate(()=>{
     document.querySelector('#restart').click();
     const s=window.__SOL_DIAGNOSTICS__.state;
+     // Latch observations at actual physics steps. Reading live state in a
+     // later browser round trip can miss the contact window, or sample far
+     // past the ledge after ordinary rolling friction has reduced speed.
+     const original=window.SOLMotion.collide;
+     window.__wallQA={contact:null,exit:null,original};
+     window.SOLMotion.collide=function(state,contacts){
+       const result=original.apply(this,arguments),qa=window.__wallQA;
+       const snapshot=()=>({x:state.x,z:state.z,speed:state.speed,grounded:state.grounded});
+       if(state===s){
+         if(!qa.contact&&state.z>39&&state.z<42&&state.x>=.65&&state.x<=.74&&state.grounded&&
+            contacts.some(c=>c.hit&&c.normalX<-.5))qa.contact=snapshot();
+         if(qa.contact&&!qa.exit&&state.z>43)qa.exit=snapshot();
+       }
+       return result;
+     };
     Object.assign(s,{x:-1,z:39,y:0,groundY:0,vy:0,dir:Math.PI/4,
       speed:9,travelSign:1,grounded:true,grinding:false,grindRail:null,
       grindCooldown:1,rampCooldown:1,airVX:null,airVZ:null,onRamp:false,
@@ -682,23 +700,15 @@ const server=http.createServer((req,res)=>{
   // Prove contact while still alongside the solid, not just at its far end.
   // This prevents a false positive from a rider who simply crosses z=43
   // without ever touching the wall. Sample live game state during rendering.
-  await page.waitForFunction(()=>{
-    const s=window.__SOL_DIAGNOSTICS__.state;
-    return s.z>39&&s.z<42&&s.x>=.65&&s.x<=.74&&s.grounded;
-  },null,{timeout:2400});
-  const wallContact=await page.evaluate(()=>{
-    const s=window.__SOL_DIAGNOSTICS__.state;
-    return {x:s.x,z:s.z,speed:s.speed,grounded:s.grounded};
-  });
+   await page.waitForFunction(()=>!!window.__wallQA.contact,null,{timeout:10000});
+   const wallContact=await page.evaluate(()=>window.__wallQA.contact);
   assert(wallContact.speed>3,'Wall contact must retain useful momentum: '+JSON.stringify(wallContact));
-  await page.screenshot({path:'test-artifacts/ledge-wall-contact.png',animations:'disabled'});
-  await page.waitForFunction(()=>{
-    const s=window.__SOL_DIAGNOSTICS__.state;
-    return s.z>43;
-  },null,{timeout:5500});
+   await page.screenshot({path:'test-artifacts/ledge-wall-followthrough.png',animations:'disabled'});
+   await page.waitForFunction(()=>!!window.__wallQA.exit,null,{timeout:15000});
   const wallSlide=await page.evaluate(()=>{
-    const s=window.__SOL_DIAGNOSTICS__.state;
-    return {x:s.x,z:s.z,speed:s.speed,grounded:s.grounded};
+     const qa=window.__wallQA;
+     window.SOLMotion.collide=qa.original;
+     return qa.exit;
   });
   assert(wallSlide.x>=.65&&wallSlide.x<=.74&&wallSlide.speed>3&&wallSlide.grounded,
     'Live WebGL skater must slide past ledge end without penetration: '+JSON.stringify(wallSlide));
