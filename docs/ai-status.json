@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "project": "SOL SKATE",
+  "source_of_truth": "https://github.com/jonmbehrends-cmd/Skate-2",
+  "current_assignment": 4,
+  "protocol_pr": 5,
+  "protocol_merged": false,
+  "active_branches": [
+    {
+      "name": "chore/ai-collaboration-protocol",
+      "purpose": "collaboration protocol",
+      "owner": "RH SOL"
+    }
+  ],
+  "known_regressions": [
+    "transparent or hollow ramp surfaces",
+    "bowl and halfpipe launch/landing instability",
+    "historical trick/control regressions"
+  ],
+  "required_checks": [
+    "SOL SKATE logic regression",
+    "SOL SKATE gameplay acceptance / bowl",
+    "browser visual evidence for rendering changes"
+  ],
+  "owner_playtest": "pending",
+  "copilot_source_access": "blocked; ZIP not yet attached",
+  "bridge_status": "design only; no autonomous worker configured",
+  "security": {
+    "auto_merge": false,
+    "untrusted_issue_comments_execute_code": false
+  }
+}
