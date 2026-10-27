@@ -427,6 +427,11 @@ const server=http.createServer((req,res)=>{
    Math.abs(vertAir.airVX)<1,
    'Halfpipe must launch vertically above left coping and return inward: '+
     JSON.stringify({vertStart,vertAir}));
+  // Clearance must be achieved by upward flight, not by a one-frame Y snap.
+  await page.waitForFunction(()=>{
+   const s=window.__SOL_DIAGNOSTICS__.state;
+   return s.name==='HALFPIPE VERT AIR'&&!s.grounded&&s.y>4.5;
+  },null,{timeout:6000});
   // A vertical launch is incomplete until the skater returns to the riding
   // surface. Catch missed collisions and airborne states that never resolve.
   await page.waitForFunction(()=>{
