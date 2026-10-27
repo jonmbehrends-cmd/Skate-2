@@ -66,6 +66,9 @@ The wall-slide test also latches contact and first exit inside the production
 collision step (forwarding the original function unchanged). It retains the
 position, grounding and speed requirements and confirms a real wall normal,
 instead of sampling a later position after ordinary rolling friction.
+Controller disconnect waits up to five seconds for the actual render-loop UI
+update instead of assuming it occurs within 250 ms; the disconnected status
+assertion remains mandatory.
 
 The visual acceptance workflow uploads the generated PNGs and JSON from
 `test-artifacts/visuals/`. `visual-result.json` records the local browser result.
