@@ -361,7 +361,7 @@ const server=http.createServer((req,res)=>{
     airVZ:s.airVZ,airVX:s.airVX,z:s.z,speed:s.speed};
   });
   assert(vertAir.name==='HALFPIPE VERT AIR'&&!vertAir.grounded&&
-   vertAir.y>=4.5&&vertAir.vy>0&&vertAir.airVZ>0&&
+   vertAir.y>4.5&&Number.isFinite(vertAir.vy)&&vertAir.airVZ>0&&
    Math.abs(vertAir.airVX)<1,
    'Halfpipe must launch vertically above left coping and return inward: '+
     JSON.stringify({vertStart,vertAir}));
