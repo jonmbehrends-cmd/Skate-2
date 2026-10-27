@@ -36,3 +36,15 @@ assert.equal(sample(-36,-31.55,[deck],4.5).height,4.5,'Board at deck height must
 assert.equal(sample(-36,-31.55,[deck],5.5).height,4.5,'Airborne rider above deck can land on it');
 assert.equal(sample(-36,-29.76,[transition],3.05).ramp,transition,'Halfpipe curved transition remains rideable');
 console.log('PASS: elevated halfpipe deck height gating and transition continuity');
+
+// The takeoff impulse must clear the lip without changing the rider's Y
+// position instantaneously. Check energy across the steep wall and ensure
+// a reasonable speed cap for malformed/very low launch positions.
+const vert=globalThis.SOLTerrain.vertTakeoffVelocity;
+const startY=globalThis.SOLTerrain.profile(transition,( -29.76-(transition.z-transition.d/2))/transition.d).height;
+const impulse=vert(startY,transition.h,8);
+assert(impulse>8&&impulse<12,'Steep-wall takeoff requires enough vertical energy to reach coping');
+assert(startY+impulse*impulse/(2*19)>=transition.h+.34,'Takeoff arc must clear coping by at least 0.34m');
+assert(vert(4.5,4.5,8)<8,'At-coping launch should preserve moderate vertical speed');
+assert(vert(-100,4.5,8)<=12,'Malformed takeoff cannot create unbounded velocity');
+console.log('PASS: continuous halfpipe vert takeoff energy and speed bound');
