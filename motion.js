@@ -53,10 +53,13 @@ function pump(state,previous,current,dt,active=false){
  const before=previous&&Number.isFinite(previous.slope)?previous.slope:slope;
  const forward=Math.cos(state.dir||0)*(state.travelSign===-1?-1:1);
  const speed=Number.isFinite(state.speed)?state.speed:0;
- // Compression while rolling into increasing transition curvature; no reverse-direction free thrust.
- const change=(slope-before)*forward;
- const impulse=clamp(Math.max(0,change)*Math.max(0,speed)*1.35,0,1.1);
- if(impulse>.0001){state.speed=clamp(speed+impulse,0,17);state.pumpIntensity=clamp(impulse*2,0,1)}
+ // Pump only through a positive change in surface TANGENT ANGLE.
+ // Raw slope approaches infinity at vert coping and previously awarded up to
+ // 1.1 m/s *per frame*, causing extreme FPS-dependent speed injection.
+ // The angular change stays finite at vert, and the gain is time-bounded.
+ const angularChange=(Math.atan(slope)-Math.atan(before))*forward;
+ const impulse=clamp(Math.max(0,angularChange)*Math.max(0,speed)*.75,0,3.2*h);
+ if(impulse>.0001){state.speed=clamp(speed+impulse,0,17);state.pumpIntensity=clamp(impulse/Math.max(.001,3.2*h),0,1)}
  else state.pumpIntensity=Math.max(0,(state.pumpIntensity||0)-h*3);
  return impulse;
 }
