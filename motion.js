@@ -45,10 +45,11 @@ function step(state,steer,throttle,boost,dt){
   return state;
 }
 // Ramp pumping converts a timed crouch/extension into tangential acceleration.
-// Never creates speed on flat ground or while airborne/grinding.
+// Never creates speed on flat ground, across disconnected ramp boundaries,
+// or while airborne/grinding.
 function pump(state,previous,current,dt,active=false){
  const h=clamp(Number.isFinite(dt)?dt:0,0,.05);
- if(!h||!state.grounded||state.grinding||!current||!current.ramp||!active){state.pumpIntensity=Math.max(0,(state.pumpIntensity||0)-h*3);return 0;}
+ if(!h||!state.grounded||state.grinding||!current||!current.ramp||!previous||previous.ramp!==current.ramp||!active){state.pumpIntensity=Math.max(0,(state.pumpIntensity||0)-h*3);return 0;}
  const slope=Number.isFinite(current.slope)?current.slope:0;
  const before=previous&&Number.isFinite(previous.slope)?previous.slope:slope;
  const forward=Math.cos(state.dir||0)*(state.travelSign===-1?-1:1);
