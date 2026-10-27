@@ -93,6 +93,20 @@ const server=http.createServer((req,res)=>{
    });
   });
   assert(cheekNormals.every(n=>n.side*n.nx>0),'Exterior ramp cheek triangle normals must point outward: '+JSON.stringify(cheekNormals));
+  // Steep ramp gravity must be physically bounded. The old raw-slope force
+  // exceeded 9.81 m/s² on the halfpipe and caused instant fakie reversals.
+  const rampGravity=await page.evaluate(()=>{
+   const cases=[{slope:10000,dir:0,sign:1},{slope:-10000,dir:0,sign:1},
+    {slope:10000,dir:Math.PI/2,sign:1},{slope:10000,dir:0,sign:-1}];
+   return cases.map(c=>{const s={speed:3,dir:c.dir,travelSign:c.sign};
+    window.SOLTerrain.rollOnSlope(s,{slope:c.slope},.025);
+    return {...c,speed:s.speed,travelSign:s.travelSign};});
+  });
+  assert(rampGravity.every(c=>Number.isFinite(c.speed)&&c.speed>=0&&Math.abs(c.speed-3)<=9.81*.025+.0001),
+   'Ramp gravity must not exceed physical gravity: '+JSON.stringify(rampGravity));
+  assert(rampGravity[0].speed<3&&rampGravity[1].speed>3&&
+   Math.abs(rampGravity[2].speed-3)<.000001&&rampGravity[3].speed>3,
+   'Uphill/downhill/fakie ramp gravity direction is incorrect: '+JSON.stringify(rampGravity));
   const status=await page.evaluate(()=>{
    const d=window.__SOL_DIAGNOSTICS__,meshes=d.scene.meshes;
    const cheeks=meshes.filter(m=>m.name==='SOLID RAMP SIDE WALL');
@@ -338,6 +352,6 @@ const server=http.createServer((req,res)=>{
   assert(fs.statSync('test-artifacts/park-chromium.png').size>14000,'Park overview screenshot unexpectedly blank');
 
   assert.equal(errors.length,0,'Browser errors: '+errors.join('; '));
-  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',spawnView,spawnPixels,cheekNormals,status,spin,push,riding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
+  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',spawnView,spawnPixels,cheekNormals,rampGravity,status,spin,push,riding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
  }finally{await browser.close()}
 })().catch(e=>{fs.mkdirSync('test-artifacts',{recursive:true});fs.writeFileSync('test-artifacts/browser-result.txt','FAIL: '+(e&&e.stack||String(e)));console.error(e);process.exitCode=1}).finally(()=>server.close());
