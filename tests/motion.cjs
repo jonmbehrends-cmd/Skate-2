@@ -100,3 +100,14 @@ for(let i=0;i<50;i++)pump(fpsA,curve,curve,.02,true);
 for(let i=0;i<100;i++)pump(fpsB,curve,curve,.01,true);
 assert(Math.abs(fpsA.speed-fpsB.speed)<.02,'Pumping must remain stable across 50 and 100 Hz');
 console.log('PASS: both halfpipe walls and bowl pump consistently across frame rates');
+
+// Bowl compression must work on the X-facing walls, not only the Z axis.
+const xWall=s({speed:8,dir:Math.PI/2,grounded:true});
+const xBefore={ramp:{curve:'bowl'},slope:0,slopeX:.2};
+const xAfter={ramp:{curve:'bowl'},slope:0,slopeX:.7};
+const xGain=globalThis.SOLMotion.pump(xWall,xBefore,xAfter,.016,true);
+assert(xGain>.1,'East-facing bowl wall must register compression from X gradient');
+const xReverse=s({speed:8,dir:-Math.PI/2,grounded:true});
+const reverseGain=globalThis.SOLMotion.pump(xReverse,xBefore,xAfter,.016,true);
+assert(reverseGain<xGain,'Opposite travel direction must not receive the same compression impulse');
+console.log('PASS: radial bowl pumping respects both slope axes and travel direction');
