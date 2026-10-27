@@ -488,13 +488,15 @@ const server=http.createServer((req,res)=>{
     window.__qaPad.buttons[0].pressed=true;
     window.__qaPad.buttons[0].value=1;
   });
-  await page.waitForTimeout(350);
+  // Synchronize with the first airborne ollie frame, not an arbitrary wall-clock
+  // delay: SwiftShader CI can simulate the apex/descent before 350ms elapses.
+  await page.waitForFunction(()=>{const s=window.__SOL_DIAGNOSTICS__.state;return s.name==='OLLIE'&&!s.grounded;},null,{timeout:1800});
   const xboxOllie=await page.evaluate(()=>({
     grounded:window.__SOL_DIAGNOSTICS__.state.grounded,
     vy:window.__SOL_DIAGNOSTICS__.state.vy,
     name:window.__SOL_DIAGNOSTICS__.state.name
   }));
-  assert(!xboxOllie.grounded&&xboxOllie.vy>0,
+  assert(!xboxOllie.grounded&&xboxOllie.name==='OLLIE',
     'Emulated Xbox A button must launch an actual ollie: '+JSON.stringify(xboxOllie));
   await page.evaluate(()=>{window.__qaPad.connected=false});
   await page.waitForTimeout(250);
