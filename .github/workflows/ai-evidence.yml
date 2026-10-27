@@ -1,0 +1,47 @@
+name: SOL SKATE AI evidence
+on:
+  workflow_dispatch:
+    inputs:
+      assignment_id:
+        description: "Assignment identifier (e.g. ISSUE-4)"
+        required: true
+        type: string
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: sol-ai-evidence-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+      - name: Run repository-owned evidence collection
+        id: collect
+        continue-on-error: true
+        run: bash scripts/collect-evidence.sh
+      - name: Write structured handoff
+        if: always()
+        env:
+          ASSIGNMENT_ID: ${{ inputs.assignment_id || format('PR-{0}', github.event.pull_request.number) }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+          TEST_OUTCOME: ${{ steps.collect.outcome }}
+        run: node scripts/write-ci-handoff.mjs
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: sol-skate-ai-evidence-${{ github.run_id }}
+          path: evidence/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Enforce test result
+        if: steps.collect.outcome != 'success'
+        run: exit 1
