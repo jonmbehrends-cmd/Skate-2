@@ -109,7 +109,17 @@ for(const name of [
  }catch(e){console.warn('Optional static batch skipped',name,e)}
 }
 staticBatchReport.after=scene.meshes.length;
-const skater=new B.TransformNode('skater',scene);const boardPivot=new B.TransformNode('board pivot',scene);boardPivot.parent=skater;const boardShape=SOLBoardGeometry.build();for(const [name,shape,material] of [['deck',boardShape.deck,deck],['grip tape',boardShape.grip,wheel]]){const part=new B.Mesh(name,scene),data=new B.VertexData();data.positions=shape.positions;data.indices=shape.indices;data.uvs=shape.uvs;data.normals=[];B.VertexData.ComputeNormals(data.positions,data.indices,data.normals);data.applyToMesh(part);part.material=material;part.parent=boardPivot;part.isPickable=false;}for(const z of [-.52,.52]){box('truck axle',.67,.06,.11,0,.095,z,metal).parent=boardPivot;box('truck hanger',.13,.12,.25,0,.13,z,metal).parent=boardPivot}const wheels=[];for(let z of [-.52,.52])for(let x of [-.27,.27]){const w=B.MeshBuilder.CreateCylinder('wheel',{height:.13,diameter:.19,tessellation:14},scene);w.parent=boardPivot;w.position.set(x,.06,z);w.rotation.z=Math.PI/2;w.material=wheel;wheels.push(w)}const stanceRig=new B.TransformNode('rider terrain stance',scene);stanceRig.parent=skater;const body=new B.TransformNode('body',scene);body.parent=stanceRig;
+const skater=new B.TransformNode('skater',scene);const boardPivot=new B.TransformNode('board pivot',scene);boardPivot.parent=skater;const boardShape=SOLBoardGeometry.build();for(const [name,shape,material] of [['deck',boardShape.deck,deck],['grip tape',boardShape.grip,wheel]]){const part=new B.Mesh(name,scene),data=new B.VertexData();data.positions=shape.positions;data.indices=shape.indices;data.uvs=shape.uvs;data.normals=[];B.VertexData.ComputeNormals(data.positions,data.indices,data.normals);data.applyToMesh(part);part.material=material;part.parent=boardPivot;part.isPickable=false;}for(const z of [-.52,.52]){
+ box('truck axle',.67,.06,.11,0,.095,z,metal).parent=boardPivot;
+ box('truck hanger',.13,.12,.25,0,.13,z,metal).parent=boardPivot;
+ box('truck baseplate',.26,.035,.31,0,.177,z,metal).parent=boardPivot;
+ const king=B.MeshBuilder.CreateCylinder('truck kingpin',{height:.14,diameter:.055,tessellation:12},scene);
+ king.parent=boardPivot;king.position.set(0,.135,z);king.material=metal;
+ for(const dx of [-.083,.083])for(const dz of [-.095,.095]){
+  const bolt=B.MeshBuilder.CreateCylinder('deck mounting bolt',{height:.008,diameter:.022,tessellation:8},scene);
+  bolt.parent=boardPivot;bolt.position.set(dx,.337,z+dz);bolt.material=metal;bolt.isPickable=false;
+ }
+}const wheels=[];for(let z of [-.52,.52])for(let x of [-.27,.27]){const w=B.MeshBuilder.CreateCylinder('wheel',{height:.13,diameter:.19,tessellation:14},scene);w.parent=boardPivot;w.position.set(x,.06,z);w.rotation.z=Math.PI/2;w.material=wheel;wheels.push(w)}const stanceRig=new B.TransformNode('rider terrain stance',scene);stanceRig.parent=skater;const body=new B.TransformNode('body',scene);body.parent=stanceRig;
 const jacket=mat('jacket fabric','#b94b2c'),trim=mat('jacket trim','#e3d6bf'),denim=mat('denim','#273a55'),rubber=mat('shoe rubber','#d8d5cc'),hair=mat('hair','#302820');
 function capsulePart(name,parent,from,to,radius,material){const delta=to.subtract(from),mesh=B.MeshBuilder.CreateCapsule(name,{height:delta.length()+radius*2,radius,tessellation:12,subdivisions:2},scene);mesh.parent=parent;mesh.position=from.add(to).scale(.5);mesh.rotation.z=Math.atan2(-delta.x,delta.y);mesh.rotation.x=Math.atan2(delta.z,Math.hypot(delta.x,delta.y));mesh.material=material;return mesh}
 const hips=new B.TransformNode('hips',scene);hips.parent=body;hips.position.y=1.19;
