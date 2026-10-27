@@ -419,13 +419,19 @@ const server=http.createServer((req,res)=>{
   const vertAir=await page.evaluate(()=>{
    const s=window.__SOL_DIAGNOSTICS__.state;
    return {name:s.name,grounded:s.grounded,y:s.y,vy:s.vy,
+    takeoffY:s.vertTakeoffY,previousY:s.vertTakeoffPreviousY,postY:s.vertLaunchPostY,
     airVZ:s.airVZ,airVX:s.airVX,z:s.z,speed:s.speed};
   });
   assert(vertAir.name==='HALFPIPE VERT AIR'&&!vertAir.grounded&&
-   vertAir.y>4.5&&Number.isFinite(vertAir.vy)&&vertAir.airVZ>0&&
+   vertAir.takeoffY>2.4&&vertAir.takeoffY<4.5&&Math.abs(vertAir.takeoffY-vertAir.previousY)<.08&&Math.abs(vertAir.postY-vertAir.takeoffY)<.08&&Number.isFinite(vertAir.vy)&&vertAir.airVZ>0&&
    Math.abs(vertAir.airVX)<1,
    'Halfpipe must launch vertically above left coping and return inward: '+
     JSON.stringify({vertStart,vertAir}));
+  // Clearance must be achieved by upward flight, not by a one-frame Y snap.
+  await page.waitForFunction(()=>{
+   const s=window.__SOL_DIAGNOSTICS__.state;
+   return s.name==='HALFPIPE VERT AIR'&&!s.grounded&&s.y>4.5;
+  },null,{timeout:6000});
   // A vertical launch is incomplete until the skater returns to the riding
   // surface. Catch missed collisions and airborne states that never resolve.
   await page.waitForFunction(()=>{
