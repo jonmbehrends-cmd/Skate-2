@@ -561,27 +561,38 @@ const server=http.createServer((req,res)=>{
   }));
   assert(xboxPush.speed>.3&&xboxPush.status.includes('Xbox connected'),
     'Emulated Xbox analog RT must actually accelerate the skater: '+JSON.stringify(xboxPush));
+  const olliePrecondition=await page.evaluate(()=>{
+    const s=window.__SOL_DIAGNOSTICS__.state;
+    return {grounded:s.grounded,y:s.y,vy:s.vy,name:s.name,
+      grinding:s.grinding,controllerConnected:window.__qaPad.connected};
+  });
+  assert(olliePrecondition.grounded&&!olliePrecondition.grinding&&olliePrecondition.controllerConnected,
+    'Xbox A ollie must start grounded and connected: '+JSON.stringify(olliePrecondition));
   await page.evaluate(()=>{
     window.__qaPad.buttons[7].value=0;
     window.__qaPad.buttons[0].pressed=true;
     window.__qaPad.buttons[0].value=1;
   });
-  // Synchronize with the first airborne ollie frame, not an arbitrary wall-clock
-  // delay: SwiftShader CI can simulate the apex/descent before 350ms elapses.
-  await page.waitForFunction(()=>{const s=window.__SOL_DIAGNOSTICS__.state;return s.name==='OLLIE'&&!s.grounded;},null,{timeout:1800});
+  // Sample the launch itself, not a fixed wall-clock instant that can land
+  // after the apex on slow software-rendered Chromium.
+  await page.waitForFunction(preY=>{
+    const s=window.__SOL_DIAGNOSTICS__.state;
+    return s.name==='OLLIE'&&!s.grounded&&s.vy>0&&s.y>preY;
+  },olliePrecondition.y,{timeout:1800});
   const xboxOllie=await page.evaluate(()=>({
     grounded:window.__SOL_DIAGNOSTICS__.state.grounded,
+    y:window.__SOL_DIAGNOSTICS__.state.y,
     vy:window.__SOL_DIAGNOSTICS__.state.vy,
     name:window.__SOL_DIAGNOSTICS__.state.name
   }));
-  assert(!xboxOllie.grounded&&xboxOllie.name==='OLLIE',
+  assert(!xboxOllie.grounded&&xboxOllie.name==='OLLIE'&&xboxOllie.vy>0&&xboxOllie.y>olliePrecondition.y,
     'Emulated Xbox A button must launch an actual ollie: '+JSON.stringify(xboxOllie));
   await page.evaluate(()=>{window.__qaPad.connected=false});
   await page.waitForTimeout(250);
   const xboxDisconnect=await page.locator('#status').textContent();
   assert(xboxDisconnect.includes('Press a controller button'),
     'Disconnect must return to touch-friendly input status: '+xboxDisconnect);
-  const gamepadIntegration={result:'PASS',xboxPush,xboxOllie,xboxDisconnect};
+  const gamepadIntegration={result:'PASS',xboxPush,olliePrecondition,xboxOllie,xboxDisconnect};
 
   assert.equal(errors.length,0,'Browser errors: '+errors.join('; '));
   fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',controllerQA,gamepadIntegration,spawnView,spawnPixels,cheekNormals,impactNormals,rampGravity,screenshotQA,status,spin,push,touchTricks,clickFallback,riding,vertStart,vertAir,vertLanding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
