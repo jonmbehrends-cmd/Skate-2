@@ -221,6 +221,21 @@ const server=http.createServer((req,res)=>{
    halfpipeProfile[4].left.height<.03&&
    halfpipeProfile[6].left.height<.001,
    'Halfpipe must have near-vertical coping and smooth level floor: '+JSON.stringify(halfpipeProfile));
+  // A ground-level board inside a raised halfpipe deck's footprint must not
+  // teleport onto its 4.5m top during a real gameplay frame.
+  const deckGroundQA=await page.evaluate(async()=>{
+   const state=window.__SOL_DIAGNOSTICS__.state;
+   Object.assign(state,{x:-36,z:-31.55,y:0,groundY:0,vy:0,dir:0,speed:0,
+    grounded:true,grinding:false,travelSign:1,controlSteer:0,controlThrottle:0,
+    pushBurstUntil:0,rampCooldown:0,airVX:null,airVZ:null});
+   await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+   const result={y:state.y,groundY:state.groundY,grounded:state.grounded};
+   Object.assign(state,{x:0,z:0,y:0,groundY:0,vy:0,dir:0,speed:0,
+    grounded:true,grinding:false,travelSign:1,controlSteer:0,controlThrottle:0});
+   return result;
+  });
+  assert(deckGroundQA.grounded&&Math.abs(deckGroundQA.y)<.15,
+   'Ground rider must not teleport to elevated halfpipe deck: '+JSON.stringify(deckGroundQA));
   // Landing impact is the signed velocity along the normalized ramp
   // normal, not an unbounded grade-weighted vertical speed.
   const impactNormals=await page.evaluate(()=>{
