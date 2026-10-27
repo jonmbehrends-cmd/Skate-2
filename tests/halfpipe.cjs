@@ -51,3 +51,22 @@ const deckTop=globalThis.SOLObstacles.rampSide(dr.x,deckRear+1.5,dr.x,deckRear-.
 assert(!deckTop.hit,'Rider at deck elevation must be able to enter');
 assert(html.includes('HALFPIPE PARK CONNECTION'),'Halfpipe must remain accessible from main park');
 console.log('PASS: raised deck rear-wall collision and connected park access');
+
+const launchSource=html.match(/const hp=previousContact\.ramp;[\s\S]*?if\(hpLaunch\)/);
+assert(launchSource,'Live game must contain dedicated halfpipe coping takeoff');
+const takeoff=(rider,prev,dt=.016)=>{
+ const hp=prev.ramp,hpSide=hp?.curve==='halfpipe-left'?-1:hp?.curve==='halfpipe-right'?1:0;
+ const hpTravel=Math.cos(rider.dir)*(rider.travelSign===-1?-1:1)*hpSide;
+ const hpLip=hp?hp.z+hpSide*hp.d/2:0;
+ const hpRemaining=hpSide*(hpLip-rider.z);
+ const hpSpeed=rider.speed*Math.max(0,hpTravel);
+ return rider.grounded&&hpSide!==0&&rider.rampCooldown<=0&&hpTravel>.55&&hpSpeed>2.8&&hpRemaining>=-.35&&hpRemaining<Math.max(.48,hpSpeed*dt*1.8);
+};
+for(const [ramp,heading,sign] of [[left,Math.PI,1],[right,0,1],[left,0,-1],[right,Math.PI,-1]]){
+ const side=ramp.curve==='halfpipe-left'?-1:1,lip=ramp.z+side*ramp.d/2;
+ const sk={x:ramp.x,z:lip-side*.12,dir:heading,travelSign:sign,speed:8,grounded:true,rampCooldown:0};
+ assert(takeoff(sk,T.sample(sk.x,sk.z,ramps)),'Coping takeoff must work on both walls and fakie');
+ assert(!takeoff({...sk,speed:1},T.sample(sk.x,sk.z,ramps)),'No launch without speed');
+ assert(!takeoff({...sk,dir:heading+Math.PI,travelSign:sign},T.sample(sk.x,sk.z,ramps)),'No launch traveling downhill');
+}
+console.log('PASS: coping release on both walls, regular/fakie, speed and direction guards');
