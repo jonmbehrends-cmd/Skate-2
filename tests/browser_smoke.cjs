@@ -233,11 +233,14 @@ const server=http.createServer((req,res)=>{
    window.SOLGrind.attach(s,c);
    const start={x:s.x,z:s.z};
    for(let i=0;i<60;i++)window.SOLGrind.advance(s,1/60);
+   const nx=(s.x-rail.x)/rail.radius,nz=(s.z-rail.z)/rail.radius;
+   const tangentAlignment=(Math.sin(s.dir)*-nz+Math.cos(s.dir)*nx)*s.grindDirection;
    return {found:true,kind:s.grindRail?.kind,grinding:s.grinding,delta:Math.hypot(s.x-start.x,s.z-start.z),
-    radius:Math.hypot(s.x-rail.x,s.z-rail.z),speed:s.speed};
+    radius:Math.hypot(s.x-rail.x,s.z-rail.z),speed:s.speed,tangentAlignment};
   });
   assert(coping.found&&coping.grinding&&coping.kind==='bowl-coping'&&coping.delta>2&&Math.abs(coping.radius-15.24)<.03,
    'Bowl coping must attach and travel around its circular rail: '+JSON.stringify(coping));
+  assert(coping.tangentAlignment>.999,'Coping heading must follow travel around the rim: '+JSON.stringify(coping));
   await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;s.grinding=false;s.grindRail=null;s.grindCooldown=0});
   // Boardslide is a real touch-triggered rail state with a 90-degree rendered
   // board stance, while physical travel continues lengthwise along the rail.

@@ -70,3 +70,29 @@ for(let i=0;i<420;i++)advance(bowlState,1/60);
 assert(bowlState.grinding&&bowlState.grindTime>7.9,
  'Bowl coping should support extended carving grinds rather than ending at straight-rail four-second limit');
 console.log('PASS: rail contact height, direction, speed, cooldown, board stability, traversal, and exit');
+// Check every quadrant in both directions. Radius-only checks miss a board
+// that follows the circle while facing across it, and a wrong dismount vector.
+require('../motion.js');
+for(const direction of [-1,1])for(let k=0;k<8;k++){
+ const angle=k*Math.PI/4;
+ const s=state({x:bowlRail.x+bowlRail.radius*Math.cos(angle),
+  z:bowlRail.z+bowlRail.radius*Math.sin(angle),y:bowlRail.y,speed:6});
+ attach(s,{rail:bowlRail,top:bowlRail.y,direction});
+ function checkHeading(){
+  const nx=(s.x-bowlRail.x)/bowlRail.radius,nz=(s.z-bowlRail.z)/bowlRail.radius;
+  const alignment=Math.sin(s.dir)*(-nz*direction)+Math.cos(s.dir)*(nx*direction);
+  assert(alignment>.999999,'Coping heading must follow the tangent in every quadrant');
+ }
+ checkHeading();
+ const x=s.x,z=s.z;
+ advance(s,.025);checkHeading();
+ const dx=s.x-x,dz=s.z-z;
+ assert((Math.sin(s.dir)*dx+Math.cos(s.dir)*dz)/Math.hypot(dx,dz)>.999,
+  'Board heading must align with actual curved travel');
+ s.grindTime=12;
+ assert(advance(s,.025),'Timed coping exit must release');
+ SOLMotion.beginAir(s);
+ const radial=(s.airVX*(s.x-bowlRail.x)+s.airVZ*(s.z-bowlRail.z))/bowlRail.radius;
+ assert(Math.abs(radial)<1e-9,'Coping exit must preserve tangent momentum, not fire radially');
+}
+console.log('PASS: coping heading and dismount momentum in both directions across all quadrants');

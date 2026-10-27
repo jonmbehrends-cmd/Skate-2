@@ -3,6 +3,9 @@
  */
 (function(root){'use strict';
 const GRAVITY=19;
+// Movement uses (sin(heading), cos(heading)); the circle uses (cos(a), sin(a)).
+// Its tangent is (-sin(a), cos(a)), so heading is -a, not a + PI/2.
+function copingHeading(angle,direction){return -angle+(direction<0?Math.PI:0);}
 function find(state,rails,dt,stable,assist=false){
  if(!stable||state.grinding||state.speed<1.3||state.grindCooldown>0||(!assist&&state.grounded)||state.vy>0&&!assist)return null;
  const h=Math.max(0,Math.min(.04,Number.isFinite(dt)?dt:0));
@@ -45,7 +48,7 @@ function attach(state,contact){
  // movement heading. Store the approach side so the stance stays consistent.
  state.grindSide=state[cross]>=rail[cross]?1:-1;
  state.grindEntryY=rail.kind==='bowl-coping'?state.y:null;
- state.y=rail.kind==='bowl-coping'?state.grindEntryY:contact.top;state.vy=0;if(rail.kind==='bowl-coping'){const a=Math.atan2(state.z-rail.z,state.x-rail.x);state.grindAngle=a;state.x=rail.x+rail.radius*Math.cos(a);state.z=rail.z+rail.radius*Math.sin(a);state.dir=a+(contact.direction>0?Math.PI/2:-Math.PI/2);}else state[cross]=rail[cross];
+ state.y=rail.kind==='bowl-coping'?state.grindEntryY:contact.top;state.vy=0;if(rail.kind==='bowl-coping'){const a=Math.atan2(state.z-rail.z,state.x-rail.x);state.grindAngle=a;state.x=rail.x+rail.radius*Math.cos(a);state.z=rail.z+rail.radius*Math.sin(a);state.dir=copingHeading(a,contact.direction);}else state[cross]=rail[cross];
  if(rail.kind!=='bowl-coping')state.dir=axis==='z'?(contact.direction>0?0:Math.PI):(contact.direction>0?Math.PI/2:-Math.PI/2);
  state.travelSign=1;state.speed*=.97;state.grindRequestType=null;return true;
 }
@@ -53,7 +56,7 @@ function advance(state,dt){
  if(!state.grinding||!state.grindRail)return false;
  const rail=state.grindRail,axis=rail.axis==='x'?'x':'z',cross=axis==='z'?'x':'z';
  const h=Math.max(0,Math.min(.04,Number.isFinite(dt)?dt:0));
- state.grindTime+=h;if(rail.kind==='bowl-coping'){const direction=state.grindDirection||1;state.grindAngle+=direction*state.speed*h/rail.radius;state.x=rail.x+rail.radius*Math.cos(state.grindAngle);state.z=rail.z+rail.radius*Math.sin(state.grindAngle);state.dir=state.grindAngle+(direction>0?Math.PI/2:-Math.PI/2);}else state[cross]=rail[cross];const top=Number.isFinite(rail.y)?rail.y:1.1;
+ state.grindTime+=h;if(rail.kind==='bowl-coping'){const direction=state.grindDirection||1;state.grindAngle+=direction*state.speed*h/rail.radius;state.x=rail.x+rail.radius*Math.cos(state.grindAngle);state.z=rail.z+rail.radius*Math.sin(state.grindAngle);state.dir=copingHeading(state.grindAngle,direction);}else state[cross]=rail[cross];const top=Number.isFinite(rail.y)?rail.y:1.1;
  // Follow the coping while easing the board up from a steep wall. Instant
  // vertical snapping at entry looked like teleporting through concrete.
  const entry=Number.isFinite(state.grindEntryY)?state.grindEntryY:top;
