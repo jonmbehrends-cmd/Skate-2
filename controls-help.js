@@ -92,7 +92,11 @@
     closeDialog();
   });
   dialog.addEventListener('click', event => {
-    if (event.target === dialog) closeDialog();
+    // Both padding and backdrop clicks target the dialog itself.
+    if (event.target !== dialog) return;
+    const box = dialog.getBoundingClientRect();
+    if (event.clientX < box.left || event.clientX > box.right ||
+        event.clientY < box.top || event.clientY > box.bottom) closeDialog();
   });
   dialog.addEventListener('click', event => {
     if (event.target.closest('[data-close]')) closeDialog();
@@ -114,8 +118,7 @@
 
   window.addEventListener('keydown', event => {
     if (!dialog.open || event.key === 'Escape' || event.key === 'Tab') return;
-    // Block gameplay listeners but retain native keyboard button activation.
+    // Block gameplay listeners while preserving native activation and scrolling.
     event.stopImmediatePropagation();
-    if (!['Enter', ' '].includes(event.key)) event.preventDefault();
   }, true);
 })();
