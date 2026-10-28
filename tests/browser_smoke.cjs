@@ -115,6 +115,29 @@ const server=http.createServer((req,res)=>{
   await page.goto('http://127.0.0.1:'+server.address().port+'/',{waitUntil:'domcontentloaded',timeout:30000});
   try{await page.waitForFunction(()=>!!window.__SOL_DIAGNOSTICS__,null,{timeout:30000});}
   catch(e){const startup=await page.evaluate(()=>({error:document.querySelector('#error')?.textContent,babylon:!!window.BABYLON,grind:!!window.SOLGrind,html:document.readyState}));throw Error('Game startup failed: '+JSON.stringify({startup,errors,cause:String(e)}));}
+  // Touch regression: every visible control must receive a tap at its center
+  // across compact Android screens. A visually present but covered button is
+  // functionally broken (as the original HALFPIPE/RESTART overlap showed).
+  const touchHitTargets=[];
+  for(const [width,height] of [[320,568],[360,740],[390,844],[430,932]]){
+   await page.setViewportSize({width,height});
+   const targets=await page.evaluate(()=>{
+    const controls=[...document.querySelectorAll('#buttons button'),'#halfpipe','#restart']
+      .map(el=>typeof el==='string'?document.querySelector(el):el);
+    return controls.map(el=>{
+     const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;
+     const hit=document.elementFromPoint(x,y);
+     return {name:el.dataset.t||el.id,x:Math.round(x),y:Math.round(y),
+      visible:getComputedStyle(el).visibility!=='hidden'&&getComputedStyle(el).display!=='none',
+      inside:r.left>=0&&r.top>=0&&r.right<=innerWidth&&r.bottom<=innerHeight,
+      tappable:hit===el||el.contains(hit),cover:hit?.id||hit?.dataset?.t||hit?.tagName};
+    });
+   });
+   const blocked=targets.filter(t=>!t.visible||!t.inside||!t.tappable);
+   assert.deepEqual(blocked,[],'Mobile touch controls blocked at '+width+'x'+height+': '+JSON.stringify(blocked));
+   touchHitTargets.push({width,height,controls:targets.length});
+  }
+  await page.setViewportSize({width:390,height:844});
   await page.waitForTimeout(1200);
   // Apparel is visual-only: all 24 details must be attached to animated joints
   // and must not intercept ramp raycasts or alter collision behavior.
@@ -499,8 +522,32 @@ const server=http.createServer((req,res)=>{
    return {type:s.grindRequestType,grounded:s.grounded,vy:s.vy,y:s.y,count:s.count,grinding:s.grinding};});
   assert(armedGrind.type==='50-50'&&!armedGrind.grounded&&armedGrind.vy>0&&!armedGrind.grinding,
    'GRIND away from a rail must ollie and arm a 50-50, not teleport or score: '+JSON.stringify(armedGrind));
+  // RESTART must cancel pending airborne grind lockout, not just movement.
+  await page.locator('#restart').click();
+  const resetState=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
+   return {grounded:s.grounded,speed:s.speed,grindAirborneUntil:s.grindAirborneUntil,
+    request:s.grindRequestType,combo:s.combo,grabHeld:s.grabHeld};});
+  assert(resetState.grounded&&resetState.speed===0&&resetState.grindAirborneUntil===0&&
+   resetState.request===null&&resetState.combo===0&&!resetState.grabHeld,
+   'RESTART must clear grind lockout and queued tricks: '+JSON.stringify(resetState));
+  // Teleport from an in-progress grind/trick; earned points must survive.
+  await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state,now=performance.now();
+   Object.assign(s,{score:1234,combo:320,count:3,flip:1,spin:1,grinding:true,
+    grindRequestType:'50-50',grindRequestUntil:now+5000,grindAirborneUntil:now+5000,
+    pushBurstUntil:now+5000,grabUntil:now+5000,grabHeld:true,manualActive:true});});
   // Move into the real connected halfpipe and confirm actual travel.
   await page.locator('#halfpipe').click();
+  const teleportState=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
+   return {x:s.x,z:s.z,score:s.score,combo:s.combo,count:s.count,flip:s.flip,spin:s.spin,
+    grounded:s.grounded,grinding:s.grinding,request:s.grindRequestType,
+    grindAirborneUntil:s.grindAirborneUntil,pushBurstUntil:s.pushBurstUntil,
+    grabHeld:s.grabHeld,manualActive:s.manualActive};});
+  assert(teleportState.x===-36&&teleportState.z===-18.1&&teleportState.score===1234&&
+   teleportState.combo===0&&teleportState.count===0&&teleportState.flip===0&&
+   teleportState.spin===0&&teleportState.grounded&&!teleportState.grinding&&
+   teleportState.request===null&&teleportState.grindAirborneUntil===0&&
+   teleportState.pushBurstUntil===0&&!teleportState.grabHeld&&!teleportState.manualActive,
+   'HALFPIPE must preserve score but reset all tricks and inputs: '+JSON.stringify(teleportState));
   assert(await page.evaluate(()=>window.__SOL_DIAGNOSTICS__.scene.activeCamera.name==='halfpipe arrival overview'),'HALFPIPE button must reveal a real 3D overview before riding');
   await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
    Object.assign(s,{x:-36,z:-18.1,y:0,groundY:0,dir:0,speed:7,travelSign:-1,grounded:true,grinding:false,vy:0})});
@@ -559,6 +606,88 @@ const server=http.createServer((req,res)=>{
    vertLanding.speed>.65&&!vertLanding.message.includes('BAIL'),
    'Halfpipe vert air must land on the physical transition with rolling momentum: '+
     JSON.stringify({vertStart,vertAir,vertLanding}));
+  // A clean landing is not enough: the board must keep rolling inward,
+  // down the transition and onto the flat without an automatic bail.
+  // Observe the real physics loop, not a forced position or a reset.
+  await page.waitForFunction(()=>{
+   const s=window.__SOL_DIAGNOSTICS__.state;
+   if(s.grounded&&!s.grinding&&s.z> -21.55&&s.z< -15.5&&s.speed>.5){
+    window.__qaLeftFollowthrough={z:s.z,y:s.y,speed:s.speed,grounded:s.grounded,
+     travelSign:s.travelSign,message:document.querySelector('#msg').textContent};
+    return true;
+   }
+   return false;
+  },null,{timeout:12000});
+  const leftFollowthrough=await page.evaluate(()=>window.__qaLeftFollowthrough);
+  assert(leftFollowthrough.grounded&&leftFollowthrough.speed>.5&&
+   !leftFollowthrough.message.includes('BAIL'),
+   'Left vert landing must roll down onto the halfpipe flat: '+JSON.stringify(leftFollowthrough));
+  // Mirror the left-wall flight test on the opposite coping. A halfpipe
+  // that only launches/lands on one end is not a working halfpipe; both
+  // directions must preserve continuous transition physics.
+  const rightVertStart=await page.evaluate(()=>{
+   const s=window.__SOL_DIAGNOSTICS__.state;
+   const r={x:-36,z:-10.4,w:38,d:8.4,h:4.5,curve:'halfpipe-right'};
+   const z=-6.44,ground=window.SOLTerrain.profile(r,(z-(r.z-r.d/2))/r.d).height;
+   Object.assign(s,{x:-36,z,y:ground,groundY:ground,dir:0,
+    speed:8,travelSign:1,grounded:true,grinding:false,vy:0,
+    rampCooldown:0,grindCooldown:0,flip:0,spin:0,airVX:null,airVZ:null,
+    controlSteer:0,controlThrottle:0});
+   return {z,ground};
+  });
+  await page.waitForFunction(()=>{
+   const s=window.__SOL_DIAGNOSTICS__.state;
+   return s.name==='HALFPIPE VERT AIR'&&!s.grounded&&s.airVZ<0;
+  },null,{timeout:6000});
+  const rightVertAir=await page.evaluate(()=>{
+   const s=window.__SOL_DIAGNOSTICS__.state;
+   return {name:s.name,grounded:s.grounded,y:s.y,vy:s.vy,
+    takeoffY:s.vertTakeoffY,previousY:s.vertTakeoffPreviousY,
+    postY:s.vertLaunchPostY,airVZ:s.airVZ,airVX:s.airVX,z:s.z,speed:s.speed};
+  });
+  assert(rightVertAir.name==='HALFPIPE VERT AIR'&&!rightVertAir.grounded&&
+   rightVertAir.takeoffY>2.4&&rightVertAir.takeoffY<4.5&&
+   Math.abs(rightVertAir.takeoffY-rightVertAir.previousY)<.08&&
+   Math.abs(rightVertAir.postY-rightVertAir.takeoffY)<.08&&
+   Number.isFinite(rightVertAir.vy)&&rightVertAir.airVZ<0&&
+   Math.abs(rightVertAir.airVX)<1,
+   'Right coping must launch vertically and travel inward without a Y snap: '+
+    JSON.stringify({rightVertStart,rightVertAir}));
+  await page.waitForFunction(()=>{
+   const s=window.__SOL_DIAGNOSTICS__.state;
+   return s.name==='HALFPIPE VERT AIR'&&!s.grounded&&s.y>4.5;
+  },null,{timeout:6000});
+  await page.waitForFunction(()=>{
+   const s=window.__SOL_DIAGNOSTICS__.state;
+   return s.grounded&&!s.grinding&&s.z< -6.4&&s.z> -15.5&&s.y>=0&&s.y<4.5;
+  },null,{timeout:6000});
+  const rightVertLanding=await page.evaluate(()=>{
+   const s=window.__SOL_DIAGNOSTICS__.state;
+   const r={x:-36,z:-10.4,w:38,d:8.4,h:4.5,curve:'halfpipe-right'};
+   const expected=window.SOLTerrain.profile(r,(s.z-(r.z-r.d/2))/r.d).height;
+   return {grounded:s.grounded,z:s.z,y:s.y,expected,speed:s.speed,
+    travelSign:s.travelSign,message:document.querySelector('#msg').textContent};
+  });
+  assert(rightVertLanding.grounded&&
+   Math.abs(rightVertLanding.y-rightVertLanding.expected)<.15&&
+   rightVertLanding.speed>.65&&!rightVertLanding.message.includes('BAIL'),
+   'Right coping vert air must land inside on the matching transition with momentum: '+
+    JSON.stringify({rightVertStart,rightVertAir,rightVertLanding}));
+  // Repeat the same follow-through on the mirrored wall. This catches
+  // landing-direction regressions that still satisfy a one-frame Y check.
+  await page.waitForFunction(()=>{
+   const s=window.__SOL_DIAGNOSTICS__.state;
+   if(s.grounded&&!s.grinding&&s.z< -14.65&&s.z> -20.7&&s.speed>.5){
+    window.__qaRightFollowthrough={z:s.z,y:s.y,speed:s.speed,grounded:s.grounded,
+     travelSign:s.travelSign,message:document.querySelector('#msg').textContent};
+    return true;
+   }
+   return false;
+  },null,{timeout:12000});
+  const rightFollowthrough=await page.evaluate(()=>window.__qaRightFollowthrough);
+  assert(rightFollowthrough.grounded&&rightFollowthrough.speed>.5&&
+   !rightFollowthrough.message.includes('BAIL'),
+   'Right vert landing must roll down onto the halfpipe flat: '+JSON.stringify(rightFollowthrough));
   // Preserve a screenshot of the real in-game mobile camera.
   await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__,s=d.state;
    Object.assign(s,{x:-36,z:-18.1,y:0,groundY:0,dir:0,speed:0,travelSign:1,grounded:true,grinding:false,vy:0});
@@ -627,7 +756,7 @@ const server=http.createServer((req,res)=>{
     // Stable interior ramp locations in the dedicated 960x540 side view;
     // exclude the moving rider and the coping silhouette.
     const spots=[[180,350],[780,350],[480,450]];
-    return spots.map(([x,y])=>{
+    const fixed=spots.map(([x,y])=>{
      let total=0,control=0,count=0;
      for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){
       const i=((y+dy)*p.width+x+dx)*4;
@@ -639,6 +768,27 @@ const server=http.createServer((req,res)=>{
      }
      return {x,y,meanChannelDelta:total/count,rampRemovalDelta:control/count};
     });
+    // Cover hundreds of actual visible ramp pixels, not just three fixed
+    // coordinates. The ramp-removal image is a positive-control mask:
+    // only pixels that visibly change when ramps disappear can count.
+    // Stay inside the pipe's riding area to exclude plaza silhouettes.
+    let covered=0,leaks=0,totalDelta=0,totalControl=0,maxDelta=0;
+    for(let y=230;y<=510;y+=8)for(let x=120;x<=840;x+=8){
+     const i=(y*p.width+x)*4;
+     let control=0,delta=0;
+     for(let k=0;k<3;k++){
+      control+=Math.abs(p.data[i+k]-r.data[i+k]);
+      delta+=Math.abs(p.data[i+k]-q.data[i+k]);
+     }
+     control/=3;delta/=3;
+     if(control<25)continue;
+     covered++;totalDelta+=delta;totalControl+=control;
+     maxDelta=Math.max(maxDelta,delta);
+     if(delta>8)leaks++;
+    }
+    return {fixed,coverage:{covered,leaks,leakFraction:covered?leaks/covered:1,
+     meanChannelDelta:covered?totalDelta/covered:0,
+     meanRampRemovalDelta:covered?totalControl/covered:0,maxChannelDelta:maxDelta}};
    },[before.toString('base64'),after.toString('base64'),rampRemoved.toString('base64')]);
    const restored=await page.evaluate(()=>{
     const scene=window.__SOL_DIAGNOSTICS__.scene;
@@ -648,13 +798,17 @@ const server=http.createServer((req,res)=>{
       rampEnabled:ramp.filter(m=>m.isEnabled()).length,
       challengeLeaked:!!window.__SOL_FLOOR_CHALLENGE__||!!window.__SOL_RAMP_CHALLENGE__};
    });
-   return {hiddenFloorMeshes:hidden,hiddenRampMeshes:rampHidden,samples,restored};
+   return {hiddenFloorMeshes:hidden,hiddenRampMeshes:rampHidden,samples:samples.fixed,coverage:samples.coverage,restored};
   })();
   assert(!floorOcclusionQA.restored.challengeLeaked,'Occlusion QA must clean up temporary scene state');
   assert(floorOcclusionQA.restored.rampEnabled>=10,'Occlusion QA must restore ramp geometry after challenge');
   assert(floorOcclusionQA.hiddenFloorMeshes>=4,'Expected underlying park floor meshes for the occlusion challenge');
   assert(floorOcclusionQA.samples.every(s=>s.meanChannelDelta<8),
    'Underlying plaza changes visible halfpipe riding pixels (ground bleed-through): '+JSON.stringify(floorOcclusionQA));
+  assert(floorOcclusionQA.coverage.covered>=400,
+   'Wide halfpipe pixel challenge must cover at least 400 ramp pixels: '+JSON.stringify(floorOcclusionQA.coverage));
+  assert(floorOcclusionQA.coverage.leakFraction<.02&&floorOcclusionQA.coverage.meanChannelDelta<3,
+   'Underlying ground changed visible ramp pixels across the halfpipe: '+JSON.stringify(floorOcclusionQA.coverage));
   assert(floorOcclusionQA.hiddenRampMeshes>=10&&
     floorOcclusionQA.samples.filter(s=>s.rampRemovalDelta>15).length>=2,
    'Halfpipe occlusion samples must visibly react when ramp geometry is removed: '+JSON.stringify(floorOcclusionQA));
@@ -921,6 +1075,6 @@ const server=http.createServer((req,res)=>{
   await page.screenshot({path:'test-artifacts/ledge-wall-slide.png',animations:'disabled'});
 
   assert.equal(errors.length,0,'Browser errors: '+errors.join('; '));
-  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',controllerQA,gamepadIntegration,visualQA,facadeQA,wallContact,wallSlide,spawnView,spawnPixels,cheekNormals,impactNormals,rampGravity,screenshotQA,floorOcclusionQA,status,spin,push,touchTricks,clickFallback,riding,vertStart,vertAir,vertLanding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
+  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',touchHitTargets,controllerQA,gamepadIntegration,visualQA,facadeQA,wallContact,wallSlide,spawnView,spawnPixels,cheekNormals,impactNormals,rampGravity,screenshotQA,floorOcclusionQA,status,spin,push,touchTricks,clickFallback,resetState,teleportState,riding,vertStart,vertAir,vertLanding,leftFollowthrough,rightVertStart,rightVertAir,rightVertLanding,rightFollowthrough,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
  }finally{await browser.close()}
 })().catch(e=>{fs.mkdirSync('test-artifacts',{recursive:true});fs.writeFileSync('test-artifacts/browser-result.txt','FAIL: '+(e&&e.stack||String(e)));console.error(e);process.exitCode=1}).finally(()=>server.close());

@@ -90,7 +90,9 @@ function land(state,contact){
 function mesh(B,scene,concrete,metal){const N=128,R=72,positions=[],indices=[],uvs=[];for(let j=0;j<=R;j++){const u=j/R;const rad=bowl.radius*(1-Math.pow(1-u,2.1));for(let i=0;i<=N;i++){const a=i*2*Math.PI/N,x=bowl.x+rad*Math.cos(a),z=bowl.z+rad*Math.sin(a);positions.push(x,height(x,z)+.015,z);uvs.push((x-bowl.x)/(2*bowl.radius)+.5,(z-bowl.z)/(2*bowl.radius)+.5)}}for(let j=0;j<R;j++)for(let i=0;i<N;i++){const a=j*(N+1)+i,b=a+N+1;indices.push(a,a+1,b,b,a+1,b+1)}const m=new B.Mesh('100 foot wide 25 foot deep sculpted concrete bowl',scene),v=new B.VertexData();v.positions=positions;v.indices=indices;v.uvs=uvs;v.normals=[];B.VertexData.ComputeNormals(positions,indices,v.normals);v.applyToMesh(m);const bowlConcrete=concrete.clone('warm pale opaque textured bowl concrete');
 // The inherited plaza texture rendered green in actual Chromium bowl captures.
 // Use a neutral, dedicated concrete finish instead of sharing that texture.
+const unusedConcreteTexture=bowlConcrete.diffuseTexture;
 bowlConcrete.diffuseTexture=null;
+if(unusedConcreteTexture&&unusedConcreteTexture!==concrete.diffuseTexture)unusedConcreteTexture.dispose();
 bowlConcrete.diffuseColor=new B.Color3(.83,.86,.87);
 bowlConcrete.emissiveColor=new B.Color3(.21,.215,.22);
 bowlConcrete.specularColor=new B.Color3(.09,.1,.1);

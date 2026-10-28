@@ -1,0 +1,27 @@
+{
+  "testedProductionCommit": "e9f36938d1f070fc4edb1d65331139750343c2e5",
+  "baselineMain": "6d03996",
+  "integratedMain": "4a2b792",
+  "before": {
+    "unusedDynamicTextures": 17
+  },
+  "after": {
+    "desktop": {
+      "textures": 12,
+      "unusedDynamicTextures": [],
+      "sharedConcrete": true,
+      "sourceReady": true,
+      "concreteTextureCopies": 1,
+      "bowlTexture": "bowl painted concrete art"
+    },
+    "mobile": {
+      "textures": 11,
+      "unusedDynamicTextures": [],
+      "sharedConcrete": true,
+      "sourceReady": true,
+      "concreteTextureCopies": 1,
+      "bowlTexture": "bowl painted concrete art"
+    }
+  },
+  "limitations": "Resource counts verified in Chromium SwiftShader; process-memory and physical GPU/mobile performance were not measured."
+}

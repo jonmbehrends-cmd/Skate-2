@@ -57,3 +57,9 @@ Validation: existing logic/geometry suites, Chromium gameplay/input/recovery, te
 Open Controls for keyboard, touch and Xbox mappings. The dialog releases held inputs, suppresses gameplay hotkeys and gamepad input while open, supports Enter/Space activation, Escape and focus return, and scrolls on short touch screens. GRIND remains a 50-50 catch action; OLLIE and assisted BOARD SLIDE stay separate.
 
 The panel originated in Copilot PR #39. This integration applies only its help UI and input-suspension changes to current R16 main, with additional keyboard and touch-scroll fixes. `node tests/controls_help_browser.cjs` covers desktop, portrait and landscape mobile behavior, including a real touch scroll gesture.
+
+## Optional audio feedback
+
+The persistent, keyboard-focusable Sound toggle enables or mutes short procedural Web Audio cues for wheel roll, ollies, landings and grinds. Audio starts silent until a trusted browser gesture unlocks it; browsers that block or do not support Web Audio remain playable. The single AudioContext is suspended when the tab loses focus, becomes hidden, or Controls help opens, and resumes when the page is active again. No audio files or third-party audio libraries are used.
+
+Run `node tests/audio_feedback_rate.cjs` to verify wheel/grind cue deadlines deterministically at 30, 60 and 120 FPS and confirm ended oscillators and envelopes disconnect. Run `node tests/audio_feedback_browser.cjs` to verify startup silence, saved mute preference, context reuse, gameplay cues, focus/help/visibility suspension and resume, and toggle layout in Chromium desktop, mobile portrait and mobile landscape. The hidden-page transition is simulated with the browser visibility event because headless Chromium does not reliably background tabs. These validate browser audio scheduling, not subjective sound quality or physical-device speakers.

@@ -13,10 +13,31 @@ const server=http.createServer((req,res)=>{const url=new URL(req.url,'http://loc
   await page.evaluate(()=>window.__SOL_DIAGNOSTICS__.scene.whenReadyAsync());
   await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__;window.__qaLoop=d.engine._activeRenderLoops[0];d.engine.stopRenderLoop();});
   const textures=await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__,B=BABYLON;return d.scene.meshes.filter(m=>['solid skatable concrete ramp','SOLID RAMP SIDE WALL','park continuous concrete','HALFPIPE FLAT BOTTOM'].includes(m.name)).map(m=>({name:m.name,ready:m.isReady(true),texture:m.material.diffuseTexture?.isReady()??true,opaque:m.material.alpha===1&&!m.material.needAlphaBlending(),normalY:m.name==='solid skatable concrete ramp'?m.getVerticesData(B.VertexBuffer.NormalKind)[1]:null}));});
+  const art=await page.evaluate(()=>{const scene=window.__SOL_DIAGNOSTICS__.scene;
+   const murals=scene.meshes.filter(m=>['halfpipe deck front fascia','halfpipe deck back fascia','park perimeter painted mural','halfpipe exterior painted mural'].includes(m.name));
+   return {count:murals.length,opaque:murals.every(m=>m.material?.alpha===1&&!m.material.needAlphaBlending()),ready:murals.every(m=>m.material?.diffuseTexture?.isReady()),safe:murals.every(m=>!m.isPickable&&!m.checkCollisions),materialNames:[...new Set(murals.map(m=>m.material?.name))]};});
+  assert(art.count>=10&&art.opaque&&art.ready&&art.safe,'Architectural murals must render opaque and stay non-colliding: '+JSON.stringify(art));
+  result[label]={art};
   assert(textures.length>=40);assert(textures.every(m=>m.ready&&m.texture&&m.opaque),'All solid surfaces must be render-ready: '+JSON.stringify(textures));assert(textures.filter(m=>m.normalY!==null).every(m=>m.normalY>0),'Top normals must face daylight in Babylon');
   const deckVertices=await page.evaluate(()=>window.__SOL_DIAGNOSTICS__.scene.getMeshByName('deck').getTotalVertices());
   assert(deckVertices>1000,'Production board must use the imported V2 mesh');
-  result[label]={textures,deckVertices,views:[],input:{}};
+  const resources=await page.evaluate(()=>{
+   const scene=window.__SOL_DIAGNOSTICS__.scene,B=BABYLON;
+   const used=new Set(scene.materials.flatMap(m=>m.getActiveTextures()));
+   const duplicates=scene.textures.filter(t=>t instanceof B.DynamicTexture&&!used.has(t)).map(t=>t.name);
+   const source=scene.getMaterialByName('concrete').diffuseTexture;
+   const concreteMaterials=scene.materials.filter(m=>m.name==='warm plaza poured concrete'||
+    m.name.startsWith('solid opaque textured ramp concrete ')||m.name==='halfpipe continuous opaque textured riding concrete');
+   return {textures:scene.textures.length,unusedDynamicTextures:duplicates,
+    sharedConcrete:concreteMaterials.every(m=>m.diffuseTexture===source),
+    sourceReady:source.isReady(),concreteTextureCopies:scene.textures.filter(t=>t.name===source.name).length,
+    bowlTexture:scene.getMaterialByName('warm pale opaque textured bowl concrete').diffuseTexture.name};
+  });
+  assert.deepEqual(resources.unusedDynamicTextures,[],'No discarded DynamicTexture clones may remain registered');
+  assert(resources.sharedConcrete&&resources.sourceReady,'Concrete materials must retain the ready shared original');
+  assert.equal(resources.concreteTextureCopies,1,'Only one concrete microtexture must remain');
+  assert.equal(resources.bowlTexture,'bowl painted concrete art','Bowl keeps its dedicated painted finish');
+  result[label]={textures,resources,deckVertices,views:[],input:{}};
   for(const [name,pos,target] of [['bank-front',[-27,9,-3],[-12,1,15]],['bank-back',[-2,7,36],[-12,1,15]],['halfpipe',[-9,17,-50],[-36,2,-18]]]){
    const active=await page.evaluate(({name,pos,target})=>{const d=window.__SOL_DIAGNOSTICS__,B=BABYLON,c=new B.FreeCamera(name,new B.Vector3(...pos),d.scene);c.setTarget(new B.Vector3(...target));c.minZ=.03;d.scene.activeCamera=c;d.scene.render();return d.scene.getActiveMeshes().data.filter(m=>m?.name==='solid skatable concrete ramp').length;},{name,pos,target});assert(active>0,'Riding skins must enter the active render pass');
    await page.screenshot({path:path.join(out,label+'-'+name+'.png')});result[label].views.push({name,active});
