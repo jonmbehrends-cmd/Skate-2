@@ -606,6 +606,57 @@ const server=http.createServer((req,res)=>{
    vertLanding.speed>.65&&!vertLanding.message.includes('BAIL'),
    'Halfpipe vert air must land on the physical transition with rolling momentum: '+
     JSON.stringify({vertStart,vertAir,vertLanding}));
+  // Mirror the left-wall flight test on the opposite coping. A halfpipe
+  // that only launches/lands on one end is not a working halfpipe; both
+  // directions must preserve continuous transition physics.
+  const rightVertStart=await page.evaluate(()=>{
+   const s=window.__SOL_DIAGNOSTICS__.state;
+   const r={x:-36,z:-10.4,w:38,d:8.4,h:4.5,curve:'halfpipe-right'};
+   const z=-6.44,ground=window.SOLTerrain.profile(r,(z-(r.z-r.d/2))/r.d).height;
+   Object.assign(s,{x:-36,z,y:ground,groundY:ground,dir:0,
+    speed:8,travelSign:1,grounded:true,grinding:false,vy:0,
+    rampCooldown:0,grindCooldown:0,flip:0,spin:0,airVX:null,airVZ:null,
+    controlSteer:0,controlThrottle:0});
+   return {z,ground};
+  });
+  await page.waitForFunction(()=>{
+   const s=window.__SOL_DIAGNOSTICS__.state;
+   return s.name==='HALFPIPE VERT AIR'&&!s.grounded&&s.airVZ<0;
+  },null,{timeout:6000});
+  const rightVertAir=await page.evaluate(()=>{
+   const s=window.__SOL_DIAGNOSTICS__.state;
+   return {name:s.name,grounded:s.grounded,y:s.y,vy:s.vy,
+    takeoffY:s.vertTakeoffY,previousY:s.vertTakeoffPreviousY,
+    postY:s.vertLaunchPostY,airVZ:s.airVZ,airVX:s.airVX,z:s.z,speed:s.speed};
+  });
+  assert(rightVertAir.name==='HALFPIPE VERT AIR'&&!rightVertAir.grounded&&
+   rightVertAir.takeoffY>2.4&&rightVertAir.takeoffY<4.5&&
+   Math.abs(rightVertAir.takeoffY-rightVertAir.previousY)<.08&&
+   Math.abs(rightVertAir.postY-rightVertAir.takeoffY)<.08&&
+   Number.isFinite(rightVertAir.vy)&&rightVertAir.airVZ<0&&
+   Math.abs(rightVertAir.airVX)<1,
+   'Right coping must launch vertically and travel inward without a Y snap: '+
+    JSON.stringify({rightVertStart,rightVertAir}));
+  await page.waitForFunction(()=>{
+   const s=window.__SOL_DIAGNOSTICS__.state;
+   return s.name==='HALFPIPE VERT AIR'&&!s.grounded&&s.y>4.5;
+  },null,{timeout:6000});
+  await page.waitForFunction(()=>{
+   const s=window.__SOL_DIAGNOSTICS__.state;
+   return s.grounded&&!s.grinding&&s.z< -6.4&&s.z> -15.5&&s.y>=0&&s.y<4.5;
+  },null,{timeout:6000});
+  const rightVertLanding=await page.evaluate(()=>{
+   const s=window.__SOL_DIAGNOSTICS__.state;
+   const r={x:-36,z:-10.4,w:38,d:8.4,h:4.5,curve:'halfpipe-right'};
+   const expected=window.SOLTerrain.profile(r,(s.z-(r.z-r.d/2))/r.d).height;
+   return {grounded:s.grounded,z:s.z,y:s.y,expected,speed:s.speed,
+    travelSign:s.travelSign,message:document.querySelector('#msg').textContent};
+  });
+  assert(rightVertLanding.grounded&&
+   Math.abs(rightVertLanding.y-rightVertLanding.expected)<.15&&
+   rightVertLanding.speed>.65&&!rightVertLanding.message.includes('BAIL'),
+   'Right coping vert air must land inside on the matching transition with momentum: '+
+    JSON.stringify({rightVertStart,rightVertAir,rightVertLanding}));
   // Preserve a screenshot of the real in-game mobile camera.
   await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__,s=d.state;
    Object.assign(s,{x:-36,z:-18.1,y:0,groundY:0,dir:0,speed:0,travelSign:1,grounded:true,grinding:false,vy:0});
@@ -993,6 +1044,6 @@ const server=http.createServer((req,res)=>{
   await page.screenshot({path:'test-artifacts/ledge-wall-slide.png',animations:'disabled'});
 
   assert.equal(errors.length,0,'Browser errors: '+errors.join('; '));
-  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',touchHitTargets,controllerQA,gamepadIntegration,visualQA,facadeQA,wallContact,wallSlide,spawnView,spawnPixels,cheekNormals,impactNormals,rampGravity,screenshotQA,floorOcclusionQA,status,spin,push,touchTricks,clickFallback,resetState,teleportState,riding,vertStart,vertAir,vertLanding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
+  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',touchHitTargets,controllerQA,gamepadIntegration,visualQA,facadeQA,wallContact,wallSlide,spawnView,spawnPixels,cheekNormals,impactNormals,rampGravity,screenshotQA,floorOcclusionQA,status,spin,push,touchTricks,clickFallback,resetState,teleportState,riding,vertStart,vertAir,vertLanding,rightVertStart,rightVertAir,rightVertLanding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
  }finally{await browser.close()}
 })().catch(e=>{fs.mkdirSync('test-artifacts',{recursive:true});fs.writeFileSync('test-artifacts/browser-result.txt','FAIL: '+(e&&e.stack||String(e)));console.error(e);process.exitCode=1}).finally(()=>server.close());
