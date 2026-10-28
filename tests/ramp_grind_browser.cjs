@@ -13,6 +13,11 @@ const server=http.createServer((req,res)=>{const url=new URL(req.url,'http://loc
   await page.evaluate(()=>window.__SOL_DIAGNOSTICS__.scene.whenReadyAsync());
   await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__;window.__qaLoop=d.engine._activeRenderLoops[0];d.engine.stopRenderLoop();});
   const textures=await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__,B=BABYLON;return d.scene.meshes.filter(m=>['solid skatable concrete ramp','SOLID RAMP SIDE WALL','park continuous concrete','HALFPIPE FLAT BOTTOM'].includes(m.name)).map(m=>({name:m.name,ready:m.isReady(true),texture:m.material.diffuseTexture?.isReady()??true,opaque:m.material.alpha===1&&!m.material.needAlphaBlending(),normalY:m.name==='solid skatable concrete ramp'?m.getVerticesData(B.VertexBuffer.NormalKind)[1]:null}));});
+  const art=await page.evaluate(()=>{const scene=window.__SOL_DIAGNOSTICS__.scene;
+   const murals=scene.meshes.filter(m=>['halfpipe deck front fascia','halfpipe deck back fascia','park perimeter painted mural'].includes(m.name));
+   return {count:murals.length,opaque:murals.every(m=>m.material?.alpha===1&&!m.material.needAlphaBlending()),ready:murals.every(m=>m.material?.diffuseTexture?.isReady()),safe:murals.every(m=>!m.isPickable&&!m.checkCollisions),materialNames:[...new Set(murals.map(m=>m.material?.name))]};});
+  assert(art.count>=8&&art.opaque&&art.ready&&art.safe,'Architectural murals must render opaque and stay non-colliding: '+JSON.stringify(art));
+  result[label]={art};
   assert(textures.length>=40);assert(textures.every(m=>m.ready&&m.texture&&m.opaque),'All solid surfaces must be render-ready: '+JSON.stringify(textures));assert(textures.filter(m=>m.normalY!==null).every(m=>m.normalY>0),'Top normals must face daylight in Babylon');
   const deckVertices=await page.evaluate(()=>window.__SOL_DIAGNOSTICS__.scene.getMeshByName('deck').getTotalVertices());
   assert(deckVertices>1000,'Production board must use the imported V2 mesh');
