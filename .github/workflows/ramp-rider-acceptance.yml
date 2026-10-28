@@ -10,7 +10,7 @@ permissions:
 jobs:
   ramp-rider:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 16
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -20,9 +20,11 @@ jobs:
       - run: npx playwright install chromium
       - run: node tests/board_v2.cjs
       - run: node tests/skater_v2.cjs
+      - run: node tests/park_architecture.cjs
       - run: node tests/ramp_grind_browser.cjs
       - run: node tests/skater_v2_browser.cjs
       - run: node tests/controls_help_browser.cjs
+      - run: node tests/render_budget_browser.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -31,3 +33,4 @@ jobs:
             test-artifacts/ramp-grind/
             test-artifacts/skater-v2/
             test-artifacts/controls-help/
+            test-artifacts/render-budget/

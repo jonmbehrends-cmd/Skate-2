@@ -44,7 +44,22 @@ function build(B,scene,ramps){
    for(const dz of [-7,7])cube('wall expansion joint',x+(x<0?.60:-.60),1.2,z+dz,.042,1.8,.065,metal);
   }
  }
- return {meshes:objects,dispose(){for(const mesh of objects)mesh.dispose();}};
+ // Batch only this module's opaque, noninteractive dressing. Keep groups local
+ // so a wall on one side of the park cannot keep the opposite side in view.
+ const groups=new Map(),meshes=[];
+ for(const mesh of objects){
+  const key=mesh.material.uniqueId+':'+Math.floor(mesh.position.x/40)+':'+Math.floor(mesh.position.z/40);
+  if(!groups.has(key))groups.set(key,[]);
+  groups.get(key).push(mesh);
+ }
+ for(const members of groups.values()){
+  const merged=members.length>1?B.Mesh.MergeMeshes(members,true,true,undefined,false,false):members[0];
+  if(!merged){meshes.push(...members);continue;}
+  merged.name='park architecture batch '+members[0].material.name;
+  merged.isPickable=false;merged.checkCollisions=false;merged.receiveShadows=true;
+  merged.freezeWorldMatrix();meshes.push(merged);
+ }
+ return {meshes,dispose(){for(const mesh of meshes)mesh.dispose();}};
 }
 root.SOLParkArchitecture={build};
 })(typeof window!=='undefined'?window:globalThis);
