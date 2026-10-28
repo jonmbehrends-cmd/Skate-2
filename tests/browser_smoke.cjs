@@ -789,7 +789,9 @@ const server=http.createServer((req,res)=>{
   assert(!xboxOllie.grounded&&xboxOllie.name==='OLLIE',
     'Emulated Xbox A button must launch an actual ollie: '+JSON.stringify(xboxOllie));
   await page.evaluate(()=>{window.__qaPad.connected=false});
-  await page.waitForTimeout(250);
+  // The WebGL render loop may be throttled under SwiftShader. Wait for the
+  // observable input-state transition, not a fixed 250 ms wall-clock delay.
+  await page.waitForFunction(()=>document.querySelector('#status')?.textContent.includes('Press a controller button'),null,{timeout:3000});
   const xboxDisconnect=await page.locator('#status').textContent();
   assert(xboxDisconnect.includes('Press a controller button'),
     'Disconnect must return to touch-friendly input status: '+xboxDisconnect);
