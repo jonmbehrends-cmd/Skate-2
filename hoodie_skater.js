@@ -77,7 +77,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    // In a grab, tuck the knees up toward the deck instead of curling the
    // spine forward. Keep the chest comparatively upright as the hips lower;
    // hip/chest lean and arm IK still bring the hand onto the moving deck.
-   const crouch=clamp((pose.crouch||0)*.20+landing*.08+takeoff*.06+(actions.grabbing?.27:0),0,.78);
+   const crouch=clamp((pose.crouch||0)*.20+landing*.08+takeoff*.06+(actions.grabbing?.05:0),0,.78);
    // In a real airborne grab the rider draws the *board* toward the hips.
    // Raising only the knees while keeping the deck below them forces a seated
    // IK pose. This is a visual transform; the physics state is never touched.
@@ -107,7 +107,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    const pushLean=pose.pushing&&state.grounded?
     clamp((pose.contact||0)*.075+(pose.recovery||0)*.025,0,.085):0;
    status.pushLean=pushLean;
-   pelvis.rotationQuaternion=rest.get(pelvis).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?.10:-pushLean*.5));
+   pelvis.rotationQuaternion=rest.get(pelvis).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?.27:-pushLean*.5));
    spine.rotationQuaternion=rest.get(spine).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.04:-pushLean))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pose.pushing?(pose.contact||0)*.07:0)));
    const travel=state.travelSign===-1?-1:1;
@@ -119,6 +119,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    const frontLevel=air&&!actions.grabbing&&!flip?(1-takeoff)*.05:0;
    const frontFlick=flip&&!actions.grabbing?.085:0;
    status.footPose={rearPop,frontLevel,frontFlick};
+   const footTargets=[];
    for(let i=0;i<legs.length;i++){
     const back=i===1,side=back?-1:1;
     const pushing=back&&pose.pushing;
@@ -134,6 +135,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     // During grabs bend the knees upward toward the chest, not forward
     // along the deck. This pole only changes skeletal IK, never board physics.
     const kneePole=actions.grabbing?v(.35,1.52,side*.57):v(.8,.65,side*.50);
+    footTargets.push(foot.asArray());
     solve(legs[i].n,foot,kneePole);placeDetached(detachedFeet[i],localPosition(legs[i].n[2]));orient(detachedFeet[i],footRotations[i]);
    }
    // Keep the shoulders active throughout a trick. A skater raises both
@@ -171,7 +173,9 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     }
    }
    for(let i=0;i<arms.length;i++)solve(arms[i].n,targets[i],v(.65,1.0-crouch,i===0?.6:-.6));
-   status.feet=legs.map(l=>localPosition(l.n[2]).asArray());status.hands=arms.map(l=>localPosition(l.n[2]).asArray());
+   status.feet=legs.map(l=>localPosition(l.n[2]).asArray());
+   status.footTargets=footTargets;
+   status.footReachError=footTargets.map((target,i)=>B.Vector3.Distance(B.Vector3.FromArray(target),B.Vector3.FromArray(status.feet[i])));status.hands=arms.map(l=>localPosition(l.n[2]).asArray());
    status.legGeometry=legs.map(l=>{const p=l.n.map(localPosition);return {hip:p[0].asArray(),knee:p[1].asArray(),foot:p[2].asArray(),upper:B.Vector3.Distance(p[0],p[1]),lower:B.Vector3.Distance(p[1],p[2])}});
    status.grip=actions.grabbing?targets[1].asArray():null;
    status.grabReachShift=grabReachShift;
