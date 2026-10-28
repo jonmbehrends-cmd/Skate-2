@@ -841,6 +841,21 @@ const server=http.createServer((req,res)=>{
   await page.evaluate(()=>{
     document.querySelector('#restart').click();
     const s=window.__SOL_DIAGNOSTICS__.state;
+     // Latch observations at actual physics steps. Reading live state in a
+     // later browser round trip can miss the contact window, or sample far
+     // past the ledge after ordinary rolling friction has reduced speed.
+     const original=window.SOLMotion.collide;
+     window.__wallQA={contact:null,exit:null,original};
+     window.SOLMotion.collide=function(state,contacts){
+       const result=original.apply(this,arguments),qa=window.__wallQA;
+       const snapshot=()=>({x:state.x,z:state.z,speed:state.speed,grounded:state.grounded});
+       if(state===s){
+         if(!qa.contact&&state.z>39&&state.z<42&&state.x>=.65&&state.x<=.74&&state.grounded&&
+            contacts.some(c=>c.hit&&c.normalX<-.5))qa.contact=snapshot();
+         if(qa.contact&&!qa.exit&&state.z>43)qa.exit=snapshot();
+       }
+       return result;
+     };
     Object.assign(s,{x:-1,z:39,y:0,groundY:0,vy:0,dir:Math.PI/4,
       speed:9,travelSign:1,grounded:true,grinding:false,grindRail:null,
       grindCooldown:1,rampCooldown:1,airVX:null,airVZ:null,onRamp:false,
@@ -849,25 +864,17 @@ const server=http.createServer((req,res)=>{
   // Prove contact while still alongside the solid, not just at its far end.
   // This prevents a false positive from a rider who simply crosses z=43
   // without ever touching the wall. Sample live game state during rendering.
-  await page.waitForFunction(()=>{
-    const s=window.__SOL_DIAGNOSTICS__.state;
-    return s.z>39&&s.z<42&&s.x>=.65&&s.x<=.74&&s.grounded;
-  },null,{timeout:2400});
-  const wallContact=await page.evaluate(()=>{
-    const s=window.__SOL_DIAGNOSTICS__.state;
-    return {x:s.x,z:s.z,speed:s.speed,grounded:s.grounded};
-  });
+   await page.waitForFunction(()=>!!window.__wallQA.contact,null,{timeout:10000});
+   const wallContact=await page.evaluate(()=>window.__wallQA.contact);
   assert(wallContact.speed>3,'Wall contact must retain useful momentum: '+JSON.stringify(wallContact));
-  await page.screenshot({path:'test-artifacts/ledge-wall-contact.png',animations:'disabled'});
-  await page.waitForFunction(()=>{
-    const s=window.__SOL_DIAGNOSTICS__.state;
-    return s.z>43;
-  },null,{timeout:5500});
+   await page.screenshot({path:'test-artifacts/ledge-wall-followthrough.png',animations:'disabled'});
+   await page.waitForFunction(()=>!!window.__wallQA.exit,null,{timeout:15000});
   const wallSlide=await page.evaluate(()=>{
-    const s=window.__SOL_DIAGNOSTICS__.state;
-    return {x:s.x,z:s.z,speed:s.speed,grounded:s.grounded};
+     const qa=window.__wallQA;
+     window.SOLMotion.collide=qa.original;
+     return qa.exit;
   });
-  assert(wallSlide.x>=.65&&wallSlide.x<=.74&&wallSlide.speed>3&&wallSlide.grounded,
+  assert(wallSlide.x>=.65&&wallSlide.x<=.74&&wallSlide.z<43.5&&wallSlide.speed>3&&wallSlide.grounded,
     'Live WebGL skater must slide past ledge end without penetration: '+JSON.stringify(wallSlide));
   await page.screenshot({path:'test-artifacts/ledge-wall-slide.png',animations:'disabled'});
 
