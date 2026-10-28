@@ -97,8 +97,8 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    const pushLean=pose.pushing&&state.grounded?
     clamp((pose.contact||0)*.075+(pose.recovery||0)*.025,0,.085):0;
    status.pushLean=pushLean;
-   pelvis.rotationQuaternion=rest.get(pelvis).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.12:-pushLean*.5));
-   spine.rotationQuaternion=rest.get(spine).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.12:-pushLean))
+   pelvis.rotationQuaternion=rest.get(pelvis).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.18:-pushLean*.5));
+   spine.rotationQuaternion=rest.get(spine).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.48:-pushLean))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pose.pushing?(pose.contact||0)*.07:0)));
    const travel=state.travelSign===-1?-1:1;
    const lift=air?(flip?.22:actions.grabbing?.08:.15+takeoff*.12):0;
