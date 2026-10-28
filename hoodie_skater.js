@@ -76,7 +76,9 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    const crouch=clamp((pose.crouch||0)*.20+landing*.08+takeoff*.06+(actions.grabbing?.35:0),0,.46);
    rig.position.y=.33-lo*scale-.10-crouch-(pose.pushing?.18:0);
    rig.rotation.x=0;rig.rotation.z=0;
-   // Torso lean rotates the upper skeleton only; it cannot lift the planted feet.
+   // Bend from the hips during a grab so the shoulder can physically reach
+   // the moving deck; leg IK below re-plants both feet after this rotation.
+   pelvis.rotationQuaternion=rest.get(pelvis).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.95:0));
    spine.rotationQuaternion=rest.get(spine).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.80:0)).multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pose.contact||0)*.07));
    const travel=state.travelSign===-1?-1:1;
    const lift=air?(flip?.22:actions.grabbing?.10:.15+takeoff*.12):0;
