@@ -75,7 +75,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    for(const [n,r] of rest){n.position.copyFrom(r.p);n.rotationQuaternion=r.q.clone()}
    // In a grab, tuck the knees up toward the deck instead of curling the\n   // spine forward. Keep the chest comparatively upright as the hips lower;
    // hip/chest lean and arm IK still bring the hand onto the moving deck.
-   const crouch=clamp((pose.crouch||0)*.20+landing*.08+takeoff*.06+(actions.grabbing?.58:0),0,.72);
+   const crouch=clamp((pose.crouch||0)*.20+landing*.08+takeoff*.06+(actions.grabbing?.65:0),0,.78);
    rig.position.y=.33-lo*scale-.10-crouch-(pose.pushing?.18:0);
    rig.rotation.x=0;rig.rotation.z=0;
    // Bend from the hips during a grab so the shoulder can physically reach
