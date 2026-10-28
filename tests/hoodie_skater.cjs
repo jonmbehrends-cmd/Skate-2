@@ -17,6 +17,8 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
   assert(feet.every(f=>Math.abs(f[1]-.45)<.035),'Ride shoes must stay on deck');
   assert(Math.abs(feet[0][2]-.36)<.035&&Math.abs(feet[1][2]+.36)<.035,
    'Ride stance must stay centered and narrower than the old .86m split');
+  assert(rig.status.toeDirections.every(t=>t[0]>.8&&Math.abs(t[2])<.2),
+   'Both shoe toes must face across the deck even when the stance is banked: '+JSON.stringify(rig.status.toeDirections));
   assert(rig.status.legGeometry.every(g=>Number.isFinite(g.upper)&&Number.isFinite(g.lower)),
    'Leg IK must retain finite anatomical segment lengths');
  };
@@ -47,6 +49,8 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
   'Grab should tuck both knees above their neutral riding position');
  assert(rig.status.legGeometry.every(l=>l.hip[1]>l.foot[1]-.20&&l.hip[1]<l.foot[1]+.30),
   'Grab shoes must tuck near the hips rather than dangle below a seated pelvis');
+ assert(rig.status.toeDirections.every(t=>t[0]>.8&&Math.abs(t[2])<.2),
+  'Grab shoes must remain parallel across the deck: '+JSON.stringify(rig.status.toeDirections));
  assert(rig.status.footReachError.every(e=>e<.15),'Grab shoes must stay close to lifted deck targets: '+JSON.stringify({errors:rig.status.footReachError,feet:rig.status.feet,targets:rig.status.footTargets}));
  assert(rig.status.legGeometry.every(l=>l.knee[0]>l.hip[0]+.06&&l.knee[1]<l.hip[1]+.22),
   'Grab knees must flex forward near the hips, not fold up behind the torso: '+JSON.stringify(rig.status.legGeometry));
