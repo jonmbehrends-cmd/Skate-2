@@ -146,6 +146,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
       B.Vector3.Distance(localPosition(chain[1]),localPosition(chain[2]));
     const delta=targets[1].subtract(shoulder),distance=delta.length();
     const shortfall=Math.max(0,distance-reach+.055);
+    status.grabDebug={shoulder:shoulder.asArray(),target:targets[1].asArray(),reach,distance,hip:localPosition(pelvis).asArray(),chest:localPosition(spine).asArray()};
     grabReachShift=shortfall;
     if(shortfall>0&&distance>.0001){
      const shiftWorld=B.Vector3.TransformNormal(delta.scale(shortfall/distance),parent.computeWorldMatrix(true));
