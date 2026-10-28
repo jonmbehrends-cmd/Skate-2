@@ -1,0 +1,206 @@
+{
+  "browser": "140.0.7339.186",
+  "renderer": "SwiftShader software rendering",
+  "cases": {
+    "desktop-spawn": {
+      "before": {
+        "meshes": 428,
+        "activeMeshes": 103,
+        "drawCalls": 104,
+        "activeIndices": 114528
+      },
+      "after": {
+        "meshes": 341,
+        "activeMeshes": 103,
+        "drawCalls": 104,
+        "activeIndices": 114600
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    },
+    "desktop-park": {
+      "before": {
+        "meshes": 428,
+        "activeMeshes": 155,
+        "drawCalls": 156,
+        "activeIndices": 118170
+      },
+      "after": {
+        "meshes": 341,
+        "activeMeshes": 129,
+        "drawCalls": 130,
+        "activeIndices": 118314
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    },
+    "desktop-left-wall": {
+      "before": {
+        "meshes": 428,
+        "activeMeshes": 88,
+        "drawCalls": 89,
+        "activeIndices": 101394
+      },
+      "after": {
+        "meshes": 341,
+        "activeMeshes": 57,
+        "drawCalls": 58,
+        "activeIndices": 101574
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    },
+    "desktop-right-wall": {
+      "before": {
+        "meshes": 428,
+        "activeMeshes": 92,
+        "drawCalls": 93,
+        "activeIndices": 101124
+      },
+      "after": {
+        "meshes": 341,
+        "activeMeshes": 61,
+        "drawCalls": 62,
+        "activeIndices": 101232
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    },
+    "desktop-halfpipe": {
+      "before": {
+        "meshes": 428,
+        "activeMeshes": 122,
+        "drawCalls": 123,
+        "activeIndices": 110472
+      },
+      "after": {
+        "meshes": 341,
+        "activeMeshes": 95,
+        "drawCalls": 96,
+        "activeIndices": 110724
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    },
+    "mobile-spawn": {
+      "before": {
+        "meshes": 428,
+        "activeMeshes": 68,
+        "drawCalls": 68,
+        "activeIndices": 107660
+      },
+      "after": {
+        "meshes": 341,
+        "activeMeshes": 68,
+        "drawCalls": 68,
+        "activeIndices": 107660
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    },
+    "mobile-park": {
+      "before": {
+        "meshes": 428,
+        "activeMeshes": 88,
+        "drawCalls": 88,
+        "activeIndices": 106308
+      },
+      "after": {
+        "meshes": 341,
+        "activeMeshes": 78,
+        "drawCalls": 78,
+        "activeIndices": 106632
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    },
+    "mobile-left-wall": {
+      "before": {
+        "meshes": 428,
+        "activeMeshes": 73,
+        "drawCalls": 73,
+        "activeIndices": 98592
+      },
+      "after": {
+        "meshes": 341,
+        "activeMeshes": 45,
+        "drawCalls": 45,
+        "activeIndices": 98880
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    },
+    "mobile-right-wall": {
+      "before": {
+        "meshes": 428,
+        "activeMeshes": 71,
+        "drawCalls": 71,
+        "activeIndices": 95268
+      },
+      "after": {
+        "meshes": 341,
+        "activeMeshes": 42,
+        "drawCalls": 42,
+        "activeIndices": 95448
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    },
+    "mobile-halfpipe": {
+      "before": {
+        "meshes": 428,
+        "activeMeshes": 80,
+        "drawCalls": 80,
+        "activeIndices": 101378
+      },
+      "after": {
+        "meshes": 341,
+        "activeMeshes": 63,
+        "drawCalls": 63,
+        "activeIndices": 101594
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    }
+  }
+}
