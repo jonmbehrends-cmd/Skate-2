@@ -19,11 +19,29 @@ let browser;
   const ready=await page.evaluate(()=>{const d=__SOL_DIAGNOSTICS__;return {version:BABYLON.Engine.Version,build:__SOL_BUILD__,status:d.rig.status,active:d.rig.meshes.filter(m=>m.isEnabled()&&m.isVisible&&m.skeleton&&m.getTotalVertices()>0).length,legacy:d.scene.meshes.filter(m=>['torso','head','thigh','shin','shoe'].includes(m.name)&&m.isVisible).length}});
   assert.equal(ready.version,'8.32.1');assert.equal(ready.active,1);assert.equal(ready.legacy,0);assert.equal(ready.status.bones,19);
   await page.screenshot({path:path.join(out,'skeletal-'+label+'-spawn.png')});
-  // Real touch/keyboard actions drive the running production animation loop.
-  if(mobile)await page.locator('[data-t="push"]').dispatchEvent('pointerdown',{pointerId:1,pointerType:'touch',isPrimary:true});else await page.keyboard.down('w');
-  // PUSH is a short animation phase, not a persistent mode. Sample each render\n  // frame instead of polling at intervals that can miss its brief contact phase.\n  const sawPush=await page.evaluate(()=>new Promise(resolve=>{let frames=0;function sample(){if(window.__SOL_DIAGNOSTICS__?.rig?.status.mode==='push')return resolve(true);if(++frames>600)return resolve(false);requestAnimationFrame(sample)}requestAnimationFrame(sample)}));\n  assert(sawPush,'PUSH input must animate the production skeletal rider');
+  // The production PUSH control is the button, not keyboard W (W only steers throttle).
+  // Dispatch the same pointerdown handler for desktop and mobile, then observe the
+  // animation in a real running Chromium/WebGL frame rather than a mocked pose.
+  await page.locator('[data-t="push"]').dispatchEvent('pointerdown',{
+   pointerId:1,pointerType:mobile?'touch':'mouse',isPrimary:true
+  });
+  const sawPush=await page.evaluate(()=>new Promise(resolve=>{
+   let frames=0;
+   function sample(){
+    const d=window.__SOL_DIAGNOSTICS__;
+    if(d?.rig?.status.mode==='push')return resolve(true);
+    if(++frames>180)return resolve(false);
+    requestAnimationFrame(sample);
+   }
+   requestAnimationFrame(sample);
+  }));
+  assert(sawPush,'PUSH button must animate production rig: '+JSON.stringify(await page.evaluate(()=>({
+   input:__SOL_DIAGNOSTICS__.input(),
+   state:{grounded:__SOL_DIAGNOSTICS__.state.grounded,onRamp:__SOL_DIAGNOSTICS__.state.onRamp,speed:__SOL_DIAGNOSTICS__.state.speed,pushBurstUntil:__SOL_DIAGNOSTICS__.state.pushBurstUntil},
+   rig:__SOL_DIAGNOSTICS__.rig.status.mode
+  }))));
   await page.screenshot({path:path.join(out,'skeletal-'+label+'-push.png')});
-  if(!mobile)await page.keyboard.up('w');
+  await page.locator('[data-t="push"]').dispatchEvent('pointerup',{pointerId:1,pointerType:mobile?'touch':'mouse'});
   await page.locator('[data-t="kick"]').click();
   await page.waitForFunction(()=>__SOL_DIAGNOSTICS__.rig.status.mode==='flip');
   await page.waitForFunction(()=>__SOL_DIAGNOSTICS__.state.grounded,null,{timeout:15000});
