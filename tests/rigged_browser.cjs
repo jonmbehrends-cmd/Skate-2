@@ -49,9 +49,10 @@ let browser;
   // scene, with physics paused only while taking deterministic inspection views.
   await page.evaluate(()=>{const d=__SOL_DIAGNOSTICS__,B=BABYLON;d.engine.stopRenderLoop();d.skater.position.set(0,0,0);d.skater.rotation.set(0,0,0);d.scene.activeCamera=new B.ArcRotateCamera('rig QA',-.9,1.25,4.3,new B.Vector3(0,1.2,0),d.scene);d.scene.getTransformNodeByName('rider terrain stance').rotation.set(0,0,0);d.scene.getTransformNodeByName('board pivot').rotation.set(0,0,0)});
   const signatures=[];
-  for(const mode of ['ride','push','crouch','flip','grab','grind','landing']){
+  for(const mode of ['ride','push','crouch','ollie','flip','grab','grind','landing']){
    const evidence=await page.evaluate(mode=>{const d=__SOL_DIAGNOSTICS__,state={grounded:['ride','push','crouch','landing'].includes(mode),speed:5,travelSign:1,flip:mode==='flip'?1:0};const pose={crouch:mode==='crouch'?.23:.1,pushing:mode==='push',contact:.8};d.rig.update(state,pose,{grabbing:mode==='grab',grinding:mode==='grind'});d.scene.render();return {status:d.rig.status,matrices:Array.from(d.rig.skeletons[0].getTransformMatrices(d.rig.meshes[0])),vertices:d.rig.meshes[0].getTotalVertices()};},mode);
-   assert(evidence.vertices>100);assert(evidence.matrices.every(Number.isFinite));signatures.push(JSON.stringify(evidence.matrices));
+   assert(evidence.vertices>100);assert(evidence.matrices.every(Number.isFinite));
+   if(mode==='ollie')assert.equal(evidence.status.mode,'ollie','Takeoff pose must render in Chromium');signatures.push(JSON.stringify(evidence.matrices));
    await page.screenshot({path:path.join(out,'skeletal-'+label+'-'+mode+'-closeup.png')});
    if(mode==='grab')assert(Math.hypot(...evidence.status.hands[1].map((n,i)=>n-evidence.status.grip[i]))<.08,'Hand must reach deck');
   }
@@ -62,5 +63,5 @@ let browser;
  const fallback=await browser.newPage();await fallback.route('**/CesiumMan.glb',r=>r.abort());await fallback.goto(url);await fallback.waitForFunction(()=>window.__SOL_DIAGNOSTICS__);await fallback.waitForTimeout(1000);
  assert(await fallback.evaluate(()=>!__SOL_DIAGNOSTICS__.rig&&__SOL_DIAGNOSTICS__.riderV2?.meshes.some(m=>m.isVisible&&m.isEnabled()&&m.skeleton&&m.getTotalVertices()>0)),'GLB load failure must preserve visible, skinned V2 fallback');
  await fallback.close();
- fs.writeFileSync(path.join(out,'skeletal-result.json'),JSON.stringify({url,result:'PASS',commit:process.env.GITHUB_SHA,results},null,2));console.log('PASS desktop/mobile Chromium: real GLB, skin deformation, gameplay push/flip/landing, seven poses, fallback, no startup errors');
+ fs.writeFileSync(path.join(out,'skeletal-result.json'),JSON.stringify({url,result:'PASS',commit:process.env.GITHUB_SHA,results},null,2));console.log('PASS desktop/mobile Chromium: real GLB, skin deformation, gameplay push/flip/landing, eight poses including ollie, fallback, no startup errors');
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(async()=>{if(browser)await browser.close();server.close()});
