@@ -96,6 +96,21 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     // Grip is attached to the actual moving deck, including a simultaneous flip.
     targets[1]=options.board?B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.23,.30,-.15),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):v(.23,.30,-.15);
    }
+   if(actions.grabbing){
+    // Two-bone IK cannot reach a deck below the shoulder if the torso stays
+    // upright. Bring the chest toward the board only by the missing reach,
+    // preserving both upper-arm and forearm lengths (no telescoping limbs).
+    const chain=arms[1].n,shoulder=localPosition(chain[0]);
+    const reach=B.Vector3.Distance(shoulder,localPosition(chain[1]))+
+      B.Vector3.Distance(localPosition(chain[1]),localPosition(chain[2]));
+    const delta=targets[1].subtract(shoulder),distance=delta.length();
+    const shortfall=Math.max(0,distance-reach+.055);
+    if(shortfall>0&&distance>.0001){
+     const shiftWorld=B.Vector3.TransformNormal(delta.scale(shortfall/distance),parent.computeWorldMatrix(true));
+     const shiftLocal=B.Vector3.TransformNormal(shiftWorld,B.Matrix.Invert(spine.parent.computeWorldMatrix(true)));
+     spine.position.addInPlace(shiftLocal);spine.computeWorldMatrix(true);
+    }
+   }
    for(let i=0;i<arms.length;i++)solve(arms[i].n,targets[i],v(.65,1.0-crouch,i===0?.6:-.6));
    status.feet=legs.map(l=>localPosition(l.n[2]).asArray());status.hands=arms.map(l=>localPosition(l.n[2]).asArray());
    status.legGeometry=legs.map(l=>{const p=l.n.map(localPosition);return {hip:p[0].asArray(),knee:p[1].asArray(),foot:p[2].asArray(),upper:B.Vector3.Distance(p[0],p[1]),lower:B.Vector3.Distance(p[1],p[2])}});
