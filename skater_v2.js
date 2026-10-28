@@ -53,6 +53,7 @@ function attach(B,scene,rig){
   // Ollies are board-and-rider jumps: keep both soles on the deck and tuck the
   // pelvis over planted feet rather than lifting the shoes off the skateboard.
   const ollieTuck=ollie?Math.sin(Math.PI*Math.min(1,Math.max(0,(state.airTime||0))/.55))*.13:0;
+  own.ollieTuck=ollieTuck;
   const anchor=point(0,1.19+rig.body.position.y-own.landing*.10-(grabbing?.35:0)-ollieTuck,0,stance);
   base.setTranslation(base.getTranslation().add(anchor.subtract(pelvis)));
   for(const name of Object.keys(bones))set(name,bind[name].multiply(base));
