@@ -47,8 +47,13 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
   'Grab should stagger the leading and trailing shoes rather than make a symmetric seated pose');
  assert(rig.status.feet.every(f=>f[1]>.50),
   'Grab should tuck both knees above their neutral riding position');
- assert(rig.status.legGeometry.every(l=>l.hip[1]>l.foot[1]-.20&&l.hip[1]<l.foot[1]+.30),
-  'Grab shoes must tuck near the hips rather than dangle below a seated pelvis');
+ // Visual acceptance guard: prior numerical IK tests passed while the
+ // rendered skater sat on the deck and the chest was translated into the hips.
+ // Do not approve this draft merely because hand/ankle targets were reached.
+ assert(rig.status.anatomy.hipClearance>.20,
+  'VISUAL BLOCKER: pelvis must remain visibly above shoes, not seated on the deck: '+JSON.stringify(rig.status.anatomy));
+ assert(rig.status.anatomy.torsoHeight>.30&&rig.status.anatomy.chestShift<.20,
+  'VISUAL BLOCKER: grab must preserve torso length rather than crush the chest: '+JSON.stringify(rig.status.anatomy));
  assert(rig.status.toeDirections.every(t=>Math.abs(t[0])>.8&&Math.abs(t[2])<.2)&&rig.status.toeDirections[0][0]*rig.status.toeDirections[1][0]>.64,
   'Grab shoes must remain parallel across the deck: '+JSON.stringify(rig.status.toeDirections));
  assert(rig.status.footReachError.every(e=>e<.15),'Grab shoes must stay close to lifted deck targets: '+JSON.stringify({errors:rig.status.footReachError,feet:rig.status.feet,targets:rig.status.footTargets}));
