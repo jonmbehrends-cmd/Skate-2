@@ -5,7 +5,7 @@ class Texture{
  getContext(){const noop=()=>{};return {fillRect:noop,save:noop,restore:noop,translate:noop,rotate:noop,beginPath:noop,moveTo:noop,lineTo:noop,stroke:noop,fillText:noop}}
  update(){}
 }
-function mesh(name){const m={name,position:{set(x,y,z){this.x=x;this.y=y;this.z=z}},rotation:{},dispose(){this.disposed=true}};meshes.push(m);return m}
+function mesh(name){const m={name,position:{set(x,y,z){this.x=x;this.y=y;this.z=z}},rotation:{},scaling:{x:1,y:1,z:1},dispose(){this.disposed=true}};meshes.push(m);return m}
 class Color3{constructor(r,g,b){this.r=r;this.g=g;this.b=b}static FromHexString(hex){return hex}}
 const B={PBRMaterial:Material,StandardMaterial:Material,DynamicTexture:Texture,
  Color3,Material:{MATERIAL_OPAQUE:0},
@@ -18,6 +18,8 @@ for(const name of ['perimeter concrete pilaster','wall-washer steel housing','wa
  assert(items.every(m=>Math.abs(m.position.x)>118),'Fixtures must stay outside the skating lanes');
  assert(items.every(m=>m.isPickable===false&&m.checkCollisions===false),'Visual details must never affect physics');
 }
+assert(named('park perimeter painted mural').every(m=>m.scaling.x===-1),
+ 'Interior-facing mural lettering must not be mirrored');
 const lens=materials.find(m=>m.name==='warm wall-washer lens');
 assert(lens&&lens.alpha===1&&lens.transparencyMode===B.Material.MATERIAL_OPAQUE&&lens.forceDepthWrite===true,
  'Wall lights must be fully opaque and depth writing');
