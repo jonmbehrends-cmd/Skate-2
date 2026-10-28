@@ -191,6 +191,13 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    status.legGeometry=legs.map(l=>{const p=l.n.map(localPosition);return {hip:p[0].asArray(),knee:p[1].asArray(),foot:p[2].asArray(),upper:B.Vector3.Distance(p[0],p[1]),lower:B.Vector3.Distance(p[1],p[2])}});
    status.grip=actions.grabbing?targets[1].asArray():null;
    status.grabReachShift=grabReachShift;
+   // Acceptance metrics are measured AFTER arm IK. A successful ankle/hand
+   // target is insufficient if the torso collapses or the hips sit on shoes.
+   status.anatomy={
+    hipClearance:Math.min(...status.legGeometry.map(l=>l.hip[1]-l.foot[1])),
+    torsoHeight:localPosition(spine).y-localPosition(pelvis).y,
+    chestShift:grabReachShift
+   };
   }
   update({grounded:true,speed:0},{crouch:0});
   for(const mesh of meshes){mesh.receiveShadows=true;mesh.alwaysSelectAsActiveMesh=true;options.shadow?.addShadowCaster(mesh)}
