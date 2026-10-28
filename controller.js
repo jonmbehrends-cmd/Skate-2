@@ -5,6 +5,7 @@
   let lastButtons = [];
   let rightArmed = true;
   let lastFlick = -Infinity;
+  let suspended = false;
   const deadzone = value => {
     const v = Number.isFinite(value) ? value : 0;
     return Math.abs(v) < .16 ? 0 : Math.sign(v) * Math.min(1, (Math.abs(v) - .16) / .84);
@@ -19,6 +20,9 @@
     lastFlick = -Infinity;
   }
   function poll(onTrick, now) {
+    if (suspended) {
+      return { x: 0, y: 0, boost: false, grabHeld: false, connected: false, status: '🎮 Controls paused' };
+    }
     const time = Number.isFinite(now) ? now : performance.now();
     // Embedded browsers may deny Gamepad API access. Touch/keyboard must keep running.
     let pads=[];
@@ -61,5 +65,9 @@
       status: '🎮 ' + (/xbox/i.test(pad.id || '') ? 'Xbox connected' : 'Controller connected') + ' · LS steer · RT push · LB grind · R3 boardslide · RB grab · RS flick'
     };
   }
-  root.SOLPad = { poll, reset, deadzone };
+  function setSuspended(value) {
+    suspended = !!value;
+    if (suspended) reset();
+  }
+  root.SOLPad = { poll, reset, deadzone, setSuspended };
 })(window);

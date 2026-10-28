@@ -6,6 +6,10 @@ Galaxy-first skateboarding prototype using **Babylon.js/WebGL** with a third-per
 
 Open the GitHub Pages build at https://jonmbehrends-cmd.github.io/Skate-2/ in Samsung Internet or Chrome. The page loads Babylon.js from its CDN, so internet access is required. If WebGL or the CDN fails, use the legacy prototype for troubleshooting.
 
+Use the in-game **Controls** button for keyboard, touch, and Xbox mappings. The
+help dialog opens over the game, releases active inputs, and closes with Escape
+or its Close/Done buttons.
+
 ## Xbox Bluetooth controller (Standard Gamepad mapping)
 
 - **Left stick**: steer (horizontal) and accelerate/brake (vertical).
@@ -30,6 +34,7 @@ Pair the controller with Android before launching. Some Android browser/controll
 - Optional local Galaxy-sized Chromium touch emulation can exercise the physics module. This is not a physical Android/Xbox test.
 - GitHub Actions workflow `.github/workflows/deploy.yml` publishes the repository on pushes to `main`, if Pages is configured for GitHub Actions.
 - `window.__SOL_DIAGNOSTICS__` exposes the Babylon scene and simulation state for browser testing.
+- With Playwright and Chromium installed, run `node tests/controls_help_browser.cjs` to verify help-panel focus, Escape, touch operation, input release, and gameplay resume. Desktop/mobile screenshots are saved under `qa/controls-help/`.
 
 ## Ramp and rider graphics verification
 
