@@ -50,6 +50,11 @@ jobs:
             meshes:gltf.meshes?.map(m=>({name:m.name,primitives:m.primitives?.length})),
             nodes:gltf.nodes?.map((n,i)=>({i,name:n.name,mesh:n.mesh,skin:n.skin,children:n.children})),
             animations:gltf.animations?.map(a=>({name:a.name,channels:a.channels.length})),
-            materials:gltf.materials?.map(m=>m.name)
+            materials:gltf.materials?.map(m=>m.name),
+            images:gltf.images?.map(i=>({name:i.name,uri:i.uri,mimeType:i.mimeType,bufferView:i.bufferView})),
+            textures:gltf.textures?.map(t=>({name:t.name,source:t.source})),
+            rootNode:gltf.nodes?.[0],
+            animationLengths:gltf.animations?.filter(a=>a.name.startsWith('skate')).map(a=>({name:a.name,duration:Math.max(...a.samplers.map(s=>gltf.accessors[s.input]?.max?.[0]||0))})),
+            meshBounds:gltf.meshes?.map(m=>m.primitives?.map(p=>({min:gltf.accessors[p.attributes.POSITION]?.min,max:gltf.accessors[p.attributes.POSITION]?.max})))
           },null,2));
           NODE
