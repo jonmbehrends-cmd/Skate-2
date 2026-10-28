@@ -456,10 +456,23 @@ const server=http.createServer((req,res)=>{
      grounded:true,grinding:false,travelSign:1,flip:0,spin:0,count:0,
      combo:0,grabUntil:0,grabHeld:false,touchGrabHeld:false,grindCooldown:0});
    });
+   await page.evaluate(()=>{
+    window.__qaTouchOutcome=null;
+    const d=window.__SOL_DIAGNOSTICS__;
+    window.__qaTouchObserver=d.scene.onAfterRenderObservable.add(()=>{
+     const s=d.state;
+     if(!window.__qaTouchOutcome&&!s.grounded&&s.vy>0&&s.count>0)
+      window.__qaTouchOutcome={airborne:true,vy:s.vy,flip:s.flip,spin:s.spin,count:s.count,name:s.name};
+    });
+   });
    await page.locator('[data-t="'+name+'"]').click();
-   const outcome=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
-    return {airborne:!s.grounded,vy:s.vy,flip:s.flip,spin:s.spin,
-     count:s.count,name:s.name};});
+   await page.waitForFunction(()=>window.__qaTouchOutcome!==null,null,{timeout:6000});
+   const {outcome,finalCount}=await page.evaluate(()=>{
+    const d=window.__SOL_DIAGNOSTICS__;
+    d.scene.onAfterRenderObservable.remove(window.__qaTouchObserver);
+    return {outcome:window.__qaTouchOutcome,finalCount:d.state.count};
+   });
+   assert.equal(finalCount,expectedCount,'Pointerdown and compatibility click must not duplicate '+name);
    assert(outcome.airborne&&outcome.vy>0&&outcome.flip===expectedFlip&&
     outcome.spin===expectedSpin&&outcome.count===expectedCount,
     'Mobile '+name+' must activate once with correct physics: '+JSON.stringify(outcome));
