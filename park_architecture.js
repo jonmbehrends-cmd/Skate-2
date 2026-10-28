@@ -90,6 +90,27 @@ function build(B,scene,ramps){
  for(const x of [-112,112]){
   for(let z=-116;z<126;z+=12)cube('perimeter safety line',x,.12,z,.18,.016,9,yellow);
  }
+ // Subtle poured-in wayfinding strips connect the existing obstacle zones in
+ // the wide overhead view. These are paint, NOT new ramps or collision paths:
+ // keep them just above the flat plaza slab, beneath any raised skate surface.
+ const flowTeal=material('flow guide inlaid teal','#477a80',true);
+ const flowOchre=material('flow guide inlaid ochre','#b28d59',true);
+ for(const m of [flowTeal,flowOchre]){
+  m.alpha=1;m.transparencyMode=B.Material.MATERIAL_OPAQUE;
+  m.forceDepthWrite=true;
+ }
+ function paintedRoute(points,paint){
+  for(let i=1;i<points.length;i++){
+   const [ax,az]=points[i-1],[bx,bz]=points[i];
+   const dx=bx-ax,dz=bz-az,length=Math.hypot(dx,dz);
+   const stripe=cube('plaza painted flow guide',(ax+bx)/2,-.035,(az+bz)/2,.16,.012,length,paint);
+   stripe.rotation.y=Math.atan2(dx,dz);
+  }
+ }
+ // The two through-park corridors pass the halfpipe, banks and far quarters;
+ // ramps themselves remain higher and occlude these ground-level paint lines.
+ paintedRoute([[-94,-99],[-94,-55],[-65,-32],[-16,0],[17,46],[52,74],[94,103]],flowTeal);
+ paintedRoute([[94,-100],[90,-63],[47,-23],[25,8],[-6,48],[-43,84],[-94,109]],flowOchre);
  // Architectural walls and acoustic panels, outside the active skateable park.
  for(const x of [-119,119]){
   for(let z=-100;z<=100;z+=20){

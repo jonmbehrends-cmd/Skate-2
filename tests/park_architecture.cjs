@@ -20,6 +20,20 @@ for(const name of ['perimeter concrete pilaster','wall-washer steel housing','wa
 }
 assert(named('park perimeter painted mural').every(m=>m.scaling.x===-1),
  'Interior-facing mural lettering must not be mirrored');
+const flow=named('plaza painted flow guide');
+assert.equal(flow.length,12,'Two six-segment ground-level flow corridors');
+assert(flow.every(m=>Math.abs(m.position.x)<112&&Math.abs(m.position.z)<120),
+ 'Painted routes must remain inside the retaining walls');
+assert(flow.every(m=>m.position.y<0&&Number.isFinite(m.rotation.y)),
+ 'Flow stripes must sit on the flat plaza with finite orientation');
+assert(flow.every(m=>m.isPickable===false&&m.checkCollisions===false),
+ 'Paint must never affect raycasts, wheels, or skating physics');
+for(const name of ['flow guide inlaid teal','flow guide inlaid ochre']){
+ const mat=materials.find(m=>m.name===name);
+ assert(mat&&mat.alpha===1&&mat.forceDepthWrite===true&&
+  mat.transparencyMode===B.Material.MATERIAL_OPAQUE,
+  'Flow paint must remain opaque and depth-writing: '+name);
+}
 const lens=materials.find(m=>m.name==='warm wall-washer lens');
 assert(lens&&lens.alpha===1&&lens.transparencyMode===B.Material.MATERIAL_OPAQUE&&lens.forceDepthWrite===true,
  'Wall lights must be fully opaque and depth writing');
