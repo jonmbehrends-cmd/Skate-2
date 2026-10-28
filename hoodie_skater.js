@@ -73,9 +73,9 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    const mode=actions.grinding?'grind':actions.grabbing?'grab':flip?'flip':air&&takeoff>.05?'ollie':air?'air':landing>.05?'landing':pose.pushing?'push':(pose.crouch||0)>.1?'crouch':Math.abs(state.speed)>1?'ride':'idle';
    status.mode=mode;
    for(const [n,r] of rest){n.position.copyFrom(r.p);n.rotationQuaternion=r.q.clone()}
-   // Keep the grab athletic with a modest knee bend, not a deep squat;
+   // In a grab, tuck the knees up toward the deck instead of curling the\n   // spine forward. Keep the chest comparatively upright as the hips lower;
    // hip/chest lean and arm IK still bring the hand onto the moving deck.
-   const crouch=clamp((pose.crouch||0)*.20+landing*.08+takeoff*.06+(actions.grabbing?.20:0),0,.46);
+   const crouch=clamp((pose.crouch||0)*.20+landing*.08+takeoff*.06+(actions.grabbing?.58:0),0,.72);
    rig.position.y=.33-lo*scale-.10-crouch-(pose.pushing?.18:0);
    rig.rotation.x=0;rig.rotation.z=0;
    // Bend from the hips during a grab so the shoulder can physically reach
@@ -86,8 +86,8 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    const pushLean=pose.pushing&&state.grounded?
     clamp((pose.contact||0)*.075+(pose.recovery||0)*.025,0,.085):0;
    status.pushLean=pushLean;
-   pelvis.rotationQuaternion=rest.get(pelvis).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.14:-pushLean*.5));
-   spine.rotationQuaternion=rest.get(spine).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.16:-pushLean))
+   pelvis.rotationQuaternion=rest.get(pelvis).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.12:-pushLean*.5));
+   spine.rotationQuaternion=rest.get(spine).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.12:-pushLean))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pose.pushing?(pose.contact||0)*.07:0)));
    const travel=state.travelSign===-1?-1:1;
    const lift=air?(flip?.22:actions.grabbing?.10:.15+takeoff*.12):0;
