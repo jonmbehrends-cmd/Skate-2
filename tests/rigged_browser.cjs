@@ -21,7 +21,7 @@ let browser;
   await page.screenshot({path:path.join(out,'skeletal-'+label+'-spawn.png')});
   // Real touch/keyboard actions drive the running production animation loop.
   if(mobile)await page.locator('[data-t="push"]').dispatchEvent('pointerdown',{pointerId:1,pointerType:'touch',isPrimary:true});else await page.keyboard.down('w');
-  await page.waitForFunction(()=>__SOL_DIAGNOSTICS__.rig.status.mode==='push',null,{timeout:10000});
+  // PUSH is a short animation phase, not a persistent mode. Sample each render\n  // frame instead of polling at intervals that can miss its brief contact phase.\n  const sawPush=await page.evaluate(()=>new Promise(resolve=>{let frames=0;function sample(){if(window.__SOL_DIAGNOSTICS__?.rig?.status.mode==='push')return resolve(true);if(++frames>600)return resolve(false);requestAnimationFrame(sample)}requestAnimationFrame(sample)}));\n  assert(sawPush,'PUSH input must animate the production skeletal rider');
   await page.screenshot({path:path.join(out,'skeletal-'+label+'-push.png')});
   if(!mobile)await page.keyboard.up('w');
   await page.locator('[data-t="kick"]').click();
