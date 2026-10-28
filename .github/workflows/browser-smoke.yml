@@ -11,7 +11,7 @@ concurrency:
   # Keep QA for each PR independent from main's screenshot-publishing run.
   # A single repository-wide pending slot caused PR validation to be cancelled
   # when unrelated commits arrived, even with cancel-in-progress disabled.
-  group: sol-skate-browser-qa-${{ github.ref }}
+  group: "sol-skate-browser-qa-${{ github.ref }}"
   cancel-in-progress: false
 jobs:
   browser-smoke:
