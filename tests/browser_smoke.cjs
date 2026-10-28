@@ -115,6 +115,29 @@ const server=http.createServer((req,res)=>{
   await page.goto('http://127.0.0.1:'+server.address().port+'/',{waitUntil:'domcontentloaded',timeout:30000});
   try{await page.waitForFunction(()=>!!window.__SOL_DIAGNOSTICS__,null,{timeout:30000});}
   catch(e){const startup=await page.evaluate(()=>({error:document.querySelector('#error')?.textContent,babylon:!!window.BABYLON,grind:!!window.SOLGrind,html:document.readyState}));throw Error('Game startup failed: '+JSON.stringify({startup,errors,cause:String(e)}));}
+  // Touch regression: every visible control must receive a tap at its center
+  // across compact Android screens. A visually present but covered button is
+  // functionally broken (as the original HALFPIPE/RESTART overlap showed).
+  const touchHitTargets=[];
+  for(const [width,height] of [[320,568],[360,740],[390,844],[430,932]]){
+   await page.setViewportSize({width,height});
+   const targets=await page.evaluate(()=>{
+    const controls=[...document.querySelectorAll('#buttons button'),'#halfpipe','#restart']
+      .map(el=>typeof el==='string'?document.querySelector(el):el);
+    return controls.map(el=>{
+     const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;
+     const hit=document.elementFromPoint(x,y);
+     return {name:el.dataset.t||el.id,x:Math.round(x),y:Math.round(y),
+      visible:getComputedStyle(el).visibility!=='hidden'&&getComputedStyle(el).display!=='none',
+      inside:r.left>=0&&r.top>=0&&r.right<=innerWidth&&r.bottom<=innerHeight,
+      tappable:hit===el||el.contains(hit),cover:hit?.id||hit?.dataset?.t||hit?.tagName};
+    });
+   });
+   const blocked=targets.filter(t=>!t.visible||!t.inside||!t.tappable);
+   assert.deepEqual(blocked,[],'Mobile touch controls blocked at '+width+'x'+height+': '+JSON.stringify(blocked));
+   touchHitTargets.push({width,height,controls:targets.length});
+  }
+  await page.setViewportSize({width:390,height:844});
   await page.waitForTimeout(1200);
   // Apparel is visual-only: all 24 details must be attached to animated joints
   // and must not intercept ramp raycasts or alter collision behavior.
@@ -921,6 +944,6 @@ const server=http.createServer((req,res)=>{
   await page.screenshot({path:'test-artifacts/ledge-wall-slide.png',animations:'disabled'});
 
   assert.equal(errors.length,0,'Browser errors: '+errors.join('; '));
-  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',controllerQA,gamepadIntegration,visualQA,facadeQA,wallContact,wallSlide,spawnView,spawnPixels,cheekNormals,impactNormals,rampGravity,screenshotQA,floorOcclusionQA,status,spin,push,touchTricks,clickFallback,riding,vertStart,vertAir,vertLanding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
+  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',touchHitTargets,controllerQA,gamepadIntegration,visualQA,facadeQA,wallContact,wallSlide,spawnView,spawnPixels,cheekNormals,impactNormals,rampGravity,screenshotQA,floorOcclusionQA,status,spin,push,touchTricks,clickFallback,riding,vertStart,vertAir,vertLanding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
  }finally{await browser.close()}
 })().catch(e=>{fs.mkdirSync('test-artifacts',{recursive:true});fs.writeFileSync('test-artifacts/browser-result.txt','FAIL: '+(e&&e.stack||String(e)));console.error(e);process.exitCode=1}).finally(()=>server.close());
