@@ -80,8 +80,8 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    rig.rotation.x=0;rig.rotation.z=0;
    // Bend from the hips during a grab so the shoulder can physically reach
    // the moving deck; leg IK below re-plants both feet after this rotation.
-   pelvis.rotationQuaternion=rest.get(pelvis).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.35:0));
-   spine.rotationQuaternion=rest.get(spine).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.40:0)).multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pose.contact||0)*.07));
+   pelvis.rotationQuaternion=rest.get(pelvis).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.25:0));
+   spine.rotationQuaternion=rest.get(spine).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.30:0)).multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pose.contact||0)*.07));
    const travel=state.travelSign===-1?-1:1;
    const lift=air?(flip?.22:actions.grabbing?.10:.15+takeoff*.12):0;
    for(let i=0;i<legs.length;i++){
