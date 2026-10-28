@@ -582,19 +582,20 @@ const server=http.createServer((req,res)=>{
    document.querySelector('#buttons').style.display='';
    document.querySelector('[data-t="grind"]').dispatchEvent(
     new PointerEvent('pointerdown',{bubbles:true,pointerId:31,pointerType:'touch'}));
-   return {grinding:s.grinding,kind:s.grindRail?.kind,vy:s.vy,y:s.y,wallY};
+   // Advance in the same browser task as capture: an intervening
+   // requestAnimationFrame can move the rider up the wall and invalidate
+   // the original wall-height baseline without any gameplay defect.
+   const initialY=s.y,top=s.grindRail?.y,kind=s.grindRail?.kind,vy=s.vy;
+   for(let i=0;i<15;i++)window.SOLGrind.advance(s,1/60);
+   return {grinding:s.grinding,kind,vy,y:s.y,wallY,
+    entry:{initialY,top,finalY:s.y,grinding:s.grinding}};
   });
   assert(touchCoping.grinding&&touchCoping.kind==='bowl-coping'&&touchCoping.vy===0,
    'GRIND touch control must catch bowl coping without forcing ollie: '+JSON.stringify(touchCoping));
   // Coping capture from a near-vertical wall must not teleport the skater
   // more than a metre upward in a single input frame. The board eases onto
   // the lip over the first 0.22s while staying attached to the circular rail.
-  const copingEntry=await page.evaluate(()=>{
-   const s=window.__SOL_DIAGNOSTICS__.state;
-   const initialY=s.y,top=s.grindRail.y;
-   for(let i=0;i<15;i++)window.SOLGrind.advance(s,1/60);
-   return {initialY,top,finalY:s.y,grinding:s.grinding};
-  });
+  const copingEntry=touchCoping.entry;
   assert(Math.abs(copingEntry.initialY-touchCoping.wallY)<.05&&
    Math.abs(copingEntry.finalY-copingEntry.top)<.02&&copingEntry.grinding,
    'Coping must blend smoothly from the wall to the steel rim: '+JSON.stringify(copingEntry));
