@@ -48,6 +48,8 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  assert(rig.status.legGeometry.every(l=>l.hip[1]>l.foot[1]-.20&&l.hip[1]<l.foot[1]+.30),
   'Grab shoes must tuck near the hips rather than dangle below a seated pelvis');
  assert(rig.status.footReachError.every(e=>e<.15),'Grab shoes must stay close to lifted deck targets: '+JSON.stringify({errors:rig.status.footReachError,feet:rig.status.feet,targets:rig.status.footTargets}));
+ assert(rig.status.legGeometry.every(l=>l.knee[0]>l.hip[0]+.06&&l.knee[1]<l.hip[1]+.22),
+  'Grab knees must flex forward near the hips, not fold up behind the torso: '+JSON.stringify(rig.status.legGeometry));
  console.log('GRAB_REACH_GEOMETRY',JSON.stringify({...rig.status.grabDebug,footReachError:rig.status.footReachError,feet:rig.status.feet}));
  assert(Number.isFinite(rig.status.grabReachShift)&&rig.status.grabReachShift<.45,
   'Grab should not translate the chest excessively: '+rig.status.grabReachShift);
