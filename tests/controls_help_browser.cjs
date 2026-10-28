@@ -114,6 +114,19 @@ async function main() {
     assert(desktopContent.scrollHeight <= desktopContent.clientHeight + 1,
       `Desktop help content must not be clipped: ${JSON.stringify(desktopContent)}`);
     assert.equal(await dialog.locator(':focus').getAttribute('aria-label'), 'Close controls help');
+    const padding = await dialog.boundingBox();
+    const paddingPoint = { x: padding.x + 8, y: padding.y + padding.height / 2 };
+    assert.equal(await desktop.evaluate(p => document.elementFromPoint(p.x, p.y).id, paddingPoint),
+      'controls-help-dialog', 'Padding test must hit the dialog itself');
+    await desktop.mouse.click(paddingPoint.x, paddingPoint.y);
+    assert.equal(await dialog.evaluate(el => el.open), true, 'Clicking dialog padding must keep help open');
+    assert.match(await desktop.evaluate(() => SOLPad.poll(() => {}).status), /paused/);
+    await desktop.mouse.click(padding.x - 8, padding.y + padding.height / 2);
+    assert.equal(await dialog.evaluate(el => el.open), false, 'Real backdrop click must close help');
+    assert.equal(await toggle.getAttribute('aria-expanded'), 'false');
+    assert.equal(await desktop.evaluate(() => document.activeElement.id), 'controls-help-toggle');
+    assert.doesNotMatch(await desktop.evaluate(() => SOLPad.poll(() => {}).status), /paused/);
+    await toggle.click();
     const released = await desktop.evaluate(() => {
       const d = window.__SOL_DIAGNOSTICS__;
       return {
@@ -247,7 +260,26 @@ async function main() {
       return {overflow:el.scrollHeight>el.clientHeight,childTouch:getComputedStyle(child).touchAction};
     });
     assert.equal(scroll.childTouch,'pan-y','Text must allow finger scrolling');
+    assert(scroll.overflow, 'Landscape dialog must overflow to exercise native scrolling');
     if(scroll.overflow){
+      for (const key of ['ArrowDown', 'PageDown']) {
+        await landscape.keyboard.press(key);
+        // Wait for the native animation to reach its destination before the next key.
+        await landscape.waitForFunction(key => {
+          const el = document.querySelector('#controls-help-dialog');
+          return el.scrollTop >= Math.min(key === 'ArrowDown' ? 39 : el.scrollHeight - el.clientHeight - 1,
+            el.scrollHeight - el.clientHeight - 1);
+        }, key, { timeout: 10000 }).catch(error => {
+            throw new Error(`${key} must scroll the open dialog: ${error.message}`);
+          });
+      }
+      await landscape.keyboard.down('w');
+      await landscape.keyboard.press('g');
+      await landscape.keyboard.press('r');
+      assert.deepEqual(await landscape.evaluate(() => window.__SOL_DIAGNOSTICS__.input().keyboard), {x:0,y:0});
+      assert.equal(await landscape.evaluate(() => window.__SOL_DIAGNOSTICS__.state.grindRequestUntil), 0);
+      await landscape.keyboard.up('w');
+      await landscape.locator('#controls-help-dialog').evaluate(el => { el.scrollTop = 0; });
       const session=await landscape.context().newCDPSession(landscape);
       const box=await landscape.locator('#controls-help-dialog').boundingBox();
       const x=box.x+box.width*.6,y=box.y+box.height*.8;
