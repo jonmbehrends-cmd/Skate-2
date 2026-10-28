@@ -11,8 +11,10 @@
   let helpOpen = false;
   let previousGrounded = null;
   let previousGrinding = false;
-  let nextWheelAt = 0;
-  let nextGrindAt = 0;
+  let nextWheelAtMs = 0;
+  let nextGrindAtMs = 0;
+  const grindEntryIntervalMs = 120;
+  const grindRepeatIntervalMs = 130;
 
   const style = document.createElement('link');
   style.rel = 'stylesheet';
@@ -119,7 +121,7 @@
     if (!context || !master || !canResume() || context.state !== 'running') return;
 
     const amount = Math.max(0, Math.min(1, intensity));
-    const now = context.currentTime;
+    const audioTimeSeconds = context.currentTime;
     const oscillator = context.createOscillator();
     const envelope = context.createGain();
     const sounds = {
@@ -132,20 +134,24 @@
     if (!sound) return;
 
     oscillator.type = sound.wave;
-    oscillator.frequency.setValueAtTime(sound.from + amount * 34, now);
-    oscillator.frequency.exponentialRampToValueAtTime(sound.to + amount * 22, now + sound.duration);
-    envelope.gain.setValueAtTime(0.0001, now);
-    envelope.gain.linearRampToValueAtTime(sound.volume * (0.65 + amount * 0.35), now + 0.012);
-    envelope.gain.exponentialRampToValueAtTime(0.0001, now + sound.duration);
+    oscillator.frequency.setValueAtTime(sound.from + amount * 34, audioTimeSeconds);
+    oscillator.frequency.exponentialRampToValueAtTime(sound.to + amount * 22, audioTimeSeconds + sound.duration);
+    envelope.gain.setValueAtTime(0.0001, audioTimeSeconds);
+    envelope.gain.linearRampToValueAtTime(sound.volume * (0.65 + amount * 0.35), audioTimeSeconds + 0.012);
+    envelope.gain.exponentialRampToValueAtTime(0.0001, audioTimeSeconds + sound.duration);
     oscillator.connect(envelope);
     envelope.connect(master);
-    oscillator.start(now);
-    oscillator.stop(now + sound.duration + 0.01);
+    oscillator.addEventListener('ended', () => {
+      oscillator.disconnect();
+      envelope.disconnect();
+    }, { once: true });
+    oscillator.start(audioTimeSeconds);
+    oscillator.stop(audioTimeSeconds + sound.duration + 0.01);
     events[type]++;
   }
 
   function updateGameplayAudio(state) {
-    const now = performance.now();
+    const nowMs = performance.now();
 
     if (previousGrounded === true && !state.grounded && state.name === 'OLLIE') {
       play('ollie', Math.min(1, Math.abs(state.speed) / 16));
@@ -155,17 +161,17 @@
     }
     if (!previousGrinding && state.grinding) {
       play('grind', Math.min(1, Math.abs(state.speed) / 16));
-      nextGrindAt = now + 0.12;
+      nextGrindAtMs = nowMs + grindEntryIntervalMs;
     }
 
-    if (state.grinding && now >= nextGrindAt) {
+    if (state.grinding && nowMs >= nextGrindAtMs) {
       play('grind', Math.min(1, Math.abs(state.speed) / 16));
-      nextGrindAt = now + 0.13;
-    } else if (state.grounded && !state.grinding && Math.abs(state.speed) > 1 && now >= nextWheelAt) {
+      nextGrindAtMs = nowMs + grindRepeatIntervalMs;
+    } else if (state.grounded && !state.grinding && Math.abs(state.speed) > 1 && nowMs >= nextWheelAtMs) {
       play('wheel', Math.min(1, Math.abs(state.speed) / 18));
-      nextWheelAt = now + Math.max(0.16, 0.32 - Math.min(0.16, Math.abs(state.speed) * 0.006));
+      nextWheelAtMs = nowMs + Math.max(160, 320 - Math.min(160, Math.abs(state.speed) * 6));
     } else if (!state.grounded || state.grinding) {
-      nextWheelAt = now + 0.12;
+      nextWheelAtMs = nowMs + grindEntryIntervalMs;
     }
 
     previousGrounded = !!state.grounded;
