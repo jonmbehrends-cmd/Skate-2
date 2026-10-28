@@ -15,6 +15,14 @@ function build(B,scene,ramps){
  const dark=material('recessed concrete','#474c50',true);
  const metal=material('galvanized park coping','#9aa8b0',false);
  const yellow=material('park edge markings','#d7aa50',true);
+ // Warm, solid wall-mounted industrial fixtures: emissive appearance without
+ // expensive dynamic lights or any changes to the skating collision world.
+ const fixture=material('recessed wall light housing','#323b3f',false);
+ const lamp=new B.StandardMaterial('warm wall-washer lens',scene);
+ lamp.diffuseColor=B.Color3.FromHexString('#e7d7b7');
+ lamp.emissiveColor=B.Color3.FromHexString('#8c7858');
+ lamp.alpha=1;lamp.transparencyMode=B.Material.MATERIAL_OPAQUE;
+ lamp.forceDepthWrite=true;
  // Shared, opaque, hand-painted concrete stencil. One 1024px atlas is reused
  // across the deck fascia and perimeter walls; no extra network assets.
  const muralTexture=new B.DynamicTexture('park concrete stencil atlas',{width:1024,height:256},scene,false);
@@ -88,12 +96,22 @@ function build(B,scene,ramps){
    cube('park perimeter retaining wall',x,1.1,z,1.1,2.2,19.8,cement);
    cube('recessed architectural wall panel',x+(x<0?.57:-.57),1.2,z,.035,1.65,17.5,dark);
    for(const dz of [-7,7])cube('wall expansion joint',x+(x<0?.60:-.60),1.2,z+dz,.042,1.8,.065,metal);
+   // All details sit on the inside face of the OUTER retaining wall
+   // (x=±119), well outside the skating lanes. No collision/pickable mesh.
+   const face=x+(x<0?.68:-.68);
+   cube('perimeter concrete pilaster',face,1.12,z+9.65,.16,2.13,.28,cement);
+   cube('wall-washer steel housing',face,2.04,z,.18,.18,3.7,fixture);
+   cube('warm wall-washer lens',face+(x<0?.11:-.11),2.025,z,.045,.055,3.35,lamp);
    // Large stencilled murals are mounted flush on the non-skateable outer
    // retaining wall. They cannot snag wheels or affect collision physics.
    if(z===-60||z===0||z===60){
     const art=B.MeshBuilder.CreatePlane('park perimeter painted mural',{width:12,height:1.5},scene);
     art.position.set(x+(x<0?.605:-.605),1.2,z);
-    art.rotation.y=x<0?Math.PI/2:-Math.PI/2;art.material=muralMat;
+    art.rotation.y=x<0?Math.PI/2:-Math.PI/2;
+    // From the skating side these inward-facing walls otherwise display
+    // the shared stencil mirrored; flip only this plane, not the atlas used
+    // by the correctly oriented halfpipe murals.
+    art.scaling.x=-1;art.material=muralMat;
     art.isPickable=false;art.checkCollisions=false;objects.push(art);
    }
   }
