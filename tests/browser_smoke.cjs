@@ -815,12 +815,13 @@ const server=http.createServer((req,res)=>{
     'Emulated Xbox analog RT must actually accelerate the skater: '+JSON.stringify(xboxPush));
   await page.evaluate(()=>{
     const d=window.__SOL_DIAGNOSTICS__;
-    if(!d.state.grounded)throw Error('Xbox A fixture must start grounded');
+    if(!d.state.grounded||!window.__qaPad.connected)throw Error('Xbox A requires a grounded rider and connected controller');
+    const preY=d.state.y;
     window.__qaXboxOllie=null;
     const observer=d.scene.onAfterRenderObservable.add(()=>{
       const s=d.state;
-      if(!s.grounded&&s.name==='OLLIE'&&s.vy>0&&s.y>s.groundY){
-        window.__qaXboxOllie={grounded:s.grounded,vy:s.vy,name:s.name,y:s.y,groundY:s.groundY,frame:d.scene.getFrameId()};
+      if(!s.grounded&&s.name==='OLLIE'&&s.vy>.05&&s.y>preY+.05){
+        window.__qaXboxOllie={grounded:s.grounded,vy:s.vy,name:s.name,y:s.y,groundY:s.groundY,preY,frame:d.scene.getFrameId()};
         d.scene.onAfterRenderObservable.remove(observer);
       }
     });
@@ -829,9 +830,9 @@ const server=http.createServer((req,res)=>{
     window.__qaPad.buttons[0].value=1;
   });
   // Latch the actual rising launch before a tool round trip can reach descent.
-  await page.waitForFunction(()=>!!window.__qaXboxOllie,null,{timeout:8000});
+  await page.waitForFunction(()=>!!window.__qaXboxOllie,null,{timeout:1800});
   const xboxOllie=await page.evaluate(()=>window.__qaXboxOllie);
-  assert(!xboxOllie.grounded&&xboxOllie.name==='OLLIE'&&xboxOllie.vy>0&&xboxOllie.y>xboxOllie.groundY,
+  assert(!xboxOllie.grounded&&xboxOllie.name==='OLLIE'&&xboxOllie.vy>.05&&xboxOllie.y>xboxOllie.preY+.05,
     'Xbox A must launch upward from the ground: '+JSON.stringify(xboxOllie));
   await page.evaluate(()=>{window.__qaPad.connected=false});
   // The WebGL render loop may be throttled under SwiftShader. Wait for the
