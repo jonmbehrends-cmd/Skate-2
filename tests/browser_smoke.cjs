@@ -1048,6 +1048,30 @@ const server=http.createServer((req,res)=>{
    const d=window.__SOL_DIAGNOSTICS__;
    d.scene.activeCamera=d.camera;d.detailCamera.dispose();delete d.detailCamera;
   });
+  // Reviewable real WebGL view of the new industrial fixtures on the outer
+  // retaining wall; never infer their appearance from unit geometry alone.
+  const fixtureQA=await page.evaluate(()=>{
+   const d=window.__SOL_DIAGNOSTICS__,B=window.BABYLON;
+   const lenses=d.scene.meshes.filter(m=>m.name==='warm wall-washer lens');
+   const housings=d.scene.meshes.filter(m=>m.name==='wall-washer steel housing');
+   const pilasters=d.scene.meshes.filter(m=>m.name==='perimeter concrete pilaster');
+   const camera=new B.ArcRotateCamera('QA perimeter wall',0,1.42,14,
+    new B.Vector3(-118.4,1.4,0),d.scene);
+   camera.fov=.75;camera.minZ=.1;d.scene.activeCamera=camera;d.detailCamera=camera;
+   return {lenses:lenses.length,housings:housings.length,pilasters:pilasters.length,
+    nonColliding:lenses.concat(housings,pilasters).every(m=>!m.isPickable&&!m.checkCollisions),
+    opaque:lenses.every(m=>m.material?.alpha===1&&m.material?.forceDepthWrite===true)};
+  });
+  assert.equal(fixtureQA.lenses,22,'All warm industrial fixtures must render');
+  assert.equal(fixtureQA.housings,22);assert.equal(fixtureQA.pilasters,22);
+  assert(fixtureQA.nonColliding&&fixtureQA.opaque,'Wall fixtures must remain solid visual-only details');
+  await page.waitForTimeout(500);
+  await page.screenshot({path:'test-artifacts/park-perimeter-lighting.png',animations:'disabled'});
+  await checkSceneScreenshot('test-artifacts/park-perimeter-lighting.png','perimeterLighting');
+  await page.evaluate(()=>{
+   const d=window.__SOL_DIAGNOSTICS__;
+   d.scene.activeCamera=d.camera;d.detailCamera.dispose();delete d.detailCamera;
+  });
   // Real WebGL render-loop acceptance for the reported Samsung bug:
   // approach the left wall of the ledge at (5,39) diagonally, slide past
   // its far end, and retain enough momentum to continue skating.
@@ -1092,6 +1116,6 @@ const server=http.createServer((req,res)=>{
   await page.screenshot({path:'test-artifacts/ledge-wall-slide.png',animations:'disabled'});
 
   assert.equal(errors.length,0,'Browser errors: '+errors.join('; '));
-  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',touchHitTargets,controllerQA,gamepadIntegration,visualQA,facadeQA,wallContact,wallSlide,spawnView,spawnPixels,cheekNormals,impactNormals,rampGravity,screenshotQA,floorOcclusionQA,status,spin,push,touchTricks,clickFallback,resetState,teleportState,riding,vertStart,vertAir,vertLanding,leftFollowthrough,rightVertStart,rightVertAir,rightVertLanding,rightFollowthrough,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
+  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',touchHitTargets,controllerQA,gamepadIntegration,visualQA,facadeQA,fixtureQA,wallContact,wallSlide,spawnView,spawnPixels,cheekNormals,impactNormals,rampGravity,screenshotQA,floorOcclusionQA,status,spin,push,touchTricks,clickFallback,resetState,teleportState,riding,vertStart,vertAir,vertLanding,leftFollowthrough,rightVertStart,rightVertAir,rightVertLanding,rightFollowthrough,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
  }finally{await browser.close()}
 })().catch(e=>{fs.mkdirSync('test-artifacts',{recursive:true});fs.writeFileSync('test-artifacts/browser-result.txt','FAIL: '+(e&&e.stack||String(e)));console.error(e);process.exitCode=1}).finally(()=>server.close());
