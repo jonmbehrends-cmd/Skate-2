@@ -17,6 +17,7 @@ jobs:
           node-version: '22'
       - run: npm install --no-save playwright@1.55.1 babylonjs@8.32.1 babylonjs-loaders@8.32.1
       - run: npx playwright install chromium
+      - run: node --check hoodie_skater.js && node --check tests/rigged_browser.cjs
       - run: node tests/hoodie_skater.cjs
       - run: node tests/rigged_browser.cjs
       - uses: actions/upload-artifact@v4
