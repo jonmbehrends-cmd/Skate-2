@@ -327,7 +327,9 @@ const server=http.createServer((req,res)=>{
   const stick=await page.locator('#stick').boundingBox();
   assert(stick,'Mobile joystick must be visible');
   await page.mouse.move(stick.x+stick.width*.83,stick.y+stick.height*.5);
-  await page.mouse.down();await page.waitForTimeout(700);await page.mouse.up();
+  await page.mouse.down();
+  await page.waitForFunction(()=>{const d=window.__SOL_DIAGNOSTICS__;return !d.state.grounded&&d.state.dir>1.5},null,{timeout:5000});
+  await page.mouse.up();
   const spin=await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__;return {yaw:d.state.dir,skaterYaw:d.skater.rotation.y,cameraYaw:d.cameraAnchor.rotation.y,grounded:d.state.grounded}});
   assert(!spin.grounded&&spin.yaw>1.5,'Touch joystick must rotate airborne skater: '+JSON.stringify(spin));
   assert(Math.abs(spin.skaterYaw-spin.yaw)<.2,'Rendered skater must follow airborne yaw');
@@ -347,8 +349,8 @@ const server=http.createServer((req,res)=>{
   const push=await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__,s=d.state;return {speed:s.speed,phase:s.pushPhase,grounded:s.grounded,onRamp:s.onRamp,grinding:s.grinding,bowlAir:!!s.bowlAir,burstUntil:s.pushBurstUntil,now:performance.now(),frame:d.scene.getFrameId(),y:s.y,z:s.z}});
   await page.locator('[data-t="push"]').dispatchEvent('pointerup',{pointerId:11});
   assert(push.speed>.05&&push.phase>0,'PUSH must animate foot and increase speed: '+JSON.stringify({push,errors}));
-  // Verify every mobile trick button through real pointer events. The click
-  // fallback must not trigger a second trick after pointerdown.
+  // Inspect trick state immediately after pointerdown, before a slow render
+  // loop can advance the launched skater past the positive-velocity frame.
   const touchTricks=[];
   for(const [name,expectedFlip,expectedSpin,expectedCount] of [
    ['ollie',0,0,1],['kick',1,0,1],['heel',-1,0,1],
@@ -359,10 +361,14 @@ const server=http.createServer((req,res)=>{
      grounded:true,grinding:false,travelSign:1,flip:0,spin:0,count:0,
      combo:0,grabUntil:0,grabHeld:false,touchGrabHeld:false,grindCooldown:0});
    });
-   await page.locator('[data-t="'+name+'"]').click();
-   const outcome=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
+   const outcome=await page.evaluate(name=>{
+    const button=document.querySelector('[data-t="'+name+'"]');
+    button.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,pointerId:20,pointerType:'touch'}));
+    const s=window.__SOL_DIAGNOSTICS__.state;
     return {airborne:!s.grounded,vy:s.vy,flip:s.flip,spin:s.spin,
-     count:s.count,name:s.name};});
+     count:s.count,name:s.name};
+   },name);
+   await page.locator('[data-t="'+name+'"]').dispatchEvent('pointerup',{pointerId:20,pointerType:'touch'});
    assert(outcome.airborne&&outcome.vy>0&&outcome.flip===expectedFlip&&
     outcome.spin===expectedSpin&&outcome.count===expectedCount,
     'Mobile '+name+' must activate once with correct physics: '+JSON.stringify(outcome));
