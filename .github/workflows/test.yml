@@ -15,6 +15,7 @@ jobs:
           node-version: '22'
       - run: node --check controller.js && node --check landing.js && node --check terrain.js && node --check ramp_geometry.js && node --check obstacles.js && node --check grind.js && node --check motion.js && node --check wheels.js && node --check skater.js && node --check board_geometry.js && node --check bowl.js
       - run: node tests/controller.cjs
+      - run: node tests/concrete_material.cjs
       - run: node tests/audio_feedback_rate.cjs
       - run: node tests/terrain.cjs
       - run: node tests/obstacles.cjs
