@@ -1064,18 +1064,27 @@ const server=http.createServer((req,res)=>{
    const lenses=d.scene.meshes.filter(m=>m.name==='warm wall-washer lens');
    const housings=d.scene.meshes.filter(m=>m.name==='wall-washer steel housing');
    const pilasters=d.scene.meshes.filter(m=>m.name==='perimeter concrete pilaster');
+   const rails=d.scene.meshes.filter(m=>/^perimeter guardrail (top|mid|upright)$/.test(m.name));
    const camera=new B.ArcRotateCamera('QA perimeter wall',0,1.42,14,
     new B.Vector3(-118.4,1.4,0),d.scene);
    camera.fov=.75;camera.minZ=.1;d.scene.activeCamera=camera;d.detailCamera=camera;
-   return {lenses:lenses.length,housings:housings.length,pilasters:pilasters.length,
+   return {lenses:lenses.length,housings:housings.length,pilasters:pilasters.length,rails:rails.length,
+    railsOpaque:rails.every(m=>m.material?.alpha===1&&m.material?.forceDepthWrite===true),
+    railsNonColliding:rails.every(m=>!m.isPickable&&!m.checkCollisions),
     nonColliding:lenses.concat(housings,pilasters).every(m=>!m.isPickable&&!m.checkCollisions),
     opaque:lenses.every(m=>m.material?.alpha===1&&m.material?.forceDepthWrite===true)};
   });
   assert.equal(fixtureQA.lenses,22,'All warm industrial fixtures must render');
   assert.equal(fixtureQA.housings,22);assert.equal(fixtureQA.pilasters,22);
   assert(fixtureQA.nonColliding&&fixtureQA.opaque,'Wall fixtures must remain solid visual-only details');
+  assert.equal(fixtureQA.rails,110,'Real WebGL scene must contain 22 top, 22 mid and 66 upright guardrails');
+  assert(fixtureQA.railsOpaque&&fixtureQA.railsNonColliding,'Guardrails must stay opaque, depth-writing and non-colliding');
   await page.waitForTimeout(500);
   await page.screenshot({path:'test-artifacts/park-perimeter-lighting.png',animations:'disabled'});
+  if(process.env.GITHUB_ACTIONS){
+   const frame=await page.screenshot({type:'jpeg',quality:55,animations:'disabled'});
+   console.log('SOL_GUARDRAIL_JPEG='+frame.toString('base64'));
+  }
   await checkSceneScreenshot('test-artifacts/park-perimeter-lighting.png','perimeterLighting');
   await page.evaluate(()=>{
    const d=window.__SOL_DIAGNOSTICS__;
