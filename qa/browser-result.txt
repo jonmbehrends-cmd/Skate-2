@@ -42,12 +42,12 @@
     },
     "xboxOllie": {
       "grounded": false,
-      "vy": 6.67,
+      "vy": 3.2500000000000027,
       "name": "OLLIE",
-      "y": 0.5079333333333333,
+      "y": 1.3568750000000003,
       "groundY": 0,
       "preY": 0,
-      "frame": 318
+      "frame": 325
     },
     "xboxDisconnect": "🎮 Press a controller button"
   },
@@ -69,24 +69,31 @@
     "buildingBatches": 1,
     "collidable": []
   },
+  "fixtureQA": {
+    "lenses": 22,
+    "housings": 22,
+    "pilasters": 22,
+    "nonColliding": true,
+    "opaque": true
+  },
   "wallContact": {
-    "x": 0.7299848371938981,
-    "z": 40.860255059269,
-    "speed": 5.883168767563724,
+    "x": 0.7299870350754035,
+    "z": 40.83271459178727,
+    "speed": 5.887629615411398,
     "grounded": true
   },
   "wallSlide": {
-    "x": 0.7299848371938981,
-    "z": 43.10294158825924,
-    "speed": 5.522990967503336,
+    "x": 0.7299870350754035,
+    "z": 43.10251490372881,
+    "speed": 5.523232707583512,
     "grounded": true
   },
   "spawnView": {
     "camera": {
       "position": [
-        5.008733908227904,
-        5.170492247452352,
-        -12.341117451995501
+        5.434150961065263,
+        5.0134260297646565,
+        -12.276582857858651
       ],
       "rotationOffset": 155
     },
@@ -96,9 +103,9 @@
         "y": 170,
         "name": "solid skatable concrete ramp",
         "point": [
-          -9.099053458443912,
-          1.3378856003692943,
-          16.219926130645362
+          -10.220477182393667,
+          1.444567066708256,
+          17.082457135088035
         ],
         "material": "solid opaque textured ramp concrete -12 15",
         "alpha": 1,
@@ -113,9 +120,9 @@
         "y": 170,
         "name": "solid skatable concrete ramp",
         "point": [
-          -7.845986059658688,
-          1.3677465206060009,
-          16.46135484745277
+          -8.9053697128696,
+          1.4764586913003428,
+          17.340304312641074
         ],
         "material": "solid opaque textured ramp concrete -12 15",
         "alpha": 1,
@@ -130,9 +137,9 @@
         "y": 170,
         "name": "solid skatable concrete ramp",
         "point": [
-          -6.612293701487225,
-          1.3971457286132467,
-          16.69905057176668
+          -7.613557891993478,
+          1.5077853916573072,
+          17.59358401765483
         ],
         "material": "solid opaque textured ramp concrete -12 15",
         "alpha": 1,
@@ -145,18 +152,18 @@
       {
         "x": 240,
         "y": 170,
-        "name": "SOLID RAMP SIDE WALL",
+        "name": "solid skatable concrete ramp",
         "point": [
-          -5.386227225557753,
-          1.4301609993365063,
-          16.901301696763237
+          -6.344428169646028,
+          1.5385620464948109,
+          17.842416546128263
         ],
-        "material": "solid ramp exterior cheek -12 15",
+        "material": "solid opaque textured ramp concrete -12 15",
         "alpha": 1,
         "diffuse": [
-          0.7254901960784313,
-          0.7607843137254902,
-          0.7803921568627451
+          0.76,
+          0.79,
+          0.81
         ]
       },
       {
@@ -164,9 +171,9 @@
         "y": 170,
         "name": "SOLID RAMP SIDE WALL",
         "point": [
-          -5.2799999999999985,
-          1.0193714324597352,
-          20.61937015775347
+          -5.280000000000003,
+          1.5090749732811517,
+          18.613405994678303
         ],
         "material": "solid ramp exterior cheek -12 15",
         "alpha": 1,
@@ -181,9 +188,9 @@
         "y": 210,
         "name": "solid skatable concrete ramp",
         "point": [
-          -7.106456959054267,
-          0.8310121619164983,
-          12.121800458048277
+          -7.883028869414782,
+          0.8949303719736492,
+          12.638585986169918
         ],
         "material": "solid opaque textured ramp concrete -12 15",
         "alpha": 1,
@@ -198,9 +205,9 @@
         "y": 210,
         "name": "solid skatable concrete ramp",
         "point": [
-          -6.0298045426695905,
-          0.8604266984888298,
-          12.35962011544159
+          -6.767702296799055,
+          0.9266464781377932,
+          12.895014078560884
         ],
         "material": "solid opaque textured ramp concrete -12 15",
         "alpha": 1,
@@ -213,18 +220,18 @@
       {
         "x": 200,
         "y": 210,
-        "name": "SOLID RAMP SIDE WALL",
+        "name": "solid skatable concrete ramp",
         "point": [
-          -5.280000000000002,
-          0.7554099942961585,
-          13.374937650043636
+          -5.66942247528026,
+          0.957877832498466,
+          13.147522901051431
         ],
-        "material": "solid ramp exterior cheek -12 15",
+        "material": "solid opaque textured ramp concrete -12 15",
         "alpha": 1,
         "diffuse": [
-          0.7254901960784313,
-          0.7607843137254902,
-          0.7803921568627451
+          0.76,
+          0.79,
+          0.81
         ]
       },
       {
@@ -232,9 +239,9 @@
         "y": 210,
         "name": "SOLID RAMP SIDE WALL",
         "point": [
-          -5.280000000000002,
-          0.27019542697826004,
-          16.660028094554008
+          -5.279999999999999,
+          0.7106503483604101,
+          15.169375245259726
         ],
         "material": "solid ramp exterior cheek -12 15",
         "alpha": 1,
@@ -247,18 +254,18 @@
       {
         "x": 280,
         "y": 210,
-        "name": "park continuous concrete",
+        "name": "SOLID RAMP SIDE WALL",
         "point": [
-          -4.747677548459493,
-          -0.050000002980230995,
-          19.043902960416414
+          -5.280000000000001,
+          0.23509899136789425,
+          18.726913699613945
         ],
-        "material": "warm plaza poured concrete",
+        "material": "solid ramp exterior cheek -12 15",
         "alpha": 1,
         "diffuse": [
-          0.98,
-          0.91,
-          0.78
+          0.7254901960784313,
+          0.7607843137254902,
+          0.7803921568627451
         ]
       },
       {
@@ -266,9 +273,9 @@
         "y": 250,
         "name": "solid skatable concrete ramp",
         "point": [
-          -5.575125041580993,
-          0.4414744533739263,
-          8.972346644299828
+          -6.117162105754229,
+          0.479697587603261,
+          9.281384750834873
         ],
         "material": "solid opaque textured ramp concrete -12 15",
         "alpha": 1,
@@ -283,9 +290,9 @@
         "y": 250,
         "name": "SOLID RAMP SIDE WALL",
         "point": [
-          -5.28,
-          0.1536423276142891,
-          10.650819814817254
+          -5.280000000000002,
+          0.45472966057223996,
+          9.798830901738928
         ],
         "material": "solid ramp exterior cheek -12 15",
         "alpha": 1,
@@ -298,18 +305,18 @@
       {
         "x": 200,
         "y": 250,
-        "name": "park continuous concrete",
+        "name": "SOLID RAMP SIDE WALL",
         "point": [
-          -4.72019541148011,
-          -0.050000002980231883,
-          11.980787402227314
+          -5.279999999999999,
+          0.03628353277610241,
+          12.260471916419611
         ],
-        "material": "warm plaza poured concrete",
+        "material": "solid ramp exterior cheek -12 15",
         "alpha": 1,
         "diffuse": [
-          0.98,
-          0.91,
-          0.78
+          0.7254901960784313,
+          0.7607843137254902,
+          0.7803921568627451
         ]
       },
       {
@@ -317,9 +324,9 @@
         "y": 250,
         "name": "park continuous concrete",
         "point": [
-          -3.742754498537166,
+          -4.4652436555994095,
           -0.050000002980231883,
-          12.37748911063887
+          13.128778525998388
         ],
         "material": "warm plaza poured concrete",
         "alpha": 1,
@@ -334,9 +341,9 @@
         "y": 250,
         "name": "park continuous concrete",
         "point": [
-          -2.7653135819869856,
-          -0.05000000298023277,
-          12.774190820514562
+          -3.4647332617639304,
+          -0.050000002980231883,
+          13.571648091163482
         ],
         "material": "warm plaza poured concrete",
         "alpha": 1,
@@ -363,11 +370,11 @@
       "x": 240,
       "y": 210,
       "rgb": [
-        125,
-        124,
-        120
+        95,
+        107,
+        110
       ],
-      "luma": 124
+      "luma": 105
     }
   ],
   "cheekNormals": [
@@ -420,8 +427,8 @@
     "mobileHalfpipe": {
       "width": 390,
       "height": 844,
-      "colors": 24,
-      "lumaRange": 213
+      "colors": 23,
+      "lumaRange": 219
     },
     "halfpipe": {
       "width": 960,
@@ -438,8 +445,14 @@
     "skater": {
       "width": 960,
       "height": 540,
-      "colors": 30,
-      "lumaRange": 225
+      "colors": 31,
+      "lumaRange": 222
+    },
+    "perimeterLighting": {
+      "width": 960,
+      "height": 540,
+      "colors": 23,
+      "lumaRange": 220
     }
   },
   "floorOcclusionQA": {
@@ -466,11 +479,11 @@
       }
     ],
     "coverage": {
-      "covered": 3168,
+      "covered": 3167,
       "leaks": 0,
       "leakFraction": 0,
       "meanChannelDelta": 0,
-      "meanRampRemovalDelta": 41.98327020202006,
+      "meanRampRemovalDelta": 41.98821176718225,
       "maxChannelDelta": 0
     },
     "restored": {
@@ -677,30 +690,30 @@
     "canvasWidth": 390,
     "independentCamera": true,
     "staticBatches": {
-      "before": 689,
+      "before": 755,
       "merged": 344,
       "groups": 15,
-      "after": 345
+      "after": 411
     }
   },
   "spin": {
-    "yaw": 4.520781206141412,
-    "skaterYaw": 4.520781206141412,
+    "yaw": 5.9701056376261326,
+    "skaterYaw": 5.9701056376261326,
     "cameraYaw": 0,
     "grounded": false
   },
   "push": {
-    "speed": 3.807505140649312,
-    "phase": 1.9005999999999623,
+    "speed": 1.4441110807649045,
+    "phase": 1.0068500000001515,
     "grounded": true,
     "onRamp": false,
     "grinding": false,
     "bowlAir": false,
-    "burstUntil": 8445.600000000006,
-    "now": 7879.600000000006,
-    "frame": 32,
+    "burstUntil": 10724.5,
+    "now": 9721.900000000023,
+    "frame": 41,
     "y": 0,
-    "z": 0.4929598876174516
+    "z": 0.09909496784783509
   },
   "touchTricks": [
     {
@@ -780,9 +793,9 @@
   },
   "riding": {
     "x": -36,
-    "z": -20.279523311285622,
+    "z": -20.321233996293255,
     "y": 0,
-    "speed": 6.64999628964413
+    "speed": 6.643271393481276
   },
   "vertStart": {
     "z": -29.76,
@@ -791,29 +804,29 @@
   "vertAir": {
     "name": "HALFPIPE VERT AIR",
     "grounded": false,
-    "y": 3.9734783016088637,
-    "vy": 5.673050031261518,
+    "y": 4.30422076070709,
+    "vy": 4.363950031262182,
     "takeoffY": 3.0500344831686563,
     "previousY": 3.0500344831686563,
     "postY": 3.0500344831686563,
-    "airVZ": 0.9545411852192296,
-    "airVX": 3.117268819021469e-16,
-    "z": -29.832774851975838,
-    "speed": 0.9545411852192296
+    "airVZ": 0.9533497898814149,
+    "airVX": 3.113378049722871e-16,
+    "z": -29.767606583460942,
+    "speed": 0.9533497898814149
   },
   "vertLanding": {
     "grounded": true,
-    "z": -28.822127629201304,
-    "y": 1.4646304977322249,
-    "expected": 1.4646304977322249,
-    "speed": 1.9163578192638848,
+    "z": -28.936605382091017,
+    "y": 1.594876345526226,
+    "expected": 1.594876345526226,
+    "speed": 1.4754725802494488,
     "travelSign": -1,
     "message": "HALFPIPE VERT AIR +200"
   },
   "leftFollowthrough": {
-    "z": -21.102537155429324,
+    "z": -21.35453078896198,
     "y": 0,
-    "speed": 4.1000062731187725,
+    "speed": 4.155738173188121,
     "grounded": true,
     "travelSign": -1,
     "message": ""
@@ -825,29 +838,29 @@
   "rightVertAir": {
     "name": "HALFPIPE VERT AIR",
     "grounded": false,
-    "y": 4.429078222634014,
-    "vy": 3.7331500312614185,
+    "y": 4.464496990984088,
+    "vy": 3.5203500312617555,
     "takeoffY": 3.05003448316865,
     "previousY": 3.05003448316865,
     "postY": 3.05003448316865,
-    "airVZ": -0.9526395510513977,
+    "airVZ": -0.9522953831316054,
     "airVX": 0,
-    "z": -6.454783671045821,
-    "speed": 0.9526395510513977
+    "z": -6.455452633045264,
+    "speed": 0.9522953831316054
   },
   "rightVertLanding": {
     "grounded": true,
-    "z": -7.530715842685672,
-    "y": 1.3053735851908432,
-    "expected": 1.3053735851908432,
-    "speed": 2.4974990632053746,
+    "z": -7.52815465255472,
+    "y": 1.3079164967235393,
+    "expected": 1.3079164967235393,
+    "speed": 2.511901179159994,
     "travelSign": -1,
     "message": "HALFPIPE VERT AIR +200"
   },
   "rightFollowthrough": {
-    "z": -14.923975071250089,
+    "z": -15.455728630621314,
     "y": 0,
-    "speed": 4.162013402694944,
+    "speed": 4.0888619143221625,
     "grounded": true,
     "travelSign": -1,
     "message": ""
@@ -861,11 +874,11 @@
   "boardslide": {
     "type": "boardslide",
     "grinding": true,
-    "yaw": 1.3457487938976265,
+    "yaw": 1.4917737364599615,
     "x": 0,
-    "z": 19.425044951125003,
-    "speed": 4.730525000000001,
-    "score": 660.9599999999989,
+    "z": 19.63121244049992,
+    "speed": 4.671530000000022,
+    "score": 411.7889999999958,
     "rail": "rail"
   },
   "touchCoping": {
@@ -913,8 +926,8 @@
     "centerY": -7.62,
     "diameterMeters": 30.48,
     "depthMeters": 7.62,
-    "meshes": 447,
-    "fps": 3.916346831675421
+    "meshes": 513,
+    "fps": 4.323701088131434
   },
   "parkWalls": 0
 }
