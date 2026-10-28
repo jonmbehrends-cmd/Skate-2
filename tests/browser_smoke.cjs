@@ -466,23 +466,39 @@ const server=http.createServer((req,res)=>{
    return {type:s.grindRequestType,airborne:!s.grounded,vy:s.vy,y:s.y}});
   assert(boardInput.type==='boardslide'&&boardInput.airborne&&(boardInput.vy>0||boardInput.y>.1),
    'Touch boardslide must request a real ollie-assisted rail catch: '+JSON.stringify(boardInput));
-  // GRIND catches a nearby rail without launching an ollie.
+  // Regression: GRIND and BOARD SLIDE both launch a real ollie before rail
+  // capture, but GRIND must remain a 50-50 rather than a boardslide.
   await page.locator('#restart').click();
   await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
    Object.assign(s,{x:0,z:19,y:0,groundY:0,dir:0,speed:5,travelSign:1,
     grounded:true,grinding:false,vy:0,grindCooldown:0,grindRequestType:null});
   });
   await page.locator('[data-t="grind"]').click();
-  const grindInput=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
-   return {type:s.grindType,vy:s.vy,y:s.y,grinding:s.grinding,name:s.name};});
-  assert(grindInput.type==='50-50'&&grindInput.grinding&&grindInput.vy===0,
-   'GRIND must directly engage a nearby rail without an ollie: '+JSON.stringify(grindInput));
+  const grindLaunch=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
+   return {request:s.grindRequestType,grounded:s.grounded,vy:s.vy,y:s.y,grinding:s.grinding,name:s.name};});
+  assert(grindLaunch.request==='50-50'&&!grindLaunch.grounded&&grindLaunch.vy>0&&!grindLaunch.grinding,
+   'GRIND must ollie upward before 50-50 rail contact, never snap from ground: '+JSON.stringify(grindLaunch));
+  // Wait for a real simulated rail catch; wall-clock snapshots can miss
+  // a brief grind when SwiftShader advances several frames between reads.
+  await page.evaluate(()=>{
+   const d=window.__SOL_DIAGNOSTICS__,s=d.state;
+   window.__qa5050=null;
+   const observer=d.scene.onAfterRenderObservable.add(()=>{
+    if(s.grinding){window.__qa5050={type:s.grindType,rail:s.grindRail?.kind,
+      y:s.y,grindTime:s.grindTime,request:s.grindRequestType};
+      d.scene.onAfterRenderObservable.remove(observer)}
+   });
+  });
+  await page.waitForFunction(()=>!!window.__qa5050,null,{timeout:6000});
+  const grindInput=await page.evaluate(()=>window.__qa5050);
+  assert(grindInput.type==='50-50'&&grindInput.rail==='rail',
+   'GRIND must automatically land a real 50-50 on the rail after takeoff: '+JSON.stringify(grindInput));
   await page.locator('#restart').click();
   await page.locator('[data-t="grind"]').click();
   const armedGrind=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
-   return {type:s.grindRequestType,grounded:s.grounded,vy:s.vy,y:s.y,count:s.count};});
-  assert(armedGrind.type==='50-50'&&armedGrind.grounded&&armedGrind.vy===0&&armedGrind.y===0&&armedGrind.count===0,
-   'GRIND away from a rail must arm without jumping or scoring: '+JSON.stringify(armedGrind));
+   return {type:s.grindRequestType,grounded:s.grounded,vy:s.vy,y:s.y,count:s.count,grinding:s.grinding};});
+  assert(armedGrind.type==='50-50'&&!armedGrind.grounded&&armedGrind.vy>0&&!armedGrind.grinding,
+   'GRIND away from a rail must ollie and arm a 50-50, not teleport or score: '+JSON.stringify(armedGrind));
   // Move into the real connected halfpipe and confirm actual travel.
   await page.locator('#halfpipe').click();
   assert(await page.evaluate(()=>window.__SOL_DIAGNOSTICS__.scene.activeCamera.name==='halfpipe arrival overview'),'HALFPIPE button must reveal a real 3D overview before riding');
