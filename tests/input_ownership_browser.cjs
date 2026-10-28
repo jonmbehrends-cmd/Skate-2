@@ -19,6 +19,18 @@ const server = http.createServer((request, response) => {
       response.writeHead(404).end();
       return;
     }
+    if (file.endsWith('index.html')) {
+      const source = contents.toString();
+      const instrumented = source.replace(
+        'function trick(t){',
+        'function trick(t){window.__SOL_TEST_TRICKS.push(t);'
+      );
+      if (instrumented === source) {
+        response.writeHead(500).end('Could not instrument trick dispatch for event-level regression checks');
+        return;
+      }
+      contents = Buffer.from(instrumented);
+    }
     const type = file.endsWith('.html') ? 'text/html' :
       file.endsWith('.css') ? 'text/css' :
       file.endsWith('.js') ? 'application/javascript' : 'text/plain';
@@ -39,6 +51,15 @@ async function scenario(name, callback) {
 
 async function openGame(browser, viewport, touch = false) {
   const page = await browser.newPage({ viewport, hasTouch: touch, isMobile: touch });
+  await page.addInitScript(() => {
+    window.__SOL_TEST_TRICKS = [];
+    window.__SOL_TEST_CLICKS = [];
+    document.addEventListener('click', event => {
+      if (!(event.target instanceof Element)) return;
+      const button = event.target.closest('#buttons button');
+      if (button) window.__SOL_TEST_CLICKS.push({ detail: event.detail, action: button.dataset.t });
+    });
+  });
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.route('https://cdn.babylonjs.com/babylon.js', route =>
@@ -77,27 +98,47 @@ async function main() {
 
     await scenario('long-held mouse action does not dispatch twice', async () => {
       await reset(page);
+      await page.evaluate(() => {
+        window.__SOL_TEST_TRICKS.length = 0;
+        window.__SOL_TEST_CLICKS.length = 0;
+      });
       const kick = page.locator('[data-t="kick"]');
       const box = await kick.boundingBox();
       await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
       await page.mouse.down();
-      await page.waitForFunction(() => window.__SOL_DIAGNOSTICS__.state.count === 1, null, { timeout: 2000 });
+      await page.waitForFunction(() => window.__SOL_TEST_TRICKS.length === 1, null, { timeout: 2000 });
       await page.waitForTimeout(700);
       await page.mouse.up();
       await page.waitForTimeout(100);
-      assert.equal(await page.evaluate(() => window.__SOL_DIAGNOSTICS__.state.count), 1);
+      const result = await page.evaluate(() => ({
+        tricks: window.__SOL_TEST_TRICKS,
+        clicks: window.__SOL_TEST_CLICKS
+      }));
+      assert.deepEqual(result.tricks, ['kick'], 'Pointer press and compatibility click must dispatch one trick total');
+      assert.equal(result.clicks.length, 1, 'The browser must emit its compatibility click after pointer release');
+      assert(result.clicks[0].detail > 0, 'Pointer-generated compatibility click must have nonzero detail');
     });
 
     await scenario('keyboard activation immediately after pointer remains active', async () => {
       await reset(page);
+      await page.evaluate(() => {
+        window.__SOL_TEST_TRICKS.length = 0;
+        window.__SOL_TEST_CLICKS.length = 0;
+      });
       const kick = page.locator('[data-t="kick"]');
       const box = await kick.boundingBox();
       await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
-      await page.waitForFunction(() => window.__SOL_DIAGNOSTICS__.state.count === 1, null, { timeout: 2000 });
+      await page.waitForFunction(() => window.__SOL_TEST_TRICKS.length === 1, null, { timeout: 2000 });
       await kick.focus();
       await page.keyboard.press('Enter');
-      await page.waitForFunction(() => window.__SOL_DIAGNOSTICS__.state.count === 2, null, { timeout: 2000 });
-      assert.equal(await page.evaluate(() => window.__SOL_DIAGNOSTICS__.state.flip), 2);
+      await page.waitForFunction(() => window.__SOL_TEST_TRICKS.length === 2, null, { timeout: 2000 });
+      const result = await page.evaluate(() => ({
+        tricks: window.__SOL_TEST_TRICKS,
+        clicks: window.__SOL_TEST_CLICKS
+      }));
+      assert.deepEqual(result.tricks, ['kick', 'kick']);
+      assert.deepEqual(result.clicks.map(click => click.detail), [1, 0],
+        'Keyboard activation must remain distinct from the pointer compatibility click');
     });
 
     await scenario('Ctrl/Meta/Alt gameplay chords preserve browser shortcuts', async () => {
@@ -105,6 +146,7 @@ async function main() {
       for (const modifier of ['Control', 'Alt', 'Meta']) {
         for (const key of ['w', 'a', 'd', 'g', 'r', 'Space']) {
           await reset(page);
+          await page.evaluate(() => { window.__SOL_TEST_TRICKS.length = 0; });
           const result = await page.evaluate(({ modifier, key }) => {
             const event = new KeyboardEvent('keydown', {
               key: key === 'Space' ? ' ' : key,
@@ -118,7 +160,7 @@ async function main() {
             window.dispatchEvent(event);
             return {
               defaultPrevented: event.defaultPrevented,
-              state: window.__SOL_DIAGNOSTICS__.state,
+              trickCalls: window.__SOL_TEST_TRICKS.slice(),
               input: window.__SOL_DIAGNOSTICS__.input()
             };
           }, { modifier, key });
@@ -126,8 +168,7 @@ async function main() {
             assert.equal(result.defaultPrevented, false,
               `${modifier}+${key} must not suppress a browser shortcut`);
             assert.deepEqual(result.input.keyboard, { x: 0, y: 0 });
-            assert.equal(result.state.count, 0, `${modifier}+${key} must not dispatch gameplay`);
-            assert.equal(result.state.grindRequestUntil, 0);
+            assert.deepEqual(result.trickCalls, [], `${modifier}+${key} must not dispatch gameplay`);
           } catch (error) {
             chordFailures.push(`${modifier}+${key}: ${error.message}`);
           }
@@ -144,7 +185,7 @@ async function main() {
         try {
           assert.equal(await page.evaluate(() => window.__realChord), false,
             `Real ${modifier}+G must not suppress the browser shortcut`);
-          assert.equal(await page.evaluate(() => window.__SOL_DIAGNOSTICS__.state.count), 0,
+          assert.deepEqual(await page.evaluate(() => window.__SOL_TEST_TRICKS), [],
             `Real ${modifier}+G must not invoke a trick`);
         } catch (error) {
           chordFailures.push(`real ${modifier}+G: ${error.message}`);
@@ -253,6 +294,9 @@ async function main() {
           grabUntil: state.grabUntil,
           grabUntilRemaining: state.grabUntil - performance.now(),
           events: window.__grabPointerEvents,
+          releasedPointerIds: window.__grabPointerEvents
+            .filter(event => event.type === 'pointerup')
+            .map(event => event.pointerId),
           remainingPointerCaptured: grab.hasPointerCapture(pointerIds[1])
         };
       });
@@ -260,6 +304,8 @@ async function main() {
       assert.equal(afterOneRelease.grabHeld, true);
       assert.equal(afterOneRelease.grabUntil, expectedGrabUntil,
         `Releasing one finger must preserve the existing deadline, got ${JSON.stringify(afterOneRelease)}`);
+      assert.deepEqual(afterOneRelease.releasedPointerIds, [capturedPointers.pointerIds[0]],
+        `CDP touchEnd must release only the first finger: ${JSON.stringify(afterOneRelease.events)}`);
       assert(afterOneRelease.remainingPointerCaptured,
         `The other captured pointer must remain captured: ${JSON.stringify(afterOneRelease.events)}`);
       await touchEndAll();
@@ -285,6 +331,26 @@ async function main() {
       assert.equal(await mobilePage.evaluate(() => window.__SOL_DIAGNOSTICS__.input().pushHeld), true);
       await mobilePage.evaluate(() => window.dispatchEvent(new Event('blur')));
       assert.equal(await mobilePage.evaluate(() => window.__SOL_DIAGNOSTICS__.input().pushHeld), false);
+      await touchEndAll();
+      await touchStart(303, '[data-t="push"]');
+      await touchStart(304, '[data-t="grab"]');
+      await mobilePage.evaluate(() => {
+        Object.defineProperty(document, 'hidden', { configurable: true, value: true });
+        document.dispatchEvent(new Event('visibilitychange'));
+      });
+      const afterHidden = await mobilePage.evaluate(() => {
+        const state = window.__SOL_DIAGNOSTICS__.state;
+        return {
+          pushHeld: window.__SOL_DIAGNOSTICS__.input().pushHeld,
+          touchGrabHeld: state.touchGrabHeld,
+          grabHeld: state.grabHeld,
+          grabUntil: state.grabUntil
+        };
+      });
+      assert.equal(afterHidden.pushHeld, false);
+      assert.equal(afterHidden.touchGrabHeld, false);
+      assert.equal(afterHidden.grabHeld, false);
+      assert.equal(afterHidden.grabUntil, 0);
       await touchEndAll();
       assert.deepEqual(mobile.errors, [], mobile.errors.join('; '));
     });

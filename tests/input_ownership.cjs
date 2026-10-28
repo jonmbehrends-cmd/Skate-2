@@ -207,7 +207,7 @@ check('help and blur clear pointer ownership', () => {
   assert.equal(f.context.pushHeld, false, 'Hidden page must clear pointer ownership');
 });
 
-console.log('PASS input ownership unit regressions');
 if (failures.length) {
   throw new Error(`${failures.length} input ownership unit regression(s) reproduced:\n${failures.map(item => `${item.name}: ${item.message}`).join('\n')}`);
 }
+console.log('PASS input ownership unit regressions');
