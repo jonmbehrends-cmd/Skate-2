@@ -19,6 +19,7 @@ jobs:
       - run: npx playwright install chromium
       - run: node tests/rigged_skater.cjs
       - run: node tests/kenney_skater.cjs
+      - run: node tests/hoodie_skater.cjs
       - run: node tests/rigged_browser.cjs
       - uses: actions/upload-artifact@v4
         if: always()
