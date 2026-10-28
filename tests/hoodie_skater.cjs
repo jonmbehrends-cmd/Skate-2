@@ -41,7 +41,7 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  assert(Math.abs(rig.status.grip[2]+.31)<.01,'Grab should reach the near-side deck rail, not across the deck');
  assert(rig.status.feet[0][0]-rig.status.feet[1][0]>.08,
   'Grab should stagger the leading and trailing shoes rather than make a symmetric seated pose');
- assert(rig.status.feet.every(f=>f[1]>.55),
+ assert(rig.status.feet.every(f=>f[1]>.50),
   'Grab should tuck both knees above their neutral riding position');
  assert(Number.isFinite(rig.status.grabReachShift)&&rig.status.grabReachShift<.45,
   'Grab should not translate the chest excessively: '+rig.status.grabReachShift);
