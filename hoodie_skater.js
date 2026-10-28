@@ -73,10 +73,21 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    const mode=actions.grinding?'grind':actions.grabbing?'grab':flip?'flip':air&&takeoff>.05?'ollie':air?'air':landing>.05?'landing':pose.pushing?'push':(pose.crouch||0)>.1?'crouch':Math.abs(state.speed)>1?'ride':'idle';
    status.mode=mode;
    for(const [n,r] of rest){n.position.copyFrom(r.p);n.rotationQuaternion=r.q.clone()}
-   // In a grab, tuck the knees up toward the deck instead of curling the\n   // spine forward. Keep the chest comparatively upright as the hips lower;
+   // In a grab, tuck the knees up toward the deck instead of curling the
+   // spine forward. Keep the chest comparatively upright as the hips lower;
    // hip/chest lean and arm IK still bring the hand onto the moving deck.
    const crouch=clamp((pose.crouch||0)*.20+landing*.08+takeoff*.06+(actions.grabbing?.65:0),0,.78);
-   // Settle the pelvis into an athletic, knee-flexed stance instead of a\n   // locked-knee upright pose. Feet remain IK-planted on the deck.\n   // The ground-reaching push shoe sits below the deck. Compress the hips\n   // during contact so the fixed-length leg can actually reach pavement;\n   // recover gradually as the shoe swings back, without stretching bones.\n   const pushCompression=pose.pushing?.18+.25*clamp(pose.contact||0,0,1)+.09*clamp(pose.recovery||0,0,1):0;\n   status.pushCompression=pushCompression;\n   rig.position.y=.33-lo*scale-.16-crouch-pushCompression;\n   // Babylon may cache ancestor matrices between consecutive gameplay poses.\n   // Refresh the scaled rig root before solving world-space IK targets.\n   rig.computeWorldMatrix(true);
+   // Settle the pelvis into an athletic, knee-flexed stance instead of a
+   // locked-knee upright pose. Feet remain IK-planted on the deck.
+   // The ground-reaching push shoe sits below the deck. Compress the hips
+   // during contact so the fixed-length leg can actually reach pavement;
+   // recover gradually as the shoe swings back, without stretching bones.
+   const pushCompression=pose.pushing?.18+.25*clamp(pose.contact||0,0,1)+.09*clamp(pose.recovery||0,0,1):0;
+   status.pushCompression=pushCompression;
+   rig.position.y=.33-lo*scale-.16-crouch-pushCompression;
+   // Babylon may cache ancestor matrices between consecutive gameplay poses.
+   // Refresh the scaled rig root before solving world-space IK targets.
+   rig.computeWorldMatrix(true);
    rig.rotation.x=0;rig.rotation.z=0;
    // Bend from the hips during a grab so the shoulder can physically reach
    // the moving deck; leg IK below re-plants both feet after this rotation.
