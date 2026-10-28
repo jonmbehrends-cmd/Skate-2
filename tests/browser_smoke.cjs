@@ -78,6 +78,10 @@ const server=http.createServer((req,res)=>{
   // but valid render can be smaller than an arbitrary 10 KB threshold.
   // Check actual rendered pixel diversity in the clean, HUD-free QA views.
   const screenshotQA={};
+  async function nextRenderedFrame(){
+   const frame=await page.evaluate(()=>window.__SOL_DIAGNOSTICS__.scene.getFrameId());
+   await page.waitForFunction(previous=>window.__SOL_DIAGNOSTICS__.scene.getFrameId()>previous,frame,{timeout:8000});
+  }
   async function checkSceneScreenshot(file,label){
    const png=fs.readFileSync(file);
    const stats=await page.evaluate(async encoded=>{
@@ -213,7 +217,7 @@ const server=http.createServer((req,res)=>{
    darkPixelIsolation=[];
    for(const target of ['SOLID RAMP SIDE WALL','SOLID RAMP CONCRETE CORE','ramp side foundation','solid skatable concrete ramp']){
     await page.evaluate(name=>window.__SOL_DIAGNOSTICS__.scene.meshes.filter(m=>m.name===name).forEach(m=>m.setEnabled(false)),target);
-    await page.waitForTimeout(70);
+    await nextRenderedFrame();
     const png=await page.screenshot({animations:'disabled'});
     const color=await page.evaluate(async encoded=>{
      const img=new Image();img.src='data:image/png;base64,'+encoded;await img.decode();
@@ -386,8 +390,19 @@ const server=http.createServer((req,res)=>{
   const stick=await page.locator('#stick').boundingBox();
   assert(stick,'Mobile joystick must be visible');
   await page.mouse.move(stick.x+stick.width*.83,stick.y+stick.height*.5);
-  await page.mouse.down();await page.waitForTimeout(700);await page.mouse.up();
-  const spin=await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__;return {yaw:d.state.dir,skaterYaw:d.skater.rotation.y,cameraYaw:d.cameraAnchor.rotation.y,grounded:d.state.grounded}});
+  await page.mouse.down();
+  // Wall time does not guarantee a physics/render tick on software WebGL.
+  // Capture the actual rider and camera once at least half a turn is rendered.
+  await page.waitForFunction(()=>{
+   const d=window.__SOL_DIAGNOSTICS__,s=d.state;
+   if(!s.grounded&&s.dir>Math.PI){
+    window.__qaSpin={yaw:s.dir,skaterYaw:d.skater.rotation.y,cameraYaw:d.cameraAnchor.rotation.y,grounded:s.grounded};
+    return true;
+   }
+   return false;
+  },null,{timeout:8000});
+  await page.mouse.up();
+  const spin=await page.evaluate(()=>window.__qaSpin);
   assert(!spin.grounded&&spin.yaw>1.5,'Touch joystick must rotate airborne skater: '+JSON.stringify(spin));
   assert(Math.abs(spin.skaterYaw-spin.yaw)<.2,'Rendered skater must follow airborne yaw');
   assert(Math.abs(spin.cameraYaw)<.15,'Camera must not follow rider spin');
@@ -473,8 +488,12 @@ const server=http.createServer((req,res)=>{
   assert(await page.evaluate(()=>window.__SOL_DIAGNOSTICS__.scene.activeCamera.name==='halfpipe arrival overview'),'HALFPIPE button must reveal a real 3D overview before riding');
   await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
    Object.assign(s,{x:-36,z:-18.1,y:0,groundY:0,dir:0,speed:7,travelSign:-1,grounded:true,grinding:false,vy:0})});
-  await page.waitForTimeout(800);
-  const riding=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;return {x:s.x,z:s.z,y:s.y,speed:s.speed}});
+  await page.waitForFunction(()=>{
+   const s=window.__SOL_DIAGNOSTICS__.state;
+   if(Math.abs(s.z+18.1)>1.2){window.__qaRiding={x:s.x,z:s.z,y:s.y,speed:s.speed};return true}
+   return false;
+  },null,{timeout:8000});
+  const riding=await page.evaluate(()=>window.__qaRiding);
   assert(Math.abs(riding.z+18.1)>1.2,'Halfpipe riding must advance across its flat bottom: '+JSON.stringify(riding));
   // Reproduce the actual left coping launch through the live physics loop.
   // A high bank without vert-air can pass geometry-only tests, so assert the
@@ -540,7 +559,7 @@ const server=http.createServer((req,res)=>{
   await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__,B=window.BABYLON;
    const c=new B.ArcRotateCamera('halfpipe QA side elevation',0,1.27,31,new B.Vector3(-36,1,-18.1),d.scene);
    c.fov=.86;d.scene.activeCamera=c;
-   for(const id of ['hud','status','buttons','stick','restart','halfpipe','msg']){const el=document.getElementById(id);if(el)el.style.display='none'}
+   for(const id of ['hud','status','buttons','stick','restart','halfpipe','msg','controls-help-toggle']){const el=document.getElementById(id);if(el)el.style.display='none'}
   });
   await page.waitForTimeout(500);
   await page.screenshot({path:'test-artifacts/halfpipe-chromium.png',animations:'disabled'});
@@ -558,7 +577,7 @@ const server=http.createServer((req,res)=>{
     for(const m of meshes)m.setEnabled(false);
     return meshes.length;
    });
-   await page.waitForTimeout(150);
+   await nextRenderedFrame();
    const after=await page.screenshot({animations:'disabled'});
    await page.evaluate(()=>{
     for(const [mesh,enabled] of window.__SOL_FLOOR_CHALLENGE__||[])mesh.setEnabled(enabled);
@@ -575,7 +594,7 @@ const server=http.createServer((req,res)=>{
     for(const m of meshes)m.setEnabled(false);
     return meshes.length;
    });
-   await page.waitForTimeout(150);
+   await nextRenderedFrame();
    const rampRemoved=await page.screenshot({animations:'disabled'});
    await page.evaluate(()=>{
     for(const [mesh,enabled] of window.__SOL_RAMP_CHALLENGE__||[])mesh.setEnabled(enabled);
@@ -786,28 +805,35 @@ const server=http.createServer((req,res)=>{
     Object.defineProperty(navigator,'getGamepads',{configurable:true,value:()=>[window.__qaPad]});
     buttons[7].value=.8; // Some browsers report analog RT without pressed=true.
   });
-  await page.waitForTimeout(850);
-  const xboxPush=await page.evaluate(()=>({
-    speed:window.__SOL_DIAGNOSTICS__.state.speed,
-    status:document.querySelector('#status').textContent
-  }));
+  await page.waitForFunction(()=>{
+    const s=window.__SOL_DIAGNOSTICS__.state,status=document.querySelector('#status').textContent;
+    if(s.speed>.3&&status.includes('Xbox connected')){window.__qaXboxPush={speed:s.speed,status};return true}
+    return false;
+  },null,{timeout:8000});
+  const xboxPush=await page.evaluate(()=>window.__qaXboxPush);
   assert(xboxPush.speed>.3&&xboxPush.status.includes('Xbox connected'),
     'Emulated Xbox analog RT must actually accelerate the skater: '+JSON.stringify(xboxPush));
   await page.evaluate(()=>{
+    const d=window.__SOL_DIAGNOSTICS__;
+    if(!d.state.grounded||!window.__qaPad.connected)throw Error('Xbox A requires a grounded rider and connected controller');
+    const preY=d.state.y;
+    window.__qaXboxOllie=null;
+    const observer=d.scene.onAfterRenderObservable.add(()=>{
+      const s=d.state;
+      if(!s.grounded&&s.name==='OLLIE'&&s.vy>.05&&s.y>preY+.05){
+        window.__qaXboxOllie={grounded:s.grounded,vy:s.vy,name:s.name,y:s.y,groundY:s.groundY,preY,frame:d.scene.getFrameId()};
+        d.scene.onAfterRenderObservable.remove(observer);
+      }
+    });
     window.__qaPad.buttons[7].value=0;
     window.__qaPad.buttons[0].pressed=true;
     window.__qaPad.buttons[0].value=1;
   });
-  // Synchronize with the first airborne ollie frame, not an arbitrary wall-clock
-  // delay: SwiftShader CI can simulate the apex/descent before 350ms elapses.
-  await page.waitForFunction(()=>{const s=window.__SOL_DIAGNOSTICS__.state;return s.name==='OLLIE'&&!s.grounded;},null,{timeout:1800});
-  const xboxOllie=await page.evaluate(()=>({
-    grounded:window.__SOL_DIAGNOSTICS__.state.grounded,
-    vy:window.__SOL_DIAGNOSTICS__.state.vy,
-    name:window.__SOL_DIAGNOSTICS__.state.name
-  }));
-  assert(!xboxOllie.grounded&&xboxOllie.name==='OLLIE',
-    'Emulated Xbox A button must launch an actual ollie: '+JSON.stringify(xboxOllie));
+  // Latch the actual rising launch before a tool round trip can reach descent.
+  await page.waitForFunction(()=>!!window.__qaXboxOllie,null,{timeout:1800});
+  const xboxOllie=await page.evaluate(()=>window.__qaXboxOllie);
+  assert(!xboxOllie.grounded&&xboxOllie.name==='OLLIE'&&xboxOllie.vy>.05&&xboxOllie.y>xboxOllie.preY+.05,
+    'Xbox A must launch upward from the ground: '+JSON.stringify(xboxOllie));
   await page.evaluate(()=>{window.__qaPad.connected=false});
   // The WebGL render loop may be throttled under SwiftShader. Wait for the
   // observable input-state transition, not a fixed 250 ms wall-clock delay.
