@@ -71,6 +71,11 @@ let browser;
    }
    if(mode==='grab'){const dist=Math.hypot(...evidence.status.hands[1].map((n,i)=>n-evidence.status.grip[i]));assert(dist<.12,'Hoodie hand must touch board: '+JSON.stringify({dist,hands:evidence.status.hands,grip:evidence.status.grip,feet:evidence.status.feet}));
     assert(evidence.status.grabReachShift<.45,'Grab must not require extreme chest displacement: '+evidence.status.grabReachShift);
+    // Real Chromium visual-anatomy acceptance, checked AFTER screenshot capture.
+    // A numerically reached hand/ankle target must not hide a seated rider.
+    const anatomy=evidence.status.anatomy;
+    assert(anatomy?.hipClearance>.20&&anatomy?.torsoHeight>.30&&anatomy?.chestShift<.20,
+     'VISUAL BLOCKER '+label+': anatomically collapsed grab '+JSON.stringify(anatomy));
    }
    if(mode==='push'){
     assert(evidence.status.feet[1][1]<.25,'Hoodie pushing foot must reach pavement');
