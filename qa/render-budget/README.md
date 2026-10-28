@@ -25,7 +25,7 @@ Direct WebGL draw calls are counted and cross-checked against Babylon's per-rend
 | Halfpipe | 148 / 121 | 104 / 87 |
 | Rider on deck | 146 / 116 | 107 / 96 |
 
-This table is the hosted hoodie/Babylon 8.32.1 integration. The earlier local V2/Babylon 8.56.2 result remains in `visual-result.json` and the four images below. Its direct GL counts are valid; its historical `engineDrawDelta` field predates the instrumentation reset correction and is not the current counter API.
+This table is the hosted hoodie/Babylon 8.32.1 integration. The earlier local V2/Babylon 8.56.2 result remains in `visual-result.json` and the original image files without the `hoodie-` prefix. Its direct GL counts are valid; its historical `engineDrawDelta` field predates the instrumentation reset correction and is not the current counter API.
 
 The small increase in active indices at cell boundaries is retained in the raw visual results. Batching never removes geometry.
 
