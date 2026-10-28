@@ -118,7 +118,10 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     const grabStagger=actions.grabbing?(back?-.055:.075):0;
     const foot=v(pushing?-.23:.015+grabStagger,.45+lift+(back?rearPop:frontLevel),side*.36+(back?0:frontFlick));
     if(pushing){foot.y=.17+(pose.recovery||0)*.29;foot.z=-.32-travel*(.18*(pose.contact||0)-.20*(pose.recovery||0))}
-    // During grabs bend the knees upward toward the chest, not forward\n    // along the deck. This pole only changes skeletal IK, never board physics.\n    const kneePole=actions.grabbing?v(.12,1.55,side*.62):v(.8,.65,side*.50);\n    solve(legs[i].n,foot,kneePole);placeDetached(detachedFeet[i],localPosition(legs[i].n[2]));orient(detachedFeet[i],footRotations[i]);
+    // During grabs bend the knees upward toward the chest, not forward
+    // along the deck. This pole only changes skeletal IK, never board physics.
+    const kneePole=actions.grabbing?v(.12,1.55,side*.62):v(.8,.65,side*.50);
+    solve(legs[i].n,foot,kneePole);placeDetached(detachedFeet[i],localPosition(legs[i].n[2]));orient(detachedFeet[i],footRotations[i]);
    }
    // Keep the shoulders active throughout a trick. A skater raises both
    // arms during the pop, counter-swings while pushing, and spreads/drops
