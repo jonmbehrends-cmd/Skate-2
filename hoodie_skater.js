@@ -80,8 +80,15 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    rig.rotation.x=0;rig.rotation.z=0;
    // Bend from the hips during a grab so the shoulder can physically reach
    // the moving deck; leg IK below re-plants both feet after this rotation.
-   pelvis.rotationQuaternion=rest.get(pelvis).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.25:0));
-   spine.rotationQuaternion=rest.get(spine).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.30:0)).multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pose.contact||0)*.07));
+   // A grounded push needs a small forward hip hinge and chest counterbalance.
+   // Drive both from the actual contact/recovery phase, not the board's speed:
+   // this keeps riding, ollies and landings neutral without touching physics.
+   const pushLean=pose.pushing&&state.grounded?
+    clamp((pose.contact||0)*.075+(pose.recovery||0)*.025,0,.085):0;
+   status.pushLean=pushLean;
+   pelvis.rotationQuaternion=rest.get(pelvis).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.25:-pushLean*.5));
+   spine.rotationQuaternion=rest.get(spine).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.30:-pushLean))
+    .multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pose.pushing?(pose.contact||0)*.07:0)));
    const travel=state.travelSign===-1?-1:1;
    const lift=air?(flip?.22:actions.grabbing?.10:.15+takeoff*.12):0;
    // Ollie pop starts at the tail: the rear knee tucks first, then the front

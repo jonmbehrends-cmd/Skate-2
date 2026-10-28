@@ -57,7 +57,11 @@ let browser;
    if(mode==='ollie')assert.equal(evidence.status.mode,'ollie','Takeoff pose must render in Chromium');signatures.set(mode,JSON.stringify(evidence.matrices));
    await page.screenshot({path:path.join(out,'skeletal-'+label+'-'+mode+'-closeup.png')});
    if(mode==='grab'){const dist=Math.hypot(...evidence.status.hands[1].map((n,i)=>n-evidence.status.grip[i]));assert(dist<.12,'Hoodie hand must touch board: '+JSON.stringify({dist,hands:evidence.status.hands,grip:evidence.status.grip,feet:evidence.status.feet}));}
-   if(mode==='push')assert(evidence.status.feet[1][1]<.25,'Hoodie pushing foot must reach pavement');
+   if(mode==='push'){
+    assert(evidence.status.feet[1][1]<.25,'Hoodie pushing foot must reach pavement');
+    assert(evidence.status.pushLean>.05&&evidence.status.pushLean<.09,'Hoodie chest must balance the push without excessive hunch');
+   }
+   if(mode==='ride')assert.equal(evidence.status.pushLean,0,'Neutral ride must have no push lean');
   }
   assert(new Set(signatures.values()).size>=6,'Skate, crouch, ollie, flip, grab and landing must deform the skin differently');
   assert.deepEqual(errors,[]);assert.deepEqual(requests,[]);
