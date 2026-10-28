@@ -70,11 +70,11 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    const mode=actions.grinding?'grind':actions.grabbing?'grab':flip?'flip':air&&takeoff>.05?'ollie':air?'air':landing>.05?'landing':pose.pushing?'push':(pose.crouch||0)>.1?'crouch':Math.abs(state.speed)>1?'ride':'idle';
    status.mode=mode;
    for(const [n,r] of rest){n.position.copyFrom(r.p);n.rotationQuaternion=r.q.clone()}
-   const crouch=clamp((pose.crouch||0)*.28+landing*.10+takeoff*.08+(actions.grabbing?.45:0),0,.55);
+   const crouch=clamp((pose.crouch||0)*.20+landing*.08+takeoff*.06+(actions.grabbing?.22:0),0,.35);
    rig.position.y=.33-lo*scale-.10-crouch-(pose.pushing?.18:0);
    rig.rotation.x=0;rig.rotation.z=0;
    // Torso lean rotates the upper skeleton only; it cannot lift the planted feet.
-   spine.rotationQuaternion=rest.get(spine).q.multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.35:.07)+(pose.contact||0)*.07));
+   spine.rotationQuaternion=rest.get(spine).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?.68:0)).multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pose.contact||0)*.07));
    const travel=state.travelSign===-1?-1:1;
    const lift=air?(flip?.22:actions.grabbing?.10:.15+takeoff*.12):0;
    for(let i=0;i<legs.length;i++){
