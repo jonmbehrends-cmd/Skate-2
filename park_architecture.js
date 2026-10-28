@@ -14,7 +14,11 @@ function build(B,scene,ramps){
  const cement=material('architectural exposed concrete','#a8a49b',true);
  const dark=material('recessed concrete','#474c50',true);
  const metal=material('galvanized park coping','#9aa8b0',false);
- const yellow=material('park edge markings','#d7aa50',true);
+ const yellow=material('park edge markings','#f8c942',true);
+ const coral=material('painted mural coral','#e66b55',true);
+ const aqua=material('painted mural teal','#40a9a5',true);
+ const cream=material('painted mural cream','#ffe3a3',true);
+ const navy=material('park graphics navy','#314d77',true);
  function cube(name,x,y,z,w,h,d,mat){
   const q=B.MeshBuilder.CreateBox(name,{width:w,height:h,depth:d},scene);
   q.position.set(x,y,z);q.material=mat;q.isPickable=false;
@@ -37,11 +41,19 @@ function build(B,scene,ramps){
   for(let z=-116;z<126;z+=12)cube('perimeter safety line',x,.12,z,.18,.016,9,yellow);
  }
  // Architectural walls and acoustic panels, outside the active skateable park.
+ // Graphic wall murals are integrated into the actual architectural surfaces,
+ // rather than adding a non-skateable obstruction over any ramp or bowl.
  for(const x of [-119,119]){
   for(let z=-100;z<=100;z+=20){
    cube('park perimeter retaining wall',x,1.1,z,1.1,2.2,19.8,cement);
    cube('recessed architectural wall panel',x+(x<0?.57:-.57),1.2,z,.035,1.65,17.5,dark);
    for(const dz of [-7,7])cube('wall expansion joint',x+(x<0?.60:-.60),1.2,z+dz,.042,1.8,.065,metal);
+   const face=x+(x<0?.63:-.63);
+   const colors=[coral,aqua,cream,navy];
+   for(let k=0;k<4;k++){
+    const panel=cube('painted geometric mural',face,1.05+(k%2)*.22,z-5.8+k*3.8,.018,.55,2.7,colors[(k+Math.round(z/20)+20)%4]);
+    panel.rotation.x=(k%2?-.16:.16);
+   }
   }
  }
  return {meshes:objects,dispose(){for(const mesh of objects)mesh.dispose();}};
