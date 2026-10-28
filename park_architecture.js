@@ -44,8 +44,11 @@ function build(B,scene,ramps){
   for(const sx of [-1,1]){
    cube('halfpipe deck support',r.x+sx*(r.w/2-.55),base,r.z,.7,r.h-.20,r.d-.55,cement);
   }
-  cube('halfpipe deck front fascia',r.x,r.h-.31,r.z+r.d/2-.13,r.w-.8,.44,.20,muralMat);
-  cube('halfpipe deck back fascia',r.x,r.h-.31,r.z-r.d/2+.13,r.w-.8,.44,.20,muralMat);
+  // Babylon box UVs mirror lettering on the outside retaining faces.
+  // Flip U only on fascia boxes, keeping the shared stencil atlas unchanged.
+  const flipFasciaU=mesh=>{const uv=mesh.getVerticesData(B.VertexBuffer.UVKind);for(let i=0;i<uv.length;i+=2)uv[i]=1-uv[i];mesh.setVerticesData(B.VertexBuffer.UVKind,uv);};
+  flipFasciaU(cube('halfpipe deck front fascia',r.x,r.h-.31,r.z+r.d/2-.13,r.w-.8,.44,.20,muralMat));
+  flipFasciaU(cube('halfpipe deck back fascia',r.x,r.h-.31,r.z-r.d/2+.13,r.w-.8,.44,.20,muralMat));
   for(const sx of [-1,1])cube('deck corner steel cap',r.x+sx*(r.w/2-.15),r.h+.018,r.z,.14,.036,r.d,metal);
  }
  // The outer deck retaining face sits 3.1m beyond each transition end.
