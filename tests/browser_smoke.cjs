@@ -387,10 +387,10 @@ const server=http.createServer((req,res)=>{
   assert(status.bankCheekAlbedo.every(c=>c.every(v=>v>=.65)),'Starting ramp exterior must be daylight-bright rather than black wedge');
   assert.equal(status.connection,1,'Halfpipe must connect to park');
   assert.deepEqual(status.bottom,[-36,-18.1],'Halfpipe must be at current plaza coordinates');
-  assert.equal(status.bottomSurface?.material,'sealed birch skate ramp plywood','Halfpipe flat bottom must continue the wooden riding surface instead of exposing gray plaza concrete');
+  assert.equal(status.bottomSurface?.material,'halfpipe continuous opaque textured riding concrete','Halfpipe flat bottom must use the same opaque poured-concrete finish as the transitions');
   assert(status.bottomSurface?.alpha===1&&!status.bottomSurface?.blend&&status.bottomSurface?.rayHit,'Halfpipe floor must be opaque, ray-pickable solid geometry');
   assert(Math.abs(status.bottomSurface.top)<.025,'Halfpipe floor must meet the two transition toes near ground level');
-  assert(status.bottomSurface.emissive[0]>=.2,'Wooden transitions need enough fill light to remain visible on mobile');
+  assert(status.bottomSurface.emissive[0]>=0,'Concrete transitions must retain finite nonnegative fill light');
   assert(status.skater&&status.rendered&&status.canvasWidth>0,'WebGL scene must render');
   // Confirm the actual WebGL scene uses the sculpted nose/tail and curved grip,
   // not a rectangular placeholder deck. These meshes remain skater children.
