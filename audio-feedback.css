@@ -1,0 +1,37 @@
+#audio-feedback-toggle {
+  position: fixed;
+  z-index: 8;
+  top: 232px;
+  right: 12px;
+  min-width: 82px;
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid #ffffff66;
+  border-radius: 9px;
+  background: #12263de8;
+  color: #fff;
+  font: 700 12px system-ui, sans-serif;
+  touch-action: manipulation;
+}
+
+#audio-feedback-toggle:focus-visible {
+  outline: 3px solid #ffc23d;
+  outline-offset: 3px;
+}
+
+#audio-feedback-toggle[aria-pressed="true"] {
+  background: #343c47;
+}
+
+#audio-feedback-toggle:disabled {
+  opacity: .65;
+}
+
+@media (max-height: 500px) {
+  #audio-feedback-toggle {
+    top: 210px;
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
