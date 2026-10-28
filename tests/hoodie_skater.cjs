@@ -15,7 +15,7 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  rig.update({...state,grounded:false},pose);assert.equal(rig.status.mode,'ollie');
  rig.update({...state,grounded:false,flip:1},pose);assert.equal(rig.status.mode,'flip');
  rig.update({...state,grounded:false},pose,{grabbing:true});assert.equal(rig.status.mode,'grab');
- const gripDistance=B.Vector3.Distance(B.Vector3.FromArray(rig.status.hands[1]),B.Vector3.FromArray(rig.status.grip));assert(gripDistance<.1,'Hand must reach board: '+JSON.stringify({gripDistance,hands:rig.status.hands,grip:rig.status.grip,feet:rig.status.feet}));
+ const gripDistance=B.Vector3.Distance(B.Vector3.FromArray(rig.status.hands[1]),B.Vector3.FromArray(rig.status.grip));assert(gripDistance<.1,'Hand must reach board: '+JSON.stringify({gripDistance,hands:rig.status.hands,grip:rig.status.grip,feet:rig.status.feet,legGeometry:rig.status.legGeometry}));
  rig.update({...state,grounded:false},pose,{grinding:true});assert.equal(rig.status.mode,'grind');
  rig.update(state,pose);assert.equal(rig.status.mode,'landing');
  for(let i=0;i<30;i++)rig.update(state,pose);assert.equal(rig.status.mode,'ride');
