@@ -120,14 +120,19 @@ function collide(state,contacts){
     }else state.speed=0;
     return true;
   }
-  let vx=state.airVX,vz=state.airVZ;
+  let vx=state.airVX,vz=state.airVZ,blocked=false;
   for(const c of hits){
     const nx=c.normalX||0,nz=c.normalZ||0,mag=Math.hypot(nx,nz);
-    if(mag>0){
+    if(mag>1e-8){
       const ux=nx/mag,uz=nz/mag,closing=vx*ux+vz*uz;
-      if(closing<0){vx-=closing*ux;vz-=closing*uz}
-    }else{vx*=.55;vz*=.55}
+      if(closing<0){vx-=closing*ux;vz-=closing*uz;blocked=true}
+    }else{vx*=.55;vz*=.55;blocked=true}
   }
+  // A collision can still be reported during overlap recovery or while the
+  // rider is already sliding away from a wall. Damping on every such frame
+  // previously drained 18% of airborne momentum per contact and could pin
+  // the board to the side of an obstacle. Only real inward impacts lose energy.
+  if(!blocked)return true;
   state.airVX=vx*.82;state.airVZ=vz*.82;
   state.speed=clamp(Math.hypot(state.airVX,state.airVZ),0,17);
   return true;
