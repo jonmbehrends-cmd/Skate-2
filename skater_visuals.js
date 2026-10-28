@@ -19,6 +19,11 @@ function attach(B,scene,body,elbows,knees,materials){
  const helmetVent=paint('skater helmet vent','#242d38',.17);
  const laces=paint('skater white shoelaces','#e5e0d6',.12);
  const toe=paint('skater reinforced toe','#30363a',.1);
+ const eyes=paint('expressive skater eye white','#fff9e7',.03);
+ const iris=paint('expressive skater pupils','#27324c',.04);
+ const smile=paint('expressive skater smile','#653a38',.02);
+ const patch=paint('skater jacket emblem','#ffda55',.08);
+ const cap=paint('helmet colorful accent','#f8cf43',.12);
  function finish(mesh,parent,material){
   mesh.parent=parent;mesh.material=material;mesh.isPickable=false;
   mesh.checkCollisions=false;mesh.receiveShadows=false;
@@ -41,6 +46,18 @@ function attach(B,scene,body,elbows,knees,materials){
   box('skater jacket seam',body,side*.238,1.485,.17,.014,.40,.018,stitching);
  }
  box('skater glasses bridge',body,0,2.183,.223,.068,.019,.022,helmetVent);
+ // Original exaggerated cartoon facial proportions. Attachments inherit the
+ // existing animated torso transform, so jumping and carving move the face.
+ for(const side of [-1,1]){
+  ellipsoid('cartoon skater oversized eye',body,side*.092,2.18,.258,.077,.084,.028,eyes);
+  ellipsoid('cartoon skater iris',body,side*.092,2.175,.287,.033,.044,.014,iris);
+  ellipsoid('cartoon skater eyebrow',body,side*.092,2.29,.259,.092,.024,.025,helmetVent);
+  ellipsoid('cartoon cheek',body,side*.143,2.073,.199,.075,.052,.042,materials.skin);
+ }
+ ellipsoid('cartoon skater smile',body,0,2.015,.267,.102,.018,.013,smile);
+ ellipsoid('cartoon skater chin',body,0,1.973,.185,.115,.062,.086,materials.skin);
+ ellipsoid('helmet central stripe',body,0,2.49,.073,.095,.032,.30,cap);
+ box('cartoon jacket chest badge',body,-.135,1.62,.294,.18,.15,.028,patch);
  ellipsoid('skater nose',body,0,2.113,.223,.067,.104,.092,materials.skin);
  box('skater jacket zipper',body,.153,1.465,.281,.015,.29,.017,stitching);
  box('skater hoodie pocket',body,0,1.292,.249,.29,.11,.018,materials.jacket);
