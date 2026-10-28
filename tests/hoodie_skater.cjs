@@ -1,0 +1,26 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),B=require('babylonjs');
+require('babylonjs-loaders');require('../hoodie_skater.js');
+(async()=>{
+ const engine=new B.NullEngine(),scene=new B.Scene(engine),parent=new B.TransformNode('stance',scene);
+ const fallback=B.MeshBuilder.CreateBox('V2 fallback',{},scene);fallback.parent=parent;
+ const url='data:;base64,'+fs.readFileSync('assets/quaternius-hoodie/hoodie-character.glb').toString('base64');
+ const rig=await SOLHoodieSkater.attach(B,scene,parent,[fallback],{url});
+ assert.equal(rig.status.bones,62);assert(rig.meshes.length>=4);assert.equal(fallback.isVisible,false);
+ const state={grounded:true,speed:4,travelSign:1},pose={crouch:0};
+ rig.update(state,pose);assert.equal(rig.status.mode,'ride');
+ const original=JSON.stringify(state);
+ parent.position.set(12,4,-18);parent.rotation.set(.4,1.3,-.2);
+ rig.update(state,{...pose,pushing:true,contact:1});assert.equal(rig.status.mode,'push');
+ assert(rig.status.feet[1][1]<.3,'Push foot must reach ground');
+ rig.update({...state,grounded:false},pose);assert.equal(rig.status.mode,'ollie');
+ rig.update({...state,grounded:false,flip:1},pose);assert.equal(rig.status.mode,'flip');
+ rig.update({...state,grounded:false},pose,{grabbing:true});assert.equal(rig.status.mode,'grab');
+ const gripDistance=B.Vector3.Distance(B.Vector3.FromArray(rig.status.hands[1]),B.Vector3.FromArray(rig.status.grip));assert(gripDistance<.1,'Hand must reach board: '+JSON.stringify({gripDistance,hands:rig.status.hands,grip:rig.status.grip,feet:rig.status.feet,legGeometry:rig.status.legGeometry}));
+ rig.update({...state,grounded:false},pose,{grinding:true});assert.equal(rig.status.mode,'grind');
+ rig.update(state,pose);assert.equal(rig.status.mode,'landing');
+ for(let i=0;i<30;i++)rig.update(state,pose);assert.equal(rig.status.mode,'ride');
+ assert.equal(JSON.stringify(state),original,'Visuals must not mutate physics');
+ assert(scene.animationGroups.every(g=>!g.isPlaying),'Source locomotion clips must stay stopped');
+ rig.dispose();assert.equal(fallback.isVisible,true);engine.dispose();
+ console.log('PASS adult 62-joint hoodie IK: push, ollie, flip, grab, grind, landing, transformed stance, V2 fallback');
+})().catch(e=>{console.error(e);process.exitCode=1});
