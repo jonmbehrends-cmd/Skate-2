@@ -534,14 +534,15 @@ const server=http.createServer((req,res)=>{
    const hidden=await page.evaluate(()=>{
     const meshes=window.__SOL_DIAGNOSTICS__.scene.meshes.filter(m=>
      m.name==='park continuous concrete'||m.name==='ground');
+    window.__SOL_FLOOR_CHALLENGE__=meshes.map(m=>[m,m.isEnabled()]);
     for(const m of meshes)m.setEnabled(false);
     return meshes.length;
    });
    await page.waitForTimeout(150);
    const after=await page.screenshot({animations:'disabled'});
    await page.evaluate(()=>{
-    for(const m of window.__SOL_DIAGNOSTICS__.scene.meshes)
-     if(m.name==='park continuous concrete'||m.name==='ground')m.setEnabled(true);
+    for(const [mesh,enabled] of window.__SOL_FLOOR_CHALLENGE__||[])mesh.setEnabled(enabled);
+    delete window.__SOL_FLOOR_CHALLENGE__;
    });
    // Positive control: removing the visible ramp must noticeably change
    // the same pixels. Otherwise a zero-difference occlusion result could
@@ -584,8 +585,18 @@ const server=http.createServer((req,res)=>{
      return {x,y,meanChannelDelta:total/count,rampRemovalDelta:control/count};
     });
    },[before.toString('base64'),after.toString('base64'),rampRemoved.toString('base64')]);
-   return {hiddenFloorMeshes:hidden,hiddenRampMeshes:rampHidden,samples};
+   const restored=await page.evaluate(()=>{
+    const scene=window.__SOL_DIAGNOSTICS__.scene;
+    const floor=scene.meshes.filter(m=>m.name==='park continuous concrete'||m.name==='ground');
+    const ramp=scene.meshes.filter(m=>new Set(['solid skatable concrete ramp','SOLID RAMP SIDE WALL','HALFPIPE FLAT BOTTOM','HALFPIPE PARK CONNECTION']).has(m.name));
+    return {floorEnabled:floor.filter(m=>m.isEnabled()).length,
+      rampEnabled:ramp.filter(m=>m.isEnabled()).length,
+      challengeLeaked:!!window.__SOL_FLOOR_CHALLENGE__||!!window.__SOL_RAMP_CHALLENGE__};
+   });
+   return {hiddenFloorMeshes:hidden,hiddenRampMeshes:rampHidden,samples,restored};
   })();
+  assert(!floorOcclusionQA.restored.challengeLeaked,'Occlusion QA must clean up temporary scene state');
+  assert(floorOcclusionQA.restored.rampEnabled>=10,'Occlusion QA must restore ramp geometry after challenge');
   assert(floorOcclusionQA.hiddenFloorMeshes>=4,'Expected underlying park floor meshes for the occlusion challenge');
   assert(floorOcclusionQA.samples.every(s=>s.meanChannelDelta<8),
    'Underlying plaza changes visible halfpipe riding pixels (ground bleed-through): '+JSON.stringify(floorOcclusionQA));
