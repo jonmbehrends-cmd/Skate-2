@@ -22,7 +22,22 @@ function cloneConcrete(name){
  if(unused&&unused!==concrete.diffuseTexture)unused.dispose();
  return copy;
 }
-const plazaConcrete=cloneConcrete('warm plaza poured concrete');plazaConcrete.diffuseTexture=concrete.diffuseTexture;plazaConcrete.diffuseColor=new B.Color3(.98,.91,.78);plazaConcrete.specularColor=new B.Color3(.035,.04,.045);const copingMetal=metal.clone('polished coping steel');copingMetal.diffuseColor=new B.Color3(.58,.68,.74);copingMetal.specularColor=new B.Color3(.82,.87,.9);copingMetal.specularPower=96;deck.specularColor=new B.Color3(.16,.12,.06);function box(n,w,h,d,x,y,z,m){let q=B.MeshBuilder.CreateBox(n,{width:w,height:h,depth:d},scene);q.position.set(x,y,z);q.material=m;q.receiveShadows=true;return q}box('ground',500,.25,500,0,-10,0,concrete);for(const [x,z,w,d] of [[0,-136.25,230,27.5],[0,27.75,230,234.5],[-65.75,-106,98.5,33],[65.75,-106,98.5,33]])box('park continuous concrete',w,.3,d,x,-.2,z,plazaConcrete);for(const side of [-1,1]){box('perimeter curb',.65,.3,300,side*115,.08,0,white);box('perimeter curb',230,.3,.65,0,.08,side*150,white)}// One shared, procedurally painted facade atlas replaces featureless skyline
+const plazaConcrete=cloneConcrete('warm plaza poured concrete');plazaConcrete.diffuseTexture=concrete.diffuseTexture;plazaConcrete.diffuseColor=new B.Color3(.98,.91,.78);plazaConcrete.specularColor=new B.Color3(.035,.04,.045);
+// Poured plaza panels: saw-cut joints, fine aggregate and scuffed wheel paths
+// are baked into one fully opaque texture, never added as rideable geometry.
+const plazaGrain=surfaceTexture('poured concrete panel joints','#aaa8a2',2601);
+const pg=plazaGrain.getContext();
+for(let v=0;v<=512;v+=128){
+ pg.fillStyle='rgba(35,41,43,.19)';pg.fillRect(v,0,2,512);pg.fillRect(0,v,512,2);
+ pg.fillStyle='rgba(235,232,221,.16)';pg.fillRect(v+2,0,1,512);pg.fillRect(0,v+2,512,1);
+}
+for(let i=0;i<42;i++){
+ const x=(i*137+29)%512,y=(i*83+61)%512;
+ pg.fillStyle=i%3===0?'rgba(69,71,70,.085)':'rgba(232,228,216,.09)';
+ pg.fillRect(x,y,24+(i%5)*9,1+(i%2));
+}
+plazaGrain.update();plazaGrain.uScale=5;plazaGrain.vScale=5;
+plazaConcrete.diffuseTexture=plazaGrain;plazaConcrete.useAlphaFromDiffuseTexture=false;plazaConcrete.alpha=1;plazaConcrete.forceDepthWrite=true;plazaConcrete.transparencyMode=B.Material.MATERIAL_OPAQUE;const copingMetal=metal.clone('polished coping steel');copingMetal.diffuseColor=new B.Color3(.58,.68,.74);copingMetal.specularColor=new B.Color3(.82,.87,.9);copingMetal.specularPower=96;deck.specularColor=new B.Color3(.16,.12,.06);function box(n,w,h,d,x,y,z,m){let q=B.MeshBuilder.CreateBox(n,{width:w,height:h,depth:d},scene);q.position.set(x,y,z);q.material=m;q.receiveShadows=true;return q}box('ground',500,.25,500,0,-10,0,concrete);for(const [x,z,w,d] of [[0,-136.25,230,27.5],[0,27.75,230,234.5],[-65.75,-106,98.5,33],[65.75,-106,98.5,33]])box('park continuous concrete',w,.3,d,x,-.2,z,plazaConcrete);for(const side of [-1,1]){box('perimeter curb',.65,.3,300,side*115,.08,0,white);box('perimeter curb',230,.3,.65,0,.08,side*150,white)}// One shared, procedurally painted facade atlas replaces featureless skyline
 // cubes. It is generated offline-once at startup: no network texture loads,
 // no extra draw call per window, and it stays out of gameplay collision.
 const skyline=mat('weathered urban facade','#9aa9b1');
