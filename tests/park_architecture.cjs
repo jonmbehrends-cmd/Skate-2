@@ -40,6 +40,10 @@ try{
   after=build(path.join(__dirname,'../park_architecture.js'));
  assert.equal(before.art.meshes.length,150);
  assert.equal(after.art.meshes.length,63);
+ for(const art of [before.art,after.art]){
+  const painted=art.meshes.filter(m=>m.material.name==='architectural skatepark mural');
+  assert.equal(painted.reduce((n,m)=>n+m.getTotalIndices()/3,0),64,'Eight mural panels and four box fascias must retain all triangles');
+ }
  assert.deepEqual(geometry(after.art.meshes),geometry(before.art.meshes),
   'All triangle winding, world positions (1mm), normals, UVs and material properties must survive batching');
  for(const mesh of after.art.meshes){

@@ -17,8 +17,8 @@ const server=http.createServer((req,res)=>{const url=new URL(req.url,'http://loc
    // Fascias may share a batch; select the rendered painted surfaces by their material.
    const murals=scene.meshes.filter(m=>m.material?.name==='architectural skatepark mural');
    const panels=scene.meshes.filter(m=>['park perimeter painted mural','halfpipe exterior painted mural'].includes(m.name));
-   return {count:murals.length,panels:panels.length,opaque:murals.every(m=>m.material?.alpha===1&&!m.material.needAlphaBlending()),ready:murals.every(m=>m.material?.diffuseTexture?.isReady()),safe:murals.every(m=>!m.isPickable&&!m.checkCollisions),materialNames:[...new Set(murals.map(m=>m.material?.name))]};});
-  assert(art.count>=10&&art.panels===8&&art.opaque&&art.ready&&art.safe,'Architectural murals must render opaque and stay non-colliding: '+JSON.stringify(art));
+   return {count:murals.length,panels:panels.length,triangles:murals.reduce((n,m)=>n+m.getTotalIndices()/3,0),opaque:murals.every(m=>m.material?.alpha===1&&!m.material.needAlphaBlending()),ready:murals.every(m=>m.material?.diffuseTexture?.isReady()),safe:murals.every(m=>!m.isPickable&&!m.checkCollisions),materialNames:[...new Set(murals.map(m=>m.material?.name))]};});
+  assert(art.triangles===64&&art.panels===8&&art.opaque&&art.ready&&art.safe,'Architectural murals must render opaque and stay non-colliding: '+JSON.stringify(art));
   result[label]={art};
   assert(textures.length>=40);assert(textures.every(m=>m.ready&&m.texture&&m.opaque),'All solid surfaces must be render-ready: '+JSON.stringify(textures));assert(textures.filter(m=>m.normalY!==null).every(m=>m.normalY>0),'Top normals must face daylight in Babylon');
   const deckVertices=await page.evaluate(()=>window.__SOL_DIAGNOSTICS__.scene.getMeshByName('deck').getTotalVertices());
