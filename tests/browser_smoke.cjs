@@ -522,8 +522,32 @@ const server=http.createServer((req,res)=>{
    return {type:s.grindRequestType,grounded:s.grounded,vy:s.vy,y:s.y,count:s.count,grinding:s.grinding};});
   assert(armedGrind.type==='50-50'&&!armedGrind.grounded&&armedGrind.vy>0&&!armedGrind.grinding,
    'GRIND away from a rail must ollie and arm a 50-50, not teleport or score: '+JSON.stringify(armedGrind));
+  // RESTART must cancel pending airborne grind lockout, not just movement.
+  await page.locator('#restart').click();
+  const resetState=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
+   return {grounded:s.grounded,speed:s.speed,grindAirborneUntil:s.grindAirborneUntil,
+    request:s.grindRequestType,combo:s.combo,grabHeld:s.grabHeld};});
+  assert(resetState.grounded&&resetState.speed===0&&resetState.grindAirborneUntil===0&&
+   resetState.request===null&&resetState.combo===0&&!resetState.grabHeld,
+   'RESTART must clear grind lockout and queued tricks: '+JSON.stringify(resetState));
+  // Teleport from an in-progress grind/trick; earned points must survive.
+  await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state,now=performance.now();
+   Object.assign(s,{score:1234,combo:320,count:3,flip:1,spin:1,grinding:true,
+    grindRequestType:'50-50',grindRequestUntil:now+5000,grindAirborneUntil:now+5000,
+    pushBurstUntil:now+5000,grabUntil:now+5000,grabHeld:true,manualActive:true});});
   // Move into the real connected halfpipe and confirm actual travel.
   await page.locator('#halfpipe').click();
+  const teleportState=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
+   return {x:s.x,z:s.z,score:s.score,combo:s.combo,count:s.count,flip:s.flip,spin:s.spin,
+    grounded:s.grounded,grinding:s.grinding,request:s.grindRequestType,
+    grindAirborneUntil:s.grindAirborneUntil,pushBurstUntil:s.pushBurstUntil,
+    grabHeld:s.grabHeld,manualActive:s.manualActive};});
+  assert(teleportState.x===-36&&teleportState.z===-18.1&&teleportState.score===1234&&
+   teleportState.combo===0&&teleportState.count===0&&teleportState.flip===0&&
+   teleportState.spin===0&&teleportState.grounded&&!teleportState.grinding&&
+   teleportState.request===null&&teleportState.grindAirborneUntil===0&&
+   teleportState.pushBurstUntil===0&&!teleportState.grabHeld&&!teleportState.manualActive,
+   'HALFPIPE must preserve score but reset all tricks and inputs: '+JSON.stringify(teleportState));
   assert(await page.evaluate(()=>window.__SOL_DIAGNOSTICS__.scene.activeCamera.name==='halfpipe arrival overview'),'HALFPIPE button must reveal a real 3D overview before riding');
   await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
    Object.assign(s,{x:-36,z:-18.1,y:0,groundY:0,dir:0,speed:7,travelSign:-1,grounded:true,grinding:false,vy:0})});
@@ -969,6 +993,6 @@ const server=http.createServer((req,res)=>{
   await page.screenshot({path:'test-artifacts/ledge-wall-slide.png',animations:'disabled'});
 
   assert.equal(errors.length,0,'Browser errors: '+errors.join('; '));
-  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',touchHitTargets,controllerQA,gamepadIntegration,visualQA,facadeQA,wallContact,wallSlide,spawnView,spawnPixels,cheekNormals,impactNormals,rampGravity,screenshotQA,floorOcclusionQA,status,spin,push,touchTricks,clickFallback,riding,vertStart,vertAir,vertLanding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
+  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',touchHitTargets,controllerQA,gamepadIntegration,visualQA,facadeQA,wallContact,wallSlide,spawnView,spawnPixels,cheekNormals,impactNormals,rampGravity,screenshotQA,floorOcclusionQA,status,spin,push,touchTricks,clickFallback,resetState,teleportState,riding,vertStart,vertAir,vertLanding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
  }finally{await browser.close()}
 })().catch(e=>{fs.mkdirSync('test-artifacts',{recursive:true});fs.writeFileSync('test-artifacts/browser-result.txt','FAIL: '+(e&&e.stack||String(e)));console.error(e);process.exitCode=1}).finally(()=>server.close());
