@@ -44,7 +44,7 @@ function summarize(report){
     submissionSignal:resolution==='submission64'&&draws.length>0&&draws.every(d=>d.after<d.before)&&
      !!ci&&ci[1]<0&&noise!==null&&-metrics.synchronizedMs.medianPercentChange>noise&&
      !!renderCI&&renderCI[1]<0&&render.aaMaxAbsolutePercent!==null&&-render.medianPercentChange>render.aaMaxAbsolutePercent,
-    withinFivePercentEquivalence:resolution==='rasterFull'&&!!ci&&ci[0]>=-5&&ci[1]<=5&&noise<=5};
+    withinFivePercentEquivalence:resolution==='rasterFull'&&!!ci&&ci[0]>=-5&&ci[1]<=5&&noise!==null&&noise<=5};
   }
  }
  return summary;

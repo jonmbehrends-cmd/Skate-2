@@ -28,4 +28,8 @@ const noisy=fixture([-5]);
 for(const r of noisy.runs)if(r.role==='control'&&r===noisy.runs.find(x=>x.size===r.size&&x.block===r.block&&x.role==='control'))
  r.cases['park-submission64'].rows.forEach(row=>{row.synchronizedMs=8;});
 assert.equal(summarize(noisy)['desktop-park-submission64'].submissionSignal,false,'A/A noise larger than the effect prevents a win');
+const noControlTime=fixture([-20]);
+for(const r of noControlTime.runs)if(r.role==='control')r.cases['park-rasterFull'].rows.forEach(row=>{row.synchronizedMs=0;});
+assert.equal(summarize(noControlTime)['desktop-park-rasterFull'].withinFivePercentEquivalence,false,
+ 'Unavailable A/A noise is not zero noise and cannot establish equivalence');
 console.log('PASS paired statistics: warm-up discard, drift rejection, bootstrap sign, equivalence and A/A noise');
