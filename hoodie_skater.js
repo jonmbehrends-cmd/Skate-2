@@ -134,7 +134,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    if(actions.grabbing){
     // Grip the near-side deck rail, rather than reaching across the middle;
     // the hand tracks the moving board even during a simultaneous flip.
-    targets[1]=options.board?B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.20,.34,.15),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):v(.18,.34,-.31);
+    targets[1]=options.board?B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.20,.34,.15),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):v(.20,.34,.15);
    }
    let grabReachShift=0;
    if(actions.grabbing){
