@@ -650,7 +650,7 @@ const server=http.createServer((req,res)=>{
     // Stable interior ramp locations in the dedicated 960x540 side view;
     // exclude the moving rider and the coping silhouette.
     const spots=[[180,350],[780,350],[480,450]];
-    return spots.map(([x,y])=>{
+    const fixed=spots.map(([x,y])=>{
      let total=0,control=0,count=0;
      for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){
       const i=((y+dy)*p.width+x+dx)*4;
@@ -662,6 +662,27 @@ const server=http.createServer((req,res)=>{
      }
      return {x,y,meanChannelDelta:total/count,rampRemovalDelta:control/count};
     });
+    // Cover hundreds of actual visible ramp pixels, not just three fixed
+    // coordinates. The ramp-removal image is a positive-control mask:
+    // only pixels that visibly change when ramps disappear can count.
+    // Stay inside the pipe's riding area to exclude plaza silhouettes.
+    let covered=0,leaks=0,totalDelta=0,totalControl=0,maxDelta=0;
+    for(let y=230;y<=510;y+=8)for(let x=120;x<=840;x+=8){
+     const i=(y*p.width+x)*4;
+     let control=0,delta=0;
+     for(let k=0;k<3;k++){
+      control+=Math.abs(p.data[i+k]-r.data[i+k]);
+      delta+=Math.abs(p.data[i+k]-q.data[i+k]);
+     }
+     control/=3;delta/=3;
+     if(control<25)continue;
+     covered++;totalDelta+=delta;totalControl+=control;
+     maxDelta=Math.max(maxDelta,delta);
+     if(delta>8)leaks++;
+    }
+    return {fixed,coverage:{covered,leaks,leakFraction:covered?leaks/covered:1,
+     meanChannelDelta:covered?totalDelta/covered:0,
+     meanRampRemovalDelta:covered?totalControl/covered:0,maxChannelDelta:maxDelta}};
    },[before.toString('base64'),after.toString('base64'),rampRemoved.toString('base64')]);
    const restored=await page.evaluate(()=>{
     const scene=window.__SOL_DIAGNOSTICS__.scene;
@@ -671,13 +692,17 @@ const server=http.createServer((req,res)=>{
       rampEnabled:ramp.filter(m=>m.isEnabled()).length,
       challengeLeaked:!!window.__SOL_FLOOR_CHALLENGE__||!!window.__SOL_RAMP_CHALLENGE__};
    });
-   return {hiddenFloorMeshes:hidden,hiddenRampMeshes:rampHidden,samples,restored};
+   return {hiddenFloorMeshes:hidden,hiddenRampMeshes:rampHidden,samples:samples.fixed,coverage:samples.coverage,restored};
   })();
   assert(!floorOcclusionQA.restored.challengeLeaked,'Occlusion QA must clean up temporary scene state');
   assert(floorOcclusionQA.restored.rampEnabled>=10,'Occlusion QA must restore ramp geometry after challenge');
   assert(floorOcclusionQA.hiddenFloorMeshes>=4,'Expected underlying park floor meshes for the occlusion challenge');
   assert(floorOcclusionQA.samples.every(s=>s.meanChannelDelta<8),
    'Underlying plaza changes visible halfpipe riding pixels (ground bleed-through): '+JSON.stringify(floorOcclusionQA));
+  assert(floorOcclusionQA.coverage.covered>=400,
+   'Wide halfpipe pixel challenge must cover at least 400 ramp pixels: '+JSON.stringify(floorOcclusionQA.coverage));
+  assert(floorOcclusionQA.coverage.leakFraction<.02&&floorOcclusionQA.coverage.meanChannelDelta<3,
+   'Underlying ground changed visible ramp pixels across the halfpipe: '+JSON.stringify(floorOcclusionQA.coverage));
   assert(floorOcclusionQA.hiddenRampMeshes>=10&&
     floorOcclusionQA.samples.filter(s=>s.rampRemovalDelta>15).length>=2,
    'Halfpipe occlusion samples must visibly react when ramp geometry is removed: '+JSON.stringify(floorOcclusionQA));
