@@ -27,4 +27,5 @@ jobs:
       - run: node tests/ramp_mesh.cjs
       - run: node tests/halfpipe.cjs
       - run: node tests/input.cjs
+      - run: node tests/input_ownership.cjs
       - run: node tests/bowl.cjs
