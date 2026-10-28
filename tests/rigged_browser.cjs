@@ -12,8 +12,10 @@ let browser;
  for(const mobile of [false,true]){
   const label=mobile?'mobile':'desktop';
   const page=await browser.newPage({viewport:mobile?{width:390,height:844}:{width:1280,height:800},hasTouch:mobile,isMobile:mobile,deviceScaleFactor:1});
-  const errors=[],requests=[];page.on('pageerror',e=>errors.push(e.message));page.on('requestfailed',r=>requests.push(r.url()));
-  await page.goto(url);await page.waitForFunction(()=>window.__SOL_DIAGNOSTICS__?.rig?.status.ready,null,{timeout:60000});
+  const errors=[],requests=[],warnings=[];page.on('pageerror',e=>errors.push(e.message));page.on('requestfailed',r=>requests.push(r.url()));page.on('console',m=>{if(['error','warning'].includes(m.type()))warnings.push(m.text())});
+  await page.goto(url);
+  try{await page.waitForFunction(()=>window.__SOL_DIAGNOSTICS__?.rig?.status.ready,null,{timeout:12000})}
+  catch(e){const diagnostic=await page.evaluate(()=>({build:window.__SOL_BUILD__,diagnostics:!!window.__SOL_DIAGNOSTICS__,plugin:window.BABYLON?.SceneLoader?.IsPluginForExtensionAvailable?.('.glb'),skinnedMeshes:window.__SOL_DIAGNOSTICS__?.scene?.meshes.filter(m=>m.skeleton).map(m=>m.name),errorBox:document.querySelector('#error')?.textContent}));throw Error('Rig startup failed: '+JSON.stringify({diagnostic,errors,requests,warnings})+'; '+e.message)};
   const ready=await page.evaluate(()=>{const d=__SOL_DIAGNOSTICS__;return {version:BABYLON.Engine.Version,build:__SOL_BUILD__,status:d.rig.status,active:d.rig.meshes.filter(m=>m.isEnabled()&&m.isVisible&&m.skeleton&&m.getTotalVertices()>0).length,legacy:d.scene.meshes.filter(m=>['torso','head','thigh','shin','shoe'].includes(m.name)&&m.isVisible).length}});
   assert.equal(ready.version,'8.32.1');assert.equal(ready.active,1);assert.equal(ready.legacy,0);assert.equal(ready.status.bones,19);
   await page.screenshot({path:path.join(out,'skeletal-'+label+'-spawn.png')});
