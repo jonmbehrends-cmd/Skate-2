@@ -10,7 +10,7 @@ const server=http.createServer((req,res)=>{const url=new URL(req.url,'http://loc
   await page.goto('http://127.0.0.1:'+server.address().port);await page.waitForFunction(()=>window.__SOL_DIAGNOSTICS__?.riderV2?.diagnostics.frames>2,null,{timeout:30000});
   await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__;window.__qaLoops=d.engine._activeRenderLoops.slice();d.engine.stopRenderLoop();});
   for(const mode of ['ride','push','ollie','flip','shove','grab','grind','boardslide','landing']){
-   result.poses[mode]=await page.evaluate(mode=>{
+   result.poses[mode]=await page.evaluate(async mode=>{
     const d=window.__SOL_DIAGNOSTICS__,B=window.BABYLON,s=d.state;
     document.querySelector('#restart').click();
     Object.assign(s,{x:0,z:0,y:0,groundY:0,vy:0,speed:0,dir:0,grounded:true,grinding:false,flip:0,spin:0,airTime:0,grabHeld:false,grabUntil:0,pushBurstUntil:0});
@@ -26,6 +26,14 @@ const server=http.createServer((req,res)=>{const url=new URL(req.url,'http://loc
     // Execute the actual game/render callback; a tiny bounded step also produces
     // the real air-to-ground transition used by the landing compression.
     window.__qaLoops[0]();
+    if(mode==='push'){
+     // Capture the real planted-foot portion of the cyclic PUSH input, not
+     // an arbitrary recovery frame that looks identical to ordinary riding.
+     for(let n=0;n<85&&d.riderV2.diagnostics.feet[0][0]<.27;n++){
+      await new Promise(resolve=>setTimeout(resolve,16));
+      window.__qaLoops[0]();
+     }
+    }
     const cam=new B.FreeCamera('V2 QA '+mode,new B.Vector3(s.x+3.2,s.y+2.0,s.z+3),d.scene);cam.setTarget(new B.Vector3(s.x,s.y+1.15,s.z));cam.minZ=.03;d.scene.activeCamera=cam;d.scene.render();
     const r=d.riderV2,palette=Array.from(r.skeleton.getTransformMatrices(r.meshes[0]));
     const hidden=d.scene.getTransformNodeByName('body').getChildMeshes().every(m=>!m.isVisible);
@@ -34,6 +42,7 @@ const server=http.createServer((req,res)=>{const url=new URL(req.url,'http://loc
    await page.screenshot({path:path.join(out,mode+'.png')});
    const p=result.poses[mode];assert.equal(p.bones,20);assert.equal(p.meshes,13);assert(p.vertices>1000&&p.hidden&&p.finite&&p.ready,mode+' skin must render');assert.equal(p.mode,mode,mode+' must use its actual gameplay state');
   }
+  assert(result.poses.push.feet[0][0]>.25&&result.poses.push.feet[0][1]<.30,'Real gameplay PUSH must put the rear foot off the board toward pavement');
   assert(result.poses.grab.grabError<.04,'Authored palm must reach the deck');
   assert(result.poses.ollie.feet.every(f=>Math.abs(f[1]-.385)<.025),'Real WebGL ollie must keep both shoes on deck');
   assert(result.poses.landing.grounded&&result.poses.landing.landing>0,'Actual landing must compress the skin');
