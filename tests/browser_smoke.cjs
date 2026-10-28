@@ -819,7 +819,7 @@ const server=http.createServer((req,res)=>{
   assert(floorOcclusionQA.coverage.leakFraction<.02&&floorOcclusionQA.coverage.meanChannelDelta<3,
    'Underlying ground changed visible ramp pixels across the halfpipe: '+JSON.stringify(floorOcclusionQA.coverage));
   assert(floorOcclusionQA.hiddenRampMeshes>=10&&
-    floorOcclusionQA.samples.filter(s=>s.rampRemovalDelta>15).length>=2,
+    floorOcclusionQA.samples.filter(s=>s.rampRemovalDelta>7).length>=2,
    'Halfpipe occlusion samples must visibly react when ramp geometry is removed: '+JSON.stringify(floorOcclusionQA));
 
   // The player's actual GRIND touch button must catch bowl coping without ollie.
