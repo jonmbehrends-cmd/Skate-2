@@ -22,6 +22,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
   rootNode.scaling.setAll(2.25/height);
   rootNode.position.y=-lo*rootNode.scaling.y;
  }
+ if(!top.length)throw Error('Skinned asset missing root nodes');
  const animations=result.animationGroups||[];
  for(const group of animations)group.stop();
  // Drive the rig through its skeletal animation track, if present.
