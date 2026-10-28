@@ -112,7 +112,11 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    for(let i=0;i<legs.length;i++){
     const back=i===1,side=back?-1:1;
     const pushing=back&&pose.pushing;
-    // A real deck grab is not a symmetric seated squat: tuck the leading\n    // knee slightly forward while the trailing foot follows the tail.\n    // Both targets remain in the moving board's local stance frame.\n    const grabStagger=actions.grabbing?(back?-.055:.075):0;\n    const foot=v(pushing?-.23:.015+grabStagger,.45+lift+(back?rearPop:frontLevel),side*.36+(back?0:frontFlick));
+    // A real deck grab is not a symmetric seated squat: tuck the leading
+    // knee slightly forward while the trailing foot follows the tail.
+    // Both targets remain in the moving board's local stance frame.
+    const grabStagger=actions.grabbing?(back?-.055:.075):0;
+    const foot=v(pushing?-.23:.015+grabStagger,.45+lift+(back?rearPop:frontLevel),side*.36+(back?0:frontFlick));
     if(pushing){foot.y=.17+(pose.recovery||0)*.29;foot.z=-.32-travel*(.18*(pose.contact||0)-.20*(pose.recovery||0))}
     solve(legs[i].n,foot,v(.8,.65,side*.50));placeDetached(detachedFeet[i],localPosition(legs[i].n[2]));orient(detachedFeet[i],footRotations[i]);
    }
