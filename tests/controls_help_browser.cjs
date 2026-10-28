@@ -47,6 +47,14 @@ async function loadGame(browser, viewport, touch) {
   });
   await page.waitForFunction(() => !!window.__SOL_DIAGNOSTICS__, null, { timeout: 30000 });
   await page.locator('#controls-help-toggle').waitFor();
+  await page.evaluate(()=>{
+    window.__helpSamples=[];
+    window.__SOL_DIAGNOSTICS__.scene.onAfterRenderObservable.add(()=>{
+      const s=window.__SOL_DIAGNOSTICS__.state;
+      window.__helpSamples.push({name:s.name,grounded:s.grounded,vy:s.vy});
+      if(window.__helpSamples.length>300)window.__helpSamples.shift();
+    });
+  });
   return page;
 }
 
@@ -150,11 +158,9 @@ async function main() {
     assert(await desktop.evaluate(()=>window.__SOL_DIAGNOSTICS__.state.grounded));
     await desktop.keyboard.press('Escape');
     await desktop.locator('#render').click({position:{x:300,y:300}});
+    await desktop.evaluate(()=>window.__helpSamples=[]);
     await desktop.keyboard.press('Space');
-    await desktop.waitForFunction(() => {
-      const state = window.__SOL_DIAGNOSTICS__.state;
-      return !state.grounded && state.name === 'OLLIE';
-    });
+    await desktop.waitForFunction(()=>window.__helpSamples.some(s=>!s.grounded&&s.vy>0&&s.name==='OLLIE'));
     await desktop.close();
 
     const mobile = await loadGame(browser, { width: 390, height: 844 }, true);
@@ -219,11 +225,9 @@ async function main() {
     await mobile.locator('#restart').click();
     await mobile.locator('#render').tap({position:{x:180,y:350}});
     await mobile.locator('#render').tap({position:{x:180,y:350}});
+    await mobile.evaluate(()=>window.__helpSamples=[]);
     await mobile.keyboard.press('Space');
-    await mobile.waitForFunction(() => {
-      const state = window.__SOL_DIAGNOSTICS__.state;
-      return !state.grounded && state.name === 'OLLIE';
-    });
+    await mobile.waitForFunction(()=>window.__helpSamples.some(s=>!s.grounded&&s.vy>0&&s.name==='OLLIE'));
     await mobile.close();
 
     const landscape = await loadGame(browser, { width: 844, height: 390 }, true);
