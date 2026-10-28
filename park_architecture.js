@@ -48,6 +48,16 @@ function build(B,scene,ramps){
   cube('halfpipe deck back fascia',r.x,r.h-.31,r.z-r.d/2+.13,r.w-.8,.44,.20,muralMat);
   for(const sx of [-1,1])cube('deck corner steel cap',r.x+sx*(r.w/2-.15),r.h+.018,r.z,.14,.036,r.d,metal);
  }
+ // Painted exterior halfpipe end caps are large, visible walls, not riding
+ // surfaces. Keep the decals 5.5 cm outside the sealed solid ramp geometry.
+ for(const r of ramps){
+  if(r.curve!=='halfpipe-left'&&r.curve!=='halfpipe-right')continue;
+  const left=r.curve==='halfpipe-left';
+  const art=B.MeshBuilder.CreatePlane('halfpipe exterior painted mural',{width:r.w-5,height:2.35},scene);
+  art.position.set(r.x,2.15,left?r.z-r.d/2-.055:r.z+r.d/2+.055);
+  art.rotation.y=left?Math.PI:0;art.material=muralMat;
+  art.isPickable=false;art.checkCollisions=false;objects.push(art);
+ }
  // Color-inlaid seams at the perimeter, outside the central skating area.
  for(const x of [-112,112]){
   for(let z=-116;z<126;z+=12)cube('perimeter safety line',x,.12,z,.18,.016,9,yellow);
