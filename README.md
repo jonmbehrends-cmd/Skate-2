@@ -37,7 +37,8 @@ Pair the controller with Android before launching. Some Android browser/controll
 textures explicitly: Babylon 8.56.2 material clones otherwise hold unready
 textures, causing opaque, pickable ramp tops and plaza slabs to be skipped by
 the renderer. It also computes outward lighting normals for the existing sealed
-ramp geometry. The terrain/contact profile, simulation, and animation rig are
+ramp geometry and keeps the key light near-vertical so skater shadows stay close
+to the rider. The terrain/contact profile, simulation, and animation rig are
 unchanged.
 
 The reviewed Gemini `skateboard_v2.glb` deck and grip are imported into
