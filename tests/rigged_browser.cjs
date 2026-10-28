@@ -48,6 +48,8 @@ let browser;
   // Close-up pose gallery uses the exact production joint updater in the real
   // scene, with physics paused only while taking deterministic inspection views.
   await page.evaluate(()=>{const d=__SOL_DIAGNOSTICS__,B=BABYLON;d.engine.stopRenderLoop();d.skater.position.set(0,0,0);d.skater.rotation.set(0,0,0);d.scene.activeCamera=new B.ArcRotateCamera('rig QA',-.9,1.25,4.3,new B.Vector3(0,1.2,0),d.scene);d.scene.getTransformNodeByName('rider terrain stance').rotation.set(0,0,0);d.scene.getTransformNodeByName('board pivot').rotation.set(0,0,0)});
+  // Let the previous gameplay landing recovery finish before asserting a new PUSH pose.
+  await page.evaluate(()=>{for(let i=0;i<40;i++)__SOL_DIAGNOSTICS__.rig.update({grounded:true,speed:5},{crouch:0},{dt:1/60})});
   const signatures=new Map();
   for(const mode of ['ride','push','crouch','ollie','flip','grab','grind','landing']){
    const evidence=await page.evaluate(mode=>{const d=__SOL_DIAGNOSTICS__,state={grounded:['ride','push','crouch','landing'].includes(mode),speed:5,travelSign:1,flip:mode==='flip'?1:0};const pose={crouch:mode==='crouch'?.23:.1,pushing:mode==='push',contact:.8};d.rig.update(state,pose,{grabbing:mode==='grab',grinding:mode==='grind'});const clip=d.scene.animationGroups.find(g=>g.name===d.rig.status.clip);clip?.goToFrame(clip.from+(clip.to-clip.from)*.5);d.scene.render();return {status:d.rig.status,matrices:Array.from(d.rig.skeletons[0].getTransformMatrices(d.rig.meshes[0])),vertices:d.rig.meshes[0].getTotalVertices()};},mode);
