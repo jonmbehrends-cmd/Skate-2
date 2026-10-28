@@ -22,8 +22,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
   const pelvis=joint('Hips'),spine=joint('Chest');
   const legs=[['L','UpperLeg.L','LowerLeg.L','LowerLeg.L_end'],['R','UpperLeg.R','LowerLeg.R','LowerLeg.R_end']].map(([side,...names])=>({side,n:names.map(joint)}));
   const detachedFeet=[joint('Foot.L'),joint('Foot.R')];
-  const arms=[['L','UpperArm.L','LowerArm.L','LowerArm.L_end'],['R','UpperArm.R','LowerArm.R','LowerArm.R_end']].map(([side,...names])=>({side,n:names.map(joint)}));
-  const detachedWrists=[joint('Wrist.L'),joint('Wrist.R')];
+  const arms=[['L','UpperArm.L','LowerArm.L','Wrist.L'],['R','UpperArm.R','LowerArm.R','Wrist.R']].map(([side,...names])=>({side,n:names.map(joint)}));
   // Bounds must be computed with the imported Z_UP and glTF handedness transforms,
   // before attaching to a moving/tilted parent. Never overwrite the base offset.
   for(const n of container.transformNodes)n.computeWorldMatrix(true);
@@ -60,7 +59,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
   // Preserve ankle orientation in the stance frame after solving each leg.
   function stanceRotation(node){const q=B.Quaternion.Identity();node.computeWorldMatrix(true).decompose(undefined,q);const pq=B.Quaternion.Identity();parent.computeWorldMatrix(true).decompose(undefined,pq);return pq.conjugate().multiply(q)}
   const footRotations=detachedFeet.map(stanceRotation);
-  const handRotations=detachedWrists.map(stanceRotation);
+  
   function placeDetached(node,target){const inv=B.Matrix.Invert(node.parent.computeWorldMatrix(true));node.position.copyFrom(B.Vector3.TransformCoordinates(world(target),inv));node.computeWorldMatrix(true)}
   function orient(node,q){const pq=B.Quaternion.Identity(),parentQ=B.Quaternion.Identity();node.parent.computeWorldMatrix(true).decompose(undefined,pq);parent.computeWorldMatrix(true).decompose(undefined,parentQ);node.rotationQuaternion=pq.conjugate().multiply(parentQ.multiply(q));node.computeWorldMatrix(true)}
   const status={ready:true,mode:'idle',height:2.05,bones:container.skeletons[0].bones.length,source:DEFAULT_URL,feet:[],hands:[],meshes:meshes.length};
@@ -95,7 +94,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     // Grip is attached to the actual moving deck, including a simultaneous flip.
     targets[1]=options.board?B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.23,.30,-.15),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):v(.23,.30,-.15);
    }
-   for(let i=0;i<arms.length;i++){solve(arms[i].n,targets[i],v(.65,1.0-crouch,i===0?.6:-.6));placeDetached(detachedWrists[i],localPosition(arms[i].n[2]));orient(detachedWrists[i],handRotations[i])}
+   for(let i=0;i<arms.length;i++)solve(arms[i].n,targets[i],v(.65,1.0-crouch,i===0?.6:-.6));
    status.feet=legs.map(l=>localPosition(l.n[2]).asArray());status.hands=arms.map(l=>localPosition(l.n[2]).asArray());
    status.legGeometry=legs.map(l=>{const p=l.n.map(localPosition);return {hip:p[0].asArray(),knee:p[1].asArray(),foot:p[2].asArray(),upper:B.Vector3.Distance(p[0],p[1]),lower:B.Vector3.Distance(p[1],p[2])}});
    status.grip=actions.grabbing?targets[1].asArray():null;
