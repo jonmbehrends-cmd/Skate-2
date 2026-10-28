@@ -84,18 +84,24 @@ function build(B,scene,ramps){
  // so a wall on one side of the park cannot keep the opposite side in view.
  const groups=new Map(),meshes=[];
  for(const mesh of objects){
-  const key=mesh.material.uniqueId+':'+Math.floor(mesh.position.x/40)+':'+Math.floor(mesh.position.z/40);
+  // Keep the named mural planes independent, including their unshadowed finish.
+  if(mesh.name.includes('mural')){mesh.freezeWorldMatrix();meshes.push(mesh);continue;}
+  const key=mesh.material.uniqueId+':'+mesh.receiveShadows+':'+Math.floor(mesh.position.x/40)+':'+Math.floor(mesh.position.z/40);
   if(!groups.has(key))groups.set(key,[]);
   groups.get(key).push(mesh);
  }
  for(const members of groups.values()){
+  const name=members[0].name,material=members[0].material,receiveShadows=members[0].receiveShadows;
   const merged=members.length>1?B.Mesh.MergeMeshes(members,true,true,undefined,false,false):members[0];
   if(!merged){meshes.push(...members);continue;}
-  merged.name='park architecture batch '+members[0].material.name;
-  merged.isPickable=false;merged.checkCollisions=false;merged.receiveShadows=true;
+  merged.name=members.length>1?'park architecture batch '+material.name:name;
+  merged.isPickable=false;merged.checkCollisions=false;merged.receiveShadows=receiveShadows;
   merged.freezeWorldMatrix();meshes.push(merged);
  }
- return {meshes,dispose(){for(const mesh of meshes)mesh.dispose();}};
+ return {meshes,dispose(){
+  for(const mesh of meshes)mesh.dispose();
+  for(const mat of [cement,dark,metal,yellow,muralMat])mat.dispose(false,true);
+ }};
 }
 root.SOLParkArchitecture={build};
 })(typeof window!=='undefined'?window:globalThis);

@@ -1,52 +1,66 @@
-# Render budget evidence
+# Local architecture batching: validation and experiment
 
-Tested production commit: 6450e58a6f955e3b4eca0569aed19abb4336f48c. Before uses the unchanged architecture fixture from main 69f885c; after uses the batched module. Both runs use the same checkout, browser, locally routed Babylon bundle, cameras and viewports.
+This branch remains unmerged. Fewer draw submissions are verified; a device speedup has not been established. The earlier sequential timing experiment is preserved in [legacy/](legacy/README.md) and is not used to infer performance on current main.
 
-## Focused change
+## Current geometry and rendering
 
-Batch only opaque, noninteractive architecture by material and 40m spatial cell, then freeze those static world matrices. Architecture meshes: 142 to 55; complete scene: 428 to 341 (20.3% fewer mesh objects). Total indexed geometry and materials are preserved. Riding surfaces, colliders, rails, rider animation, input and physics code are unchanged.
+The baseline fixture is the unbatched component from main `cc81a51`. Both variants contain the current mural artwork and V2 ollie-tuck rider. Architecture becomes 63 meshes instead of 150, and the full scene becomes 349 instead of 436 (87 fewer objects, about 20%). Only opaque, noninteractive component geometry is batched by material, shadow-receiver flag, and 40m spatial cell. Named mural planes remain independent.
 
-## Full game measurements
+The unit test compares indexed world-space triangles, winding, normals, UVs, materials and shadow flags at 1mm positional precision. It also checks local bounds and component disposal. The component owns five materials and one atlas; its dispose method now releases those as well as its meshes. The production call site builds the component once during page initialization; restarting a run does not rebuild the scene. The baseline's incomplete material disposal predates batching.
 
-Chromium 140.0.7339.186, Babylon 8.56.2, SwiftShader software rendering. Desktop 1280x800; mobile emulation 390x844. Each view uses 20 warm-up frames and 40 measured frames. Numbers below are medians except callback p95.
+The browser test now requires exact equality of every RGB pixel. It compares six cameras at desktop 960×720 and mobile 390×844: spawn, park, both perimeter walls, halfpipe, and a rider standing on the deck. Physics is frozen after a deterministic idle pose; the real rider, shadows and current artwork remain visible. Only the HUD is hidden. All 12 comparisons passed with zero channel difference.
 
-| View | Draw calls before/after | Active meshes before/after | Callback ms before/after | Callback p95 ms before/after | Frame interval ms before/after |
-|---|---:|---:|---:|---:|---:|
-| desktop-spawn | 168 / 166 | 149 / 147 | 6.9 / 7.3 | 18.2 / 12.2 | 409.3 / 478.2 |
-| desktop-park | 227 / 197 | 208 / 178 | 7.6 / 7.0 | 13.7 / 15.0 | 388.3 / 423.1 |
-| mobile-spawn | 121 / 121 | 103 / 103 | 6.6 / 7.0 | 9.4 / 10.5 | 101.3 / 108.5 |
-| mobile-park | 111 / 101 | 97 / 87 | 5.5 / 6.6 | 17.6 / 17.3 | 87.0 / 94.1 |
+Direct WebGL draw calls are counted and cross-checked against Babylon's per-render counter. `SceneInstrumentation` resets that counter before each render, so current is read after the render rather than subtracting a previous frame. The previous static/whole-game tables also differed in viewport, rider visibility and shadow passes; their totals were never interchangeable.
 
-Startup (navigation through engine readiness and first five frames): desktop 1651.4 / 2477.9 ms; mobile 2284.3 / 2172.2 ms. These are one startup sample per run, and should not be interpreted as a reliable startup improvement.
-
-Software rasterization and host contention dominate these timings. Timing results are mixed; this PR claims measured draw-call and scene-object reductions, not universal FPS gains or physical mobile performance. The mobile spawn draw count is unchanged. Texture count, shadow resolution, geometry detail and shader quality remain unchanged.
-
-## Visual and gameplay verification
-
-The static A/B test hides the moving rider and HUD only for deterministic screenshots. Across desktop 960x720 and mobile 390x844, five cameras each (spawn, park, left wall, right wall, halfpipe), all 10 images are pixel-identical. The test permits at most 0.1% of pixels differing by more than 2 channel levels; this run changed zero pixels. Separate production browser suites include the rider and full gameplay.
-
-| Static view | Draw calls before/after | Changed pixels |
+| Fixed-pose view | Desktop GL draws before/after | Mobile GL draws before/after |
 |---|---:|---:|
-| desktop-spawn | 104 / 104 | 0 |
-| desktop-park | 156 / 130 | 0 |
-| desktop-left-wall | 89 / 58 | 0 |
-| desktop-right-wall | 93 / 62 | 0 |
-| desktop-halfpipe | 123 / 96 | 0 |
-| mobile-spawn | 68 / 68 | 0 |
-| mobile-park | 88 / 78 | 0 |
-| mobile-left-wall | 73 / 45 | 0 |
-| mobile-right-wall | 71 / 42 | 0 |
-| mobile-halfpipe | 80 / 63 | 0 |
+| Spawn | 157 / 157 | 121 / 121 |
+| Park | 213 / 187 | 113 / 103 |
+| Left wall | 106 / 75 | 89 / 61 |
+| Right wall | 110 / 79 | 87 / 58 |
+| Halfpipe | 141 / 114 | 97 / 80 |
+| Rider on deck | 152 / 122 | 113 / 102 |
 
-Local spatial batching can submit a few extra offscreen triangles at cell boundaries (at most 0.31% more active indices in these static views), while reducing draw submissions. It never removes geometry. The unit test compares indexed world-space triangles, winding, normals, UVs and material properties at 1mm positional precision and checks disposal/local bounds.
+The small increase in active indices at cell boundaries is retained in the raw visual results. Batching never removes geometry.
 
-Passed: park_architecture.cjs; render_budget_browser.cjs; ramp_grind_browser.cjs; skater_v2_browser.cjs; controls_help_browser.cjs; browser_smoke.cjs; all existing controller, terrain, obstacle, grind, motion, wheel, landing, board, push, ramp, halfpipe, input and bowl logic tests. Physical mobile/Xbox hardware and other browsers remain untested.
+## Paired timing protocol
+
+`tools/render_budget_paired.cjs` measures the render path with simulation frozen. It does not measure FPS, animation speed, or physical mobile performance. The previous wall-clock full-game profiler remains an exploratory tool: its physics substep count depends on host frame intervals and it must not be used to estimate animation savings on a 60 FPS device.
+
+- One Chromium process, eight blocks per viewport. Each block uses ABBA or BAAB plus two baseline A/A control runs, with a fresh page for every run. The entire first block is discarded.
+- All five original camera views are timed, including the previously untimed wall and halfpipe views.
+- Each camera uses a fixed projection at both a 64×64 render target and full resolution. Rider and shadows are disabled in **both timing conditions**, isolating architectural submission and raster work without a large shadow-map fill cost at 64×64. Rider/shadow preservation is tested separately above.
+- Three warm-up renders and five measured renders per condition. Each sample ends with a 1×1 readPixels synchronization. Submission time, synchronized time, sync wait, Babylon render time, active-mesh evaluation time, active indices and GL draw counts are recorded.
+- GL-counting wrappers are removed during timed samples. Timing therefore does not include per-draw JavaScript counting overhead.
+- A fixed-work JS canary runs before and after each page's measurements, using the median of five batches after ten warm-up calls. A whole block is excluded if any canary differs by more than 10% from the session median. Rejected data remains in the raw report.
+- Inference uses block-level paired median percent changes and a seeded 10,000-resample bootstrap 95% interval. Frames within a page are not treated as independent pairs. At least four accepted blocks are required for an interval.
+- A submission signal requires lower GL draw counts, both render-time and synchronized-time intervals below zero, and improvements exceeding the corresponding A/A spread. Full-resolution equivalence requires the synchronized interval to lie entirely within a predefined ±5% margin and A/A noise no larger than 5%. An interval merely covering zero does not establish equivalence.
+- Three scratch-scene build/dispose measurements per page record construction cost, disposal cost, retained materials and retained atlas. Scratch scenes are then fully cleaned to prevent the baseline's lifecycle leak from affecting subsequent samples.
+
+The raw report records flags, Chromium version, CPU count and OS load averages. Windows does not expose loadavg through Node, so those zeros are explicitly marked unavailable. All local browser rendering uses SwiftShader. Host drift, GPU-driver waits and the readback itself remain limitations; no result supports a claim about phones.
+
+The full paired run and its accepted/rejected counts will be recorded in `paired-result.json`. Insufficient accepted blocks will be reported as inconclusive, without relaxing rejection thresholds.
 
 ## Reproduce
 
-Install the existing browser test dependencies (`npm install --no-save playwright@1.55.1 babylonjs@8`) and Chromium (`npx playwright install chromium`). Run `node tests/park_architecture.cjs` and `node tests/render_budget_browser.cjs`. For the timing profile, set PERF_FRAMES=40 and run `node tools/render_budget_profile.cjs before`, then `node tools/render_budget_profile.cjs after`. Default is 60 measured frames. Raw rows and screenshots are written under test-artifacts/render-budget/.
+Install the existing test dependencies and Chromium:
 
-![Desktop park before](desktop-park-before.png)
-![Desktop park after](desktop-park-after.png)
+```text
+npm install --no-save playwright@1.55.1 babylonjs@8
+npx playwright install chromium
+node tests/park_architecture.cjs
+node tests/render_budget_statistics.cjs
+node tests/render_budget_browser.cjs
+node tools/render_budget_paired.cjs
+```
+
+`RENDER_PAIRS` defaults to 8 and `RENDER_SAMPLES` to 5. A two-block/one-sample harness check verifies execution but cannot establish a timing conclusion. Reports and screenshots are written under `test-artifacts/render-budget/`. The normal acceptance workflow runs the geometry and exact-pixel checks; the longer timing experiment is a deliberate local run.
+
+## Animation work is deferred
+
+V2 retargeting is unchanged. Its heavy bone writes occur inside physics substeps, but the same function observes landing transitions and applies landing decay. A single call after the loop would lose intermediate landings and can change the rendered pose. Before implementing a split, profile V2's actual share at 1/2/4/10 substeps and compare final palettes, joints, feet, grab contact and landing decay across intermediate land/launch sequences. No animation saving is claimed from this batching experiment.
+
+![Rider/deck before](desktop-rider-on-deck-before.png)
+![Rider/deck after](desktop-rider-on-deck-after.png)
 ![Mobile halfpipe before](mobile-halfpipe-before.png)
 ![Mobile halfpipe after](mobile-halfpipe-after.png)

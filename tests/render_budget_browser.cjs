@@ -1,6 +1,7 @@
 /* Same-browser A/B of unchanged art versus local material batches. */
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http');
 const {chromium}=require('playwright');
+const {installRenderBudgetHooks}=require('../tools/render_budget_support.cjs');
 const {PNG}=require(path.join(path.dirname(require.resolve('playwright-core')),'lib/utilsBundle.js'));
 const root=path.resolve(__dirname,'..'),out=path.join(root,'test-artifacts/render-budget');
 const server=http.createServer((req,res)=>{
@@ -10,7 +11,7 @@ const server=http.createServer((req,res)=>{
 });
 const views=[['spawn',[5,5,-12],[0,1,8]],['park',[25,28,-50],[-20,1,0]],
  ['left-wall',[-105,4,-70],[-119,1,0]],['right-wall',[105,4,70],[119,1,0]],
- ['halfpipe',[-9,17,-50],[-36,2,-18]]];
+ ['halfpipe',[-9,17,-50],[-36,2,-18]],['rider-on-deck',[-31,6.5,-35],[-36,5.6,-31.55]]];
 (async()=>{
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
  const browser=await chromium.launch({args:['--use-gl=angle','--use-angle=swiftshader','--enable-webgl','--enable-unsafe-swiftshader','--no-sandbox']});
@@ -27,23 +28,22 @@ const views=[['spawn',[5,5,-12],[0,1,8]],['park',[25,28,-50],[-20,1,0]],
     await page.addInitScript(()=>Object.defineProperty(navigator,'getGamepads',{value:()=>[]}));
     await page.goto('http://127.0.0.1:'+server.address().port);
     await page.waitForFunction(()=>window.__SOL_DIAGNOSTICS__?.riderV2?.diagnostics.frames>2,null,{timeout:60000});
-    await page.evaluate(async()=>{
-     const d=window.__SOL_DIAGNOSTICS__;d.engine.stopRenderLoop();await d.scene.whenReadyAsync();
-     // Remove moving rider/shadow and HUD from pixel comparisons only. The
-     // separate ramp/rider suites exercise the complete production scene.
-     d.scene.getTransformNodeByName('skater').setEnabled(false);
-     document.querySelectorAll('body > :not(canvas)').forEach(el=>{el.style.display='none';});
-    });
+    await page.evaluate(()=>window.__SOL_DIAGNOSTICS__.scene.whenReadyAsync());
+    await page.evaluate(installRenderBudgetHooks);
     for(const [view,position,target] of views){
-     const stats=await page.evaluate(({position,target})=>{
+     const stats=await page.evaluate(({view,position,target})=>{
       const d=window.__SOL_DIAGNOSTICS__,B=BABYLON,c=new B.FreeCamera('render parity',new B.Vector3(...position),d.scene);
+      if(view==='rider-on-deck')d.skater.position.set(-36,4.5,-31.55);
       c.setTarget(new B.Vector3(...target));c.minZ=.1;d.scene.activeCamera=c;
       for(let i=0;i<4;i++){d.engine.beginFrame();d.scene.render();d.engine.endFrame();}
-      const previousDraws=d.engine._drawCalls.current;
+      window.__renderBudget.reset();
       d.scene.render();
+      window.__renderBudget.sync();
       return {meshes:d.scene.meshes.length,activeMeshes:d.scene.getActiveMeshes().length,
-       drawCalls:d.engine._drawCalls.current-previousDraws,activeIndices:d.scene.getActiveIndices()};
-     },{position,target});
+       drawCalls:window.__renderBudget.stats.calls,drawKinds:window.__renderBudget.stats.byKind,
+       engineDrawCalls:d.engine._drawCalls.current,activeIndices:d.scene.getActiveIndices()};
+     },{view,position,target});
+     assert.equal(stats.drawCalls,stats.engineDrawCalls,'GL draws must cross-check the per-render engine counter');
      const file=path.join(out,`${size}-${view}-${variant}.png`),data=await page.screenshot({path:file});
      const key=size+'-'+view;report.cases[key]||={};report.cases[key][variant]=stats;
      const png=PNG.sync.read(data);
@@ -54,7 +54,7 @@ const views=[['spawn',[5,5,-12],[0,1,8]],['park',[25,28,-50],[-20,1,0]],
       for(let i=0;i<png.data.length;i+=4){let delta=0;for(let c=0;c<3;c++)delta=Math.max(delta,Math.abs(png.data[i+c]-before.data[i+c]));if(delta>2)changed++;total+=delta;max=Math.max(max,delta);}
       const diff={changedPixels:changed,fraction:changed/(png.width*png.height),meanMaxChannelDelta:total/(png.width*png.height),maxChannelDelta:max};
       report.cases[key].pixels=diff;
-      assert(diff.fraction<.001,`${key}: more than 0.1% of pixels changed by >2 levels: ${JSON.stringify(diff)}`);
+      assert.equal(diff.maxChannelDelta,0,`${key}: every RGB pixel must match exactly: ${JSON.stringify(diff)}`);
       assert(stats.drawCalls<=report.cases[key].before.drawCalls,`${key}: batching must not increase submissions`);
       console.log(key,JSON.stringify(report.cases[key]));
      }
@@ -64,7 +64,7 @@ const views=[['spawn',[5,5,-12],[0,1,8]],['park',[25,28,-50],[-20,1,0]],
   }
   assert(Object.values(report.cases).filter(c=>c.after.drawCalls<c.before.drawCalls).length>=6,
    'At least six views must reduce draw submissions');
-  console.log('PASS static park parity and draw-call reduction across desktop/mobile and five views');
+  console.log('PASS exact park/rider/shadow parity and GL draw reduction across desktop/mobile and six views');
  }finally{
   fs.writeFileSync(path.join(out,'result.json'),JSON.stringify(report,null,2));
   await browser.close();server.close();

@@ -1,0 +1,342 @@
+{
+  "browser": "140.0.7339.186",
+  "renderer": "SwiftShader software rendering",
+  "cases": {
+    "desktop-spawn": {
+      "before": {
+        "meshes": 436,
+        "activeMeshes": 138,
+        "drawCalls": 157,
+        "drawKinds": {
+          "drawElements": 157
+        },
+        "engineDrawDelta": 157,
+        "activeIndices": 178788
+      },
+      "after": {
+        "meshes": 349,
+        "activeMeshes": 138,
+        "drawCalls": 157,
+        "drawKinds": {
+          "drawElements": 157
+        },
+        "engineDrawDelta": 157,
+        "activeIndices": 178860
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    },
+    "desktop-park": {
+      "before": {
+        "meshes": 436,
+        "activeMeshes": 194,
+        "drawCalls": 213,
+        "drawKinds": {
+          "drawElements": 213
+        },
+        "engineDrawDelta": 213,
+        "activeIndices": 182454
+      },
+      "after": {
+        "meshes": 349,
+        "activeMeshes": 168,
+        "drawCalls": 187,
+        "drawKinds": {
+          "drawElements": 187
+        },
+        "engineDrawDelta": 187,
+        "activeIndices": 182598
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    },
+    "desktop-left-wall": {
+      "before": {
+        "meshes": 436,
+        "activeMeshes": 91,
+        "drawCalls": 106,
+        "drawKinds": {
+          "drawElements": 106
+        },
+        "engineDrawDelta": 106,
+        "activeIndices": 121386
+      },
+      "after": {
+        "meshes": 349,
+        "activeMeshes": 60,
+        "drawCalls": 75,
+        "drawKinds": {
+          "drawElements": 75
+        },
+        "engineDrawDelta": 75,
+        "activeIndices": 121566
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    },
+    "desktop-right-wall": {
+      "before": {
+        "meshes": 436,
+        "activeMeshes": 95,
+        "drawCalls": 110,
+        "drawKinds": {
+          "drawElements": 110
+        },
+        "engineDrawDelta": 110,
+        "activeIndices": 121116
+      },
+      "after": {
+        "meshes": 349,
+        "activeMeshes": 64,
+        "drawCalls": 79,
+        "drawKinds": {
+          "drawElements": 79
+        },
+        "engineDrawDelta": 79,
+        "activeIndices": 121224
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    },
+    "desktop-halfpipe": {
+      "before": {
+        "meshes": 436,
+        "activeMeshes": 126,
+        "drawCalls": 141,
+        "drawKinds": {
+          "drawElements": 141
+        },
+        "engineDrawDelta": 141,
+        "activeIndices": 130470
+      },
+      "after": {
+        "meshes": 349,
+        "activeMeshes": 99,
+        "drawCalls": 114,
+        "drawKinds": {
+          "drawElements": 114
+        },
+        "engineDrawDelta": 114,
+        "activeIndices": 130722
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    },
+    "desktop-rider-on-deck": {
+      "before": {
+        "meshes": 436,
+        "activeMeshes": 133,
+        "drawCalls": 152,
+        "drawKinds": {
+          "drawElements": 152
+        },
+        "engineDrawDelta": 152,
+        "activeIndices": 165264
+      },
+      "after": {
+        "meshes": 349,
+        "activeMeshes": 103,
+        "drawCalls": 122,
+        "drawKinds": {
+          "drawElements": 122
+        },
+        "engineDrawDelta": 122,
+        "activeIndices": 165372
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    },
+    "mobile-spawn": {
+      "before": {
+        "meshes": 436,
+        "activeMeshes": 103,
+        "drawCalls": 121,
+        "drawKinds": {
+          "drawElements": 121
+        },
+        "engineDrawDelta": 121,
+        "activeIndices": 171920
+      },
+      "after": {
+        "meshes": 349,
+        "activeMeshes": 103,
+        "drawCalls": 121,
+        "drawKinds": {
+          "drawElements": 121
+        },
+        "engineDrawDelta": 121,
+        "activeIndices": 171920
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    },
+    "mobile-park": {
+      "before": {
+        "meshes": 436,
+        "activeMeshes": 99,
+        "drawCalls": 113,
+        "drawKinds": {
+          "drawElements": 113
+        },
+        "engineDrawDelta": 113,
+        "activeIndices": 132708
+      },
+      "after": {
+        "meshes": 349,
+        "activeMeshes": 89,
+        "drawCalls": 103,
+        "drawKinds": {
+          "drawElements": 103
+        },
+        "engineDrawDelta": 103,
+        "activeIndices": 133032
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    },
+    "mobile-left-wall": {
+      "before": {
+        "meshes": 436,
+        "activeMeshes": 75,
+        "drawCalls": 89,
+        "drawKinds": {
+          "drawElements": 89
+        },
+        "engineDrawDelta": 89,
+        "activeIndices": 118578
+      },
+      "after": {
+        "meshes": 349,
+        "activeMeshes": 47,
+        "drawCalls": 61,
+        "drawKinds": {
+          "drawElements": 61
+        },
+        "engineDrawDelta": 61,
+        "activeIndices": 118866
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    },
+    "mobile-right-wall": {
+      "before": {
+        "meshes": 436,
+        "activeMeshes": 73,
+        "drawCalls": 87,
+        "drawKinds": {
+          "drawElements": 87
+        },
+        "engineDrawDelta": 87,
+        "activeIndices": 115254
+      },
+      "after": {
+        "meshes": 349,
+        "activeMeshes": 44,
+        "drawCalls": 58,
+        "drawKinds": {
+          "drawElements": 58
+        },
+        "engineDrawDelta": 58,
+        "activeIndices": 115434
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    },
+    "mobile-halfpipe": {
+      "before": {
+        "meshes": 436,
+        "activeMeshes": 83,
+        "drawCalls": 97,
+        "drawKinds": {
+          "drawElements": 97
+        },
+        "engineDrawDelta": 97,
+        "activeIndices": 121370
+      },
+      "after": {
+        "meshes": 349,
+        "activeMeshes": 66,
+        "drawCalls": 80,
+        "drawKinds": {
+          "drawElements": 80
+        },
+        "engineDrawDelta": 80,
+        "activeIndices": 121586
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    },
+    "mobile-rider-on-deck": {
+      "before": {
+        "meshes": 436,
+        "activeMeshes": 95,
+        "drawCalls": 113,
+        "drawKinds": {
+          "drawElements": 113
+        },
+        "engineDrawDelta": 113,
+        "activeIndices": 160218
+      },
+      "after": {
+        "meshes": 349,
+        "activeMeshes": 84,
+        "drawCalls": 102,
+        "drawKinds": {
+          "drawElements": 102
+        },
+        "engineDrawDelta": 102,
+        "activeIndices": 160542
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    }
+  }
+}
