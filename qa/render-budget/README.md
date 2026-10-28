@@ -12,6 +12,8 @@ The unit test compares indexed world-space triangles, winding, normals, UVs, mat
 
 The browser test now requires exact equality of every RGB pixel. It compares six cameras at desktop 960×720 and mobile 390×844: spawn, park, both perimeter walls, halfpipe, and a rider standing on the deck. Physics is frozen after a deterministic idle pose; the real rider, shadows and current artwork remain visible. Only the HUD is hidden. All 12 comparisons passed with zero channel difference.
 
+A final local rerun with the hoodie integrated also passed all 12 comparisons. It explicitly waits for the production rig and asserts visible skinned meshes, registered rider shadow casters and enabled shadows in every comparison: ten hoodie meshes and ten shadow casters in both variants. [Local results](hoodie-local-result.json) record the runtime revision and test-file hash; the current hoodie images appear below.
+
 Direct WebGL draw calls are counted and cross-checked against Babylon's per-render counter. `SceneInstrumentation` resets that counter before each render, so current is read after the render rather than subtracting a previous frame. The previous static/whole-game tables also differed in viewport, rider visibility and shadow passes; their totals were never interchangeable.
 
 | Fixed-pose view | Desktop GL draws before/after | Mobile GL draws before/after |
@@ -86,7 +88,7 @@ V2 retargeting is unchanged. Its heavy bone writes occur inside physics substeps
 
 [Response to all five independent-review findings](review-response.md).
 
-![Rider/deck before](desktop-rider-on-deck-before.png)
-![Rider/deck after](desktop-rider-on-deck-after.png)
-![Mobile halfpipe before](mobile-halfpipe-before.png)
-![Mobile halfpipe after](mobile-halfpipe-after.png)
+![Hoodie rider/deck before](hoodie-desktop-rider-on-deck-before.png)
+![Hoodie rider/deck after](hoodie-desktop-rider-on-deck-after.png)
+![Hoodie mobile halfpipe before](hoodie-mobile-halfpipe-before.png)
+![Hoodie mobile halfpipe after](hoodie-mobile-halfpipe-after.png)

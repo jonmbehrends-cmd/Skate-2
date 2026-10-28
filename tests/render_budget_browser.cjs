@@ -28,6 +28,8 @@ const views=[['spawn',[5,5,-12],[0,1,8]],['park',[25,28,-50],[-20,1,0]],
     await page.addInitScript(()=>Object.defineProperty(navigator,'getGamepads',{value:()=>[]}));
     await page.goto('http://127.0.0.1:'+server.address().port);
     await page.waitForFunction(()=>window.__SOL_DIAGNOSTICS__?.riderV2?.diagnostics.frames>2,null,{timeout:60000});
+    await page.waitForFunction(()=>!window.SOLHoodieSkater||window.__SOL_DIAGNOSTICS__.rig?.status.ready,
+     null,{timeout:30000});
     await page.evaluate(()=>window.__SOL_DIAGNOSTICS__.scene.whenReadyAsync());
     await page.evaluate(installRenderBudgetHooks);
     for(const [view,position,target] of views){
@@ -39,11 +41,18 @@ const views=[['spawn',[5,5,-12],[0,1,8]],['park',[25,28,-50],[-20,1,0]],
       window.__renderBudget.reset();
       d.scene.render();
       window.__renderBudget.sync();
+      const rider=d.rig?.meshes||d.riderV2.meshes,
+       visibleRider=rider.filter(m=>m.skeleton&&m.isVisible&&m.isEnabled()),
+       shadowCasters=d.scene.getLightByName('sun').getShadowGenerator().getShadowMap().renderList;
       return {meshes:d.scene.meshes.length,activeMeshes:d.scene.getActiveMeshes().length,
        drawCalls:window.__renderBudget.stats.calls,drawKinds:window.__renderBudget.stats.byKind,
-       engineDrawCalls:d.engine._drawCalls.current,activeIndices:d.scene.getActiveIndices()};
+       engineDrawCalls:d.engine._drawCalls.current,activeIndices:d.scene.getActiveIndices(),
+       visibleSkinnedRiderMeshes:visibleRider.length,riderShadowCasters:visibleRider.filter(m=>shadowCasters.includes(m)).length,
+       shadowsEnabled:d.scene.shadowsEnabled};
      },{view,position,target});
      assert.equal(stats.drawCalls,stats.engineDrawCalls,'GL draws must cross-check the per-render engine counter');
+     assert(stats.visibleSkinnedRiderMeshes>0&&stats.riderShadowCasters>0&&stats.shadowsEnabled,
+      'Parity must include the loaded, visible production rider and its shadow casters');
      const file=path.join(out,`${size}-${view}-${variant}.png`),data=await page.screenshot({path:file});
      const key=size+'-'+view;report.cases[key]||={};report.cases[key][variant]=stats;
      const png=PNG.sync.read(data);
