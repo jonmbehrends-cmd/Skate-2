@@ -14,6 +14,10 @@ function build(B,scene,ramps){
  const cement=material('architectural exposed concrete','#a8a49b',true);
  const dark=material('recessed concrete','#474c50',true);
  const metal=material('galvanized park coping','#9aa8b0',false);
+ // Shared galvanized metal stays opaque and depth-writing even at grazing
+ // camera angles; guardrails must never expose see-through wall geometry.
+ metal.alpha=1;metal.transparencyMode=B.Material.MATERIAL_OPAQUE;
+ metal.forceDepthWrite=true;
  const yellow=material('park edge markings','#d7aa50',true);
  // Warm, solid wall-mounted industrial fixtures: emissive appearance without
  // expensive dynamic lights or any changes to the skating collision world.
@@ -115,6 +119,13 @@ function build(B,scene,ramps){
  for(const x of [-119,119]){
   for(let z=-100;z<=100;z+=20){
    cube('park perimeter retaining wall',x,1.1,z,1.1,2.2,19.8,cement);
+   // Raised galvanized guardrail follows the top of the existing concrete
+   // retaining wall. All members sit at x=±119 outside active skate lanes,
+   // remain visual-only, and never change the authoritative wall collider.
+   cube('perimeter guardrail top',x,2.91,z,.12,.08,19.2,metal);
+   cube('perimeter guardrail mid',x,2.57,z,.08,.045,19.2,metal);
+   for(const dz of [-8,0,8])
+    cube('perimeter guardrail upright',x,2.56,z+dz,.12,.72,.12,metal);
    cube('recessed architectural wall panel',x+(x<0?.57:-.57),1.2,z,.035,1.65,17.5,dark);
    for(const dz of [-7,7])cube('wall expansion joint',x+(x<0?.60:-.60),1.2,z+dz,.042,1.8,.065,metal);
    // All details sit on the inside face of the OUTER retaining wall
