@@ -76,7 +76,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    // In a grab, tuck the knees up toward the deck instead of curling the
    // spine forward. Keep the chest comparatively upright as the hips lower;
    // hip/chest lean and arm IK still bring the hand onto the moving deck.
-   const crouch=clamp((pose.crouch||0)*.20+landing*.08+takeoff*.06+(actions.grabbing?.34:0),0,.78);
+   const crouch=clamp((pose.crouch||0)*.20+landing*.08+takeoff*.06+(actions.grabbing?.37:0),0,.78);
    // Settle the pelvis into an athletic, knee-flexed stance instead of a
    // locked-knee upright pose. Feet remain IK-planted on the deck.
    // The ground-reaching push shoe sits below the deck. Compress the hips
@@ -134,7 +134,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    if(actions.grabbing){
     // Grip the near-side deck rail, rather than reaching across the middle;
     // the hand tracks the moving board even during a simultaneous flip.
-    targets[1]=options.board?B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.18,.34,-.31),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):v(.18,.34,-.31);
+    targets[1]=options.board?B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.08,.34,-.31),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):v(.18,.34,-.31);
    }
    let grabReachShift=0;
    if(actions.grabbing){
