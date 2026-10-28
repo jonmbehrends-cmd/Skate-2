@@ -56,6 +56,12 @@ let browser;
    assert(evidence.vertices>100);assert(evidence.matrices.every(Number.isFinite));
    if(mode==='ollie')assert.equal(evidence.status.mode,'ollie','Takeoff pose must render in Chromium');signatures.set(mode,JSON.stringify(evidence.matrices));
    await page.screenshot({path:path.join(out,'skeletal-'+label+'-'+mode+'-closeup.png')});
+   // Emit a compact real Chromium frame for visual review through CI logs;
+   // the full-resolution PNG remains available as an uploaded artifact.
+   if(mode==='grab'&&process.env.GITHUB_ACTIONS){
+    const frame=await page.screenshot({type:'jpeg',quality:55});
+    console.log('SOL_GRAB_JPEG_'+label.toUpperCase()+'='+frame.toString('base64'));
+   }
    if(mode==='grab'){const dist=Math.hypot(...evidence.status.hands[1].map((n,i)=>n-evidence.status.grip[i]));assert(dist<.12,'Hoodie hand must touch board: '+JSON.stringify({dist,hands:evidence.status.hands,grip:evidence.status.grip,feet:evidence.status.feet}));
     assert(evidence.status.grabReachShift<.45,'Grab must not require extreme chest displacement: '+evidence.status.grabReachShift);
    }
