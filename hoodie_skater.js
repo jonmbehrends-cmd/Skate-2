@@ -62,7 +62,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
   const footRotations=detachedFeet.map(stanceRotation);
   // The imported feet have asymmetric bind-pose yaw: one shoe points toward
   // the tail even when its ankle IK is exactly on the deck. Preserve each
-  // shoe's own bind transform, but rotate its toe axis across the deck (+X)
+  // shoe's own bind transform, but rotate its toe axis across the deck (X axis)
   // in stance space. The board's longitudinal axis is Z.
   const alignedFootRotations=detachedFeet.map((foot,i)=>{
    const toeAxis=localPosition(toeEnds[i]).subtract(localPosition(foot)).normalize();
