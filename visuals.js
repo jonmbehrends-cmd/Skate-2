@@ -10,6 +10,9 @@ function enhance(B,scene){
   m.alpha=1;m.transparencyMode=B.Material.MATERIAL_OPAQUE;
   return m;
  };
+ const sun=scene.getLightByName('sun');
+ sun.direction.set(-.18,-1,.22).normalize();
+ sun.position.set(12,65,-16);
  const grain=new B.DynamicTexture('opaque mineral aggregate',256,scene,false);
  const ctx=grain.getContext();ctx.fillStyle='#c4c4b9';ctx.fillRect(0,0,256,256);
  let seed=41;const rand=()=>((seed=(Math.imul(seed,1664525)+1013904223)>>>0)/4294967296);

@@ -265,6 +265,7 @@ const server=http.createServer((req,res)=>{
    'Uphill/downhill/fakie ramp gravity direction is incorrect: '+JSON.stringify(rampGravity));
   const status=await page.evaluate(()=>{
    const d=window.__SOL_DIAGNOSTICS__,meshes=d.scene.meshes;
+   const sun=d.scene.getLightByName('sun');
    const cheeks=meshes.filter(m=>m.name==='SOLID RAMP SIDE WALL');
    const cores=meshes.filter(m=>m.name==='SOLID RAMP CONCRETE CORE');
    const bottom=meshes.find(m=>m.name==='HALFPIPE FLAT BOTTOM');
@@ -284,7 +285,8 @@ const server=http.createServer((req,res)=>{
     bottom:bottom?[bottom.position.x,bottom.position.z]:null,
     bottomSurface:bottom?{material:bottom.material?.name,alpha:bottom.material?.alpha,blend:bottom.material?.needAlphaBlending(),emissive:bottom.material?.emissiveColor?.asArray(),top:bottom.getBoundingInfo().boundingBox.maximumWorld.y,rayHit:bottomPick?.hit}:null,
     skater:!!d.skater,rendered:d.scene.getFrameId()>1,canvasWidth:d.engine.getRenderingCanvas().width,
-    independentCamera:!!d.cameraAnchor&&d.camera.lockedTarget===d.cameraAnchor,staticBatches:d.staticBatchReport};
+    independentCamera:!!d.cameraAnchor&&d.camera.lockedTarget===d.cameraAnchor,
+    sunDirection:sun?.direction.asArray(),staticBatches:d.staticBatchReport};
   });
   // The park is expanded frequently; derive expected cheeks/cores from the
   // actual number of skatable ramp meshes rather than a stale six-ramp layout.
@@ -319,6 +321,8 @@ const server=http.createServer((req,res)=>{
   assert(deckVisual.deckVertices>=160&&deckVisual.gripVertices>=80&&deckVisual.samePivot&&deckVisual.visible,
    'Actual skater must render sculpted board and grip attached to one animated pivot: '+JSON.stringify(deckVisual));
   assert(status.independentCamera,'Camera must not rotate with rider during airborne spins');
+  assert(status.sunDirection&&Math.hypot(status.sunDirection[0],status.sunDirection[2])/Math.abs(status.sunDirection[1])<.35,
+   'Directional light must keep the rider shadow close to its caster: '+JSON.stringify(status.sunDirection));
   assert(status.staticBatches?.merged>80&&status.staticBatches?.groups>=8,'Static park art must be batched to avoid hundreds of unnecessary mobile draw calls: '+JSON.stringify(status.staticBatches));
   // Exercise the actual mobile joystick: the board and skater must visibly yaw,
   // while the camera's orientation remains fixed during an aerial spin.
