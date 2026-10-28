@@ -76,7 +76,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    // In a grab, tuck the knees up toward the deck instead of curling the
    // spine forward. Keep the chest comparatively upright as the hips lower;
    // hip/chest lean and arm IK still bring the hand onto the moving deck.
-   const crouch=clamp((pose.crouch||0)*.20+landing*.08+takeoff*.06+(actions.grabbing?.65:0),0,.78);
+   const crouch=clamp((pose.crouch||0)*.20+landing*.08+takeoff*.06+(actions.grabbing?.59:0),0,.78);
    // Settle the pelvis into an athletic, knee-flexed stance instead of a
    // locked-knee upright pose. Feet remain IK-planted on the deck.
    // The ground-reaching push shoe sits below the deck. Compress the hips
@@ -101,7 +101,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    spine.rotationQuaternion=rest.get(spine).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.12:-pushLean))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pose.pushing?(pose.contact||0)*.07:0)));
    const travel=state.travelSign===-1?-1:1;
-   const lift=air?(flip?.22:actions.grabbing?.10:.15+takeoff*.12):0;
+   const lift=air?(flip?.22:actions.grabbing?.15:.15+takeoff*.12):0;
    // Ollie pop starts at the tail: the rear knee tucks first, then the front
    // knee levels the board. A kickflip briefly flicks the leading shoe out.
    // These are skin-only targets and never change deck rotation or collision.
@@ -112,7 +112,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    for(let i=0;i<legs.length;i++){
     const back=i===1,side=back?-1:1;
     const pushing=back&&pose.pushing;
-    const foot=v(pushing?-.23:.015,.45+lift+(back?rearPop:frontLevel),side*.36+(back?0:frontFlick));
+    // A real deck grab is not a symmetric seated squat: tuck the leading\n    // knee slightly forward while the trailing foot follows the tail.\n    // Both targets remain in the moving board's local stance frame.\n    const grabStagger=actions.grabbing?(back?-.055:.075):0;\n    const foot=v(pushing?-.23:.015+grabStagger,.45+lift+(back?rearPop:frontLevel),side*.36+(back?0:frontFlick));
     if(pushing){foot.y=.17+(pose.recovery||0)*.29;foot.z=-.32-travel*(.18*(pose.contact||0)-.20*(pose.recovery||0))}
     solve(legs[i].n,foot,v(.8,.65,side*.50));placeDetached(detachedFeet[i],localPosition(legs[i].n[2]));orient(detachedFeet[i],footRotations[i]);
    }
