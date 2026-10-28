@@ -107,7 +107,11 @@ function build(B,scene,ramps){
    if(z===-60||z===0||z===60){
     const art=B.MeshBuilder.CreatePlane('park perimeter painted mural',{width:12,height:1.5},scene);
     art.position.set(x+(x<0?.605:-.605),1.2,z);
-    art.rotation.y=x<0?Math.PI/2:-Math.PI/2;art.material=muralMat;
+    art.rotation.y=x<0?Math.PI/2:-Math.PI/2;
+    // From the skating side these inward-facing walls otherwise display
+    // the shared stencil mirrored; flip only this plane, not the atlas used
+    // by the correctly oriented halfpipe murals.
+    art.scaling.x=-1;art.material=muralMat;
     art.isPickable=false;art.checkCollisions=false;objects.push(art);
    }
   }
