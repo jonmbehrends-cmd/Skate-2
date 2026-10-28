@@ -1,0 +1,35 @@
+name: Import CC0 Kenney skate-boy asset (one-time)
+on:
+  push:
+    branches: [feature/kenney-skater-asset-20261028]
+permissions:
+  contents: write
+jobs:
+  import:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Import verified original Kenney Mini Skate GLB
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p assets/kenney-mini-skate
+          curl -fLsS --retry 3 --max-time 45 \
+            'https://raw.githubusercontent.com/lalomorales22/threejskate/main/mini-skate/Models/GLB%20format/character-skate-boy.glb' \
+            -o assets/kenney-mini-skate/character-skate-boy.glb
+          test "$(git hash-object assets/kenney-mini-skate/character-skate-boy.glb)" = '78b1dae8d95b5a54c827b5a3f8e8e44935aa3888'
+          curl -fLsS --retry 3 --max-time 30 \
+            'https://raw.githubusercontent.com/lalomorales22/threejskate/main/mini-skate/License.txt' \
+            -o assets/kenney-mini-skate/License.txt
+          grep -q 'Creative Commons Zero, CC0' assets/kenney-mini-skate/License.txt
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/kenney-mini-skate
+          if ! git diff --cached --quiet; then
+            git commit -m 'assets: import verified Kenney CC0 skater GLB and license'
+            git push origin HEAD:feature/kenney-skater-asset-20261028
+          fi
