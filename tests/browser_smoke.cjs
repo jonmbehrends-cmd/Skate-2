@@ -543,31 +543,55 @@ const server=http.createServer((req,res)=>{
     for(const m of window.__SOL_DIAGNOSTICS__.scene.meshes)
      if(m.name==='park continuous concrete'||m.name==='ground')m.setEnabled(true);
    });
-   const samples=await page.evaluate(async ([a,b])=>{
+   // Positive control: removing the visible ramp must noticeably change
+   // the same pixels. Otherwise a zero-difference occlusion result could
+   // simply be sampling the sky or an unrelated piece of scenery.
+   const rampHidden=await page.evaluate(()=>{
+    const names=new Set(['solid skatable concrete ramp','SOLID RAMP SIDE WALL',
+      'HALFPIPE FLAT BOTTOM','HALFPIPE PARK CONNECTION']);
+    const meshes=window.__SOL_DIAGNOSTICS__.scene.meshes.filter(m=>names.has(m.name));
+    window.__SOL_RAMP_CHALLENGE__=meshes.map(m=>[m,m.isEnabled()]);
+    for(const m of meshes)m.setEnabled(false);
+    return meshes.length;
+   });
+   await page.waitForTimeout(150);
+   const rampRemoved=await page.screenshot({animations:'disabled'});
+   await page.evaluate(()=>{
+    for(const [mesh,enabled] of window.__SOL_RAMP_CHALLENGE__||[])mesh.setEnabled(enabled);
+    delete window.__SOL_RAMP_CHALLENGE__;
+   });
+   const samples=await page.evaluate(async ([a,b,c])=>{
     async function pixels(encoded){
      const img=new Image();img.src='data:image/png;base64,'+encoded;await img.decode();
      const c=document.createElement('canvas');c.width=img.width;c.height=img.height;
      const ctx=c.getContext('2d');ctx.drawImage(img,0,0);
      return ctx.getImageData(0,0,c.width,c.height);
     }
-    const p=await pixels(a),q=await pixels(b);
+    const p=await pixels(a),q=await pixels(b),r=await pixels(c);
     // Stable interior ramp locations in the dedicated 960x540 side view;
     // exclude the moving rider and the coping silhouette.
     const spots=[[180,350],[780,350],[480,450]];
     return spots.map(([x,y])=>{
-     let total=0,count=0;
+     let total=0,control=0,count=0;
      for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){
       const i=((y+dy)*p.width+x+dx)*4;
-      for(let k=0;k<3;k++){total+=Math.abs(p.data[i+k]-q.data[i+k]);count++}
+      for(let k=0;k<3;k++){
+       total+=Math.abs(p.data[i+k]-q.data[i+k]);
+       control+=Math.abs(p.data[i+k]-r.data[i+k]);
+       count++;
+      }
      }
-     return {x,y,meanChannelDelta:total/count};
+     return {x,y,meanChannelDelta:total/count,rampRemovalDelta:control/count};
     });
-   },[before.toString('base64'),after.toString('base64')]);
-   return {hiddenFloorMeshes:hidden,samples};
+   },[before.toString('base64'),after.toString('base64'),rampRemoved.toString('base64')]);
+   return {hiddenFloorMeshes:hidden,hiddenRampMeshes:rampHidden,samples};
   })();
   assert(floorOcclusionQA.hiddenFloorMeshes>=4,'Expected underlying park floor meshes for the occlusion challenge');
   assert(floorOcclusionQA.samples.every(s=>s.meanChannelDelta<8),
    'Underlying plaza changes visible halfpipe riding pixels (ground bleed-through): '+JSON.stringify(floorOcclusionQA));
+  assert(floorOcclusionQA.hiddenRampMeshes>=10&&
+    floorOcclusionQA.samples.filter(s=>s.rampRemovalDelta>15).length>=2,
+   'Halfpipe occlusion samples must visibly react when ramp geometry is removed: '+JSON.stringify(floorOcclusionQA));
 
   // The player's actual GRIND touch button must catch bowl coping without ollie.
   // Set a physically valid position on the steep bowl wall (not 1.3m
