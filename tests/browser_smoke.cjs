@@ -708,6 +708,12 @@ const server=http.createServer((req,res)=>{
   });
   await page.waitForTimeout(500);
   await page.screenshot({path:'test-artifacts/halfpipe-chromium.png',animations:'disabled'});
+  // Preserve the PNG artifact and expose a compact rendered frame in CI logs
+  // so concrete opacity and finish can be visually inspected before merging.
+  if(process.env.GITHUB_ACTIONS){
+   const frame=await page.screenshot({type:'jpeg',quality:52,animations:'disabled'});
+   console.log('SOL_HALFPIPE_JPEG='+frame.toString('base64'));
+  }
   await checkSceneScreenshot('test-artifacts/halfpipe-chromium.png','halfpipe');
   // Rendered-pixel occlusion regression: the concrete plaza is BELOW the
   // halfpipe. Removing it must not change pixels on the visible wooden
