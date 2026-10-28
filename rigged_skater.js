@@ -60,22 +60,23 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
   const footRotations=legs.map(l=>stanceRotation(l.n[2]));
   function orient(node,q){const pq=B.Quaternion.Identity(),parentQ=B.Quaternion.Identity();node.parent.computeWorldMatrix(true).decompose(undefined,pq);parent.computeWorldMatrix(true).decompose(undefined,parentQ);node.rotationQuaternion=pq.conjugate().multiply(parentQ.multiply(q));node.computeWorldMatrix(true)}
   const status={ready:true,mode:'idle',height:2.18,bones:container.skeletons[0].bones.length,source:DEFAULT_URL,feet:[],hands:[]};
-  let wasGrounded=true,landing=0;
+  let wasGrounded=true,landing=0,takeoff=0;
   function update(state,pose,actions={}){
    const dt=clamp(actions.dt||1/60,0,.05);
    if(state.grounded&&!wasGrounded)landing=1;else landing=Math.max(0,landing-dt*5);
+   if(!state.grounded&&wasGrounded)takeoff=1;else takeoff=Math.max(0,takeoff-dt*5);
    wasGrounded=!!state.grounded;
    const air=!state.grounded&&!actions.grinding,flip=air&&Math.abs(state.flip||0)>0;
-   const mode=actions.grinding?'grind':actions.grabbing?'grab':flip?'flip':air?'air':landing>.05?'landing':pose.pushing?'push':(pose.crouch||0)>.1?'crouch':Math.abs(state.speed)>1?'ride':'idle';
+   const mode=actions.grinding?'grind':actions.grabbing?'grab':flip?'flip':air&&takeoff>.05?'ollie':air?'air':landing>.05?'landing':pose.pushing?'push':(pose.crouch||0)>.1?'crouch':Math.abs(state.speed)>1?'ride':'idle';
    status.mode=mode;
    for(const [n,r] of rest){n.position.copyFrom(r.p);n.rotationQuaternion=r.q.clone()}
-   const crouch=clamp((pose.crouch||0)*.48+landing*.15+(actions.grabbing?.75:0),0,.92);
+   const crouch=clamp((pose.crouch||0)*.48+landing*.15+takeoff*.26+(actions.grabbing?.75:0),0,.92);
    rig.position.y=.33-lo*scale-.13-crouch-(pose.pushing?.32:0);
    rig.rotation.x=0;rig.rotation.z=0;
    // Torso lean rotates the upper skeleton only; it cannot lift the planted feet.
    spine.rotationQuaternion=rest.get(spine).q.multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.35:.07)+(pose.contact||0)*.07));
    const travel=state.travelSign===-1?-1:1;
-   const lift=air&&!actions.grabbing?(flip?.20:.12):0;
+   const lift=air&&!actions.grabbing?(flip?.20:.12+takeoff*.18):0;
    for(let i=0;i<legs.length;i++){
     const back=i===1,side=back?-1:1;
     const pushing=back&&pose.pushing;
@@ -99,7 +100,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
   // Visibility, not setEnabled: legacy animation still toggles arm nodes.
   const oldVisibility=legacyMeshes.map(m=>m.isVisible);
   for(const mesh of legacyMeshes)mesh.isVisible=false;
-  return {root:rig,update,status,meshes,skeletons:container.skeletons,animationNames:['idle','ride','push','crouch','air','flip','grab','grind','landing'],dispose(){legacyMeshes.forEach((m,i)=>m.isVisible=oldVisibility[i]);container.dispose();rig.dispose()}};
+  return {root:rig,update,status,meshes,skeletons:container.skeletons,animationNames:['idle','ride','push','crouch','ollie','air','flip','grab','grind','landing'],dispose(){legacyMeshes.forEach((m,i)=>m.isVisible=oldVisibility[i]);container.dispose();rig.dispose()}};
  }catch(error){container.dispose();rig?.dispose();throw error}
 }
 root.SOLRiggedSkater={attach,DEFAULT_URL};
