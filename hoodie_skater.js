@@ -63,7 +63,8 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
   function placeDetached(node,target){const inv=B.Matrix.Invert(node.parent.computeWorldMatrix(true));node.position.copyFrom(B.Vector3.TransformCoordinates(world(target),inv));node.computeWorldMatrix(true)}
   function orient(node,q){const pq=B.Quaternion.Identity(),parentQ=B.Quaternion.Identity();node.parent.computeWorldMatrix(true).decompose(undefined,pq);parent.computeWorldMatrix(true).decompose(undefined,parentQ);node.rotationQuaternion=pq.conjugate().multiply(parentQ.multiply(q));node.computeWorldMatrix(true)}
   const status={ready:true,mode:'idle',height:2.05,bones:container.skeletons[0].bones.length,source:DEFAULT_URL,feet:[],hands:[],meshes:meshes.length};
-  let wasGrounded=true,landing=0,takeoff=0;
+  let wasGrounded=true,landing=0,takeoff=0,grabLift=0;
+  const boardRestY=options.board?.position.y||0;
   function update(state,pose,actions={}){
    const dt=clamp(actions.dt||1/60,0,.05);
    if(state.grounded&&!wasGrounded)landing=1;else landing=Math.max(0,landing-dt*5);
@@ -76,7 +77,14 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    // In a grab, tuck the knees up toward the deck instead of curling the
    // spine forward. Keep the chest comparatively upright as the hips lower;
    // hip/chest lean and arm IK still bring the hand onto the moving deck.
-   const crouch=clamp((pose.crouch||0)*.20+landing*.08+takeoff*.06+(actions.grabbing?.55:0),0,.78);
+   const crouch=clamp((pose.crouch||0)*.20+landing*.08+takeoff*.06+(actions.grabbing?.27:0),0,.78);
+   // In a real airborne grab the rider draws the *board* toward the hips.
+   // Raising only the knees while keeping the deck below them forces a seated
+   // IK pose. This is a visual transform; the physics state is never touched.
+   const targetLift=air&&actions.grabbing?.58:0;
+   grabLift=state.grounded?0:grabLift+(targetLift-grabLift)*Math.min(1,dt*18);
+   if(options.board){options.board.position.y=boardRestY+grabLift;options.board.computeWorldMatrix(true)}
+   status.grabLift=grabLift;
    // Settle the pelvis into an athletic, knee-flexed stance instead of a
    // locked-knee upright pose. Feet remain IK-planted on the deck.
    // The ground-reaching push shoe sits below the deck. Compress the hips
@@ -99,8 +107,8 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    const pushLean=pose.pushing&&state.grounded?
     clamp((pose.contact||0)*.075+(pose.recovery||0)*.025,0,.085):0;
    status.pushLean=pushLean;
-   pelvis.rotationQuaternion=rest.get(pelvis).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?.45:-pushLean*.5));
-   spine.rotationQuaternion=rest.get(spine).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.08:-pushLean))
+   pelvis.rotationQuaternion=rest.get(pelvis).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?.10:-pushLean*.5));
+   spine.rotationQuaternion=rest.get(spine).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.04:-pushLean))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pose.pushing?(pose.contact||0)*.07:0)));
    const travel=state.travelSign===-1?-1:1;
    const lift=air?(flip?.22:actions.grabbing?.08:.15+takeoff*.12):0;
@@ -118,11 +126,14 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     // knee slightly forward while the trailing foot follows the tail.
     // Both targets remain in the moving board's local stance frame.
     const grabStagger=actions.grabbing?(back?-.055:.075):0;
-    const foot=v(pushing?-.23:.015+grabStagger,.45+lift+(back?rearPop:frontLevel),side*(actions.grabbing?.22:.36)+(back?0:frontFlick));
+    let foot=v(pushing?-.23:.015+grabStagger,.45+lift+(back?rearPop:frontLevel),side*(actions.grabbing?.22:.36)+(back?0:frontFlick));
+    // When the deck is raised/rotated during a grab, the shoes follow the
+    // actual visual deck in stance coordinates rather than a fixed floor plane.
+    if(actions.grabbing){foot=options.board?B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(foot,options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):foot.add(v(0,grabLift,0))}
     if(pushing){foot.y=.17+(pose.recovery||0)*.29;foot.z=-.32-travel*(.18*(pose.contact||0)-.20*(pose.recovery||0))}
     // During grabs bend the knees upward toward the chest, not forward
     // along the deck. This pole only changes skeletal IK, never board physics.
-    const kneePole=actions.grabbing?v(.38,1.05,side*.62):v(.8,.65,side*.50);
+    const kneePole=actions.grabbing?v(.35,1.52,side*.57):v(.8,.65,side*.50);
     solve(legs[i].n,foot,kneePole);placeDetached(detachedFeet[i],localPosition(legs[i].n[2]));orient(detachedFeet[i],footRotations[i]);
    }
    // Keep the shoulders active throughout a trick. A skater raises both
@@ -139,7 +150,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    if(actions.grabbing){
     // Grip the near-side deck rail, rather than reaching across the middle;
     // the hand tracks the moving board even during a simultaneous flip.
-    targets[1]=options.board?B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.20,.34,.15),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):v(.20,.34,.15);
+    targets[1]=options.board?B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.20,.34,.15),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):v(.20,.34+grabLift,.15);
    }
    let grabReachShift=0;
    if(actions.grabbing){
@@ -170,7 +181,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
   // Visibility, not setEnabled: legacy animation still toggles arm nodes.
   const oldVisibility=legacyMeshes.map(m=>m.isVisible);
   for(const mesh of legacyMeshes)mesh.isVisible=false;
-  return {root:rig,update,status,meshes,skeletons:container.skeletons,animationNames:['idle','ride','push','crouch','ollie','air','flip','grab','grind','landing'],dispose(){legacyMeshes.forEach((m,i)=>m.isVisible=oldVisibility[i]);container.dispose();rig.dispose()}};
+  return {root:rig,update,status,meshes,skeletons:container.skeletons,animationNames:['idle','ride','push','crouch','ollie','air','flip','grab','grind','landing'],dispose(){if(options.board)options.board.position.y=boardRestY;legacyMeshes.forEach((m,i)=>m.isVisible=oldVisibility[i]);container.dispose();rig.dispose()}};
  }catch(error){container.dispose();rig?.dispose();throw error}
 }
 root.SOLHoodieSkater={attach,DEFAULT_URL};
