@@ -314,9 +314,24 @@ const server=http.createServer((req,res)=>{
    const bottomPick=d.scene.pickWithRay(bottomRay,m=>m.name==='HALFPIPE FLAT BOTTOM');
    const skins=meshes.filter(m=>m.name==='solid skatable concrete ramp');
    const skinMaterial=skins[0]?.material;
+   // A single opaque-looking sample is insufficient: a different ramp can
+   // still render the plaza grid through its riding face if depth writing
+   // or mesh visibility is accidentally disabled.
+   const skinOcclusion=skins.map(m=>({
+    name:m.material?.name,
+    alpha:m.material?.alpha,
+    blending:m.material?.needAlphaBlending?.(),
+    textureAlpha:!!m.material?.diffuseTexture?.hasAlpha,
+    depthWriteDisabled:!!m.material?.disableDepthWrite,
+    meshVisibility:m.visibility,
+    meshVisible:m.isVisible,
+    meshEnabled:m.isEnabled(),
+    indices:m.getTotalIndices()
+   }));
+   const bottomDepthWriteDisabled=!!bottom?.material?.disableDepthWrite;
    const topRay=new window.BABYLON.Ray(new window.BABYLON.Vector3(-36,12,-28),new window.BABYLON.Vector3(0,-1,0),20);
    const topPick=d.scene.pickWithRay(topRay,m=>m.name==='solid skatable concrete ramp');
-   return {rampCheeks:cheeks.length,cores:cores.length,skinCount:skins.length,skinMaterial:{alpha:skinMaterial?.alpha,blend:skinMaterial?.needAlphaBlending(),textureAlpha:skinMaterial?.diffuseTexture?.hasAlpha,transparency:skinMaterial?.transparencyMode,culled:skinMaterial?.backFaceCulling},topPick:{hit:topPick?.hit,y:topPick?.pickedPoint?.y},
+   return {rampCheeks:cheeks.length,cores:cores.length,skinCount:skins.length,skinOcclusion,bottomDepthWriteDisabled,skinMaterial:{alpha:skinMaterial?.alpha,blend:skinMaterial?.needAlphaBlending(),textureAlpha:skinMaterial?.diffuseTexture?.hasAlpha,transparency:skinMaterial?.transparencyMode,culled:skinMaterial?.backFaceCulling},topPick:{hit:topPick?.hit,y:topPick?.pickedPoint?.y},
     opaqueCheeks:cheeks.every(m=>m.material&&m.material.alpha===1&&m.material.backFaceCulling===false&&m.getTotalIndices()>0),
     opaqueCores:cores.every(m=>m.material&&m.material.alpha===1),
     minCheekThickness:Math.min(...cheeks.map(m=>m.getBoundingInfo().boundingBox.maximumWorld.x-m.getBoundingInfo().boundingBox.minimumWorld.x)),
@@ -333,6 +348,9 @@ const server=http.createServer((req,res)=>{
   assert.equal(status.rampCheeks,status.skinCount*2,'Every ramp needs two solid concrete sidewalls');
   assert.equal(status.cores,0,'Sealed ramp bodies must not contain overlapping concrete infill cores');
   assert.equal(status.skinMaterial.alpha,1,'Riding skin must be opaque');
+  assert(status.skinOcclusion.every(m=>m.alpha===1&&!m.blending&&!m.textureAlpha&&!m.depthWriteDisabled&&m.meshVisibility===1&&m.meshVisible&&m.meshEnabled&&m.indices>0),
+   'Every ramp skin must be visible, opaque, depth-writing geometry to prevent ground-grid bleed-through: '+JSON.stringify(status.skinOcclusion));
+  assert.equal(status.bottomDepthWriteDisabled,false,'Halfpipe floor must write depth to occlude the plaza grid');
   assert.equal(status.skinMaterial.blend,false,'Riding skin must not use alpha blending');
   assert.equal(status.skinMaterial.culled,false,'Riding skin must render from both sides');
   assert(status.topPick.hit&&Number.isFinite(status.topPick.y),'A ray must hit the halfpipe riding skin');
