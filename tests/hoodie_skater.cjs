@@ -47,6 +47,20 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
   'Grab should stagger the leading and trailing shoes rather than make a symmetric seated pose');
  assert(rig.status.feet.every(f=>f[1]>.50),
   'Grab should tuck both knees above their neutral riding position');
+ // Always emit skinned mesh/joint diagnostics BEFORE visual gates can fail.
+ // Earlier placement after the assertions hid the evidence on the failing run.
+ console.log('GRAB_REACH_GEOMETRY',JSON.stringify({...rig.status.grabDebug,footReachError:rig.status.footReachError,feet:rig.status.feet}));
+ // Diagnostic-only: compare joint-space IK with the actual skinned apparel
+ // and shoe mesh hierarchy. Ankle targets alone cannot prove shoes are on deck.
+ const nodes=scene.transformNodes.filter(n=>/Foot\.|LowerLeg\.|Hips|Chest/.test(n.name));
+ console.log('GRAB_SKIN_HIERARCHY',JSON.stringify({
+  nodes:nodes.map(n=>({name:n.name,parent:n.parent?.name,
+   local:n.position.asArray(),stance:B.Vector3.TransformCoordinates(n.getAbsolutePosition(),B.Matrix.Invert(parent.computeWorldMatrix(true))).asArray()})),
+  meshes:rig.meshes.map(m=>{m.refreshBoundingInfo(true);return {name:m.name,parent:m.parent?.name,vertices:m.getTotalVertices(),
+   skeleton:m.skeleton?.name,material:m.material?.name,
+   bounds:m.getBoundingInfo()?.boundingBox?.extendSizeWorld?.asArray(),center:m.getBoundingInfo()?.boundingBox?.centerWorld?.asArray()}})
+ }));
+
  // Visual acceptance guard: prior numerical IK tests passed while the
  // rendered skater sat on the deck and the chest was translated into the hips.
  // Do not approve this draft merely because hand/ankle targets were reached.
@@ -59,17 +73,6 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  assert(rig.status.footReachError.every(e=>e<.15),'Grab shoes must stay close to lifted deck targets: '+JSON.stringify({errors:rig.status.footReachError,feet:rig.status.feet,targets:rig.status.footTargets}));
  assert(rig.status.legGeometry.every(l=>l.knee[0]>l.hip[0]+.06&&l.knee[1]<l.hip[1]+.22),
   'Grab knees must flex forward near the hips, not fold up behind the torso: '+JSON.stringify(rig.status.legGeometry));
- console.log('GRAB_REACH_GEOMETRY',JSON.stringify({...rig.status.grabDebug,footReachError:rig.status.footReachError,feet:rig.status.feet}));
- // Diagnostic-only: compare joint-space IK with the actual skinned apparel
- // and shoe mesh hierarchy. Ankle targets alone cannot prove shoes are on deck.
- const nodes=scene.transformNodes.filter(n=>/Foot\.|LowerLeg\.|Hips|Chest/.test(n.name));
- console.log('GRAB_SKIN_HIERARCHY',JSON.stringify({
-  nodes:nodes.map(n=>({name:n.name,parent:n.parent?.name,
-   local:n.position.asArray(),stance:B.Vector3.TransformCoordinates(n.getAbsolutePosition(),B.Matrix.Invert(parent.computeWorldMatrix(true))).asArray()})),
-  meshes:rig.meshes.map(m=>{m.refreshBoundingInfo(true);return {name:m.name,parent:m.parent?.name,vertices:m.getTotalVertices(),
-   skeleton:m.skeleton?.name,material:m.material?.name,
-   bounds:m.getBoundingInfo()?.boundingBox?.extendSizeWorld?.asArray(),center:m.getBoundingInfo()?.boundingBox?.centerWorld?.asArray()}})
- }));
 
  assert(Number.isFinite(rig.status.grabReachShift)&&rig.status.grabReachShift<.45,
   'Grab should not translate the chest excessively: '+rig.status.grabReachShift);
