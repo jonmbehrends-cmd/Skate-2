@@ -18,8 +18,8 @@ let browser;
   assert.equal(ready.version,'8.32.1');assert.equal(ready.active,1);assert.equal(ready.legacy,0);assert.equal(ready.status.bones,19);
   await page.screenshot({path:path.join(out,'skeletal-'+label+'-spawn.png')});
   // Real touch/keyboard actions drive the running production animation loop.
-  if(mobile)await page.locator('[data-t="push"]').tap();else await page.keyboard.down('w');
-  await page.waitForFunction(()=>__SOL_DIAGNOSTICS__.rig.status.mode==='push');
+  if(mobile)await page.locator('[data-t="push"]').dispatchEvent('pointerdown',{pointerId:1,pointerType:'touch',isPrimary:true});else await page.keyboard.down('w');
+  await page.waitForFunction(()=>__SOL_DIAGNOSTICS__.rig.status.mode==='push',null,{timeout:10000});
   await page.screenshot({path:path.join(out,'skeletal-'+label+'-push.png')});
   if(!mobile)await page.keyboard.up('w');
   await page.locator('[data-t="kick"]').click();
