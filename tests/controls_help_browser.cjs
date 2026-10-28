@@ -263,14 +263,21 @@ async function main() {
     assert(scroll.overflow, 'Landscape dialog must overflow to exercise native scrolling');
     if(scroll.overflow){
       for (const key of ['ArrowDown', 'PageDown']) {
+        await landscape.locator('#controls-help-dialog').evaluate(el => {
+          window.__helpScrollEnded = false;
+          el.addEventListener('scrollend', () => { window.__helpScrollEnded = true; }, {once:true});
+        });
         await landscape.keyboard.press(key);
         // Wait for the native animation to reach its destination before the next key.
         await landscape.waitForFunction(key => {
           const el = document.querySelector('#controls-help-dialog');
-          return el.scrollTop >= Math.min(key === 'ArrowDown' ? 39 : el.scrollHeight - el.clientHeight - 1,
+          return window.__helpScrollEnded && el.scrollTop >= Math.min(key === 'ArrowDown' ? 39 : el.scrollHeight - el.clientHeight - 1,
             el.scrollHeight - el.clientHeight - 1);
-        }, key, { timeout: 10000 }).catch(error => {
-            throw new Error(`${key} must scroll the open dialog: ${error.message}`);
+        }, key, { timeout: 10000 }).catch(async error => {
+            const details = await landscape.locator('#controls-help-dialog').evaluate(el => ({
+              top:el.scrollTop,height:el.clientHeight,total:el.scrollHeight,focus:document.activeElement.outerHTML
+            }));
+            throw new Error(`${key} must scroll the open dialog: ${JSON.stringify(details)} ${error.message}`);
           });
       }
       await landscape.keyboard.down('w');
