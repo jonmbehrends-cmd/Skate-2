@@ -89,7 +89,9 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    // Refresh the scaled rig root before solving world-space IK targets.
    rig.computeWorldMatrix(true);
    rig.rotation.x=0;rig.rotation.z=0;
-   // Keep the hips above the board and the chest comparatively upright: a\n   // grab should be a compressed athletic stance, not a prone torso.\n   // Bend from the hips during a grab so the shoulder can physically reach
+   // Keep the hips above the board and the chest comparatively upright: a
+   // grab should be a compressed athletic stance, not a prone torso.
+   // Bend from the hips during a grab so the shoulder can physically reach
    // the moving deck; leg IK below re-plants both feet after this rotation.
    // A grounded push needs a small forward hip hinge and chest counterbalance.
    // Drive both from the actual contact/recovery phase, not the board's speed:
@@ -120,7 +122,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     if(pushing){foot.y=.17+(pose.recovery||0)*.29;foot.z=-.32-travel*(.18*(pose.contact||0)-.20*(pose.recovery||0))}
     // During grabs bend the knees upward toward the chest, not forward
     // along the deck. This pole only changes skeletal IK, never board physics.
-    const kneePole=actions.grabbing?v(.12,1.55,side*.62):v(.8,.65,side*.50);
+    const kneePole=actions.grabbing?v(.38,1.05,side*.62):v(.8,.65,side*.50);
     solve(legs[i].n,foot,kneePole);placeDetached(detachedFeet[i],localPosition(legs[i].n[2]));orient(detachedFeet[i],footRotations[i]);
    }
    // Keep the shoulders active throughout a trick. A skater raises both
