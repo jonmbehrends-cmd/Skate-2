@@ -61,6 +61,13 @@ let browser;
    if(mode==='grab'&&process.env.GITHUB_ACTIONS){
     const frame=await page.screenshot({type:'jpeg',quality:55});
     console.log('SOL_GRAB_JPEG_'+label.toUpperCase()+'='+frame.toString('base64'));
+    // Inspect the other side of the rig: rear-quarter views can hide a
+    // reversed knee or a shoe mesh that is visually off the deck.
+    await page.evaluate(()=>{const d=__SOL_DIAGNOSTICS__;d.scene.activeCamera.alpha=1.3;d.scene.render()});
+    await page.screenshot({path:path.join(out,'skeletal-'+label+'-grab-opposite-closeup.png')});
+    const opposite=await page.screenshot({type:'jpeg',quality:55});
+    console.log('SOL_GRAB_OPPOSITE_JPEG_'+label.toUpperCase()+'='+opposite.toString('base64'));
+    await page.evaluate(()=>{const d=__SOL_DIAGNOSTICS__;d.scene.activeCamera.alpha=-.9;d.scene.render()});
    }
    if(mode==='grab'){const dist=Math.hypot(...evidence.status.hands[1].map((n,i)=>n-evidence.status.grip[i]));assert(dist<.12,'Hoodie hand must touch board: '+JSON.stringify({dist,hands:evidence.status.hands,grip:evidence.status.grip,feet:evidence.status.feet}));
     assert(evidence.status.grabReachShift<.45,'Grab must not require extreme chest displacement: '+evidence.status.grabReachShift);
