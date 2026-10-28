@@ -232,9 +232,9 @@ const server=http.createServer((req,res)=>{
    const r={x:-12,z:15,w:13,d:19,h:2.35};
    return [-1,1].map(side=>{
     const g=window.SOLRampGeometry.sideWall(r,window.SOLTerrain.profile,side,8);
-    const [a,b,c]=g.indices.slice(0,3).map(i=>g.positions.slice(i*3,i*3+3));
-    const u=b.map((v,i)=>v-a[i]),v=c.map((w,i)=>w-a[i]);
-    const nx=u[1]*v[2]-u[2]*v[1];
+    const normals=[];
+    window.BABYLON.VertexData.ComputeNormals(g.positions,g.indices,normals);
+    const nx=normals[g.indices[0]*3];
     return {side,nx};
    });
   });
@@ -451,7 +451,7 @@ const server=http.createServer((req,res)=>{
    return {type:s.grindRequestType,airborne:!s.grounded,vy:s.vy,y:s.y}});
   assert(boardInput.type==='boardslide'&&boardInput.airborne&&(boardInput.vy>0||boardInput.y>.1),
    'Touch boardslide must request a real ollie-assisted rail catch: '+JSON.stringify(boardInput));
-  // The GRIND button must Ollie by itself and retain the distinct 50-50 request.
+  // GRIND catches a nearby rail without launching an ollie.
   await page.locator('#restart').click();
   await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
    Object.assign(s,{x:0,z:19,y:0,groundY:0,dir:0,speed:5,travelSign:1,
@@ -459,26 +459,15 @@ const server=http.createServer((req,res)=>{
   });
   await page.locator('[data-t="grind"]').click();
   const grindInput=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
-   return {type:s.grindRequestType,airborne:!s.grounded,vy:s.vy,y:s.y,
-    count:s.count,grinding:s.grinding,guard:s.grindAirborneUntil-performance.now()};});
-  assert(grindInput.type==='50-50'&&grindInput.airborne&&grindInput.vy>0&&
-   grindInput.guard>0&&!grindInput.grinding,
-   'GRIND button must trigger a visible Ollie before a distinct 50-50: '+JSON.stringify(grindInput));
-  // Wait for real simulated motion; SwiftShader can miss a fixed 110ms window.
-  // Require the board to visibly rise before rail attachment.
-  await page.waitForFunction(()=>{
-   const s=window.__SOL_DIAGNOSTICS__.state;
-   return s.y>.15&&!s.grounded&&!s.grinding;
-  },null,{timeout:2500,polling:'raf'}).catch(async error=>{
-   const detail=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
-    return {y:s.y,vy:s.vy,airTime:s.airTime,grounded:s.grounded,
-     grinding:s.grinding,request:s.grindRequestType};});
-   throw Error('GRIND did not rise before rail capture: '+JSON.stringify(detail)+'; '+error.message);
-  });
-  const grindRising=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
-   return {y:s.y,grounded:s.grounded,grinding:s.grinding};});
-  assert(grindRising.y>.15&&!grindRising.grounded&&!grindRising.grinding,
-   'GRIND must visibly rise before any rail attachment: '+JSON.stringify(grindRising));
+   return {type:s.grindType,vy:s.vy,y:s.y,grinding:s.grinding,name:s.name};});
+  assert(grindInput.type==='50-50'&&grindInput.grinding&&grindInput.vy===0,
+   'GRIND must directly engage a nearby rail without an ollie: '+JSON.stringify(grindInput));
+  await page.locator('#restart').click();
+  await page.locator('[data-t="grind"]').click();
+  const armedGrind=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
+   return {type:s.grindRequestType,grounded:s.grounded,vy:s.vy,y:s.y,count:s.count};});
+  assert(armedGrind.type==='50-50'&&armedGrind.grounded&&armedGrind.vy===0&&armedGrind.y===0&&armedGrind.count===0,
+   'GRIND away from a rail must arm without jumping or scoring: '+JSON.stringify(armedGrind));
   // Move into the real connected halfpipe and confirm actual travel.
   await page.locator('#halfpipe').click();
   assert(await page.evaluate(()=>window.__SOL_DIAGNOSTICS__.scene.activeCamera.name==='halfpipe arrival overview'),'HALFPIPE button must reveal a real 3D overview before riding');
@@ -852,6 +841,21 @@ const server=http.createServer((req,res)=>{
   await page.evaluate(()=>{
     document.querySelector('#restart').click();
     const s=window.__SOL_DIAGNOSTICS__.state;
+     // Latch observations at actual physics steps. Reading live state in a
+     // later browser round trip can miss the contact window, or sample far
+     // past the ledge after ordinary rolling friction has reduced speed.
+     const original=window.SOLMotion.collide;
+     window.__wallQA={contact:null,exit:null,original};
+     window.SOLMotion.collide=function(state,contacts){
+       const result=original.apply(this,arguments),qa=window.__wallQA;
+       const snapshot=()=>({x:state.x,z:state.z,speed:state.speed,grounded:state.grounded});
+       if(state===s){
+         if(!qa.contact&&state.z>39&&state.z<42&&state.x>=.65&&state.x<=.74&&state.grounded&&
+            contacts.some(c=>c.hit&&c.normalX<-.5))qa.contact=snapshot();
+         if(qa.contact&&!qa.exit&&state.z>43)qa.exit=snapshot();
+       }
+       return result;
+     };
     Object.assign(s,{x:-1,z:39,y:0,groundY:0,vy:0,dir:Math.PI/4,
       speed:9,travelSign:1,grounded:true,grinding:false,grindRail:null,
       grindCooldown:1,rampCooldown:1,airVX:null,airVZ:null,onRamp:false,
@@ -860,25 +864,17 @@ const server=http.createServer((req,res)=>{
   // Prove contact while still alongside the solid, not just at its far end.
   // This prevents a false positive from a rider who simply crosses z=43
   // without ever touching the wall. Sample live game state during rendering.
-  await page.waitForFunction(()=>{
-    const s=window.__SOL_DIAGNOSTICS__.state;
-    return s.z>39&&s.z<42&&s.x>=.65&&s.x<=.74&&s.grounded;
-  },null,{timeout:2400});
-  const wallContact=await page.evaluate(()=>{
-    const s=window.__SOL_DIAGNOSTICS__.state;
-    return {x:s.x,z:s.z,speed:s.speed,grounded:s.grounded};
-  });
+   await page.waitForFunction(()=>!!window.__wallQA.contact,null,{timeout:10000});
+   const wallContact=await page.evaluate(()=>window.__wallQA.contact);
   assert(wallContact.speed>3,'Wall contact must retain useful momentum: '+JSON.stringify(wallContact));
-  await page.screenshot({path:'test-artifacts/ledge-wall-contact.png',animations:'disabled'});
-  await page.waitForFunction(()=>{
-    const s=window.__SOL_DIAGNOSTICS__.state;
-    return s.z>43;
-  },null,{timeout:5500});
+   await page.screenshot({path:'test-artifacts/ledge-wall-followthrough.png',animations:'disabled'});
+   await page.waitForFunction(()=>!!window.__wallQA.exit,null,{timeout:15000});
   const wallSlide=await page.evaluate(()=>{
-    const s=window.__SOL_DIAGNOSTICS__.state;
-    return {x:s.x,z:s.z,speed:s.speed,grounded:s.grounded};
+     const qa=window.__wallQA;
+     window.SOLMotion.collide=qa.original;
+     return qa.exit;
   });
-  assert(wallSlide.x>=.65&&wallSlide.x<=.74&&wallSlide.speed>3&&wallSlide.grounded,
+  assert(wallSlide.x>=.65&&wallSlide.x<=.74&&wallSlide.z<43.5&&wallSlide.speed>3&&wallSlide.grounded,
     'Live WebGL skater must slide past ledge end without penetration: '+JSON.stringify(wallSlide));
   await page.screenshot({path:'test-artifacts/ledge-wall-slide.png',animations:'disabled'});
 

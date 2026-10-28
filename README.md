@@ -41,3 +41,13 @@ This is an early **true WebGL 3D** prototype, not console-grade graphics or a co
 2. Improve contact-aware landings, board/terrain collisions, and realistic airborne inertia beyond kinematic angular motion.
 3. Add bowls, refined ramp-wall corner contact, more precise truck/rail alignment, and rail-side transfer geometry.
 4. Add objectives, combo challenges, audio, performance budgets, and graphics improvements.
+
+## R16 ramp, grind and V2 integration
+
+Ramp volumes now use Babylon's left-handed winding so their lighting normals point outward. Cloned concrete materials explicitly share the uploaded source texture: alpha=1 alone did not prevent Babylon from skipping a surface with an unready cloned DynamicTexture.
+
+GRIND (touch, G, Xbox LB) engages a nearby rail as a 50-50 without dispatching OLLIE. Away from a rail it arms a 2.2-second catch request. OLLIE retains its own jump; BOARD SLIDE retains its existing assisted jump and sideways stance. Incomplete board rotations still prevent catches.
+
+The recovered Gemini V2 deck and 20-bone rider are connected to the existing board pivot and production pose updates. The rider follows riding, pushing, flips, shoves, grabs, grinds, boardslides and landing compression; the skin does not write physics state. The original procedural deck and rider nodes remain available as fallback/pose drivers. Importers in tools/ reproduce the runtime assets from the reviewed local GLBs and include source hashes.
+
+Validation: existing logic/geometry suites, Chromium gameplay/input/recovery, ten uninterrupted bowl airs, plus tests/ramp_grind_browser.cjs (desktop/mobile render readiness, camera views and touch/keyboard/Xbox actions) and tests/skater_v2_browser.cjs (eight skin poses). Physical Samsung/Xbox hardware remains untested.

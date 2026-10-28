@@ -1,0 +1,837 @@
+{
+  "desktop": {
+    "textures": [
+      {
+        "name": "park continuous concrete",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "park continuous concrete",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "park continuous concrete",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "park continuous concrete",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "solid skatable concrete ramp",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": 0.9924377623710297
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "solid skatable concrete ramp",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": 0.9910387361242573
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "solid skatable concrete ramp",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": 0.9999818235924706
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "solid skatable concrete ramp",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": 0.9999800559983227
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "solid skatable concrete ramp",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": 0.1527525231651953
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "solid skatable concrete ramp",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": 1
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "solid skatable concrete ramp",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": 0.9999854203188568
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "solid skatable concrete ramp",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": 0.9909161083213731
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "solid skatable concrete ramp",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": 0.9999883196490935
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "solid skatable concrete ramp",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": 0.9999879588937548
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "solid skatable concrete ramp",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": 0.9999865571983659
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "solid skatable concrete ramp",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": 0.985030467155704
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "solid skatable concrete ramp",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": 0.9999875002343701
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "HALFPIPE FLAT BOTTOM",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      }
+    ],
+    "deckVertices": 1110,
+    "views": [
+      {
+        "name": "bank-front",
+        "active": 8
+      },
+      {
+        "name": "bank-back",
+        "active": 4
+      },
+      {
+        "name": "halfpipe",
+        "active": 6
+      }
+    ],
+    "input": {
+      "armed": {
+        "grounded": true,
+        "grinding": false,
+        "type": null,
+        "request": "50-50",
+        "vy": 0,
+        "y": 0,
+        "x": 0,
+        "z": 0,
+        "count": 0
+      },
+      "touchGrind": {
+        "grounded": false,
+        "grinding": true,
+        "type": "50-50",
+        "request": null,
+        "vy": 0,
+        "y": 1.1,
+        "x": 0,
+        "z": 19,
+        "count": 1
+      },
+      "traversal": {
+        "grounded": false,
+        "grinding": true,
+        "type": "50-50",
+        "request": null,
+        "vy": 0,
+        "y": 1.1,
+        "x": 0,
+        "z": 20.32667412978605,
+        "count": 1
+      },
+      "touchOllie": {
+        "grounded": false,
+        "grinding": false,
+        "type": null,
+        "request": null,
+        "vy": 8,
+        "y": 0.01,
+        "x": 0,
+        "z": 0,
+        "count": 1
+      },
+      "keyboardGrind": {
+        "grounded": false,
+        "grinding": true,
+        "type": "50-50",
+        "request": null,
+        "vy": 0,
+        "y": 1.1,
+        "x": 0,
+        "z": 19,
+        "count": 1
+      },
+      "keyboardOllie": {
+        "grounded": false,
+        "grinding": false,
+        "type": null,
+        "request": null,
+        "vy": 8,
+        "y": 0.01,
+        "x": 0,
+        "z": 0,
+        "count": 1
+      },
+      "xboxGrind": {
+        "grounded": false,
+        "grinding": true,
+        "type": "50-50",
+        "request": null,
+        "vy": 0,
+        "y": 1.1,
+        "x": 0,
+        "z": 19.213929380217962,
+        "count": 1
+      },
+      "xboxOllie": {
+        "grounded": false,
+        "grinding": false,
+        "type": null,
+        "request": null,
+        "vy": 7.8366000018119815,
+        "y": 0.07739475926822663,
+        "x": 0,
+        "z": 0,
+        "count": 1
+      }
+    }
+  },
+  "mobile": {
+    "textures": [
+      {
+        "name": "park continuous concrete",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "park continuous concrete",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "park continuous concrete",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "park continuous concrete",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "solid skatable concrete ramp",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": 0.9924377623710297
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "solid skatable concrete ramp",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": 0.9910387361242573
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "solid skatable concrete ramp",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": 0.9999818235924706
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "solid skatable concrete ramp",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": 0.9999800559983227
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "solid skatable concrete ramp",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": 0.1527525231651953
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "solid skatable concrete ramp",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": 1
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "solid skatable concrete ramp",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": 0.9999854203188568
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "solid skatable concrete ramp",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": 0.9909161083213731
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "solid skatable concrete ramp",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": 0.9999883196490935
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "solid skatable concrete ramp",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": 0.9999879588937548
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "solid skatable concrete ramp",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": 0.9999865571983659
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "solid skatable concrete ramp",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": 0.985030467155704
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "solid skatable concrete ramp",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": 0.9999875002343701
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "SOLID RAMP SIDE WALL",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      },
+      {
+        "name": "HALFPIPE FLAT BOTTOM",
+        "ready": true,
+        "texture": true,
+        "opaque": true,
+        "normalY": null
+      }
+    ],
+    "deckVertices": 1110,
+    "views": [
+      {
+        "name": "bank-front",
+        "active": 6
+      },
+      {
+        "name": "bank-back",
+        "active": 4
+      },
+      {
+        "name": "halfpipe",
+        "active": 3
+      }
+    ],
+    "input": {
+      "armed": {
+        "grounded": true,
+        "grinding": false,
+        "type": null,
+        "request": "50-50",
+        "vy": 0,
+        "y": 0,
+        "x": 0,
+        "z": 0,
+        "count": 0
+      },
+      "touchGrind": {
+        "grounded": false,
+        "grinding": true,
+        "type": "50-50",
+        "request": null,
+        "vy": 0,
+        "y": 1.1,
+        "x": 0,
+        "z": 19,
+        "count": 1
+      },
+      "traversal": {
+        "grounded": false,
+        "grinding": true,
+        "type": "50-50",
+        "request": null,
+        "vy": 0,
+        "y": 1.1,
+        "x": 0,
+        "z": 20.476188334349846,
+        "count": 1
+      },
+      "touchOllie": {
+        "grounded": false,
+        "grinding": false,
+        "type": null,
+        "request": null,
+        "vy": 8,
+        "y": 0.01,
+        "x": 0,
+        "z": 0,
+        "count": 1
+      },
+      "keyboardGrind": {
+        "grounded": false,
+        "grinding": true,
+        "type": "50-50",
+        "request": null,
+        "vy": 0,
+        "y": 1.1,
+        "x": 0,
+        "z": 19,
+        "count": 1
+      },
+      "keyboardOllie": {
+        "grounded": false,
+        "grinding": false,
+        "type": null,
+        "request": null,
+        "vy": 8,
+        "y": 0.01,
+        "x": 0,
+        "z": 0,
+        "count": 1
+      },
+      "xboxGrind": {
+        "grounded": false,
+        "grinding": true,
+        "type": "50-50",
+        "request": null,
+        "vy": 0,
+        "y": 1.1,
+        "x": 0,
+        "z": 19.161176812704603,
+        "count": 1
+      },
+      "xboxOllie": {
+        "grounded": false,
+        "grinding": false,
+        "type": null,
+        "request": null,
+        "vy": 7.829,
+        "y": 0.08046099999999999,
+        "x": 0,
+        "z": 0,
+        "count": 1
+      }
+    }
+  },
+  "result": "PASS"
+}

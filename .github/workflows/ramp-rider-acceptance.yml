@@ -1,0 +1,31 @@
+name: SOL SKATE ramp and V2 acceptance
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ramp-rider:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save playwright@1.55.1 babylonjs@8
+      - run: npx playwright install chromium
+      - run: node tests/board_v2.cjs
+      - run: node tests/skater_v2.cjs
+      - run: node tests/ramp_grind_browser.cjs
+      - run: node tests/skater_v2_browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ramp-grind-v2-evidence
+          path: |
+            test-artifacts/ramp-grind/
+            test-artifacts/skater-v2/

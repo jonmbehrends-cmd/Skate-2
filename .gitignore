@@ -147,3 +147,6 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# Local Chromium evidence (published selectively in QA or CI artifacts)
+test-artifacts/

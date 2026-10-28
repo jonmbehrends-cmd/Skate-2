@@ -3,6 +3,12 @@
  * by triangles so Babylon's back-face culling and lighting behave correctly.
  */
 (function(root){'use strict';
+// Babylon's default left-handed scene uses clockwise front faces. The
+// profile construction below uses mathematical counterclockwise faces;
+// reverse once before upload so computed normals point OUT of the volume.
+function babylonWinding(indices){
+ for(let i=0;i<indices.length;i+=3){const t=indices[i+1];indices[i+1]=indices[i+2];indices[i+2]=t;}
+}
 function build(r,profile,segments=40){
   if(!r||!Number.isFinite(r.w)||!Number.isFinite(r.d)||r.w<=0||r.d<=0)throw Error('Invalid ramp dimensions');
   const N=Math.max(2,Math.min(160,Math.floor(segments)||40));
@@ -27,6 +33,7 @@ function build(r,profile,segments=40){
   // End caps: -Z and +Z.
   quad([l,floor,front],[l,low,front],[rr,low,front],[rr,floor,front]);
   quad([rr,floor,back],[rr,high,back],[l,high,back],[l,floor,back]);
+  babylonWinding(indices);
   return {positions,indices,uvs,segments:N};
 }
 // Opaque, genuinely three-dimensional cast-concrete cheeks. The previous
@@ -62,6 +69,7 @@ function sideWall(r,profile,side,segments=40){
   // winding so its outward face normals point toward -X, its top points +Y,
   // and its front/back end caps face outward instead of into the ramp.
   if(side<0)for(let i=0;i<indices.length;i+=3){const t=indices[i+1];indices[i+1]=indices[i+2];indices[i+2]=t;}
+  babylonWinding(indices);
   return {positions,indices,uvs,segments:N};
 }
 root.SOLRampGeometry={build,sideWall};
