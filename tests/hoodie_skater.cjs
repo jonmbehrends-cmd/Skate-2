@@ -24,7 +24,7 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  parent.position.set(12,4,-18);parent.rotation.set(.4,1.3,-.2);
  rig.update(state,pose);checkStance();
  rig.update(state,{...pose,pushing:true,contact:1});assert.equal(rig.status.mode,'push');assert(rig.status.armPose.counter>.05&&rig.status.armPose.spread>.45,'Pushing needs visible counterbalance');
- assert(rig.status.feet[1][1]<.3,'Push foot must reach ground');
+ assert(rig.status.feet[1][1]<.3,'Push foot must reach ground: '+JSON.stringify({feet:rig.status.feet,legs:rig.status.legGeometry}));
  assert(rig.status.pushLean>.07&&rig.status.pushLean<.09,'Push contact should hinge hips and chest subtly');
  rig.update(state,{...pose,pushing:true,contact:0,recovery:1});
  assert(rig.status.pushLean>.02&&rig.status.pushLean<.03,'Push recovery must relax the upper body');
