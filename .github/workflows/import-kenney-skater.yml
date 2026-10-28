@@ -31,9 +31,22 @@ jobs:
             'https://raw.githubusercontent.com/lalomorales22/threejskate/main/mini-skate/License.txt' \
             -o assets/kenney-mini-skate/License.txt
           grep -q 'Creative Commons Zero, CC0' assets/kenney-mini-skate/License.txt
+          mkdir -p assets/quaternius-hoodie
+          curl -fLsS --retry 3 --max-time 60 \
+            'https://raw.githubusercontent.com/nishit47/Blender-Pre-vis-Pipeline---Screenplay-to-Animatic/main/assets/Ultimate%20Modular%20Men%20Pack-glb/Hoodie%20Character.glb' \
+            -o assets/quaternius-hoodie/hoodie-character.glb
+          test "$(git hash-object assets/quaternius-hoodie/hoodie-character.glb)" = '8c4974b4d7e193bd6e7edab045d9a8e21fc19018'
+          cat > assets/quaternius-hoodie/SOURCE.md <<'SOURCE'
+          Hoodie Character from Quaternius Ultimate Modular Men Pack (2022).
+          CC0 1.0 public domain; commercial reuse permitted.
+          https://poly.pizza/bundle/Ultimate-Modular-Men-Pack-ZiH8muWqwQ
+          https://poly.pizza/m/gKLBoRsyKe
+          Binary mirror: https://github.com/nishit47/Blender-Pre-vis-Pipeline---Screenplay-to-Animatic
+          Original mirrored Git blob SHA: 8c4974b4d7e193bd6e7edab045d9a8e21fc19018
+          SOURCE
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add assets/kenney-mini-skate
+          git add assets/kenney-mini-skate assets/quaternius-hoodie
           if ! git diff --cached --quiet; then
             git commit -m 'assets: import verified Kenney CC0 skater GLB and license'
             git push origin HEAD:feature/kenney-skater-asset-20261028
