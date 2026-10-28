@@ -525,6 +525,50 @@ const server=http.createServer((req,res)=>{
   await page.waitForTimeout(500);
   await page.screenshot({path:'test-artifacts/halfpipe-chromium.png',animations:'disabled'});
   await checkSceneScreenshot('test-artifacts/halfpipe-chromium.png','halfpipe');
+  // Rendered-pixel occlusion regression: the concrete plaza is BELOW the
+  // halfpipe. Removing it must not change pixels on the visible wooden
+  // riding surfaces. Material alpha checks alone cannot catch shader-level
+  // depth bugs or coplanar floor bleed-through.
+  const floorOcclusionQA=await (async()=>{
+   const before=await page.screenshot({animations:'disabled'});
+   const hidden=await page.evaluate(()=>{
+    const meshes=window.__SOL_DIAGNOSTICS__.scene.meshes.filter(m=>
+     m.name==='park continuous concrete'||m.name==='ground');
+    for(const m of meshes)m.setEnabled(false);
+    return meshes.length;
+   });
+   await page.waitForTimeout(150);
+   const after=await page.screenshot({animations:'disabled'});
+   await page.evaluate(()=>{
+    for(const m of window.__SOL_DIAGNOSTICS__.scene.meshes)
+     if(m.name==='park continuous concrete'||m.name==='ground')m.setEnabled(true);
+   });
+   const samples=await page.evaluate(async ([a,b])=>{
+    async function pixels(encoded){
+     const img=new Image();img.src='data:image/png;base64,'+encoded;await img.decode();
+     const c=document.createElement('canvas');c.width=img.width;c.height=img.height;
+     const ctx=c.getContext('2d');ctx.drawImage(img,0,0);
+     return ctx.getImageData(0,0,c.width,c.height);
+    }
+    const p=await pixels(a),q=await pixels(b);
+    // Stable interior ramp locations in the dedicated 960x540 side view;
+    // exclude the moving rider and the coping silhouette.
+    const spots=[[180,350],[780,350],[480,450]];
+    return spots.map(([x,y])=>{
+     let total=0,count=0;
+     for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){
+      const i=((y+dy)*p.width+x+dx)*4;
+      for(let k=0;k<3;k++){total+=Math.abs(p.data[i+k]-q.data[i+k]);count++}
+     }
+     return {x,y,meanChannelDelta:total/count};
+    });
+   },[before.toString('base64'),after.toString('base64')]);
+   return {hiddenFloorMeshes:hidden,samples};
+  })();
+  assert(floorOcclusionQA.hiddenFloorMeshes>=4,'Expected underlying park floor meshes for the occlusion challenge');
+  assert(floorOcclusionQA.samples.every(s=>s.meanChannelDelta<8),
+   'Underlying plaza changes visible halfpipe riding pixels (ground bleed-through): '+JSON.stringify(floorOcclusionQA));
+
   // The player's actual GRIND touch button must catch bowl coping without ollie.
   // Set a physically valid position on the steep bowl wall (not 1.3m
   // above the concrete) and press the real button in the SAME browser frame.
@@ -538,19 +582,20 @@ const server=http.createServer((req,res)=>{
    document.querySelector('#buttons').style.display='';
    document.querySelector('[data-t="grind"]').dispatchEvent(
     new PointerEvent('pointerdown',{bubbles:true,pointerId:31,pointerType:'touch'}));
-   return {grinding:s.grinding,kind:s.grindRail?.kind,vy:s.vy,y:s.y,wallY};
+   // Advance in the same browser task as capture: an intervening
+   // requestAnimationFrame can move the rider up the wall and invalidate
+   // the original wall-height baseline without any gameplay defect.
+   const initialY=s.y,top=s.grindRail?.y,kind=s.grindRail?.kind,vy=s.vy;
+   for(let i=0;i<15;i++)window.SOLGrind.advance(s,1/60);
+   return {grinding:s.grinding,kind,vy,y:s.y,wallY,
+    entry:{initialY,top,finalY:s.y,grinding:s.grinding}};
   });
   assert(touchCoping.grinding&&touchCoping.kind==='bowl-coping'&&touchCoping.vy===0,
    'GRIND touch control must catch bowl coping without forcing ollie: '+JSON.stringify(touchCoping));
   // Coping capture from a near-vertical wall must not teleport the skater
   // more than a metre upward in a single input frame. The board eases onto
   // the lip over the first 0.22s while staying attached to the circular rail.
-  const copingEntry=await page.evaluate(()=>{
-   const s=window.__SOL_DIAGNOSTICS__.state;
-   const initialY=s.y,top=s.grindRail.y;
-   for(let i=0;i<15;i++)window.SOLGrind.advance(s,1/60);
-   return {initialY,top,finalY:s.y,grinding:s.grinding};
-  });
+  const copingEntry=touchCoping.entry;
   assert(Math.abs(copingEntry.initialY-touchCoping.wallY)<.05&&
    Math.abs(copingEntry.finalY-copingEntry.top)<.02&&copingEntry.grinding,
    'Coping must blend smoothly from the wall to the steel rim: '+JSON.stringify(copingEntry));
@@ -770,6 +815,6 @@ const server=http.createServer((req,res)=>{
   await page.screenshot({path:'test-artifacts/ledge-wall-slide.png',animations:'disabled'});
 
   assert.equal(errors.length,0,'Browser errors: '+errors.join('; '));
-  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',controllerQA,gamepadIntegration,visualQA,facadeQA,wallContact,wallSlide,spawnView,spawnPixels,cheekNormals,impactNormals,rampGravity,screenshotQA,status,spin,push,touchTricks,clickFallback,riding,vertStart,vertAir,vertLanding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
+  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',controllerQA,gamepadIntegration,visualQA,facadeQA,wallContact,wallSlide,spawnView,spawnPixels,cheekNormals,impactNormals,rampGravity,screenshotQA,floorOcclusionQA,status,spin,push,touchTricks,clickFallback,riding,vertStart,vertAir,vertLanding,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
  }finally{await browser.close()}
 })().catch(e=>{fs.mkdirSync('test-artifacts',{recursive:true});fs.writeFileSync('test-artifacts/browser-result.txt','FAIL: '+(e&&e.stack||String(e)));console.error(e);process.exitCode=1}).finally(()=>server.close());
