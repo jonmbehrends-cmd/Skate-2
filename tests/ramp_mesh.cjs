@@ -14,7 +14,7 @@ function test(r){
  for(let k=0;k<g.indices.length;k+=3){
   const p=g.indices.slice(k,k+3).map(i=>g.positions.slice(i*3,i*3+3));
   const [a,b,c]=p,u=b.map((x,i)=>x-a[i]),v=c.map((x,i)=>x-a[i]);
-  const n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
+  const n=[u[2]*v[1]-u[1]*v[2],u[0]*v[2]-u[2]*v[0],u[1]*v[0]-u[0]*v[1]];
   const ctr=a.map((_,i)=>(a[i]+b[i]+c[i])/3);
   const near=(x,y)=>Math.abs(x-y)<EPS;
   let face,sign;
@@ -57,7 +57,7 @@ for(const side of [-1,1]){
  for(let i=0;i<wall.indices.length;i+=3){
   const [a,b,c]=wall.indices.slice(i,i+3).map(n=>wall.positions.slice(n*3,n*3+3));
   const u=b.map((v,j)=>v-a[j]),v=c.map((w,j)=>w-a[j]);
-  const n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
+  const n=[u[2]*v[1]-u[1]*v[2],u[0]*v[2]-u[2]*v[0],u[1]*v[0]-u[0]*v[1]];
   const ctr=a.map((v,j)=>(v+b[j]+c[j])/3),near=(x,y)=>Math.abs(x-y)<EPS;
   const outward=near(ctr[0],minX)?-n[0]:near(ctr[0],maxX)?n[0]:
    near(ctr[1],-.32)?-n[1]:near(ctr[2],r.z-r.d/2)?-n[2]:

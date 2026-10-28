@@ -1,0 +1,198 @@
+{
+  "poses": {
+    "ride": {
+      "mode": "ride",
+      "bones": 20,
+      "meshes": 13,
+      "vertices": 2624,
+      "hidden": true,
+      "feet": [
+        [
+          0,
+          0.385,
+          0.43
+        ],
+        [
+          0,
+          0.385,
+          -0.43
+        ]
+      ],
+      "grabError": null,
+      "landing": 0,
+      "finite": true,
+      "ready": true,
+      "grounded": true
+    },
+    "push": {
+      "mode": "push",
+      "bones": 20,
+      "meshes": 13,
+      "vertices": 2624,
+      "hidden": true,
+      "feet": [
+        [
+          0,
+          0.39583542700538743,
+          0.43
+        ],
+        [
+          0,
+          0.385,
+          -0.43
+        ]
+      ],
+      "grabError": null,
+      "landing": 0,
+      "finite": true,
+      "ready": true,
+      "grounded": true
+    },
+    "flip": {
+      "mode": "flip",
+      "bones": 20,
+      "meshes": 13,
+      "vertices": 2624,
+      "hidden": true,
+      "feet": [
+        [
+          1.1021821192326179e-17,
+          0.525,
+          0.43
+        ],
+        [
+          -1.1021821192326179e-17,
+          0.525,
+          -0.43
+        ]
+      ],
+      "grabError": null,
+      "landing": 0,
+      "finite": true,
+      "ready": true,
+      "grounded": false
+    },
+    "shove": {
+      "mode": "shove",
+      "bones": 20,
+      "meshes": 13,
+      "vertices": 2624,
+      "hidden": true,
+      "feet": [
+        [
+          0,
+          0.525,
+          0.43
+        ],
+        [
+          0,
+          0.525,
+          -0.43
+        ]
+      ],
+      "grabError": null,
+      "landing": 0,
+      "finite": true,
+      "ready": true,
+      "grounded": false
+    },
+    "grab": {
+      "mode": "grab",
+      "bones": 20,
+      "meshes": 13,
+      "vertices": 2624,
+      "hidden": true,
+      "feet": [
+        [
+          0,
+          0.385,
+          0.43
+        ],
+        [
+          0,
+          0.385,
+          -0.43
+        ]
+      ],
+      "grabError": 0.004474028674156936,
+      "landing": 0,
+      "finite": true,
+      "ready": true,
+      "grounded": false
+    },
+    "grind": {
+      "mode": "grind",
+      "bones": 20,
+      "meshes": 13,
+      "vertices": 2624,
+      "hidden": true,
+      "feet": [
+        [
+          0,
+          0.385,
+          0.43
+        ],
+        [
+          0,
+          0.385,
+          -0.43
+        ]
+      ],
+      "grabError": null,
+      "landing": 0.08208499862389879,
+      "finite": true,
+      "ready": true,
+      "grounded": true
+    },
+    "boardslide": {
+      "mode": "boardslide",
+      "bones": 20,
+      "meshes": 13,
+      "vertices": 2624,
+      "hidden": true,
+      "feet": [
+        [
+          -2.1159382868063403e-7,
+          0.385,
+          0.4299999986952659
+        ],
+        [
+          -2.1159382868063403e-7,
+          0.385,
+          -0.4300000013047341
+        ]
+      ],
+      "grabError": null,
+      "landing": 0.006737946999085467,
+      "finite": true,
+      "ready": true,
+      "grounded": true
+    },
+    "landing": {
+      "mode": "landing",
+      "bones": 20,
+      "meshes": 13,
+      "vertices": 2624,
+      "hidden": true,
+      "feet": [
+        [
+          0,
+          0.385,
+          0.43
+        ],
+        [
+          0,
+          0.385,
+          -0.43
+        ]
+      ],
+      "grabError": null,
+      "landing": 0.08208499862389879,
+      "finite": true,
+      "ready": true,
+      "grounded": true
+    }
+  },
+  "errors": [],
+  "result": "PASS"
+}
