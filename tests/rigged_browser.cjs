@@ -8,7 +8,7 @@ let browser;
  await new Promise(r=>server.listen(0,'127.0.0.1',r));
  browser=await chromium.launch({args:['--use-gl=angle','--use-angle=swiftshader','--enable-webgl','--enable-unsafe-swiftshader','--ignore-gpu-blocklist','--no-sandbox']});
  const url=process.env.SOL_GAME_URL||'http://127.0.0.1:'+server.address().port+'/';
- const results=[];
+ const results=[],visualFailures=[];
  for(const mobile of [false,true]){
   const label=mobile?'mobile':'desktop';
   const page=await browser.newPage({viewport:mobile?{width:390,height:844}:{width:1280,height:800},hasTouch:mobile,isMobile:mobile,deviceScaleFactor:1});
@@ -74,8 +74,8 @@ let browser;
     // Real Chromium visual-anatomy acceptance, checked AFTER screenshot capture.
     // A numerically reached hand/ankle target must not hide a seated rider.
     const anatomy=evidence.status.anatomy;
-    assert(anatomy?.hipClearance>.20&&anatomy?.torsoHeight>.30&&anatomy?.chestShift<.20,
-     'VISUAL BLOCKER '+label+': anatomically collapsed grab '+JSON.stringify(anatomy));
+    if(!(anatomy?.hipClearance>.20&&anatomy?.torsoHeight>.30&&anatomy?.chestShift<.20))
+     visualFailures.push(label+': anatomically collapsed grab '+JSON.stringify(anatomy));
    }
    if(mode==='push'){
     assert(evidence.status.feet[1][1]<.25,'Hoodie pushing foot must reach pavement');
@@ -90,5 +90,8 @@ let browser;
  const fallback=await browser.newPage();await fallback.route('**/hoodie-character.glb',r=>r.abort());await fallback.goto(url);await fallback.waitForFunction(()=>window.__SOL_DIAGNOSTICS__);await fallback.waitForTimeout(1000);
  assert(await fallback.evaluate(()=>!__SOL_DIAGNOSTICS__.rig&&__SOL_DIAGNOSTICS__.riderV2?.meshes.some(m=>m.isVisible&&m.isEnabled()&&m.skeleton&&m.getTotalVertices()>0)),'GLB load failure must preserve visible, skinned V2 fallback');
  await fallback.close();
+ // Do not abort desktop early: collect the mobile pose and fallback evidence
+ // before failing this draft for anatomy. Both viewport screenshots survive.
+ assert.equal(visualFailures.length,0,'VISUAL BLOCKER: '+visualFailures.join(' | '));
  fs.writeFileSync(path.join(out,'skeletal-result.json'),JSON.stringify({url,result:'PASS',commit:process.env.GITHUB_SHA,results},null,2));console.log('PASS desktop/mobile Chromium: real GLB, skin deformation, gameplay push/flip/landing, adult hoodie IK poses, fallback, no startup errors');
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(async()=>{if(browser)await browser.close();server.close()});
