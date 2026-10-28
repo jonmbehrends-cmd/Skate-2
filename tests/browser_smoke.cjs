@@ -464,7 +464,17 @@ const server=http.createServer((req,res)=>{
   assert(grindInput.type==='50-50'&&grindInput.airborne&&grindInput.vy>0&&
    grindInput.guard>0&&!grindInput.grinding,
    'GRIND button must trigger a visible Ollie before a distinct 50-50: '+JSON.stringify(grindInput));
-  await page.waitForTimeout(110);
+  // Wait for real simulated motion; SwiftShader can miss a fixed 110ms window.
+  // Require the board to visibly rise before rail attachment.
+  await page.waitForFunction(()=>{
+   const s=window.__SOL_DIAGNOSTICS__.state;
+   return s.y>.15&&!s.grounded&&!s.grinding;
+  },null,{timeout:2500,polling:'raf'}).catch(async error=>{
+   const detail=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
+    return {y:s.y,vy:s.vy,airTime:s.airTime,grounded:s.grounded,
+     grinding:s.grinding,request:s.grindRequestType};});
+   throw Error('GRIND did not rise before rail capture: '+JSON.stringify(detail)+'; '+error.message);
+  });
   const grindRising=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
    return {y:s.y,grounded:s.grounded,grinding:s.grinding};});
   assert(grindRising.y>.15&&!grindRising.grounded&&!grindRising.grinding,
