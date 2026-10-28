@@ -60,7 +60,7 @@ let browser;
   results.push({label,result:'PASS',ready,distinctPoses:signatures.length});await page.close();
  }
  const fallback=await browser.newPage();await fallback.route('**/CesiumMan.glb',r=>r.abort());await fallback.goto(url);await fallback.waitForFunction(()=>window.__SOL_DIAGNOSTICS__);await fallback.waitForTimeout(1000);
- assert(await fallback.evaluate(()=>!__SOL_DIAGNOSTICS__.rig&&__SOL_DIAGNOSTICS__.scene.meshes.some(m=>m.name==='torso'&&m.isVisible&&m.isEnabled())),'Load failure must preserve visible fallback');
+ assert(await fallback.evaluate(()=>!__SOL_DIAGNOSTICS__.rig&&__SOL_DIAGNOSTICS__.riderV2?.meshes.some(m=>m.isVisible&&m.isEnabled()&&m.skeleton&&m.getTotalVertices()>0)),'GLB load failure must preserve visible, skinned V2 fallback');
  await fallback.close();
  fs.writeFileSync(path.join(out,'skeletal-result.json'),JSON.stringify({url,result:'PASS',commit:process.env.GITHUB_SHA,results},null,2));console.log('PASS desktop/mobile Chromium: real GLB, skin deformation, gameplay push/flip/landing, seven poses, fallback, no startup errors');
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(async()=>{if(browser)await browser.close();server.close()});
