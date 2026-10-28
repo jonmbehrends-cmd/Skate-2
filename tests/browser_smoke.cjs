@@ -793,21 +793,32 @@ const server=http.createServer((req,res)=>{
   }));
   assert(xboxPush.speed>.3&&xboxPush.status.includes('Xbox connected'),
     'Emulated Xbox analog RT must actually accelerate the skater: '+JSON.stringify(xboxPush));
-  await page.evaluate(()=>{
+  const preOllieY=await page.evaluate(()=>{
+    const s=window.__SOL_DIAGNOSTICS__.state;
+    if(!s.grounded||!window.__qaPad.connected)
+      throw Error('Xbox ollie requires a grounded rider and connected controller');
+    // Capture the baseline before pressing A, in the same browser task.
+    const y=s.y;
     window.__qaPad.buttons[7].value=0;
     window.__qaPad.buttons[0].pressed=true;
     window.__qaPad.buttons[0].value=1;
+    return y;
   });
-  // Synchronize with the first airborne ollie frame, not an arbitrary wall-clock
-  // delay: SwiftShader CI can simulate the apex/descent before 350ms elapses.
-  await page.waitForFunction(()=>{const s=window.__SOL_DIAGNOSTICS__.state;return s.name==='OLLIE'&&!s.grounded;},null,{timeout:1800});
-  const xboxOllie=await page.evaluate(()=>({
-    grounded:window.__SOL_DIAGNOSTICS__.state.grounded,
-    vy:window.__SOL_DIAGNOSTICS__.state.vy,
-    name:window.__SOL_DIAGNOSTICS__.state.name
-  }));
-  assert(!xboxOllie.grounded&&xboxOllie.name==='OLLIE',
-    'Emulated Xbox A button must launch an actual ollie: '+JSON.stringify(xboxOllie));
+  // Synchronize with actual ascending elevation, not a wall-clock delay.
+  // Return a snapshot from the successful poll so a later browser round trip
+  // cannot sample descent after SwiftShader has advanced past the apex.
+  const xboxOllieHandle=await page.waitForFunction(preY=>{
+    const s=window.__SOL_DIAGNOSTICS__.state;
+    if(s.name==='OLLIE'&&!s.grounded&&s.vy>0.05&&s.y>preY+0.05)
+      return {grounded:s.grounded,vy:s.vy,y:s.y,name:s.name};
+    return false;
+  },preOllieY,{timeout:1800});
+  const xboxOllie=await xboxOllieHandle.jsonValue();
+  await xboxOllieHandle.dispose();
+  assert(!xboxOllie.grounded&&xboxOllie.name==='OLLIE'&&
+    xboxOllie.vy>0.05&&xboxOllie.y>preOllieY+0.05,
+    'Emulated Xbox A button must produce a real positive-velocity ollie launch: '+
+      JSON.stringify({xboxOllie,preOllieY}));
   await page.evaluate(()=>{window.__qaPad.connected=false});
   // The WebGL render loop may be throttled under SwiftShader. Wait for the
   // observable input-state transition, not a fixed 250 ms wall-clock delay.
