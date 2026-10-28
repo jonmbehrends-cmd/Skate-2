@@ -27,6 +27,8 @@ jobs:
       # Ubuntu hosted runners include Chromium's standard shared libraries;
       # avoid apt install-deps, which can stall under heavy CI load.
       - run: npx playwright install chromium
+      - name: Test procedural audio feedback on desktop and mobile
+        run: node tests/audio_feedback_browser.cjs
       - name: Verify deterministic halfpipe pump physics
         run: node tests/pump_physics.cjs
       - name: Verify input ownership in desktop and mobile Chromium

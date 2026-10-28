@@ -41,7 +41,8 @@ function attach(B,scene,rig){
  function update(state,pose,grabbing,dt){
   if(state.grounded&&!own.grounded)own.landing=1;
   own.grounded=!!state.grounded;own.landing*=Math.exp(-Math.max(0,dt)*10);
-  own.mode=grabbing?'grab':state.grinding?(state.grindType==='boardslide'?'boardslide':'grind'):!state.grounded?(state.flip?'flip':state.spin?'shove':'air'):own.landing>.08?'landing':pose.pushing?'push':'ride';
+  const ollie=!state.grounded&&!state.grinding&&!state.flip&&!state.spin&&!grabbing;
+  own.mode=grabbing?'grab':state.grinding?(state.grindType==='boardslide'?'boardslide':'grind'):!state.grounded?(state.flip?'flip':state.spin?'shove':ollie?'ollie':'air'):own.landing>.08?'landing':pose.pushing?'push':'ride';
   own.frames++;
   rig.skater.computeWorldMatrix(true);rig.body.computeWorldMatrix(true);rig.stanceRig.computeWorldMatrix(true);rig.boardPivot.computeWorldMatrix(true);
   const inverse=rig.skater.getWorldMatrix().clone().invert(),body=rig.body.getWorldMatrix().multiply(inverse),stance=rig.stanceRig.getWorldMatrix().multiply(inverse);
@@ -49,14 +50,21 @@ function attach(B,scene,rig){
   // Rotate around the pelvis, not the ground origin: leaning must not drag
   // the entire rider sideways or cross the legs over the deck.
   const pelvis=bind.pelvis.multiply(base).getTranslation();
-  const anchor=point(0,1.19+rig.body.position.y-own.landing*.10-(grabbing?.35:0),0,stance);
+  // Ollies are board-and-rider jumps: keep both soles on the deck and tuck the
+  // pelvis over planted feet rather than lifting the shoes off the skateboard.
+  const ollieTuck=ollie?Math.sin(Math.PI*Math.min(1,Math.max(0,(state.airTime||0))/.55))*.13:0;
+  own.ollieTuck=ollieTuck;
+  const anchor=point(0,1.19+rig.body.position.y-own.landing*.10-(grabbing?.35:0)-ollieTuck,0,stance);
   base.setTranslation(base.getTranslation().add(anchor.subtract(pelvis)));
   for(const name of Object.keys(bones))set(name,bind[name].multiply(base));
   const bend=V.TransformNormal(new V(0,0,1),body).normalize(),feet=[];
   for(const [i,side] of ['L','R'].entries()){
    const back=i===0,sign=back?1:-1,air=!state.grounded&&!state.grinding;
    const flick=air&&state.flip?Math.sin(Math.min(1,(state.airTime||0)*3)*Math.PI):0;
-   let foot=point((back?1:-1)*flick*.09,.385+(air&&!grabbing?.14:0),sign*.43,stance);
+   // Only flip/shove tricks separate the shoes from the board; a clean ollie
+   // retains deck contact throughout ascent and descent.
+   const trickLift=air&&!grabbing&&(state.flip||state.spin)?.14:0;
+   let foot=point((back?1:-1)*flick*.09,.385+trickLift,sign*.43,stance);
    if(back&&pose.pushing){foot.x+=pose.contact*.36;foot.y-=pose.contact*.22;foot.z-=(state.travelSign===-1?-1:1)*pose.contact*.45;foot.y+=pose.recovery*.20;}
    const hip=bind['thigh.'+side].multiply(base).getTranslation();
    const knee=ik(hip,foot,.430581*SCALE,(side==='L'?.37054:.374833)*SCALE,bend);
