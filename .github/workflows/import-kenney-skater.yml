@@ -22,6 +22,11 @@ jobs:
             'https://raw.githubusercontent.com/lalomorales22/threejskate/main/mini-skate/Models/GLB%20format/character-skate-boy.glb' \
             -o assets/kenney-mini-skate/character-skate-boy.glb
           test "$(git hash-object assets/kenney-mini-skate/character-skate-boy.glb)" = '78b1dae8d95b5a54c827b5a3f8e8e44935aa3888'
+          mkdir -p assets/kenney-mini-skate/Textures
+          curl -fLsS --retry 3 --max-time 30 \
+            'https://raw.githubusercontent.com/lalomorales22/threejskate/main/mini-skate/Models/GLB%20format/Textures/colormap.png' \
+            -o assets/kenney-mini-skate/Textures/colormap.png
+          test "$(git hash-object assets/kenney-mini-skate/Textures/colormap.png)" = 'c6646e245404f334bfc719014ff08735b3e6fa82'
           curl -fLsS --retry 3 --max-time 30 \
             'https://raw.githubusercontent.com/lalomorales22/threejskate/main/mini-skate/License.txt' \
             -o assets/kenney-mini-skate/License.txt
