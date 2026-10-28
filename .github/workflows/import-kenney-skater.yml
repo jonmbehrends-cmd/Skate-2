@@ -33,3 +33,23 @@ jobs:
             git commit -m 'assets: import verified Kenney CC0 skater GLB and license'
             git push origin HEAD:feature/kenney-skater-asset-20261028
           fi
+
+      - name: Inspect imported glTF skin, nodes, and clips
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const buf=fs.readFileSync('assets/kenney-mini-skate/character-skate-boy.glb');
+          if(buf.toString('utf8',0,4)!=='glTF')throw Error('Invalid GLB');
+          const len=buf.readUInt32LE(12);
+          const gltf=JSON.parse(buf.toString('utf8',20,20+len));
+          console.log('KENNEY_ASSET_METADATA',JSON.stringify({
+            bytes:buf.length,
+            scenes:gltf.scenes?.length,
+            skins:gltf.skins?.map(s=>({name:s.name,joints:s.joints.map(i=>({index:i,name:gltf.nodes[i]?.name,children:gltf.nodes[i]?.children}))})),
+            meshes:gltf.meshes?.map(m=>({name:m.name,primitives:m.primitives?.length})),
+            nodes:gltf.nodes?.map((n,i)=>({i,name:n.name,mesh:n.mesh,skin:n.skin,children:n.children})),
+            animations:gltf.animations?.map(a=>({name:a.name,channels:a.channels.length})),
+            materials:gltf.materials?.map(m=>m.name)
+          },null,2));
+          NODE
