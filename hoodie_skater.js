@@ -73,9 +73,9 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    const mode=actions.grinding?'grind':actions.grabbing?'grab':flip?'flip':air&&takeoff>.05?'ollie':air?'air':landing>.05?'landing':pose.pushing?'push':(pose.crouch||0)>.1?'crouch':Math.abs(state.speed)>1?'ride':'idle';
    status.mode=mode;
    for(const [n,r] of rest){n.position.copyFrom(r.p);n.rotationQuaternion=r.q.clone()}
-   // Keep the grab athletic instead of dropping the entire rider too low;
+   // In a grab, tuck the knees up toward the deck instead of curling the\n   // spine forward. Keep the chest comparatively upright as the hips lower;
    // hip/chest lean and arm IK still bring the hand onto the moving deck.
-   const crouch=clamp((pose.crouch||0)*.20+landing*.08+takeoff*.06+(actions.grabbing?.27:0),0,.46);
+   const crouch=clamp((pose.crouch||0)*.20+landing*.08+takeoff*.06+(actions.grabbing?.65:0),0,.78);
    rig.position.y=.33-lo*scale-.10-crouch-(pose.pushing?.18:0);
    rig.rotation.x=0;rig.rotation.z=0;
    // Bend from the hips during a grab so the shoulder can physically reach
@@ -86,8 +86,8 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    const pushLean=pose.pushing&&state.grounded?
     clamp((pose.contact||0)*.075+(pose.recovery||0)*.025,0,.085):0;
    status.pushLean=pushLean;
-   pelvis.rotationQuaternion=rest.get(pelvis).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.25:-pushLean*.5));
-   spine.rotationQuaternion=rest.get(spine).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.30:-pushLean))
+   pelvis.rotationQuaternion=rest.get(pelvis).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.12:-pushLean*.5));
+   spine.rotationQuaternion=rest.get(spine).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.12:-pushLean))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pose.pushing?(pose.contact||0)*.07:0)));
    const travel=state.travelSign===-1?-1:1;
    const lift=air?(flip?.22:actions.grabbing?.10:.15+takeoff*.12):0;
@@ -117,9 +117,11 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
                   v(.08-swing,1.25-crouch+armLift-armDrop-pushCounter,-balance)];
    status.armPose={spread:balance,lift:armLift,drop:armDrop,counter:pushCounter};
    if(actions.grabbing){
-    // Grip is attached to the actual moving deck, including a simultaneous flip.
-    targets[1]=options.board?B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.23,.30,-.15),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):v(.23,.30,-.15);
+    // Grip the near-side deck rail, rather than reaching across the middle;
+    // the hand tracks the moving board even during a simultaneous flip.
+    targets[1]=options.board?B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.18,.34,-.31),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):v(.18,.34,-.31);
    }
+   let grabReachShift=0;
    if(actions.grabbing){
     // Two-bone IK cannot reach a deck below the shoulder if the torso stays
     // upright. Bring the chest toward the board only by the missing reach,
@@ -129,6 +131,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
       B.Vector3.Distance(localPosition(chain[1]),localPosition(chain[2]));
     const delta=targets[1].subtract(shoulder),distance=delta.length();
     const shortfall=Math.max(0,distance-reach+.055);
+    grabReachShift=shortfall;
     if(shortfall>0&&distance>.0001){
      const shiftWorld=B.Vector3.TransformNormal(delta.scale(shortfall/distance),parent.computeWorldMatrix(true));
      const shiftLocal=B.Vector3.TransformNormal(shiftWorld,B.Matrix.Invert(spine.parent.computeWorldMatrix(true)));
@@ -139,6 +142,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    status.feet=legs.map(l=>localPosition(l.n[2]).asArray());status.hands=arms.map(l=>localPosition(l.n[2]).asArray());
    status.legGeometry=legs.map(l=>{const p=l.n.map(localPosition);return {hip:p[0].asArray(),knee:p[1].asArray(),foot:p[2].asArray(),upper:B.Vector3.Distance(p[0],p[1]),lower:B.Vector3.Distance(p[1],p[2])}});
    status.grip=actions.grabbing?targets[1].asArray():null;
+   status.grabReachShift=grabReachShift;
   }
   update({grounded:true,speed:0},{crouch:0});
   for(const mesh of meshes){mesh.receiveShadows=true;mesh.alwaysSelectAsActiveMesh=true;options.shadow?.addShadowCaster(mesh)}
