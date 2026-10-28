@@ -1,2 +1,2 @@
-FAIL: AssertionError [ERR_ASSERTION]: GRIND touch control must catch bowl coping without forcing ollie: {"grinding":false,"vy":8,"y":-1.1950621942870148,"wallY":-1.2050621942870148,"entry":{"initialY":-1.1950621942870148,"finalY":-1.1950621942870148,"grinding":false}}
-    at /home/runner/work/Skate-2/Skate-2/tests/browser_smoke.cjs:631:3
+FAIL: AssertionError [ERR_ASSERTION]: GRIND must visibly rise before any rail attachment: {"y":0.01,"grounded":false,"grinding":false}
+    at /home/runner/work/Skate-2/Skate-2/tests/browser_smoke.cjs:470:3
