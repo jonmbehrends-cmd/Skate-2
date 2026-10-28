@@ -9,7 +9,7 @@ assert(hit&&hit.rail===rails[0],'Descending stable board must contact rail');
 assert(!find(state({y:5}),rails,dt,true),'Cannot teleport down from high above');
 assert(!find(state({y:.8}),rails,dt,true),'Cannot attach from below');
 assert(!find(state({vy:2}),rails,dt,true),'Rising skater cannot attach');
-assert(!find(state({vy:2}),rails,dt,true,true),'Assisted grind must not attach on ascent');
+assert(find(state({vy:2}),rails,dt,true,true),'Button-assisted grind must catch a rising ollie near the rail');
 assert(!find(state({dir:Math.PI/2}),rails,dt,true),'Perpendicular travel must not grind');
 assert(!find(state({x:.5}),rails,dt,true),'Too much lateral offset');
 assert(find(state({x:.5}),rails,dt,true,true),'GRIND button should widen lateral catch without changing passive contact');
@@ -52,6 +52,12 @@ assert(Math.abs(visualYaw(other)+Math.PI/2)<1e-9,'Opposite-side boardslides rota
 const ordinary=state({grindRequestType:'50-50'});
 assert(attach(ordinary,find(ordinary,rails,dt,true)));
 assert.equal(visualYaw(ordinary),0,'Standard 50-50 must remain lengthwise');
+const ollieGrind=state({vy:5.5,x:.3,grindRequestType:'50-50'});
+const ollieHit=find(ollieGrind,rails,dt,true,true);
+assert(ollieHit,'GRIND must capture a rail after its automatic ollie');
+assert(attach(ollieGrind,ollieHit));
+assert.equal(ollieGrind.grindType,'50-50','GRIND must never become a boardslide');
+assert.equal(visualYaw(ollieGrind),0,'50-50 must keep the deck parallel to the rail');
 // The 100-foot bowl has a single circular coping rail, not four straight rails.
 const bowlRail={x:0,z:-106,radius:15.24,y:.09,kind:'bowl-coping'};
 require('../bowl.js');
