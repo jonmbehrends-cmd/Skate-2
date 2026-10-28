@@ -43,6 +43,8 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
   'Grab should stagger the leading and trailing shoes rather than make a symmetric seated pose');
  assert(rig.status.feet.every(f=>f[1]>.50),
   'Grab should tuck both knees above their neutral riding position');
+ assert(rig.status.legGeometry.every(l=>l.hip[1]>l.foot[1]+.025),
+  'Grab pelvis must stay above the shoes; do not sit through the skateboard');
  console.log('GRAB_REACH_GEOMETRY',JSON.stringify(rig.status.grabDebug));
  assert(Number.isFinite(rig.status.grabReachShift)&&rig.status.grabReachShift<.45,
   'Grab should not translate the chest excessively: '+rig.status.grabReachShift);
