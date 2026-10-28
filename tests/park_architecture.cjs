@@ -18,6 +18,18 @@ for(const name of ['perimeter concrete pilaster','wall-washer steel housing','wa
  assert(items.every(m=>Math.abs(m.position.x)>118),'Fixtures must stay outside the skating lanes');
  assert(items.every(m=>m.isPickable===false&&m.checkCollisions===false),'Visual details must never affect physics');
 }
+for(const [name,count] of [['perimeter guardrail top',22],['perimeter guardrail mid',22],['perimeter guardrail upright',66]]){
+ const items=named(name);
+ assert.equal(items.length,count,name+' count should match 11 wall segments on each side');
+ assert(items.every(m=>Math.abs(m.position.x)===119&&m.position.y>2.2),
+  'Guardrails must sit above and outside the concrete wall: '+name);
+ assert(items.every(m=>m.isPickable===false&&m.checkCollisions===false),
+  'Guardrails must never change skating collision or raycast behavior: '+name);
+}
+const metal=materials.find(m=>m.name==='galvanized park coping');
+assert(metal&&metal.alpha===1&&metal.forceDepthWrite===true&&
+ metal.transparencyMode===B.Material.MATERIAL_OPAQUE,
+ 'Galvanized rails must be fully opaque and depth-writing');
 assert(named('park perimeter painted mural').every(m=>m.scaling.x===-1),
  'Interior-facing mural lettering must not be mirrored');
 const flow=named('plaza painted flow guide');
