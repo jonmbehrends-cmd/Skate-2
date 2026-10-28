@@ -22,6 +22,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
   const pelvis=joint('Hips'),spine=joint('Chest');
   const legs=[['L','UpperLeg.L','LowerLeg.L','LowerLeg.L_end'],['R','UpperLeg.R','LowerLeg.R','LowerLeg.R_end']].map(([side,...names])=>({side,n:names.map(joint)}));
   const detachedFeet=[joint('Foot.L'),joint('Foot.R')];
+  const toeEnds=[joint('Foot.L_end'),joint('Foot.R_end')];
   const arms=[['L','UpperArm.L','LowerArm.L','Wrist.L'],['R','UpperArm.R','LowerArm.R','Wrist.R']].map(([side,...names])=>({side,n:names.map(joint)}));
   // Bounds must be computed with the imported Z_UP and glTF handedness transforms,
   // before attaching to a moving/tilted parent. Never overwrite the base offset.
@@ -59,6 +60,16 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
   // Preserve ankle orientation in the stance frame after solving each leg.
   function stanceRotation(node){const q=B.Quaternion.Identity();node.computeWorldMatrix(true).decompose(undefined,q);const pq=B.Quaternion.Identity();parent.computeWorldMatrix(true).decompose(undefined,pq);return pq.conjugate().multiply(q)}
   const footRotations=detachedFeet.map(stanceRotation);
+  // The imported feet have asymmetric bind-pose yaw: one shoe points toward
+  // the tail even when its ankle IK is exactly on the deck. Preserve each
+  // shoe's own bind transform, but rotate its toe axis across the deck (+X)
+  // in stance space. The board's longitudinal axis is Z.
+  const alignedFootRotations=detachedFeet.map((foot,i)=>{
+   const toeAxis=localPosition(toeEnds[i]).subtract(localPosition(foot)).normalize();
+   const correction=B.Quaternion.Identity();
+   B.Quaternion.FromUnitVectorsToRef(toeAxis,v(1,0,0),correction);
+   return correction.multiply(footRotations[i]);
+  });
   
   function placeDetached(node,target){const inv=B.Matrix.Invert(node.parent.computeWorldMatrix(true));node.position.copyFrom(B.Vector3.TransformCoordinates(world(target),inv));node.computeWorldMatrix(true)}
   function orient(node,q){const pq=B.Quaternion.Identity(),parentQ=B.Quaternion.Identity();node.parent.computeWorldMatrix(true).decompose(undefined,pq);parent.computeWorldMatrix(true).decompose(undefined,parentQ);node.rotationQuaternion=pq.conjugate().multiply(parentQ.multiply(q));node.computeWorldMatrix(true)}
@@ -136,7 +147,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     // along the deck. This pole only changes skeletal IK, never board physics.
     const kneePole=actions.grabbing?v(.85,.86,side*.54):v(.8,.65,side*.50);
     footTargets.push(foot.asArray());
-    solve(legs[i].n,foot,kneePole);placeDetached(detachedFeet[i],localPosition(legs[i].n[2]));orient(detachedFeet[i],footRotations[i]);
+    solve(legs[i].n,foot,kneePole);placeDetached(detachedFeet[i],localPosition(legs[i].n[2]));orient(detachedFeet[i],alignedFootRotations[i]);
    }
    // Keep the shoulders active throughout a trick. A skater raises both
    // arms during the pop, counter-swings while pushing, and spreads/drops
@@ -175,6 +186,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    for(let i=0;i<arms.length;i++)solve(arms[i].n,targets[i],v(.65,1.0-crouch,i===0?.6:-.6));
    status.feet=legs.map(l=>localPosition(l.n[2]).asArray());
    status.footTargets=footTargets;
+   status.toeDirections=detachedFeet.map((foot,i)=>localPosition(toeEnds[i]).subtract(localPosition(foot)).normalize().asArray());
    status.footReachError=footTargets.map((target,i)=>B.Vector3.Distance(B.Vector3.FromArray(target),B.Vector3.FromArray(status.feet[i])));status.hands=arms.map(l=>localPosition(l.n[2]).asArray());
    status.legGeometry=legs.map(l=>{const p=l.n.map(localPosition);return {hip:p[0].asArray(),knee:p[1].asArray(),foot:p[2].asArray(),upper:B.Vector3.Distance(p[0],p[1]),lower:B.Vector3.Distance(p[1],p[2])}});
    status.grip=actions.grabbing?targets[1].asArray():null;
