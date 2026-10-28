@@ -2,7 +2,7 @@ name: Hoodie skeletal character acceptance
 on:
   pull_request:
   push:
-    branches: [feature/hoodie-skater-main-20261028]
+    branches: [main]
   workflow_dispatch:
 permissions:
   contents: read
