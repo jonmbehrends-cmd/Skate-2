@@ -787,7 +787,10 @@ const server=http.createServer((req,res)=>{
       delta+=Math.abs(p.data[i+k]-q.data[i+k]);
      }
      control/=3;delta/=3;
-     if(control<25)continue;
+     // Poured concrete is closer in tone to the underlying plaza than the
+     // former plywood. A 12-channel positive-control threshold still
+     // requires visible ramp removal, without rejecting valid gray surfaces.
+     if(control<12)continue;
      covered++;totalDelta+=delta;totalControl+=control;
      maxDelta=Math.max(maxDelta,delta);
      if(delta>8)leaks++;
