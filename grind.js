@@ -14,7 +14,7 @@ function find(state,rails,dt,stable,assist=false){
  for(const rail of rails){
   // Only bowl coping permits rising capture: standard rail/ledge catches
   // remain descending-only, preserving the existing ollie/boardslide physics.
-  if(state.vy>0&&rail.kind!=='bowl-coping')continue;
+  if(state.vy>0&&rail.kind!=='bowl-coping'&&!assist)continue;
   if(rail.kind==='bowl-coping'){
    const dx=state.x-rail.x,dz=state.z-rail.z,r=Math.hypot(dx,dz),radialError=Math.abs(r-rail.radius);
    if(radialError>(assist?2.0:.42)||state.y<rail.y-(assist?1.8:.3)||nextY>rail.y+(assist?2.5:.65)||r<.01)continue;
@@ -28,13 +28,13 @@ function find(state,rails,dt,stable,assist=false){
    continue;
   }
   const top=Number.isFinite(rail.y)?rail.y:1.1;
-  if(state.y<top-(assist?.8:.28)||nextY>top+(assist?1.8:.65))continue;
+  if(state.y<top-(assist?1.25:.28)||nextY>top+(assist?2.2:.65))continue;
   const axis=rail.axis==='x'?'x':'z',cross=axis==='z'?'x':'z';
   const crossDist=Math.abs(state[cross]-rail[cross]);
   const alongDist=Math.abs(state[axis]-rail[axis]);
-  if(crossDist>(assist?1.7:.35)||alongDist>rail.len/2+(assist?.35:-.001))continue;
+  if(crossDist>(assist?1.15:.35)||alongDist>rail.len/2+(assist?.35:-.001))continue;
   const heading=axis==='z'?Math.cos(state.dir):Math.sin(state.dir);
-  if(Math.abs(heading)<(assist?.05:.3))continue;
+  if(Math.abs(heading)<(assist?0:.3))continue;
   const distance=crossDist+Math.abs(state.y-top)*.3;
   if(distance<bestDist){best={rail,top,direction:heading*(state.travelSign===-1?-1:1)>=0?1:-1};bestDist=distance}
  }
