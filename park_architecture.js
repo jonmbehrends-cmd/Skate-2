@@ -15,6 +15,22 @@ function build(B,scene,ramps){
  const dark=material('recessed concrete','#474c50',true);
  const metal=material('galvanized park coping','#9aa8b0',false);
  const yellow=material('park edge markings','#d7aa50',true);
+ // Shared, opaque, hand-painted concrete stencil. One 1024px atlas is reused
+ // across the deck fascia and perimeter walls; no extra network assets.
+ const muralTexture=new B.DynamicTexture('park concrete stencil atlas',{width:1024,height:256},scene,false);
+ const ink=muralTexture.getContext();
+ ink.fillStyle='#374047';ink.fillRect(0,0,1024,256);
+ for(let i=0;i<90;i++){const x=(i*137)%1024,y=(i*71)%256;ink.fillStyle=i%3===0?'#495157':'#303940';ink.fillRect(x,y,18+(i%7)*9,1+(i%3));}
+ ink.fillStyle='#d3c9ad';ink.fillRect(22,24,980,6);ink.fillRect(22,222,980,5);
+ for(const x of [28,958]){ink.fillStyle='#c18a48';for(let i=0;i<5;i++){ink.save();ink.translate(x+i*8,185);ink.rotate(-.45);ink.fillRect(0,0,7,42);ink.restore();}}
+ ink.font='bold 112px sans-serif';ink.textAlign='center';ink.fillStyle='#e9e0c9';ink.fillText('SOL SKATE',512,147);
+ ink.font='bold 28px sans-serif';ink.fillStyle='#c69c64';ink.fillText('CONCRETE  /  COPING  /  FLOW',512,198);
+ muralTexture.update();
+ const muralMat=new B.StandardMaterial('architectural skatepark mural',scene);
+ muralMat.diffuseTexture=muralTexture;muralMat.emissiveColor=new B.Color3(.10,.10,.10);
+ muralMat.specularColor=new B.Color3(.025,.025,.025);muralMat.alpha=1;
+ muralMat.transparencyMode=B.Material.MATERIAL_OPAQUE;muralMat.forceDepthWrite=true;
+ muralMat.backFaceCulling=false;
  function cube(name,x,y,z,w,h,d,mat){
   const q=B.MeshBuilder.CreateBox(name,{width:w,height:h,depth:d},scene);
   q.position.set(x,y,z);q.material=mat;q.isPickable=false;
@@ -28,8 +44,8 @@ function build(B,scene,ramps){
   for(const sx of [-1,1]){
    cube('halfpipe deck support',r.x+sx*(r.w/2-.55),base,r.z,.7,r.h-.20,r.d-.55,cement);
   }
-  cube('halfpipe deck front fascia',r.x,r.h-.31,r.z+r.d/2-.13,r.w-.8,.44,.20,dark);
-  cube('halfpipe deck back fascia',r.x,r.h-.31,r.z-r.d/2+.13,r.w-.8,.44,.20,dark);
+  cube('halfpipe deck front fascia',r.x,r.h-.31,r.z+r.d/2-.13,r.w-.8,.44,.20,muralMat);
+  cube('halfpipe deck back fascia',r.x,r.h-.31,r.z-r.d/2+.13,r.w-.8,.44,.20,muralMat);
   for(const sx of [-1,1])cube('deck corner steel cap',r.x+sx*(r.w/2-.15),r.h+.018,r.z,.14,.036,r.d,metal);
  }
  // Color-inlaid seams at the perimeter, outside the central skating area.
@@ -42,6 +58,14 @@ function build(B,scene,ramps){
    cube('park perimeter retaining wall',x,1.1,z,1.1,2.2,19.8,cement);
    cube('recessed architectural wall panel',x+(x<0?.57:-.57),1.2,z,.035,1.65,17.5,dark);
    for(const dz of [-7,7])cube('wall expansion joint',x+(x<0?.60:-.60),1.2,z+dz,.042,1.8,.065,metal);
+   // Large stencilled murals are mounted flush on the non-skateable outer
+   // retaining wall. They cannot snag wheels or affect collision physics.
+   if(z===-60||z===0||z===60){
+    const art=B.MeshBuilder.CreatePlane('park perimeter painted mural',{width:12,height:1.5},scene);
+    art.position.set(x+(x<0?.605:-.605),1.2,z);
+    art.rotation.y=x<0?Math.PI/2:-Math.PI/2;art.material=muralMat;
+    art.isPickable=false;art.checkCollisions=false;objects.push(art);
+   }
   }
  }
  return {meshes:objects,dispose(){for(const mesh of objects)mesh.dispose();}};
