@@ -91,9 +91,17 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     if(pushing){foot.y=.17+(pose.recovery||0)*.29;foot.z=-.32-travel*(.18*(pose.contact||0)-.20*(pose.recovery||0))}
     solve(legs[i].n,foot,v(.8,.8,side*.50));placeDetached(detachedFeet[i],localPosition(legs[i].n[2]));orient(detachedFeet[i],footRotations[i]);
    }
-   const balance=actions.grinding?.78:air?.60:.39;
-   const swing=pose.pushing?(pose.contact||0)*.23-(pose.recovery||0)*.15:0;
-   const targets=[v(.12+swing,1.25-crouch,balance),v(.08-swing,1.25-crouch,-balance)];
+   // Keep the shoulders active throughout a trick. A skater raises both
+   // arms during the pop, counter-swings while pushing, and spreads/drops
+   // them to absorb a landing; this is visual-only (no forces or input edits).
+   const balance=actions.grinding?.78:air?.60:landing>.05?.64:pose.pushing?.49:.39;
+   const swing=pose.pushing?(pose.contact||0)*.25-(pose.recovery||0)*.17:0;
+   const armLift=air&&!actions.grabbing?takeoff*.18+(flip?.06:0):0;
+   const armDrop=landing*.13;
+   const pushCounter=pose.pushing?.10:0;
+   const targets=[v(.12+swing,1.25-crouch+armLift-armDrop+pushCounter,balance),
+                  v(.08-swing,1.25-crouch+armLift-armDrop-pushCounter,-balance)];
+   status.armPose={spread:balance,lift:armLift,drop:armDrop,counter:pushCounter};
    if(actions.grabbing){
     // Grip is attached to the actual moving deck, including a simultaneous flip.
     targets[1]=options.board?B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.23,.30,-.15),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):v(.23,.30,-.15);
