@@ -171,19 +171,22 @@ async function main() {
     }
 
     async function touchEndOne(id) {
+      const endingTouch = activeTouches.find(point => point.id === id);
+      assert(endingTouch, `Touch ${id} must be active before it is released`);
       activeTouches = activeTouches.filter(point => point.id !== id);
       await cdp.send('Input.dispatchTouchEvent', {
         type: 'touchEnd',
-        touchPoints: activeTouches,
+        touchPoints: [endingTouch],
         modifiers: 0
       });
     }
 
     async function touchEndAll() {
+      const endingTouches = activeTouches;
       activeTouches = [];
       await cdp.send('Input.dispatchTouchEvent', {
         type: 'touchEnd',
-        touchPoints: [],
+        touchPoints: endingTouches,
         modifiers: 0
       });
     }
@@ -203,28 +206,62 @@ async function main() {
 
     await scenario('two-finger Grab preserves remaining touch and grab timer', async () => {
       await reset(mobilePage);
+      await mobilePage.evaluate(() => {
+        window.__SOL_DIAGNOSTICS__.engine.stopRenderLoop();
+        const grab = document.querySelector('[data-t="grab"]');
+        window.__grabPointerEvents = [];
+        for (const type of ['pointerdown', 'pointerup', 'pointercancel', 'lostpointercapture']) {
+          grab.addEventListener(type, event => {
+            window.__grabPointerEvents.push({ type, pointerId: event.pointerId });
+          }, true);
+        }
+      });
       await touchStart(201, '[data-t="grab"]');
       await touchStart(202, '[data-t="grab"]');
-      await mobilePage.evaluate(() => {
+      const capturedPointers = await mobilePage.evaluate(() => {
+        const grab = document.querySelector('[data-t="grab"]');
+        const pointerIds = window.__grabPointerEvents
+          .filter(event => event.type === 'pointerdown')
+          .map(event => event.pointerId);
+        return {
+          pointerIds,
+          hasCapture: pointerIds.map(pointerId => grab.hasPointerCapture(pointerId))
+        };
+      });
+      assert.equal(capturedPointers.pointerIds.length, 2,
+        `CDP multitouch must produce two pointerdown events: ${JSON.stringify(capturedPointers)}`);
+      assert.notEqual(capturedPointers.pointerIds[0], capturedPointers.pointerIds[1]);
+      assert(capturedPointers.hasCapture.every(Boolean),
+        `Both pointers must be captured: ${JSON.stringify(capturedPointers)}`);
+      const expectedGrabUntil = await mobilePage.evaluate(() => {
         const state = window.__SOL_DIAGNOSTICS__.state;
-        state.grabUntil = performance.now() + 900;
+        state.grabUntil = Number.MAX_SAFE_INTEGER;
         state.touchGrabHeld = true;
         state.grabHeld = true;
+        return state.grabUntil;
       });
       await touchEndOne(201);
       const afterOneRelease = await mobilePage.evaluate(() => {
         const state = window.__SOL_DIAGNOSTICS__.state;
+        const grab = document.querySelector('[data-t="grab"]');
+        const pointerIds = window.__grabPointerEvents
+          .filter(event => event.type === 'pointerdown')
+          .map(event => event.pointerId);
         return {
           touchGrabHeld: state.touchGrabHeld,
           grabHeld: state.grabHeld,
           grabUntil: state.grabUntil,
-          grabUntilRemaining: state.grabUntil - performance.now()
+          grabUntilRemaining: state.grabUntil - performance.now(),
+          events: window.__grabPointerEvents,
+          remainingPointerCaptured: grab.hasPointerCapture(pointerIds[1])
         };
       });
       assert.equal(afterOneRelease.touchGrabHeld, true);
       assert.equal(afterOneRelease.grabHeld, true);
-      assert(afterOneRelease.grabUntilRemaining > 0,
-        `The still-held finger must retain grabUntil, got ${JSON.stringify(afterOneRelease)}`);
+      assert.equal(afterOneRelease.grabUntil, expectedGrabUntil,
+        `Releasing one finger must preserve the existing deadline, got ${JSON.stringify(afterOneRelease)}`);
+      assert(afterOneRelease.remainingPointerCaptured,
+        `The other captured pointer must remain captured: ${JSON.stringify(afterOneRelease.events)}`);
       await touchEndAll();
       await mobilePage.waitForTimeout(50);
       const afterAllRelease = await mobilePage.evaluate(() => {
