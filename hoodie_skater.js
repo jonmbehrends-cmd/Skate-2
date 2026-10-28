@@ -76,7 +76,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    // In a grab, tuck the knees up toward the deck instead of curling the
    // spine forward. Keep the chest comparatively upright as the hips lower;
    // hip/chest lean and arm IK still bring the hand onto the moving deck.
-   const crouch=clamp((pose.crouch||0)*.20+landing*.08+takeoff*.06+(actions.grabbing?.37:0),0,.78);
+   const crouch=clamp((pose.crouch||0)*.20+landing*.08+takeoff*.06+(actions.grabbing?.42:0),0,.78);
    // Settle the pelvis into an athletic, knee-flexed stance instead of a
    // locked-knee upright pose. Feet remain IK-planted on the deck.
    // The ground-reaching push shoe sits below the deck. Compress the hips
@@ -97,8 +97,8 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    const pushLean=pose.pushing&&state.grounded?
     clamp((pose.contact||0)*.075+(pose.recovery||0)*.025,0,.085):0;
    status.pushLean=pushLean;
-   pelvis.rotationQuaternion=rest.get(pelvis).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?1.08:-pushLean*.5));
-   spine.rotationQuaternion=rest.get(spine).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.28:-pushLean))
+   pelvis.rotationQuaternion=rest.get(pelvis).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?.85:-pushLean*.5));
+   spine.rotationQuaternion=rest.get(spine).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.18:-pushLean))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pose.pushing?(pose.contact||0)*.07:0)));
    const travel=state.travelSign===-1?-1:1;
    const lift=air?(flip?.22:actions.grabbing?.08:.15+takeoff*.12):0;
@@ -134,7 +134,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    if(actions.grabbing){
     // Grip the near-side deck rail, rather than reaching across the middle;
     // the hand tracks the moving board even during a simultaneous flip.
-    targets[1]=options.board?B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.08,.34,-.31),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):v(.18,.34,-.31);
+    targets[1]=options.board?B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.20,.34,.15),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):v(.18,.34,-.31);
    }
    let grabReachShift=0;
    if(actions.grabbing){
