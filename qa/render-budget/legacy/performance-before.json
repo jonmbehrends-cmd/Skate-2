@@ -1,0 +1,6368 @@
+{
+  "label": "before",
+  "source": "6450e58a6f955e3b4eca0569aed19abb4336f48c",
+  "browser": "140.0.7339.186",
+  "renderer": "SwiftShader software rendering",
+  "frames": 40,
+  "warmup": 20,
+  "cases": {
+    "desktop-spawn": {
+      "engine": "8.56.2",
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "meshes": 428,
+      "materials": 121,
+      "textures": 28,
+      "unusedDynamicTextures": [
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        }
+      ],
+      "vertices": 88958,
+      "triangles": 107459.99999999999,
+      "shadowCasters": 28,
+      "hiddenShadowCasters": [
+        "torso",
+        "shoulders",
+        "head",
+        "helmet",
+        "thigh",
+        "shin",
+        "shoe",
+        "upper arm",
+        "forearm",
+        "thigh",
+        "shin",
+        "shoe",
+        "upper arm",
+        "forearm"
+      ],
+      "rows": [
+        {
+          "loopMs": 8.100000143051147,
+          "intervalMs": 428.2000000476837,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 0.9000000953674316,
+          "renderMs": 2.5999999046325684,
+          "activeMeshEvaluationMs": 2.299999952316284,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.2999999523162842
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 1.1000001430511475
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 6
+            }
+          }
+        },
+        {
+          "loopMs": 13.600000143051147,
+          "intervalMs": 453,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 2.5,
+          "renderMs": 6.900000095367432,
+          "activeMeshEvaluationMs": 2.6999998092651367,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0.19999980926513672
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.20000028610229492
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.39999985694885254
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 12.400000095367432
+            }
+          }
+        },
+        {
+          "loopMs": 6.400000095367432,
+          "intervalMs": 72.29999995231628,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 0.7999999523162842,
+          "renderMs": 3.200000047683716,
+          "activeMeshEvaluationMs": 1.5999999046325684,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0.10000014305114746
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0.10000014305114746
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.4999997615814209
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.700000047683716
+            }
+          }
+        },
+        {
+          "loopMs": 8.599999904632568,
+          "intervalMs": 438.7999999523163,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 0.7000000476837158,
+          "renderMs": 4.3999998569488525,
+          "activeMeshEvaluationMs": 1.7000000476837158,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0.09999990463256836
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0.10000014305114746
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.40000009536743164
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 7.299999952316284
+            }
+          }
+        },
+        {
+          "loopMs": 8.5,
+          "intervalMs": 425.7000000476837,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 2,
+          "renderMs": 3,
+          "activeMeshEvaluationMs": 1.7000000476837158,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0.20000028610229492
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0.10000014305114746
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.3000001907348633
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.5999996662139893
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 7
+            }
+          }
+        },
+        {
+          "loopMs": 6.900000095367432,
+          "intervalMs": 414,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 0.7000000476837158,
+          "renderMs": 3,
+          "activeMeshEvaluationMs": 1.5,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0.09999990463256836
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.19999980926513672
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.7000002861022949
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.599999904632568
+            }
+          }
+        },
+        {
+          "loopMs": 6.799999952316284,
+          "intervalMs": 401,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 0.5999999046325684,
+          "renderMs": 2.6000001430511475,
+          "activeMeshEvaluationMs": 1.7999999523162842,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 1.2000000476837158
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.299999952316284
+            }
+          }
+        },
+        {
+          "loopMs": 10.700000047683716,
+          "intervalMs": 411.2999999523163,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 0.7999999523162842,
+          "renderMs": 6.299999952316284,
+          "activeMeshEvaluationMs": 1.7000000476837158,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0.2999999523162842
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.20000004768371582
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 1.1000001430511475
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 8.899999856948853
+            }
+          }
+        },
+        {
+          "loopMs": 6,
+          "intervalMs": 348.2999999523163,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 0.7000000476837158,
+          "renderMs": 2.799999952316284,
+          "activeMeshEvaluationMs": 1.2000000476837158,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.10000014305114746
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.7000000476837158
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.8999998569488525
+            }
+          }
+        },
+        {
+          "loopMs": 8.099999904632568,
+          "intervalMs": 409,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 0.6999998092651367,
+          "renderMs": 3.5,
+          "activeMeshEvaluationMs": 1.8000001907348633,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0.10000014305114746
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 1.4000000953674316
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 6.199999809265137
+            }
+          }
+        },
+        {
+          "loopMs": 8.200000047683716,
+          "intervalMs": 394.90000009536743,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 0.8000001907348633,
+          "renderMs": 3.5,
+          "activeMeshEvaluationMs": 1.7999999523162842,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0.10000014305114746
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 1.3000001907348633
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 6.400000095367432
+            }
+          }
+        },
+        {
+          "loopMs": 7.799999952316284,
+          "intervalMs": 410.2000000476837,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 0.8000001907348633,
+          "renderMs": 3.6999998092651367,
+          "activeMeshEvaluationMs": 1.5999999046325684,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0.10000014305114746
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.9000000953674316
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 6.400000095367432
+            }
+          }
+        },
+        {
+          "loopMs": 8.299999952316284,
+          "intervalMs": 417.09999990463257,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 0.7000000476837158,
+          "renderMs": 4.299999952316284,
+          "activeMeshEvaluationMs": 1.7000000476837158,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0.09999990463256836
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.8000001907348633
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 7
+            }
+          }
+        },
+        {
+          "loopMs": 9.899999856948853,
+          "intervalMs": 415.5,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 1.2000000476837158,
+          "renderMs": 5.799999952316284,
+          "activeMeshEvaluationMs": 1.5,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.6000001430511475
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 8.700000047683716
+            }
+          }
+        },
+        {
+          "loopMs": 6,
+          "intervalMs": 401,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 0.7000000476837158,
+          "renderMs": 2,
+          "activeMeshEvaluationMs": 1.7000000476837158,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.7999999523162842
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.700000047683716
+            }
+          }
+        },
+        {
+          "loopMs": 12.100000143051147,
+          "intervalMs": 405.40000009536743,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 1.2000000476837158,
+          "renderMs": 7.200000047683716,
+          "activeMeshEvaluationMs": 1.9000000953674316,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.7000002861022949
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 10.799999952316284
+            }
+          }
+        },
+        {
+          "loopMs": 7,
+          "intervalMs": 411.2999999523163,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 0.7999999523162842,
+          "renderMs": 3,
+          "activeMeshEvaluationMs": 1.9000000953674316,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0.20000028610229492
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.3000004291534424
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.4999997615814209
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.900000095367432
+            }
+          }
+        },
+        {
+          "loopMs": 9.100000143051147,
+          "intervalMs": 405.2000000476837,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 0.7000000476837158,
+          "renderMs": 5.5,
+          "activeMeshEvaluationMs": 1.4000000953674316,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0.10000014305114746
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.6999998092651367
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 7.799999952316284
+            }
+          }
+        },
+        {
+          "loopMs": 5.6000001430511475,
+          "intervalMs": 413.5,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 0.5,
+          "renderMs": 2.9000000953674316,
+          "activeMeshEvaluationMs": 1.0999999046325684,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0.10000014305114746
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.6999995708465576
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.6000001430511475
+            }
+          }
+        },
+        {
+          "loopMs": 6.099999904632568,
+          "intervalMs": 409.7999999523163,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 0.5,
+          "renderMs": 3,
+          "activeMeshEvaluationMs": 1.2000000476837158,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.9000000953674316
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.799999952316284
+            }
+          }
+        },
+        {
+          "loopMs": 6.3999998569488525,
+          "intervalMs": 409.2999999523163,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 0.39999985694885254,
+          "renderMs": 3.5999999046325684,
+          "activeMeshEvaluationMs": 1.2999999523162842,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.6000001430511475
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.5
+            }
+          }
+        },
+        {
+          "loopMs": 7.299999952316284,
+          "intervalMs": 476.90000009536743,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 0.7999999523162842,
+          "renderMs": 3.299999952316284,
+          "activeMeshEvaluationMs": 1.6000001430511475,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0.09999990463256836
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0.10000014305114746
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.6000001430511475
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 6.200000047683716
+            }
+          }
+        },
+        {
+          "loopMs": 6.1000001430511475,
+          "intervalMs": 404.2000000476837,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 0.5999999046325684,
+          "renderMs": 2.8000001907348633,
+          "activeMeshEvaluationMs": 1.5,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.20000004768371582
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.6999998092651367
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5
+            }
+          }
+        },
+        {
+          "loopMs": 6.699999809265137,
+          "intervalMs": 425.69999980926514,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 0.5999999046325684,
+          "renderMs": 3.0999999046325684,
+          "activeMeshEvaluationMs": 1.5,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.9000000953674316
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.5
+            }
+          }
+        },
+        {
+          "loopMs": 6,
+          "intervalMs": 405.30000019073486,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 0.5,
+          "renderMs": 3,
+          "activeMeshEvaluationMs": 1.4000000953674316,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.5999996662139893
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.1000001430511475
+            }
+          }
+        },
+        {
+          "loopMs": 6,
+          "intervalMs": 388.59999990463257,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 0.6000001430511475,
+          "renderMs": 2.700000047683716,
+          "activeMeshEvaluationMs": 1.2999999523162842,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.7000000476837158
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.900000095367432
+            }
+          }
+        },
+        {
+          "loopMs": 6.3999998569488525,
+          "intervalMs": 387.2999999523163,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 0.5999999046325684,
+          "renderMs": 3,
+          "activeMeshEvaluationMs": 1.6000001430511475,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.5999999046325684
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.299999952316284
+            }
+          }
+        },
+        {
+          "loopMs": 6.299999952316284,
+          "intervalMs": 397.7999999523163,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 0.5999999046325684,
+          "renderMs": 2.9000000953674316,
+          "activeMeshEvaluationMs": 1.4000000953674316,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0.10000014305114746
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.5999996662139893
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.299999952316284
+            }
+          }
+        },
+        {
+          "loopMs": 6.400000095367432,
+          "intervalMs": 398.40000009536743,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 0.6000001430511475,
+          "renderMs": 2.799999952316284,
+          "activeMeshEvaluationMs": 1.5,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.9000000953674316
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.099999904632568
+            }
+          }
+        },
+        {
+          "loopMs": 6.900000095367432,
+          "intervalMs": 343.90000009536743,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 1,
+          "renderMs": 3.299999952316284,
+          "activeMeshEvaluationMs": 1.2000000476837158,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.8000001907348633
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.800000190734863
+            }
+          }
+        },
+        {
+          "loopMs": 5.099999904632568,
+          "intervalMs": 385.59999990463257,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 0.40000009536743164,
+          "renderMs": 2.0999999046325684,
+          "activeMeshEvaluationMs": 1.2999999523162842,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.20000004768371582
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.7000000476837158
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 3.9000000953674316
+            }
+          }
+        },
+        {
+          "loopMs": 31.800000190734863,
+          "intervalMs": 611.4000000953674,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 1.2000000476837158,
+          "renderMs": 27,
+          "activeMeshEvaluationMs": 2.200000047683716,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.8000001907348633
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 30.600000143051147
+            }
+          }
+        },
+        {
+          "loopMs": 11,
+          "intervalMs": 381.69999980926514,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 0.9000000953674316,
+          "renderMs": 7.199999809265137,
+          "activeMeshEvaluationMs": 1.2999999523162842,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.10000014305114746
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.5999999046325684
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 9.599999904632568
+            }
+          }
+        },
+        {
+          "loopMs": 5.300000190734863,
+          "intervalMs": 253.30000019073486,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 0.40000009536743164,
+          "renderMs": 2.299999952316284,
+          "activeMeshEvaluationMs": 1.0999999046325684,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.2999999523162842
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.7000000476837158
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.1000001430511475
+            }
+          }
+        },
+        {
+          "loopMs": 9.100000143051147,
+          "intervalMs": 549,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 1.3999998569488525,
+          "renderMs": 4.099999904632568,
+          "activeMeshEvaluationMs": 2.0999999046325684,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.10000014305114746
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.7999999523162842
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 8
+            }
+          }
+        },
+        {
+          "loopMs": 6.700000047683716,
+          "intervalMs": 452.09999990463257,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 0.6000001430511475,
+          "renderMs": 3.1000001430511475,
+          "activeMeshEvaluationMs": 1.5999999046325684,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.2999999523162842
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.7000000476837158
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.599999904632568
+            }
+          }
+        },
+        {
+          "loopMs": 6.8999998569488525,
+          "intervalMs": 260.59999990463257,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 0.7000000476837158,
+          "renderMs": 3.0999999046325684,
+          "activeMeshEvaluationMs": 1.5,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 1
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.599999904632568
+            }
+          }
+        },
+        {
+          "loopMs": 6.5,
+          "intervalMs": 535.7000000476837,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 0.6999998092651367,
+          "renderMs": 3.200000047683716,
+          "activeMeshEvaluationMs": 1.4000000953674316,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0.10000014305114746
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.20000028610229492
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.4999995231628418
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.299999952316284
+            }
+          }
+        },
+        {
+          "loopMs": 4.299999952316284,
+          "intervalMs": 199.5,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 0.40000009536743164,
+          "renderMs": 2,
+          "activeMeshEvaluationMs": 1,
+          "functions": {
+            "terrain": {
+              "calls": 63,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 9,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 9,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 9,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 9,
+              "ms": 0.3000001907348633
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 3.4000000953674316
+            }
+          }
+        },
+        {
+          "loopMs": 18.199999809265137,
+          "intervalMs": 799.2999999523163,
+          "drawCalls": 168,
+          "activeMeshes": 149,
+          "activeIndices": 180150,
+          "renderTargetsMs": 5.799999952316284,
+          "renderMs": 8.699999809265137,
+          "activeMeshEvaluationMs": 2,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.8000004291534424
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 16.899999856948853
+            }
+          }
+        }
+      ]
+    },
+    "desktop-park": {
+      "engine": "8.56.2",
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "meshes": 428,
+      "materials": 121,
+      "textures": 28,
+      "unusedDynamicTextures": [
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        }
+      ],
+      "vertices": 88958,
+      "triangles": 107459.99999999999,
+      "shadowCasters": 28,
+      "hiddenShadowCasters": [
+        "torso",
+        "shoulders",
+        "head",
+        "helmet",
+        "thigh",
+        "shin",
+        "shoe",
+        "upper arm",
+        "forearm",
+        "thigh",
+        "shin",
+        "shoe",
+        "upper arm",
+        "forearm"
+      ],
+      "rows": [
+        {
+          "loopMs": 7.6000001430511475,
+          "intervalMs": 412.40000009536743,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.5,
+          "renderMs": 3.9000000953674316,
+          "activeMeshEvaluationMs": 1.9000000953674316,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.7000000476837158
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 6.5
+            }
+          }
+        },
+        {
+          "loopMs": 9.600000143051147,
+          "intervalMs": 402.5,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.5999999046325684,
+          "renderMs": 5.800000190734863,
+          "activeMeshEvaluationMs": 2,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0.20000004768371582
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.3000001907348633
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.5999999046325684
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 8.5
+            }
+          }
+        },
+        {
+          "loopMs": 8.299999952316284,
+          "intervalMs": 403.09999990463257,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.5,
+          "renderMs": 4.900000095367432,
+          "activeMeshEvaluationMs": 1.5999999046325684,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.20000028610229492
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.39999961853027344
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 7.299999952316284
+            }
+          }
+        },
+        {
+          "loopMs": 9.400000095367432,
+          "intervalMs": 388.90000009536743,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.7000000476837158,
+          "renderMs": 6,
+          "activeMeshEvaluationMs": 1.5,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.7000002861022949
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 8.400000095367432
+            }
+          }
+        },
+        {
+          "loopMs": 7.299999952316284,
+          "intervalMs": 391.89999985694885,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.7999999523162842,
+          "renderMs": 3,
+          "activeMeshEvaluationMs": 2.5,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.5000002384185791
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 6.599999904632568
+            }
+          }
+        },
+        {
+          "loopMs": 6.5,
+          "intervalMs": 383.7999999523163,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.7999999523162842,
+          "renderMs": 2.799999952316284,
+          "activeMeshEvaluationMs": 1.5999999046325684,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.7000002861022949
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.3999998569488525
+            }
+          }
+        },
+        {
+          "loopMs": 8.299999952316284,
+          "intervalMs": 390.90000009536743,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.7999999523162842,
+          "renderMs": 3.9000000953674316,
+          "activeMeshEvaluationMs": 2.299999952316284,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.8000004291534424
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 7.099999904632568
+            }
+          }
+        },
+        {
+          "loopMs": 12.200000047683716,
+          "intervalMs": 388.2999999523163,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.7000000476837158,
+          "renderMs": 7.3999998569488525,
+          "activeMeshEvaluationMs": 2,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 1.000000238418579
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 10.399999856948853
+            }
+          }
+        },
+        {
+          "loopMs": 8.099999904632568,
+          "intervalMs": 365.2000000476837,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.7000000476837158,
+          "renderMs": 4.700000047683716,
+          "activeMeshEvaluationMs": 1.6999998092651367,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.19999980926513672
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.40000033378601074
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 7.299999952316284
+            }
+          }
+        },
+        {
+          "loopMs": 7.300000190734863,
+          "intervalMs": 388.90000009536743,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.5,
+          "renderMs": 3.5999999046325684,
+          "activeMeshEvaluationMs": 1.7000000476837158,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0.10000014305114746
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.10000014305114746
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.7999997138977051
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.900000095367432
+            }
+          }
+        },
+        {
+          "loopMs": 6.599999904632568,
+          "intervalMs": 384.59999990463257,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.2999999523162842,
+          "renderMs": 4.299999952316284,
+          "activeMeshEvaluationMs": 1.0999999046325684,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.5
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.900000095367432
+            }
+          }
+        },
+        {
+          "loopMs": 6.400000095367432,
+          "intervalMs": 388,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.5,
+          "renderMs": 3.5,
+          "activeMeshEvaluationMs": 1.2000000476837158,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.39999985694885254
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.5
+            }
+          }
+        },
+        {
+          "loopMs": 8.299999952316284,
+          "intervalMs": 416.7999999523163,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.6999998092651367,
+          "renderMs": 4.700000047683716,
+          "activeMeshEvaluationMs": 1.7000000476837158,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.5999996662139893
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 7.200000047683716
+            }
+          }
+        },
+        {
+          "loopMs": 14.299999952316284,
+          "intervalMs": 410.40000009536743,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 1.3999998569488525,
+          "renderMs": 8.799999952316284,
+          "activeMeshEvaluationMs": 2.700000047683716,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.9000000953674316
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 13.200000047683716
+            }
+          }
+        },
+        {
+          "loopMs": 13.700000047683716,
+          "intervalMs": 402.2999999523163,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.8999998569488525,
+          "renderMs": 4.700000047683716,
+          "activeMeshEvaluationMs": 5.1000001430511475,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0.10000014305114746
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 1.2999992370605469
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 11.5
+            }
+          }
+        },
+        {
+          "loopMs": 13,
+          "intervalMs": 408.59999990463257,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.7999999523162842,
+          "renderMs": 8.5,
+          "activeMeshEvaluationMs": 2.0999999046325684,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 1.1000001430511475
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 11.5
+            }
+          }
+        },
+        {
+          "loopMs": 7,
+          "intervalMs": 389.40000009536743,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.7000000476837158,
+          "renderMs": 3.5999999046325684,
+          "activeMeshEvaluationMs": 1.5,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.8999998569488525
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.900000095367432
+            }
+          }
+        },
+        {
+          "loopMs": 6.099999904632568,
+          "intervalMs": 402.09999990463257,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.39999985694885254,
+          "renderMs": 3.5,
+          "activeMeshEvaluationMs": 1.2000000476837158,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.10000014305114746
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.39999961853027344
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.199999809265137
+            }
+          }
+        },
+        {
+          "loopMs": 7.599999904632568,
+          "intervalMs": 387.7000000476837,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.7000000476837158,
+          "renderMs": 3.9000000953674316,
+          "activeMeshEvaluationMs": 1.5999999046325684,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 1.2000000476837158
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 6.3999998569488525
+            }
+          }
+        },
+        {
+          "loopMs": 13.299999952316284,
+          "intervalMs": 422.7000000476837,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 4.6000001430511475,
+          "renderMs": 4.700000047683716,
+          "activeMeshEvaluationMs": 2.299999952316284,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 1.0999999046325684
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 11.900000095367432
+            }
+          }
+        },
+        {
+          "loopMs": 6.8999998569488525,
+          "intervalMs": 103.79999995231628,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.6000001430511475,
+          "renderMs": 3.799999952316284,
+          "activeMeshEvaluationMs": 1.5,
+          "functions": {
+            "terrain": {
+              "calls": 35,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 5,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 5,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 5,
+              "ms": 0.09999990463256836
+            },
+            "riderV2": {
+              "calls": 5,
+              "ms": 0.5
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 6.099999904632568
+            }
+          }
+        },
+        {
+          "loopMs": 11.200000047683716,
+          "intervalMs": 364.40000009536743,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.7999999523162842,
+          "renderMs": 7.1000001430511475,
+          "activeMeshEvaluationMs": 2.0999999046325684,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0.09999990463256836
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.19999980926513672
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.5000002384185791
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 10.200000047683716
+            }
+          }
+        },
+        {
+          "loopMs": 7.5,
+          "intervalMs": 412.59999990463257,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.8000001907348633,
+          "renderMs": 3.799999952316284,
+          "activeMeshEvaluationMs": 1.5999999046325684,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.20000004768371582
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.6000001430511475
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 6.3999998569488525
+            }
+          }
+        },
+        {
+          "loopMs": 12,
+          "intervalMs": 806.1000001430511,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.5,
+          "renderMs": 4.099999904632568,
+          "activeMeshEvaluationMs": 6,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0.09999990463256836
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.6000001430511475
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 11
+            }
+          }
+        },
+        {
+          "loopMs": 7.099999904632568,
+          "intervalMs": 386.09999990463257,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.6000001430511475,
+          "renderMs": 3.4000000953674316,
+          "activeMeshEvaluationMs": 1.7000000476837158,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.8000001907348633
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 6
+            }
+          }
+        },
+        {
+          "loopMs": 12.199999809265137,
+          "intervalMs": 395.59999990463257,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.7000000476837158,
+          "renderMs": 4.699999809265137,
+          "activeMeshEvaluationMs": 5.3999998569488525,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.6000001430511475
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 11.099999904632568
+            }
+          }
+        },
+        {
+          "loopMs": 6.299999952316284,
+          "intervalMs": 65.40000009536743,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.7000000476837158,
+          "renderMs": 3.5,
+          "activeMeshEvaluationMs": 1.4000000953674316,
+          "functions": {
+            "terrain": {
+              "calls": 21,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 3,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 3,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 3,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 3,
+              "ms": 0.3000001907348633
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.799999952316284
+            }
+          }
+        },
+        {
+          "loopMs": 6.199999809265137,
+          "intervalMs": 303.59999990463257,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.39999985694885254,
+          "renderMs": 3,
+          "activeMeshEvaluationMs": 2,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.10000014305114746
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.4999997615814209
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.5
+            }
+          }
+        },
+        {
+          "loopMs": 6,
+          "intervalMs": 356.5,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.9000000953674316,
+          "renderMs": 3.1999998092651367,
+          "activeMeshEvaluationMs": 1,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.5
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.299999952316284
+            }
+          }
+        },
+        {
+          "loopMs": 11,
+          "intervalMs": 743.2000000476837,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 1.2000000476837158,
+          "renderMs": 6.3999998569488525,
+          "activeMeshEvaluationMs": 2.299999952316284,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.6000001430511475
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 10.099999904632568
+            }
+          }
+        },
+        {
+          "loopMs": 7.900000095367432,
+          "intervalMs": 361.40000009536743,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.6999998092651367,
+          "renderMs": 4.1000001430511475,
+          "activeMeshEvaluationMs": 1.8000001907348633,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.5999996662139893
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 6.799999952316284
+            }
+          }
+        },
+        {
+          "loopMs": 6.900000095367432,
+          "intervalMs": 367.7999999523163,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.7999999523162842,
+          "renderMs": 3.4000000953674316,
+          "activeMeshEvaluationMs": 1.4000000953674316,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.7000000476837158
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.900000095367432
+            }
+          }
+        },
+        {
+          "loopMs": 11,
+          "intervalMs": 366.40000009536743,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.6000001430511475,
+          "renderMs": 3.6000001430511475,
+          "activeMeshEvaluationMs": 5,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0.09999990463256836
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.10000014305114746
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 1.000000238418579
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 9.400000095367432
+            }
+          }
+        },
+        {
+          "loopMs": 6,
+          "intervalMs": 63.799999952316284,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.5999999046325684,
+          "renderMs": 3.4000000953674316,
+          "activeMeshEvaluationMs": 1.2999999523162842,
+          "functions": {
+            "terrain": {
+              "calls": 21,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 3,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 3,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 3,
+              "ms": 0.10000014305114746
+            },
+            "riderV2": {
+              "calls": 3,
+              "ms": 0.2999997138977051
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.400000095367432
+            }
+          }
+        },
+        {
+          "loopMs": 6.200000047683716,
+          "intervalMs": 309.09999990463257,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.5,
+          "renderMs": 3.700000047683716,
+          "activeMeshEvaluationMs": 1.0999999046325684,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.2999999523162842
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.3999998569488525
+            }
+          }
+        },
+        {
+          "loopMs": 5.400000095367432,
+          "intervalMs": 362.2000000476837,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.39999985694885254,
+          "renderMs": 2.5999999046325684,
+          "activeMeshEvaluationMs": 0.8999998569488525,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.10000014305114746
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.9000000953674316
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.299999952316284
+            }
+          }
+        },
+        {
+          "loopMs": 11.5,
+          "intervalMs": 735.0999999046326,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.9000000953674316,
+          "renderMs": 6.599999904632568,
+          "activeMeshEvaluationMs": 2.3999998569488525,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0.19999980926513672
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0.09999990463256836
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.5000002384185791
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 10.399999856948853
+            }
+          }
+        },
+        {
+          "loopMs": 5.5,
+          "intervalMs": 377.5,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.39999985694885254,
+          "renderMs": 2.299999952316284,
+          "activeMeshEvaluationMs": 1.3999998569488525,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.8000001907348633
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.3999998569488525
+            }
+          }
+        },
+        {
+          "loopMs": 11.5,
+          "intervalMs": 365.7000000476837,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.7000000476837158,
+          "renderMs": 4,
+          "activeMeshEvaluationMs": 5.3999998569488525,
+          "functions": {
+            "terrain": {
+              "calls": 70,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 10,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 10,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 10,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 10,
+              "ms": 0.7000000476837158
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 10.299999952316284
+            }
+          }
+        },
+        {
+          "loopMs": 6.700000047683716,
+          "intervalMs": 66.10000014305115,
+          "drawCalls": 227,
+          "activeMeshes": 208,
+          "activeIndices": 184176,
+          "renderTargetsMs": 0.6000001430511475,
+          "renderMs": 3.8999998569488525,
+          "activeMeshEvaluationMs": 1.5,
+          "functions": {
+            "terrain": {
+              "calls": 21,
+              "ms": 0.09999990463256836
+            },
+            "motion": {
+              "calls": 3,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 3,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 3,
+              "ms": 0.10000014305114746
+            },
+            "riderV2": {
+              "calls": 3,
+              "ms": 0.2999999523162842
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 6.200000047683716
+            }
+          }
+        }
+      ]
+    },
+    "mobile-spawn": {
+      "engine": "8.56.2",
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "meshes": 428,
+      "materials": 121,
+      "textures": 27,
+      "unusedDynamicTextures": [
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        }
+      ],
+      "vertices": 88958,
+      "triangles": 107459.99999999999,
+      "shadowCasters": 28,
+      "hiddenShadowCasters": [
+        "torso",
+        "shoulders",
+        "head",
+        "helmet",
+        "thigh",
+        "shin",
+        "shoe",
+        "upper arm",
+        "forearm",
+        "thigh",
+        "shin",
+        "shoe",
+        "upper arm",
+        "forearm"
+      ],
+      "rows": [
+        {
+          "loopMs": 5.400000095367432,
+          "intervalMs": 97.10000014305115,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.6999998092651367,
+          "renderMs": 2,
+          "activeMeshEvaluationMs": 1.5,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0.09999990463256836
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.7000000476837158
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.5
+            }
+          }
+        },
+        {
+          "loopMs": 8.799999952316284,
+          "intervalMs": 105.5,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 1,
+          "renderMs": 3.6999998092651367,
+          "activeMeshEvaluationMs": 2.5999999046325684,
+          "functions": {
+            "terrain": {
+              "calls": 35,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 5,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 5,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 5,
+              "ms": 0.20000004768371582
+            },
+            "riderV2": {
+              "calls": 5,
+              "ms": 0.7000000476837158
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 7.799999952316284
+            }
+          }
+        },
+        {
+          "loopMs": 6.900000095367432,
+          "intervalMs": 101.5,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.7000000476837158,
+          "renderMs": 3.1999998092651367,
+          "activeMeshEvaluationMs": 1.5999999046325684,
+          "functions": {
+            "terrain": {
+              "calls": 35,
+              "ms": 0.09999990463256836
+            },
+            "motion": {
+              "calls": 5,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 5,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 5,
+              "ms": 0.20000004768371582
+            },
+            "riderV2": {
+              "calls": 5,
+              "ms": 0.6000001430511475
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.799999952316284
+            }
+          }
+        },
+        {
+          "loopMs": 9.599999904632568,
+          "intervalMs": 111.79999995231628,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.6999998092651367,
+          "renderMs": 2.8000001907348633,
+          "activeMeshEvaluationMs": 2.6000001430511475,
+          "functions": {
+            "terrain": {
+              "calls": 35,
+              "ms": 0.09999990463256836
+            },
+            "motion": {
+              "calls": 5,
+              "ms": 0.09999990463256836
+            },
+            "obstacles": {
+              "calls": 5,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 5,
+              "ms": 0.19999980926513672
+            },
+            "riderV2": {
+              "calls": 5,
+              "ms": 1.4000000953674316
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 6.900000095367432
+            }
+          }
+        },
+        {
+          "loopMs": 6.6000001430511475,
+          "intervalMs": 100.40000009536743,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.7000000476837158,
+          "renderMs": 3,
+          "activeMeshEvaluationMs": 1.7999999523162842,
+          "functions": {
+            "terrain": {
+              "calls": 35,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 5,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 5,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 5,
+              "ms": 0.10000014305114746
+            },
+            "riderV2": {
+              "calls": 5,
+              "ms": 0.5999999046325684
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.6000001430511475
+            }
+          }
+        },
+        {
+          "loopMs": 5.799999952316284,
+          "intervalMs": 99.09999990463257,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.7999999523162842,
+          "renderMs": 2.299999952316284,
+          "activeMeshEvaluationMs": 1.7000000476837158,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.2999997138977051
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.900000095367432
+            }
+          }
+        },
+        {
+          "loopMs": 7.1000001430511475,
+          "intervalMs": 102.70000004768372,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.7000000476837158,
+          "renderMs": 2.299999952316284,
+          "activeMeshEvaluationMs": 1.5999999046325684,
+          "functions": {
+            "terrain": {
+              "calls": 35,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 5,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 5,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 5,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 5,
+              "ms": 0.5999999046325684
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.799999952316284
+            }
+          }
+        },
+        {
+          "loopMs": 7.700000047683716,
+          "intervalMs": 101.79999995231628,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.7000000476837158,
+          "renderMs": 2.5999999046325684,
+          "activeMeshEvaluationMs": 1.7000000476837158,
+          "functions": {
+            "terrain": {
+              "calls": 35,
+              "ms": 0.09999990463256836
+            },
+            "motion": {
+              "calls": 5,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 5,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 5,
+              "ms": 0.09999990463256836
+            },
+            "riderV2": {
+              "calls": 5,
+              "ms": 2.000000238418579
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.099999904632568
+            }
+          }
+        },
+        {
+          "loopMs": 6.599999904632568,
+          "intervalMs": 98.29999995231628,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.8000001907348633,
+          "renderMs": 2.3999998569488525,
+          "activeMeshEvaluationMs": 1.7999999523162842,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.8999998569488525
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.099999904632568
+            }
+          }
+        },
+        {
+          "loopMs": 6.900000095367432,
+          "intervalMs": 104.60000014305115,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.7999999523162842,
+          "renderMs": 3.4000000953674316,
+          "activeMeshEvaluationMs": 1.6000001430511475,
+          "functions": {
+            "terrain": {
+              "calls": 35,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 5,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 5,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 5,
+              "ms": 0.10000014305114746
+            },
+            "riderV2": {
+              "calls": 5,
+              "ms": 0.2999999523162842
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 6
+            }
+          }
+        },
+        {
+          "loopMs": 7.099999904632568,
+          "intervalMs": 96.39999985694885,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.5,
+          "renderMs": 2.799999952316284,
+          "activeMeshEvaluationMs": 1.5,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0.10000014305114746
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 1.5
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.099999904632568
+            }
+          }
+        },
+        {
+          "loopMs": 5.6000001430511475,
+          "intervalMs": 98.40000009536743,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.5999999046325684,
+          "renderMs": 2.1000001430511475,
+          "activeMeshEvaluationMs": 1.9000000953674316,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0.09999990463256836
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.20000004768371582
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.799999952316284
+            }
+          }
+        },
+        {
+          "loopMs": 7.6000001430511475,
+          "intervalMs": 101.70000004768372,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.7000000476837158,
+          "renderMs": 3.6000001430511475,
+          "activeMeshEvaluationMs": 1.7999999523162842,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0.09999990463256836
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.5
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 6.300000190734863
+            }
+          }
+        },
+        {
+          "loopMs": 5.700000047683716,
+          "intervalMs": 103.79999995231628,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.5,
+          "renderMs": 2.5,
+          "activeMeshEvaluationMs": 1.7000000476837158,
+          "functions": {
+            "terrain": {
+              "calls": 35,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 5,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 5,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 5,
+              "ms": 0.10000014305114746
+            },
+            "riderV2": {
+              "calls": 5,
+              "ms": 0.39999985694885254
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.900000095367432
+            }
+          }
+        },
+        {
+          "loopMs": 7.900000095367432,
+          "intervalMs": 103.5,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.5999999046325684,
+          "renderMs": 3.6000001430511475,
+          "activeMeshEvaluationMs": 2.1000001430511475,
+          "functions": {
+            "terrain": {
+              "calls": 35,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 5,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 5,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 5,
+              "ms": 0.09999990463256836
+            },
+            "riderV2": {
+              "calls": 5,
+              "ms": 0.4999997615814209
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 6.700000047683716
+            }
+          }
+        },
+        {
+          "loopMs": 5.6000001430511475,
+          "intervalMs": 97.20000004768372,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.6000001430511475,
+          "renderMs": 2.5,
+          "activeMeshEvaluationMs": 1.7000000476837158,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0.10000014305114746
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.2999997138977051
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.900000095367432
+            }
+          }
+        },
+        {
+          "loopMs": 7.700000047683716,
+          "intervalMs": 100.89999985694885,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.7000000476837158,
+          "renderMs": 2.799999952316284,
+          "activeMeshEvaluationMs": 1.8999998569488525,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0.09999990463256836
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.3000001907348633
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.599999904632568
+            }
+          }
+        },
+        {
+          "loopMs": 6.1000001430511475,
+          "intervalMs": 99.10000014305115,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.5,
+          "renderMs": 2.799999952316284,
+          "activeMeshEvaluationMs": 1.6000001430511475,
+          "functions": {
+            "terrain": {
+              "calls": 35,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 5,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 5,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 5,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 5,
+              "ms": 0.4999997615814209
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.300000190734863
+            }
+          }
+        },
+        {
+          "loopMs": 6.300000190734863,
+          "intervalMs": 98,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.5999999046325684,
+          "renderMs": 3.4000000953674316,
+          "activeMeshEvaluationMs": 1.4000000953674316,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.40000009536743164
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.5
+            }
+          }
+        },
+        {
+          "loopMs": 7.200000047683716,
+          "intervalMs": 101.29999995231628,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.5999999046325684,
+          "renderMs": 3.700000047683716,
+          "activeMeshEvaluationMs": 1.6000001430511475,
+          "functions": {
+            "terrain": {
+              "calls": 35,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 5,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 5,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 5,
+              "ms": 0.10000014305114746
+            },
+            "riderV2": {
+              "calls": 5,
+              "ms": 0.6000001430511475
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 6
+            }
+          }
+        },
+        {
+          "loopMs": 4.799999952316284,
+          "intervalMs": 9.599999904632568,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.5,
+          "renderMs": 2.799999952316284,
+          "activeMeshEvaluationMs": 1,
+          "functions": {
+            "terrain": {
+              "calls": 7,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 1,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 1,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 1,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 1,
+              "ms": 0.09999990463256836
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.3999998569488525
+            }
+          }
+        },
+        {
+          "loopMs": 8.299999952316284,
+          "intervalMs": 103.70000004768372,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.40000009536743164,
+          "renderMs": 6,
+          "activeMeshEvaluationMs": 1.0999999046325684,
+          "functions": {
+            "terrain": {
+              "calls": 35,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 5,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 5,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 5,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 5,
+              "ms": 0.5
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 7.599999904632568
+            }
+          }
+        },
+        {
+          "loopMs": 5.700000047683716,
+          "intervalMs": 114.40000009536743,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.5,
+          "renderMs": 2.5,
+          "activeMeshEvaluationMs": 1.4000000953674316,
+          "functions": {
+            "terrain": {
+              "calls": 35,
+              "ms": 0.20000004768371582
+            },
+            "motion": {
+              "calls": 5,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 5,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 5,
+              "ms": 0.20000004768371582
+            },
+            "riderV2": {
+              "calls": 5,
+              "ms": 0.39999985694885254
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.700000047683716
+            }
+          }
+        },
+        {
+          "loopMs": 6.200000047683716,
+          "intervalMs": 80.09999990463257,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.39999985694885254,
+          "renderMs": 3.1000001430511475,
+          "activeMeshEvaluationMs": 1.7000000476837158,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0.10000014305114746
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0.19999980926513672
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.3000001907348633
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.5
+            }
+          }
+        },
+        {
+          "loopMs": 6.599999904632568,
+          "intervalMs": 102.59999990463257,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.40000009536743164,
+          "renderMs": 4.099999904632568,
+          "activeMeshEvaluationMs": 1,
+          "functions": {
+            "terrain": {
+              "calls": 35,
+              "ms": 0.09999990463256836
+            },
+            "motion": {
+              "calls": 5,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 5,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 5,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 5,
+              "ms": 0.5000002384185791
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.699999809265137
+            }
+          }
+        },
+        {
+          "loopMs": 7.299999952316284,
+          "intervalMs": 101.40000009536743,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.40000009536743164,
+          "renderMs": 5,
+          "activeMeshEvaluationMs": 1.0999999046325684,
+          "functions": {
+            "terrain": {
+              "calls": 35,
+              "ms": 0.09999990463256836
+            },
+            "motion": {
+              "calls": 5,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 5,
+              "ms": 0.09999990463256836
+            },
+            "wheelPose": {
+              "calls": 5,
+              "ms": 0.09999990463256836
+            },
+            "riderV2": {
+              "calls": 5,
+              "ms": 0.3000001907348633
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 6.599999904632568
+            }
+          }
+        },
+        {
+          "loopMs": 4.8999998569488525,
+          "intervalMs": 95.59999990463257,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.2999999523162842,
+          "renderMs": 2.3999998569488525,
+          "activeMeshEvaluationMs": 1.2000000476837158,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0.09999990463256836
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.2999997138977051
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.099999904632568
+            }
+          }
+        },
+        {
+          "loopMs": 4.299999952316284,
+          "intervalMs": 98.40000009536743,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.40000009536743164,
+          "renderMs": 1.9000000953674316,
+          "activeMeshEvaluationMs": 1.0999999046325684,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0.09999990463256836
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.39999985694885254
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 3.5999999046325684
+            }
+          }
+        },
+        {
+          "loopMs": 6.400000095367432,
+          "intervalMs": 166.70000004768372,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.5999999046325684,
+          "renderMs": 2.4000000953674316,
+          "activeMeshEvaluationMs": 1.9000000953674316,
+          "functions": {
+            "terrain": {
+              "calls": 49,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 7,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 7,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 7,
+              "ms": 0.20000004768371582
+            },
+            "riderV2": {
+              "calls": 7,
+              "ms": 0.9000000953674316
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5
+            }
+          }
+        },
+        {
+          "loopMs": 5.300000190734863,
+          "intervalMs": 32.200000047683716,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.5,
+          "renderMs": 3,
+          "activeMeshEvaluationMs": 1.3000001907348633,
+          "functions": {
+            "terrain": {
+              "calls": 14,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 2,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 2,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 2,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 2,
+              "ms": 0.40000009536743164
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.900000095367432
+            }
+          }
+        },
+        {
+          "loopMs": 6.099999904632568,
+          "intervalMs": 160.59999990463257,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.7000000476837158,
+          "renderMs": 2.5999999046325684,
+          "activeMeshEvaluationMs": 1.5,
+          "functions": {
+            "terrain": {
+              "calls": 49,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 7,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 7,
+              "ms": 0.09999990463256836
+            },
+            "wheelPose": {
+              "calls": 7,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 7,
+              "ms": 0.6000001430511475
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.099999904632568
+            }
+          }
+        },
+        {
+          "loopMs": 5.3999998569488525,
+          "intervalMs": 31.59999990463257,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.5,
+          "renderMs": 2.8999998569488525,
+          "activeMeshEvaluationMs": 1.5,
+          "functions": {
+            "terrain": {
+              "calls": 14,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 2,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 2,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 2,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 2,
+              "ms": 0.10000014305114746
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.099999904632568
+            }
+          }
+        },
+        {
+          "loopMs": 7.3999998569488525,
+          "intervalMs": 100,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.6000001430511475,
+          "renderMs": 4.599999904632568,
+          "activeMeshEvaluationMs": 1.2000000476837158,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.3000001907348633
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 6.699999809265137
+            }
+          }
+        },
+        {
+          "loopMs": 5.900000095367432,
+          "intervalMs": 94.80000019073486,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.6000001430511475,
+          "renderMs": 2.700000047683716,
+          "activeMeshEvaluationMs": 1.3999998569488525,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0.10000014305114746
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.5
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.800000190734863
+            }
+          }
+        },
+        {
+          "loopMs": 5.6000001430511475,
+          "intervalMs": 138.79999995231628,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.6000001430511475,
+          "renderMs": 2.299999952316284,
+          "activeMeshEvaluationMs": 1.4000000953674316,
+          "functions": {
+            "terrain": {
+              "calls": 42,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 6,
+              "ms": 0.10000014305114746
+            },
+            "obstacles": {
+              "calls": 6,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 6,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 6,
+              "ms": 0.8999998569488525
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.6000001430511475
+            }
+          }
+        },
+        {
+          "loopMs": 8.600000143051147,
+          "intervalMs": 64.70000004768372,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 1.1999998092651367,
+          "renderMs": 5.300000190734863,
+          "activeMeshEvaluationMs": 1.4000000953674316,
+          "functions": {
+            "terrain": {
+              "calls": 21,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 3,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 3,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 3,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 3,
+              "ms": 0.40000009536743164
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 8
+            }
+          }
+        },
+        {
+          "loopMs": 7.6000001430511475,
+          "intervalMs": 190.79999995231628,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.5,
+          "renderMs": 2.6999998092651367,
+          "activeMeshEvaluationMs": 1.5,
+          "functions": {
+            "terrain": {
+              "calls": 56,
+              "ms": 0.09999990463256836
+            },
+            "motion": {
+              "calls": 8,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 8,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 8,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 8,
+              "ms": 0.7000000476837158
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.1000001430511475
+            }
+          }
+        },
+        {
+          "loopMs": 5.6000001430511475,
+          "intervalMs": 97.5,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.7000000476837158,
+          "renderMs": 2.4000000953674316,
+          "activeMeshEvaluationMs": 1.5999999046325684,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0.10000014305114746
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.4999997615814209
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.900000095367432
+            }
+          }
+        },
+        {
+          "loopMs": 5.5,
+          "intervalMs": 105.39999985694885,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.7999999523162842,
+          "renderMs": 2.3999998569488525,
+          "activeMeshEvaluationMs": 1.3000001907348633,
+          "functions": {
+            "terrain": {
+              "calls": 35,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 5,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 5,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 5,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 5,
+              "ms": 0.5000002384185791
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.599999904632568
+            }
+          }
+        },
+        {
+          "loopMs": 9.400000095367432,
+          "intervalMs": 106.40000009536743,
+          "drawCalls": 121,
+          "activeMeshes": 103,
+          "activeIndices": 171920,
+          "renderTargetsMs": 0.5,
+          "renderMs": 6.200000047683716,
+          "activeMeshEvaluationMs": 1.6000001430511475,
+          "functions": {
+            "terrain": {
+              "calls": 35,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 5,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 5,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 5,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 5,
+              "ms": 0.39999985694885254
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 8.400000095367432
+            }
+          }
+        }
+      ]
+    },
+    "mobile-park": {
+      "engine": "8.56.2",
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "meshes": 428,
+      "materials": 121,
+      "textures": 27,
+      "unusedDynamicTextures": [
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "name": "concrete microtexture",
+          "size": {
+            "width": 512,
+            "height": 512
+          }
+        }
+      ],
+      "vertices": 88958,
+      "triangles": 107459.99999999999,
+      "shadowCasters": 28,
+      "hiddenShadowCasters": [
+        "torso",
+        "shoulders",
+        "head",
+        "helmet",
+        "thigh",
+        "shin",
+        "shoe",
+        "upper arm",
+        "forearm",
+        "thigh",
+        "shin",
+        "shoe",
+        "upper arm",
+        "forearm"
+      ],
+      "rows": [
+        {
+          "loopMs": 14.400000095367432,
+          "intervalMs": 23.800000190734863,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 1,
+          "renderMs": 11.200000047683716,
+          "activeMeshEvaluationMs": 1.6000001430511475,
+          "functions": {
+            "terrain": {
+              "calls": 7,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 1,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 1,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 1,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 1,
+              "ms": 0.20000004768371582
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 13.900000095367432
+            }
+          }
+        },
+        {
+          "loopMs": 8.100000143051147,
+          "intervalMs": 73.79999995231628,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 1,
+          "renderMs": 5,
+          "activeMeshEvaluationMs": 1.5,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.20000004768371582
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 7.700000047683716
+            }
+          }
+        },
+        {
+          "loopMs": 17.59999990463257,
+          "intervalMs": 98.79999995231628,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.7000000476837158,
+          "renderMs": 4.700000047683716,
+          "activeMeshEvaluationMs": 2.5,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0.09999990463256836
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.40000009536743164
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 16.90000009536743
+            }
+          }
+        },
+        {
+          "loopMs": 5.5,
+          "intervalMs": 72.90000009536743,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.6000001430511475,
+          "renderMs": 2.5,
+          "activeMeshEvaluationMs": 1.5999999046325684,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.39999985694885254
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.800000190734863
+            }
+          }
+        },
+        {
+          "loopMs": 5.900000095367432,
+          "intervalMs": 88.59999990463257,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.5,
+          "renderMs": 2.9000000953674316,
+          "activeMeshEvaluationMs": 1.5999999046325684,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.2999999523162842
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.299999952316284
+            }
+          }
+        },
+        {
+          "loopMs": 5.700000047683716,
+          "intervalMs": 119.79999995231628,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.5999999046325684,
+          "renderMs": 2.5,
+          "activeMeshEvaluationMs": 1.5,
+          "functions": {
+            "terrain": {
+              "calls": 35,
+              "ms": 0.09999990463256836
+            },
+            "motion": {
+              "calls": 5,
+              "ms": 0.20000004768371582
+            },
+            "obstacles": {
+              "calls": 5,
+              "ms": 0.10000014305114746
+            },
+            "wheelPose": {
+              "calls": 5,
+              "ms": 0.09999990463256836
+            },
+            "riderV2": {
+              "calls": 5,
+              "ms": 0.40000009536743164
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.799999952316284
+            }
+          }
+        },
+        {
+          "loopMs": 5.199999809265137,
+          "intervalMs": 135.29999995231628,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.5,
+          "renderMs": 2.200000047683716,
+          "activeMeshEvaluationMs": 1.3999998569488525,
+          "functions": {
+            "terrain": {
+              "calls": 42,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 6,
+              "ms": 0.09999990463256836
+            },
+            "obstacles": {
+              "calls": 6,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 6,
+              "ms": 0.10000014305114746
+            },
+            "riderV2": {
+              "calls": 6,
+              "ms": 0.3000001907348633
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.3999998569488525
+            }
+          }
+        },
+        {
+          "loopMs": 5.400000095367432,
+          "intervalMs": 86.90000009536743,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.5,
+          "renderMs": 2.799999952316284,
+          "activeMeshEvaluationMs": 1.2999999523162842,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.5
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.799999952316284
+            }
+          }
+        },
+        {
+          "loopMs": 5.299999952316284,
+          "intervalMs": 83.59999990463257,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.5,
+          "renderMs": 2.299999952316284,
+          "activeMeshEvaluationMs": 1.4000000953674316,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.40000009536743164
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.400000095367432
+            }
+          }
+        },
+        {
+          "loopMs": 5.199999809265137,
+          "intervalMs": 86,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.7000000476837158,
+          "renderMs": 2.299999952316284,
+          "activeMeshEvaluationMs": 1.4000000953674316,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0.19999980926513672
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.2999999523162842
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.599999904632568
+            }
+          }
+        },
+        {
+          "loopMs": 6.200000047683716,
+          "intervalMs": 84.30000019073486,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.6000001430511475,
+          "renderMs": 2.200000047683716,
+          "activeMeshEvaluationMs": 1.3999998569488525,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 1.7000000476837158
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.400000095367432
+            }
+          }
+        },
+        {
+          "loopMs": 5.5,
+          "intervalMs": 87.89999985694885,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.5999999046325684,
+          "renderMs": 2.299999952316284,
+          "activeMeshEvaluationMs": 1.4000000953674316,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.5999999046325684
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.599999904632568
+            }
+          }
+        },
+        {
+          "loopMs": 5.400000095367432,
+          "intervalMs": 89.20000004768372,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.5999999046325684,
+          "renderMs": 2.4000000953674316,
+          "activeMeshEvaluationMs": 1.5,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.5
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.700000047683716
+            }
+          }
+        },
+        {
+          "loopMs": 13.199999809265137,
+          "intervalMs": 96.09999990463257,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.39999985694885254,
+          "renderMs": 3.700000047683716,
+          "activeMeshEvaluationMs": 2,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0.10000014305114746
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 2.3999996185302734
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 10.599999904632568
+            }
+          }
+        },
+        {
+          "loopMs": 5.099999904632568,
+          "intervalMs": 78.90000009536743,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.5,
+          "renderMs": 2.299999952316284,
+          "activeMeshEvaluationMs": 1.3999998569488525,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0.09999990463256836
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0.09999990463256836
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.2999999523162842
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.5
+            }
+          }
+        },
+        {
+          "loopMs": 6.099999904632568,
+          "intervalMs": 87.79999995231628,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.6000001430511475,
+          "renderMs": 3.3999998569488525,
+          "activeMeshEvaluationMs": 1.2999999523162842,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0.09999990463256836
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.3000001907348633
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.5
+            }
+          }
+        },
+        {
+          "loopMs": 5,
+          "intervalMs": 88.90000009536743,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.40000009536743164,
+          "renderMs": 2.200000047683716,
+          "activeMeshEvaluationMs": 1.4000000953674316,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0.10000014305114746
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.2999999523162842
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.299999952316284
+            }
+          }
+        },
+        {
+          "loopMs": 5.5,
+          "intervalMs": 88.09999990463257,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.5999999046325684,
+          "renderMs": 2.5,
+          "activeMeshEvaluationMs": 1.5,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0.09999990463256836
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0.10000014305114746
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.19999980926513672
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.799999952316284
+            }
+          }
+        },
+        {
+          "loopMs": 7.700000047683716,
+          "intervalMs": 89.10000014305115,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.5999999046325684,
+          "renderMs": 3,
+          "activeMeshEvaluationMs": 1.7999999523162842,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 1.5
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.6000001430511475
+            }
+          }
+        },
+        {
+          "loopMs": 5.699999809265137,
+          "intervalMs": 87.69999980926514,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.5999999046325684,
+          "renderMs": 2.700000047683716,
+          "activeMeshEvaluationMs": 1.4000000953674316,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0.10000014305114746
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.39999961853027344
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5
+            }
+          }
+        },
+        {
+          "loopMs": 5.1000001430511475,
+          "intervalMs": 84.30000019073486,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.5999999046325684,
+          "renderMs": 2.4000000953674316,
+          "activeMeshEvaluationMs": 1.4000000953674316,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.2999999523162842
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.5
+            }
+          }
+        },
+        {
+          "loopMs": 5.8999998569488525,
+          "intervalMs": 86.19999980926514,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.39999985694885254,
+          "renderMs": 2.6999998092651367,
+          "activeMeshEvaluationMs": 1.6000001430511475,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0.09999990463256836
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.39999985694885254
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.8999998569488525
+            }
+          }
+        },
+        {
+          "loopMs": 5.900000095367432,
+          "intervalMs": 87.40000009536743,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.40000009536743164,
+          "renderMs": 2.0999999046325684,
+          "activeMeshEvaluationMs": 1.4000000953674316,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0.10000014305114746
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0.10000014305114746
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 1.3999998569488525
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.099999904632568
+            }
+          }
+        },
+        {
+          "loopMs": 4.6000001430511475,
+          "intervalMs": 88.70000004768372,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.6000001430511475,
+          "renderMs": 1.7000000476837158,
+          "activeMeshEvaluationMs": 1.3999998569488525,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.40000009536743164
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4
+            }
+          }
+        },
+        {
+          "loopMs": 4.6000001430511475,
+          "intervalMs": 85.5,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.5,
+          "renderMs": 1.8999998569488525,
+          "activeMeshEvaluationMs": 1.4000000953674316,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0.10000014305114746
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.2999999523162842
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4
+            }
+          }
+        },
+        {
+          "loopMs": 5.5,
+          "intervalMs": 86.89999985694885,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.5999999046325684,
+          "renderMs": 2.5,
+          "activeMeshEvaluationMs": 1.7000000476837158,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.40000009536743164
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.8999998569488525
+            }
+          }
+        },
+        {
+          "loopMs": 5,
+          "intervalMs": 85.80000019073486,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.40000009536743164,
+          "renderMs": 2.4000000953674316,
+          "activeMeshEvaluationMs": 1.3999998569488525,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.5
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.300000190734863
+            }
+          }
+        },
+        {
+          "loopMs": 6.599999904632568,
+          "intervalMs": 83.19999980926514,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.5999999046325684,
+          "renderMs": 2.299999952316284,
+          "activeMeshEvaluationMs": 1.5,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0.10000014305114746
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 1.5999996662139893
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.5
+            }
+          }
+        },
+        {
+          "loopMs": 5.199999809265137,
+          "intervalMs": 94.5,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.7000000476837158,
+          "renderMs": 2.1999998092651367,
+          "activeMeshEvaluationMs": 1.5,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.5999999046325684
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.5
+            }
+          }
+        },
+        {
+          "loopMs": 14.299999952316284,
+          "intervalMs": 23.600000143051147,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.5999999046325684,
+          "renderMs": 11.600000143051147,
+          "activeMeshEvaluationMs": 1.4000000953674316,
+          "functions": {
+            "terrain": {
+              "calls": 7,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 1,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 1,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 1,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 1,
+              "ms": 0.20000004768371582
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 13.900000095367432
+            }
+          }
+        },
+        {
+          "loopMs": 17.799999952316284,
+          "intervalMs": 91.59999990463257,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.7999999523162842,
+          "renderMs": 2.6000001430511475,
+          "activeMeshEvaluationMs": 13.599999904632568,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0.09999990463256836
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.10000014305114746
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 17.299999952316284
+            }
+          }
+        },
+        {
+          "loopMs": 7.300000190734863,
+          "intervalMs": 147.60000014305115,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.7000000476837158,
+          "renderMs": 2.299999952316284,
+          "activeMeshEvaluationMs": 1.8999998569488525,
+          "functions": {
+            "terrain": {
+              "calls": 49,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 7,
+              "ms": 0.19999980926513672
+            },
+            "obstacles": {
+              "calls": 7,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 7,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 7,
+              "ms": 0.5
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5
+            }
+          }
+        },
+        {
+          "loopMs": 4.900000095367432,
+          "intervalMs": 84.09999990463257,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.5,
+          "renderMs": 2,
+          "activeMeshEvaluationMs": 1.5,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.19999980926513672
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.200000047683716
+            }
+          }
+        },
+        {
+          "loopMs": 5.400000095367432,
+          "intervalMs": 87,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.6000001430511475,
+          "renderMs": 2.5,
+          "activeMeshEvaluationMs": 1.4000000953674316,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.40000009536743164
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.799999952316284
+            }
+          }
+        },
+        {
+          "loopMs": 4.8999998569488525,
+          "intervalMs": 85.79999995231628,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.6000001430511475,
+          "renderMs": 2.0999999046325684,
+          "activeMeshEvaluationMs": 1.3999998569488525,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0.10000014305114746
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.20000004768371582
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.299999952316284
+            }
+          }
+        },
+        {
+          "loopMs": 6.200000047683716,
+          "intervalMs": 85.60000014305115,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.5,
+          "renderMs": 2.1000001430511475,
+          "activeMeshEvaluationMs": 1.2999999523162842,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0.10000014305114746
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.5999999046325684
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.200000047683716
+            }
+          }
+        },
+        {
+          "loopMs": 5.099999904632568,
+          "intervalMs": 84.69999980926514,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.5,
+          "renderMs": 2.0999999046325684,
+          "activeMeshEvaluationMs": 1.4000000953674316,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.5999999046325684
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.199999809265137
+            }
+          }
+        },
+        {
+          "loopMs": 6.700000047683716,
+          "intervalMs": 88.60000014305115,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.6000001430511475,
+          "renderMs": 2.200000047683716,
+          "activeMeshEvaluationMs": 1.5,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0.09999990463256836
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0.09999990463256836
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 1.6000001430511475
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.700000047683716
+            }
+          }
+        },
+        {
+          "loopMs": 6.200000047683716,
+          "intervalMs": 88.29999995231628,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.5,
+          "renderMs": 3.0999999046325684,
+          "activeMeshEvaluationMs": 1.8999998569488525,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0.10000014305114746
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0.10000014305114746
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.40000009536743164
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 5.599999904632568
+            }
+          }
+        },
+        {
+          "loopMs": 5.299999952316284,
+          "intervalMs": 84.29999995231628,
+          "drawCalls": 111,
+          "activeMeshes": 97,
+          "activeIndices": 132696,
+          "renderTargetsMs": 0.6000001430511475,
+          "renderMs": 2.3999998569488525,
+          "activeMeshEvaluationMs": 1.5999999046325684,
+          "functions": {
+            "terrain": {
+              "calls": 28,
+              "ms": 0
+            },
+            "motion": {
+              "calls": 4,
+              "ms": 0
+            },
+            "obstacles": {
+              "calls": 4,
+              "ms": 0.09999990463256836
+            },
+            "wheelPose": {
+              "calls": 4,
+              "ms": 0.10000014305114746
+            },
+            "riderV2": {
+              "calls": 4,
+              "ms": 0.2999997138977051
+            },
+            "sceneRender": {
+              "calls": 1,
+              "ms": 4.700000047683716
+            }
+          }
+        }
+      ]
+    }
+  },
+  "desktopStartupMs": 1651.3580000000002,
+  "mobileStartupMs": 2284.317099999993
+}

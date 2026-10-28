@@ -1,0 +1,346 @@
+{
+  "source": "GitHub Actions job log",
+  "jobUrl": "https://github.com/jonmbehrends-cmd/Skate-2/actions/runs/40713003131/job/122903037615",
+  "prHead": "322c1f36ed9dd17fc34a45a36587fb82ca605f3f",
+  "main": "68d735689b5bed05ab58c74d634df3d99419972e",
+  "checkout": "3f3c91fecfdfe9145da9a3a4129d30fd41636014",
+  "renderer": "Chromium SwiftShader, bundled Babylon 8.32.1, hoodie character",
+  "cases": {
+    "desktop-spawn": {
+      "before": {
+        "meshes": 447,
+        "activeMeshes": 136,
+        "drawCalls": 151,
+        "drawKinds": {
+          "drawElements": 151
+        },
+        "engineDrawCalls": 151,
+        "activeIndices": 189372
+      },
+      "after": {
+        "meshes": 360,
+        "activeMeshes": 136,
+        "drawCalls": 151,
+        "drawKinds": {
+          "drawElements": 151
+        },
+        "engineDrawCalls": 151,
+        "activeIndices": 189444
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    },
+    "desktop-park": {
+      "before": {
+        "meshes": 447,
+        "activeMeshes": 192,
+        "drawCalls": 207,
+        "drawKinds": {
+          "drawElements": 207
+        },
+        "engineDrawCalls": 207,
+        "activeIndices": 193038
+      },
+      "after": {
+        "meshes": 360,
+        "activeMeshes": 166,
+        "drawCalls": 181,
+        "drawKinds": {
+          "drawElements": 181
+        },
+        "engineDrawCalls": 181,
+        "activeIndices": 193182
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    },
+    "desktop-left-wall": {
+      "before": {
+        "meshes": 447,
+        "activeMeshes": 101,
+        "drawCalls": 113,
+        "drawKinds": {
+          "drawElements": 113
+        },
+        "engineDrawCalls": 113,
+        "activeIndices": 145296
+      },
+      "after": {
+        "meshes": 360,
+        "activeMeshes": 70,
+        "drawCalls": 82,
+        "drawKinds": {
+          "drawElements": 82
+        },
+        "engineDrawCalls": 82,
+        "activeIndices": 145476
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    },
+    "desktop-right-wall": {
+      "before": {
+        "meshes": 447,
+        "activeMeshes": 105,
+        "drawCalls": 117,
+        "drawKinds": {
+          "drawElements": 117
+        },
+        "engineDrawCalls": 117,
+        "activeIndices": 145026
+      },
+      "after": {
+        "meshes": 360,
+        "activeMeshes": 74,
+        "drawCalls": 86,
+        "drawKinds": {
+          "drawElements": 86
+        },
+        "engineDrawCalls": 86,
+        "activeIndices": 145134
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    },
+    "desktop-halfpipe": {
+      "before": {
+        "meshes": 447,
+        "activeMeshes": 136,
+        "drawCalls": 148,
+        "drawKinds": {
+          "drawElements": 148
+        },
+        "engineDrawCalls": 148,
+        "activeIndices": 154380
+      },
+      "after": {
+        "meshes": 360,
+        "activeMeshes": 109,
+        "drawCalls": 121,
+        "drawKinds": {
+          "drawElements": 121
+        },
+        "engineDrawCalls": 121,
+        "activeIndices": 154632
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    },
+    "desktop-rider-on-deck": {
+      "before": {
+        "meshes": 447,
+        "activeMeshes": 131,
+        "drawCalls": 146,
+        "drawKinds": {
+          "drawElements": 146
+        },
+        "engineDrawCalls": 146,
+        "activeIndices": 175848
+      },
+      "after": {
+        "meshes": 360,
+        "activeMeshes": 101,
+        "drawCalls": 116,
+        "drawKinds": {
+          "drawElements": 116
+        },
+        "engineDrawCalls": 116,
+        "activeIndices": 175956
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    },
+    "mobile-spawn": {
+      "before": {
+        "meshes": 447,
+        "activeMeshes": 101,
+        "drawCalls": 115,
+        "drawKinds": {
+          "drawElements": 115
+        },
+        "engineDrawCalls": 115,
+        "activeIndices": 182504
+      },
+      "after": {
+        "meshes": 360,
+        "activeMeshes": 101,
+        "drawCalls": 115,
+        "drawKinds": {
+          "drawElements": 115
+        },
+        "engineDrawCalls": 115,
+        "activeIndices": 182504
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    },
+    "mobile-park": {
+      "before": {
+        "meshes": 447,
+        "activeMeshes": 100,
+        "drawCalls": 111,
+        "drawKinds": {
+          "drawElements": 111
+        },
+        "engineDrawCalls": 111,
+        "activeIndices": 150204
+      },
+      "after": {
+        "meshes": 360,
+        "activeMeshes": 90,
+        "drawCalls": 101,
+        "drawKinds": {
+          "drawElements": 101
+        },
+        "engineDrawCalls": 101,
+        "activeIndices": 150528
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    },
+    "mobile-left-wall": {
+      "before": {
+        "meshes": 447,
+        "activeMeshes": 85,
+        "drawCalls": 96,
+        "drawKinds": {
+          "drawElements": 96
+        },
+        "engineDrawCalls": 96,
+        "activeIndices": 142488
+      },
+      "after": {
+        "meshes": 360,
+        "activeMeshes": 57,
+        "drawCalls": 68,
+        "drawKinds": {
+          "drawElements": 68
+        },
+        "engineDrawCalls": 68,
+        "activeIndices": 142776
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    },
+    "mobile-right-wall": {
+      "before": {
+        "meshes": 447,
+        "activeMeshes": 83,
+        "drawCalls": 94,
+        "drawKinds": {
+          "drawElements": 94
+        },
+        "engineDrawCalls": 94,
+        "activeIndices": 139164
+      },
+      "after": {
+        "meshes": 360,
+        "activeMeshes": 54,
+        "drawCalls": 65,
+        "drawKinds": {
+          "drawElements": 65
+        },
+        "engineDrawCalls": 65,
+        "activeIndices": 139344
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    },
+    "mobile-halfpipe": {
+      "before": {
+        "meshes": 447,
+        "activeMeshes": 93,
+        "drawCalls": 104,
+        "drawKinds": {
+          "drawElements": 104
+        },
+        "engineDrawCalls": 104,
+        "activeIndices": 145280
+      },
+      "after": {
+        "meshes": 360,
+        "activeMeshes": 76,
+        "drawCalls": 87,
+        "drawKinds": {
+          "drawElements": 87
+        },
+        "engineDrawCalls": 87,
+        "activeIndices": 145496
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    },
+    "mobile-rider-on-deck": {
+      "before": {
+        "meshes": 447,
+        "activeMeshes": 93,
+        "drawCalls": 107,
+        "drawKinds": {
+          "drawElements": 107
+        },
+        "engineDrawCalls": 107,
+        "activeIndices": 170802
+      },
+      "after": {
+        "meshes": 360,
+        "activeMeshes": 82,
+        "drawCalls": 96,
+        "drawKinds": {
+          "drawElements": 96
+        },
+        "engineDrawCalls": 96,
+        "activeIndices": 171126
+      },
+      "pixels": {
+        "changedPixels": 0,
+        "fraction": 0,
+        "meanMaxChannelDelta": 0,
+        "maxChannelDelta": 0
+      }
+    }
+  }
+}
