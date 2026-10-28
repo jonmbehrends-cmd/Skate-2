@@ -514,6 +514,9 @@ const server=http.createServer((req,res)=>{
   await page.waitForTimeout(1000);
   fs.mkdirSync('test-artifacts',{recursive:true});
   await page.screenshot({path:'test-artifacts/halfpipe-mobile.png',animations:'disabled'});
+  // The real 390px gameplay camera needs its own visual regression; the
+  // desktop side-view cannot detect a blank or occluded mobile WebGL frame.
+  await checkSceneScreenshot('test-artifacts/halfpipe-mobile.png','mobileHalfpipe');
   // Dedicated side-on overview exposes the entire U profile, both coping lips
   // and the filled concrete sidewalls; this is the visual QA evidence.
   await page.setViewportSize({width:960,height:540});
