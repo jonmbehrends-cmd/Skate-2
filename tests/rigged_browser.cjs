@@ -17,7 +17,7 @@ let browser;
   try{await page.waitForFunction(()=>window.__SOL_DIAGNOSTICS__?.rig?.status.ready,null,{timeout:12000})}
   catch(e){const diagnostic=await page.evaluate(()=>({build:window.__SOL_BUILD__,diagnostics:!!window.__SOL_DIAGNOSTICS__,plugin:window.BABYLON?.SceneLoader?.IsPluginForExtensionAvailable?.('.glb'),skinnedMeshes:window.__SOL_DIAGNOSTICS__?.scene?.meshes.filter(m=>m.skeleton).map(m=>m.name),errorBox:document.querySelector('#error')?.textContent}));throw Error('Rig startup failed: '+JSON.stringify({diagnostic,errors,requests,warnings})+'; '+e.message)};
   const ready=await page.evaluate(()=>{const d=__SOL_DIAGNOSTICS__;return {version:BABYLON.Engine.Version,build:__SOL_BUILD__,status:d.rig.status,active:d.rig.meshes.filter(m=>m.isEnabled()&&m.isVisible&&m.skeleton&&m.getTotalVertices()>0).length,legacy:d.scene.meshes.filter(m=>['torso','head','thigh','shin','shoe'].includes(m.name)&&m.isVisible).length}});
-  assert.equal(ready.version,'8.32.1');assert.equal(ready.active,2);assert.equal(ready.legacy,0);assert.equal(ready.status.bones,14);assert(ready.status.source.includes('kenney-mini-skate'));
+  assert.equal(ready.version,'8.32.1');assert(ready.active>=4,'Hoodie apparel must have at least four skinned meshes');assert.equal(ready.legacy,0);assert.equal(ready.status.bones,62);assert(ready.status.source.includes('quaternius-hoodie'));
   await page.screenshot({path:path.join(out,'skeletal-'+label+'-spawn.png')});
   // The production PUSH control is the button, not keyboard W (W only steers throttle).
   // Dispatch the same pointerdown handler for desktop and mobile, then observe the
@@ -52,19 +52,19 @@ let browser;
   await page.evaluate(()=>{for(let i=0;i<40;i++)__SOL_DIAGNOSTICS__.rig.update({grounded:true,speed:5},{crouch:0},{dt:1/60})});
   const signatures=new Map();
   for(const mode of ['ride','push','crouch','ollie','flip','grab','grind','landing']){
-   const evidence=await page.evaluate(mode=>{const d=__SOL_DIAGNOSTICS__,state={grounded:['ride','push','crouch','landing'].includes(mode),speed:5,travelSign:1,flip:mode==='flip'?1:0};const pose={crouch:mode==='crouch'?.23:.1,pushing:mode==='push',contact:.8};d.rig.update(state,pose,{grabbing:mode==='grab',grinding:mode==='grind'});const clip=d.scene.animationGroups.find(g=>g.name===d.rig.status.clip);clip?.goToFrame(clip.from+(clip.to-clip.from)*.5);d.scene.render();return {status:d.rig.status,matrices:Array.from(d.rig.skeletons[0].getTransformMatrices(d.rig.meshes[0])),vertices:d.rig.meshes[0].getTotalVertices()};},mode);
+   const evidence=await page.evaluate(mode=>{const d=__SOL_DIAGNOSTICS__,state={grounded:['ride','push','crouch','landing'].includes(mode),speed:5,travelSign:1,flip:mode==='flip'?1:0};const pose={crouch:mode==='crouch'?.23:.1,pushing:mode==='push',contact:.8};d.rig.update(state,pose,{grabbing:mode==='grab',grinding:mode==='grind'});d.scene.render();return {status:d.rig.status,matrices:Array.from(d.rig.skeletons[0].getTransformMatrices(d.rig.meshes[0])),vertices:d.rig.meshes[0].getTotalVertices()};},mode);
    assert(evidence.vertices>100);assert(evidence.matrices.every(Number.isFinite));
    if(mode==='ollie')assert.equal(evidence.status.mode,'ollie','Takeoff pose must render in Chromium');signatures.set(mode,JSON.stringify(evidence.matrices));
    await page.screenshot({path:path.join(out,'skeletal-'+label+'-'+mode+'-closeup.png')});
-   if(mode==='grab')assert.equal(evidence.status.clip,'skate-grab','GRAB must drive licensed skate-grab clip');
-   if(mode==='push')assert.equal(evidence.status.clip,'skate','PUSH must drive licensed skate clip');
+   if(mode==='grab')assert(Math.hypot(...evidence.status.hands[1].map((n,i)=>n-evidence.status.grip[i]))<.08,'Hoodie hand must touch board');
+   if(mode==='push')assert(evidence.status.feet[1][1]<.25,'Hoodie pushing foot must reach pavement');
   }
-  assert(new Set(signatures.values()).size>=4,'Skate, crouch, air and grab must deform the skin differently');
+  assert(new Set(signatures.values()).size>=6,'Skate, crouch, ollie, flip, grab and landing must deform the skin differently');
   assert.deepEqual(errors,[]);assert.deepEqual(requests,[]);
   results.push({label,result:'PASS',ready,distinctPoses:new Set(signatures.values()).size});await page.close();
  }
- const fallback=await browser.newPage();await fallback.route('**/character-skate-boy.glb',r=>r.abort());await fallback.goto(url);await fallback.waitForFunction(()=>window.__SOL_DIAGNOSTICS__);await fallback.waitForTimeout(1000);
+ const fallback=await browser.newPage();await fallback.route('**/hoodie-character.glb',r=>r.abort());await fallback.goto(url);await fallback.waitForFunction(()=>window.__SOL_DIAGNOSTICS__);await fallback.waitForTimeout(1000);
  assert(await fallback.evaluate(()=>!__SOL_DIAGNOSTICS__.rig&&__SOL_DIAGNOSTICS__.riderV2?.meshes.some(m=>m.isVisible&&m.isEnabled()&&m.skeleton&&m.getTotalVertices()>0)),'GLB load failure must preserve visible, skinned V2 fallback');
  await fallback.close();
- fs.writeFileSync(path.join(out,'skeletal-result.json'),JSON.stringify({url,result:'PASS',commit:process.env.GITHUB_SHA,results},null,2));console.log('PASS desktop/mobile Chromium: real GLB, skin deformation, gameplay push/flip/landing, skate-specific poses, fallback, no startup errors');
+ fs.writeFileSync(path.join(out,'skeletal-result.json'),JSON.stringify({url,result:'PASS',commit:process.env.GITHUB_SHA,results},null,2));console.log('PASS desktop/mobile Chromium: real GLB, skin deformation, gameplay push/flip/landing, adult hoodie IK poses, fallback, no startup errors');
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(async()=>{if(browser)await browser.close();server.close()});
