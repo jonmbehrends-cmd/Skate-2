@@ -134,7 +134,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     if(pushing){foot.y=.17+(pose.recovery||0)*.29;foot.z=-.32-travel*(.18*(pose.contact||0)-.20*(pose.recovery||0))}
     // During grabs bend the knees upward toward the chest, not forward
     // along the deck. This pole only changes skeletal IK, never board physics.
-    const kneePole=actions.grabbing?v(.35,1.52,side*.57):v(.8,.65,side*.50);
+    const kneePole=actions.grabbing?v(.85,.86,side*.54):v(.8,.65,side*.50);
     footTargets.push(foot.asArray());
     solve(legs[i].n,foot,kneePole);placeDetached(detachedFeet[i],localPosition(legs[i].n[2]));orient(detachedFeet[i],footRotations[i]);
    }
