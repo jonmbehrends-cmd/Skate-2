@@ -451,6 +451,24 @@ const server=http.createServer((req,res)=>{
    return {type:s.grindRequestType,airborne:!s.grounded,vy:s.vy,y:s.y}});
   assert(boardInput.type==='boardslide'&&boardInput.airborne&&(boardInput.vy>0||boardInput.y>.1),
    'Touch boardslide must request a real ollie-assisted rail catch: '+JSON.stringify(boardInput));
+  // The GRIND button must Ollie by itself and retain the distinct 50-50 request.
+  await page.locator('#restart').click();
+  await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
+   Object.assign(s,{x:0,z:19,y:0,groundY:0,dir:0,speed:5,travelSign:1,
+    grounded:true,grinding:false,vy:0,grindCooldown:0,grindRequestType:null});
+  });
+  await page.locator('[data-t="grind"]').click();
+  const grindInput=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
+   return {type:s.grindRequestType,airborne:!s.grounded,vy:s.vy,y:s.y,
+    count:s.count,grinding:s.grinding,guard:s.grindAirborneUntil-performance.now()};});
+  assert(grindInput.type==='50-50'&&grindInput.airborne&&grindInput.vy>0&&
+   grindInput.guard>0&&!grindInput.grinding,
+   'GRIND button must trigger a visible Ollie before a distinct 50-50: '+JSON.stringify(grindInput));
+  await page.waitForTimeout(110);
+  const grindRising=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
+   return {y:s.y,grounded:s.grounded,grinding:s.grinding};});
+  assert(grindRising.y>.15&&!grindRising.grounded&&!grindRising.grinding,
+   'GRIND must visibly rise before any rail attachment: '+JSON.stringify(grindRising));
   // Move into the real connected halfpipe and confirm actual travel.
   await page.locator('#halfpipe').click();
   assert(await page.evaluate(()=>window.__SOL_DIAGNOSTICS__.scene.activeCamera.name==='halfpipe arrival overview'),'HALFPIPE button must reveal a real 3D overview before riding');
