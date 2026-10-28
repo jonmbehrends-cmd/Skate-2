@@ -52,7 +52,7 @@ let browser;
   await page.evaluate(()=>{for(let i=0;i<40;i++)__SOL_DIAGNOSTICS__.rig.update({grounded:true,speed:5},{crouch:0},{dt:1/60})});
   const signatures=new Map();
   for(const mode of ['ride','push','crouch','ollie','flip','grab','grind','landing']){
-   const evidence=await page.evaluate(mode=>{const d=__SOL_DIAGNOSTICS__,state={grounded:['ride','push','crouch','landing'].includes(mode),speed:5,travelSign:1,flip:mode==='flip'?1:0};const pose={crouch:mode==='crouch'?.23:.1,pushing:mode==='push',contact:.8};d.rig.update(state,pose,{grabbing:mode==='grab',grinding:mode==='grind'});d.scene.render();return {status:d.rig.status,matrices:Array.from(d.rig.skeletons[0].getTransformMatrices(d.rig.meshes[0])),vertices:d.rig.meshes[0].getTotalVertices()};},mode);
+   const evidence=await page.evaluate(mode=>{const d=__SOL_DIAGNOSTICS__,state={grounded:['ride','push','crouch','landing'].includes(mode),speed:5,travelSign:1,flip:mode==='flip'?1:0};const pose={crouch:mode==='crouch'?.23:.1,pushing:mode==='push',contact:.8};for(let i=0;i<(mode==='grab'?24:1);i++)d.rig.update(state,pose,{grabbing:mode==='grab',grinding:mode==='grind'});d.scene.render();return {status:d.rig.status,matrices:Array.from(d.rig.skeletons[0].getTransformMatrices(d.rig.meshes[0])),vertices:d.rig.meshes[0].getTotalVertices()};},mode);
    assert(evidence.vertices>100);assert(evidence.matrices.every(Number.isFinite));
    if(mode==='ollie')assert.equal(evidence.status.mode,'ollie','Takeoff pose must render in Chromium');signatures.set(mode,JSON.stringify(evidence.matrices));
    await page.screenshot({path:path.join(out,'skeletal-'+label+'-'+mode+'-closeup.png')});
