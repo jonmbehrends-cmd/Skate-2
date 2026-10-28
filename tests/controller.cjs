@@ -39,3 +39,18 @@ pad.connected=false;assert.equal(poll(2550).grabHeld,false,'Disconnect clears gr
 console.log('PASS: Xbox LB grind, RB hold/release and disconnect');
 
 context.navigator.getGamepads=()=>{throw new Error('SecurityError: gamepad permission denied')};assert.equal(poll(2600).connected,false,'Denied Gamepad API must not crash touch gameplay');
+
+// Modal input suspension must suppress actions and re-arm on release/repress.
+context.navigator.getGamepads=()=>[pad];pad.connected=true;
+pad.buttons.forEach(b=>b.pressed=false);pad.axes=[.7,-.6,0,-1];
+const suspendedActions=actions.length;
+context.window.SOLPad.setSuspended(true);
+pad.buttons[0].pressed=true;pad.buttons[7].pressed=true;
+p=poll(3000);assert.equal(p.x,0);assert.equal(p.y,0);assert.equal(p.boost,false);
+assert.equal(actions.length,suspendedActions,'Help must suppress controller tricks');
+context.window.SOLPad.setSuspended(false);p=poll(3010);
+assert(p.x>0&&p.y<0&&p.boost,'Closing help must restore movement polling');
+assert.equal(actions.length,suspendedActions,'Held A/right stick must not fire on resume');
+pad.buttons[0].pressed=false;pad.axes[3]=0;poll(3020);
+pad.buttons[0].pressed=true;poll(3030);assert.equal(actions.at(-1),'ollie');
+console.log('PASS: modal controller suspension, held-button resume and re-arming');

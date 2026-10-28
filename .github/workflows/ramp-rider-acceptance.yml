@@ -22,6 +22,7 @@ jobs:
       - run: node tests/skater_v2.cjs
       - run: node tests/ramp_grind_browser.cjs
       - run: node tests/skater_v2_browser.cjs
+      - run: node tests/controls_help_browser.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -29,3 +30,4 @@ jobs:
           path: |
             test-artifacts/ramp-grind/
             test-artifacts/skater-v2/
+            test-artifacts/controls-help/

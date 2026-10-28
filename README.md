@@ -51,3 +51,9 @@ GRIND (touch, G, Xbox LB) engages a nearby rail as a 50-50 without dispatching O
 The recovered Gemini V2 deck and 20-bone rider are connected to the existing board pivot and production pose updates. The rider follows riding, pushing, flips, shoves, grabs, grinds, boardslides and landing compression; the skin does not write physics state. The original procedural deck and rider nodes remain available as fallback/pose drivers. Importers in tools/ reproduce the runtime assets from the reviewed local GLBs and include source hashes.
 
 Validation: existing logic/geometry suites, Chromium gameplay/input/recovery, ten uninterrupted bowl airs, plus tests/ramp_grind_browser.cjs (desktop/mobile render readiness, camera views and touch/keyboard/Xbox actions) and tests/skater_v2_browser.cjs (eight skin poses). Physical Samsung/Xbox hardware remains untested.
+
+## Controls help
+
+Open Controls for keyboard, touch and Xbox mappings. The dialog releases held inputs, suppresses gameplay hotkeys and gamepad input while open, supports Enter/Space activation, Escape and focus return, and scrolls on short touch screens. GRIND remains a 50-50 catch action; OLLIE and assisted BOARD SLIDE stay separate.
+
+The panel originated in Copilot PR #39. This integration applies only its help UI and input-suspension changes to current R16 main, with additional keyboard and touch-scroll fixes. `node tests/controls_help_browser.cjs` covers desktop, portrait and landscape mobile behavior, including a real touch scroll gesture.
