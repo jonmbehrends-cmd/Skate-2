@@ -3,8 +3,9 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
 (async()=>{
  const engine=new B.NullEngine(),scene=new B.Scene(engine),parent=new B.TransformNode('stance',scene);
  const fallback=B.MeshBuilder.CreateBox('V2 fallback',{},scene);fallback.parent=parent;
+ const board=new B.TransformNode('visual deck',scene);board.parent=parent;
  const url='data:;base64,'+fs.readFileSync('assets/quaternius-hoodie/hoodie-character.glb').toString('base64');
- const rig=await SOLHoodieSkater.attach(B,scene,parent,[fallback],{url});
+ const rig=await SOLHoodieSkater.attach(B,scene,parent,[fallback],{url,board});
  assert.equal(rig.status.bones,62);assert(rig.meshes.length>=4);assert.equal(fallback.isVisible,false);
  const state={grounded:true,speed:4,travelSign:1},pose={crouch:0};
  rig.update(state,pose);assert.equal(rig.status.mode,'ride');
@@ -36,20 +37,22 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  assert(rig.status.footPose.frontLevel>.04&&rig.status.footPose.rearPop<.01,'Front foot must level after rear pop');
  rig.update({...state,grounded:false,flip:1},pose);assert.equal(rig.status.mode,'flip');
  assert(rig.status.footPose.frontFlick>.08,'Kickflip needs a leading-foot flick');
- rig.update({...state,grounded:false},pose,{grabbing:true});assert.equal(rig.status.mode,'grab');
+ for(let i=0;i<24;i++)rig.update({...state,grounded:false},pose,{grabbing:true});assert.equal(rig.status.mode,'grab');
+ assert(rig.status.grabLift>.55&&board.position.y>.55,'Airborne grab must bring visual board toward rider');
  const gripDistance=B.Vector3.Distance(B.Vector3.FromArray(rig.status.hands[1]),B.Vector3.FromArray(rig.status.grip));assert(gripDistance<.1,'Hand must reach board: '+JSON.stringify({gripDistance,hands:rig.status.hands,grip:rig.status.grip,feet:rig.status.feet,legGeometry:rig.status.legGeometry}));
  assert(Math.abs(rig.status.grip[0]-.20)<.01&&Math.abs(rig.status.grip[2]-.15)<.01,'Grab should reach the near-side rail at mid-deck, not across the tail');
  assert(rig.status.feet[0][0]-rig.status.feet[1][0]>.08,
   'Grab should stagger the leading and trailing shoes rather than make a symmetric seated pose');
  assert(rig.status.feet.every(f=>f[1]>.50),
   'Grab should tuck both knees above their neutral riding position');
- assert(rig.status.legGeometry.every(l=>l.hip[1]>l.foot[1]+.025),
-  'Grab pelvis must stay above the shoes; do not sit through the skateboard');
+ assert(rig.status.legGeometry.every(l=>l.foot[1]>l.hip[1]-.12&&l.foot[1]<l.hip[1]+.45),
+  'Grab shoes must tuck near the hips rather than dangle below a seated pelvis');
  console.log('GRAB_REACH_GEOMETRY',JSON.stringify(rig.status.grabDebug));
  assert(Number.isFinite(rig.status.grabReachShift)&&rig.status.grabReachShift<.45,
   'Grab should not translate the chest excessively: '+rig.status.grabReachShift);
  rig.update({...state,grounded:false},pose,{grinding:true});assert.equal(rig.status.mode,'grind');
- rig.update(state,pose);assert.equal(rig.status.mode,'landing');assert(rig.status.armPose.drop>.1&&rig.status.armPose.spread>.6,'Landing needs widened, lowered arms');
+ rig.update(state,pose);assert.equal(rig.status.mode,'landing');
+ assert.equal(board.position.y,0,'Landing must restore deck visual transform without changing physics');assert(rig.status.armPose.drop>.1&&rig.status.armPose.spread>.6,'Landing needs widened, lowered arms');
  for(let i=0;i<30;i++)rig.update(state,pose);assert.equal(rig.status.mode,'ride');
  assert.equal(JSON.stringify(state),original,'Visuals must not mutate physics');
  assert(scene.animationGroups.every(g=>!g.isPlaying),'Source locomotion clips must stay stopped');
