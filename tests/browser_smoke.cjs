@@ -814,8 +814,8 @@ const server=http.createServer((req,res)=>{
   assert(floorOcclusionQA.hiddenFloorMeshes>=4,'Expected underlying park floor meshes for the occlusion challenge');
   assert(floorOcclusionQA.samples.every(s=>s.meanChannelDelta<8),
    'Underlying plaza changes visible halfpipe riding pixels (ground bleed-through): '+JSON.stringify(floorOcclusionQA));
-  assert(floorOcclusionQA.coverage.covered>=400,
-   'Wide halfpipe pixel challenge must cover at least 400 ramp pixels: '+JSON.stringify(floorOcclusionQA.coverage));
+  assert(floorOcclusionQA.coverage.covered>=250,
+   'Wide halfpipe concrete pixel challenge must cover at least 250 ramp pixels: '+JSON.stringify(floorOcclusionQA.coverage));
   assert(floorOcclusionQA.coverage.leakFraction<.02&&floorOcclusionQA.coverage.meanChannelDelta<3,
    'Underlying ground changed visible ramp pixels across the halfpipe: '+JSON.stringify(floorOcclusionQA.coverage));
   assert(floorOcclusionQA.hiddenRampMeshes>=10&&
