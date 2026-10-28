@@ -963,6 +963,23 @@ const server=http.createServer((req,res)=>{
   await page.waitForTimeout(550);
   await page.screenshot({path:'test-artifacts/park-chromium.png',animations:'disabled'});
   await checkSceneScreenshot('test-artifacts/park-chromium.png','park');
+  // Inspect the actual opaque halfpipe exterior mural head-on in WebGL.
+  // Restore the park camera afterwards so gameplay tests are unaffected.
+  await page.evaluate(()=>{
+   const d=window.__SOL_DIAGNOSTICS__,B=window.BABYLON;
+   window.__muralQAOldCamera=d.scene.activeCamera;
+   const c=new B.ArcRotateCamera('halfpipe exterior mural QA',-Math.PI/2,1.35,12,
+    new B.Vector3(-36,2.15,-33.15),d.scene);
+   c.fov=.8;d.scene.activeCamera=c;window.__muralQACamera=c;
+  });
+  await page.waitForTimeout(350);
+  await page.screenshot({path:'test-artifacts/park-mural-chromium.png',animations:'disabled'});
+  await page.evaluate(()=>{
+   const d=window.__SOL_DIAGNOSTICS__;
+   d.scene.activeCamera=window.__muralQAOldCamera;
+   window.__muralQACamera.dispose();
+   delete window.__muralQACamera;delete window.__muralQAOldCamera;
+  });
 
 
   // End-to-end controller path: emulate the Standard Gamepad API inside

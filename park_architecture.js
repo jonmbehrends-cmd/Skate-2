@@ -20,7 +20,25 @@ function build(B,scene,ramps){
  const muralTexture=new B.DynamicTexture('park concrete stencil atlas',{width:1024,height:256},scene,false);
  const ink=muralTexture.getContext();
  ink.fillStyle='#374047';ink.fillRect(0,0,1024,256);
- for(let i=0;i<90;i++){const x=(i*137)%1024,y=(i*71)%256;ink.fillStyle=i%3===0?'#495157':'#303940';ink.fillRect(x,y,18+(i%7)*9,1+(i%3));}
+ // Layered, weathered street-art paint on the existing wall/deck mural atlas.
+ // This adds no meshes, collisions, transparent skins or mobile texture fetches.
+ for(const [x,y,w,h,color,angle] of [
+  [90,48,320,92,'#245e66',-.14],[575,75,340,82,'#865044',.12],
+  [350,165,290,35,'#ab8856',-.08]]){
+  ink.save();ink.translate(x,y);ink.rotate(angle);ink.fillStyle=color;
+  ink.fillRect(0,0,w,h);ink.restore();
+ }
+ for(let i=0;i<170;i++){
+  const x=(i*137+43)%1024,y=(i*71+19)%256;
+  ink.fillStyle=i%4===0?'#a2a39a':i%3===0?'#26383d':'#495157';
+  ink.fillRect(x,y,2+(i%9)*3,1+(i%3));
+ }
+ // The stencil remains readable above the paint and the scratches.
+ for(let i=0;i<45;i++){
+  const x=(i*181+9)%1024,y=(i*53+23)%256;
+  ink.strokeStyle=i%2?'#a4b2ac':'#27363b';ink.lineWidth=1;
+  ink.beginPath();ink.moveTo(x,y);ink.lineTo(x+13+(i%5)*6,y-2);ink.stroke();
+ }
  ink.fillStyle='#d3c9ad';ink.fillRect(22,24,980,6);ink.fillRect(22,222,980,5);
  for(const x of [28,958]){ink.fillStyle='#c18a48';for(let i=0;i<5;i++){ink.save();ink.translate(x+i*8,185);ink.rotate(-.45);ink.fillRect(0,0,7,42);ink.restore();}}
  ink.font='bold 112px sans-serif';ink.textAlign='center';ink.fillStyle='#e9e0c9';ink.fillText('SOL SKATE',512,147);
