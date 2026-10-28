@@ -4,7 +4,9 @@ This branch remains unmerged. Fewer draw submissions are verified; a device spee
 
 ## Current geometry and rendering
 
-The baseline fixture is the unbatched component from main `cc81a51`. Both variants contain the current mural artwork and V2 ollie-tuck rider. Architecture becomes 63 meshes instead of 150, and the full scene becomes 349 instead of 436 (87 fewer objects, about 20%). Only opaque, noninteractive component geometry is batched by material, shadow-receiver flag, and 40m spatial cell. Named mural planes remain independent.
+The baseline fixture is the unbatched component from main `cc81a51`. Both variants contain the same mural artwork. Architecture becomes 63 meshes instead of 150 (87 fewer objects). Only opaque, noninteractive component geometry is batched by material, shadow-receiver flag, and 40m spatial cell. Named mural planes remain independent. All 64 painted triangles (eight panels and four box fascias) are preserved, independently of their merged object count.
+
+The local V2-rider validation used the scene at `cc81a51`: 436 → 349 meshes. Main subsequently added the licensed hoodie character and bundled Babylon 8.32.1. Hosted acceptance against that main (`68d7356`) passed at PR head `322c1f3`, merge checkout `3f3c91f`: 447 → 360 meshes, again 87 fewer. [The hosted result](hoodie-integration-result.json) records all 12 cases and links the exact job. These are separate integration records; the long local timing experiment remains pinned to its original source revision.
 
 The unit test compares indexed world-space triangles, winding, normals, UVs, materials and shadow flags at 1mm positional precision. It also checks local bounds and component disposal. The component owns five materials and one atlas; its dispose method now releases those as well as its meshes. The production call site builds the component once during page initialization; restarting a run does not rebuild the scene. The baseline's incomplete material disposal predates batching.
 
@@ -14,12 +16,14 @@ Direct WebGL draw calls are counted and cross-checked against Babylon's per-rend
 
 | Fixed-pose view | Desktop GL draws before/after | Mobile GL draws before/after |
 |---|---:|---:|
-| Spawn | 157 / 157 | 121 / 121 |
-| Park | 213 / 187 | 113 / 103 |
-| Left wall | 106 / 75 | 89 / 61 |
-| Right wall | 110 / 79 | 87 / 58 |
-| Halfpipe | 141 / 114 | 97 / 80 |
-| Rider on deck | 152 / 122 | 113 / 102 |
+| Spawn | 151 / 151 | 115 / 115 |
+| Park | 207 / 181 | 111 / 101 |
+| Left wall | 113 / 82 | 96 / 68 |
+| Right wall | 117 / 86 | 94 / 65 |
+| Halfpipe | 148 / 121 | 104 / 87 |
+| Rider on deck | 146 / 116 | 107 / 96 |
+
+This table is the hosted hoodie/Babylon 8.32.1 integration. The earlier local V2/Babylon 8.56.2 result remains in `visual-result.json` and the four images below. Its direct GL counts are valid; its historical `engineDrawDelta` field predates the instrumentation reset correction and is not the current counter API.
 
 The small increase in active indices at cell boundaries is retained in the raw visual results. Batching never removes geometry.
 
@@ -39,7 +43,27 @@ The small increase in active indices at cell boundaries is retained in the raw v
 
 The raw report records flags, Chromium version, CPU count and OS load averages. Windows does not expose loadavg through Node, so those zeros are explicitly marked unavailable. All local browser rendering uses SwiftShader. Host drift, GPU-driver waits and the readback itself remain limitations; no result supports a claim about phones.
 
-The full paired run and its accepted/rejected counts will be recorded in `paired-result.json`. Insufficient accepted blocks will be reported as inconclusive, without relaxing rejection thresholds.
+## Paired result: timing remains inconclusive
+
+The full run completed all 96 fresh pages, 4,800 measured renders and 288 scratch build/dispose cycles. [Raw samples, block audit, lifecycle observations and analysis](paired-result.json) are retained. Render measurement source: `9f88e12893801383f1adef0559622f31a05a6c28`; analysis source: `322c1f36ed9dd17fc34a45a36587fb82ca605f3f`. The latter adds the explicit guard that unavailable A/A noise cannot establish equivalence. Production rendering did not change during the run.
+
+| Viewport | Warm-up blocks discarded | Eligible blocks rejected | Accepted blocks | Canary median / range (ms) |
+|---|---:|---:|---:|---|
+| Desktop | 1 | 7 / 7 | 0 | 3.90 / 3.30–6.80 |
+| Mobile emulation | 1 | 7 / 7 | 0 | 4.60 / 3.30–15.80 |
+
+Every eligible block contains at least one host-canary sample outside the predefined ±10% band. Consequently there are no valid paired confidence intervals, no established submission-time speedup and no established raster equivalence. Null metrics in the report mean insufficient accepted data, not zero cost or zero change. Thresholds were not relaxed. A quieter controlled host is required for timing inference; this shared Windows/SwiftShader session cannot answer it.
+
+Construction measurements below describe **all raw cycles**, including rejected blocks. They do not establish a startup regression or improvement, but expose the additional merge work instead of hiding it. The module is built once per page, not on restart.
+
+| Viewport / variant | Cycles | Build median / p95 (ms) | Dispose median / p95 (ms) | Retained owned materials / atlas |
+|---|---:|---:|---:|---|
+| Desktop before | 96 | 26.25 / 80.20 | 2.15 / 6.40 | 5 / yes |
+| Desktop after | 48 | 38.10 / 78.20 | 1.15 / 3.60 | 0 / no |
+| Mobile before | 96 | 52.50 / 80.90 | 3.30 / 5.30 | 5 / yes |
+| Mobile after | 48 | 77.35 / 108.30 | 1.70 / 5.90 | 0 / no |
+
+All 288 cycles released their meshes. Every after cycle also released the five owned materials and atlas, while the baseline retained them. That lifecycle observation and the independent geometry/parity/draw-count checks remain valid regardless of noisy timing. PR47 remains unmerged and undeployed.
 
 ## Reproduce
 
@@ -59,6 +83,8 @@ node tools/render_budget_paired.cjs
 ## Animation work is deferred
 
 V2 retargeting is unchanged. Its heavy bone writes occur inside physics substeps, but the same function observes landing transitions and applies landing decay. A single call after the loop would lose intermediate landings and can change the rendered pose. Before implementing a split, profile V2's actual share at 1/2/4/10 substeps and compare final palettes, joints, feet, grab contact and landing decay across intermediate land/launch sequences. No animation saving is claimed from this batching experiment.
+
+[Response to all five independent-review findings](review-response.md).
 
 ![Rider/deck before](desktop-rider-on-deck-before.png)
 ![Rider/deck after](desktop-rider-on-deck-after.png)
