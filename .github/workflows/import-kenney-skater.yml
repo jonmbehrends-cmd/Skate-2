@@ -76,3 +76,20 @@ jobs:
             meshBounds:gltf.meshes?.map(m=>m.primitives?.map(p=>({min:gltf.accessors[p.attributes.POSITION]?.min,max:gltf.accessors[p.attributes.POSITION]?.max})))
           },null,2));
           NODE
+
+      - name: Inspect Quaternius hoodie rig and animation clips
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const fs=require('fs'),b=fs.readFileSync('assets/quaternius-hoodie/hoodie-character.glb');
+          if(b.toString('utf8',0,4)!=='glTF')throw Error('Invalid hoodie GLB');
+          const g=JSON.parse(b.toString('utf8',20,20+b.readUInt32LE(12)));
+          console.log('HOODIE_METADATA',JSON.stringify({
+            bytes:b.length,scenes:g.scenes?.length,
+            skins:g.skins?.map(s=>({name:s.name,joints:s.joints?.length,jointNames:s.joints?.map(i=>g.nodes[i]?.name)})),
+            meshes:g.meshes?.map(m=>({name:m.name,primitives:m.primitives?.length,bounds:m.primitives?.map(p=>({min:g.accessors[p.attributes.POSITION]?.min,max:g.accessors[p.attributes.POSITION]?.max}))})),
+            animations:g.animations?.map(a=>a.name),
+            images:g.images?.map(i=>({name:i.name,uri:i.uri,mimeType:i.mimeType,bufferView:i.bufferView})),
+            nodes:g.nodes?.filter(n=>n.name&&/root|armature|hips|head|foot|hand|leg|spine|arm/i.test(n.name)).slice(0,80).map(n=>({name:n.name,children:n.children,translation:n.translation}))
+          },null,2));
+          NODE
