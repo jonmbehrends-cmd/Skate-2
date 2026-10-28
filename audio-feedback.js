@@ -71,7 +71,7 @@
     try {
       context = new AudioContextConstructor();
       master = context.createGain();
-      master.gain.value = muted ? 0 : 0.16;
+      master.gain.value = muted ? 0 : 0.65;
       master.connect(context.destination);
       return true;
     } catch (error) {
@@ -113,7 +113,7 @@
     }
 
     if (!createContext()) return;
-    master.gain.setTargetAtTime(0.16, context.currentTime, 0.02);
+    master.gain.setTargetAtTime(0.65, context.currentTime, 0.02);
     resumeContext();
   }
 
@@ -125,10 +125,10 @@
     const oscillator = context.createOscillator();
     const envelope = context.createGain();
     const sounds = {
-      wheel: { wave: 'triangle', from: 82, to: 62, duration: 0.075, volume: 0.014 },
-      ollie: { wave: 'sine', from: 190, to: 390, duration: 0.14, volume: 0.045 },
-      landing: { wave: 'triangle', from: 104, to: 54, duration: 0.18, volume: 0.055 },
-      grind: { wave: 'sawtooth', from: 215, to: 145, duration: 0.11, volume: 0.012 }
+      wheel: { wave: 'triangle', from: 82, to: 62, duration: 0.12, volume: 0.065 },
+      ollie: { wave: 'sine', from: 190, to: 390, duration: 0.17, volume: 0.14 },
+      landing: { wave: 'triangle', from: 104, to: 54, duration: 0.21, volume: 0.17 },
+      grind: { wave: 'sawtooth', from: 215, to: 145, duration: 0.14, volume: 0.06 }
     };
     const sound = sounds[type];
     if (!sound) return;
