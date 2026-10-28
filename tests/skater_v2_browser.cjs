@@ -9,13 +9,13 @@ const server=http.createServer((req,res)=>{const url=new URL(req.url,'http://loc
   await page.route('https://cdn.babylonjs.com/babylon.js',r=>r.fulfill({path:require.resolve('babylonjs'),contentType:'application/javascript'}));
   await page.goto('http://127.0.0.1:'+server.address().port);await page.waitForFunction(()=>window.__SOL_DIAGNOSTICS__?.riderV2?.diagnostics.frames>2,null,{timeout:30000});
   await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__;window.__qaLoops=d.engine._activeRenderLoops.slice();d.engine.stopRenderLoop();});
-  for(const mode of ['ride','push','flip','shove','grab','grind','boardslide','landing']){
+  for(const mode of ['ride','push','ollie','flip','shove','grab','grind','boardslide','landing']){
    result.poses[mode]=await page.evaluate(mode=>{
     const d=window.__SOL_DIAGNOSTICS__,B=window.BABYLON,s=d.state;
     document.querySelector('#restart').click();
     Object.assign(s,{x:0,z:0,y:0,groundY:0,vy:0,speed:0,dir:0,grounded:true,grinding:false,flip:0,spin:0,airTime:0,grabHeld:false,grabUntil:0,pushBurstUntil:0});
     if(mode==='push'){s.pushPhase=Math.PI/2;s.pushBurstUntil=performance.now()+3000;}
-    if(['flip','shove','grab'].includes(mode)){s.y=.9;s.vy=1;s.grounded=false;s.airTime=.25;s.airVX=0;s.airVZ=0;}
+    if(['ollie','flip','shove','grab'].includes(mode)){s.y=.9;s.vy=1;s.grounded=false;s.airTime=.25;s.airVX=0;s.airVZ=0;}
     if(mode==='flip'){s.flip=1;s.rollAngle=1.2;}
     if(mode==='shove'){s.spin=1;s.yawAngle=1.2;}
     if(mode==='grab'){s.grabHeld=true;s.touchGrabHeld=true;s.grabUntil=performance.now()+3000;}
@@ -35,9 +35,10 @@ const server=http.createServer((req,res)=>{const url=new URL(req.url,'http://loc
    const p=result.poses[mode];assert.equal(p.bones,20);assert.equal(p.meshes,13);assert(p.vertices>1000&&p.hidden&&p.finite&&p.ready,mode+' skin must render');assert.equal(p.mode,mode,mode+' must use its actual gameplay state');
   }
   assert(result.poses.grab.grabError<.04,'Authored palm must reach the deck');
+  assert(result.poses.ollie.feet.every(f=>Math.abs(f[1]-.385)<.025),'Real WebGL ollie must keep both shoes on deck');
   assert(result.poses.landing.grounded&&result.poses.landing.landing>0,'Actual landing must compress the skin');
-  for(const mode of ['push','flip','shove','grab','grind','landing'])assert.notDeepEqual(result.poses[mode].palette,result.poses.ride.palette,mode+' must deform bones');
+  for(const mode of ['push','ollie','flip','shove','grab','grind','landing'])assert.notDeepEqual(result.poses[mode].palette,result.poses.ride.palette,mode+' must deform bones');
   assert.deepEqual(result.errors,[]);result.result='PASS';
  }finally{await browser.close();fs.writeFileSync(path.join(out,'result.json'),JSON.stringify(result,null,2));}
- console.log('PASS V2 skinned rider: ride, push, flip, shove, grab, grind, boardslide, landing');
+ console.log('PASS V2 skinned rider: ride, push, ollie, flip, shove, grab, grind, boardslide, landing');
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(()=>server.close());
