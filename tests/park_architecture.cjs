@@ -6,8 +6,9 @@ class Texture{
  update(){}
 }
 function mesh(name){const m={name,position:{set(x,y,z){this.x=x;this.y=y;this.z=z}},rotation:{},dispose(){this.disposed=true}};meshes.push(m);return m}
+class Color3{constructor(r,g,b){this.r=r;this.g=g;this.b=b}static FromHexString(hex){return hex}}
 const B={PBRMaterial:Material,StandardMaterial:Material,DynamicTexture:Texture,
- Color3:{FromHexString:hex=>hex},Material:{MATERIAL_OPAQUE:0},
+ Color3,Material:{MATERIAL_OPAQUE:0},
  MeshBuilder:{CreateBox:mesh,CreatePlane:mesh}};
 const sandbox={};vm.runInNewContext(fs.readFileSync('park_architecture.js','utf8'),sandbox);
 const park=sandbox.SOLParkArchitecture.build(B,{},[]);
