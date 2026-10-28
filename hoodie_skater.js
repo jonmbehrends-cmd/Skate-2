@@ -84,10 +84,17 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    spine.rotationQuaternion=rest.get(spine).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.30:0)).multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pose.contact||0)*.07));
    const travel=state.travelSign===-1?-1:1;
    const lift=air?(flip?.22:actions.grabbing?.10:.15+takeoff*.12):0;
+   // Ollie pop starts at the tail: the rear knee tucks first, then the front
+   // knee levels the board. A kickflip briefly flicks the leading shoe out.
+   // These are skin-only targets and never change deck rotation or collision.
+   const rearPop=air&&!actions.grabbing&&!flip?takeoff*.11:0;
+   const frontLevel=air&&!actions.grabbing&&!flip?(1-takeoff)*.05:0;
+   const frontFlick=flip&&!actions.grabbing?.085:0;
+   status.footPose={rearPop,frontLevel,frontFlick};
    for(let i=0;i<legs.length;i++){
     const back=i===1,side=back?-1:1;
     const pushing=back&&pose.pushing;
-    const foot=v(pushing?-.23:.015,.45+lift,side*.43);
+    const foot=v(pushing?-.23:.015,.45+lift+(back?rearPop:frontLevel),side*.43+(back?0:frontFlick));
     if(pushing){foot.y=.17+(pose.recovery||0)*.29;foot.z=-.32-travel*(.18*(pose.contact||0)-.20*(pose.recovery||0))}
     solve(legs[i].n,foot,v(.8,.8,side*.50));placeDetached(detachedFeet[i],localPosition(legs[i].n[2]));orient(detachedFeet[i],footRotations[i]);
    }
