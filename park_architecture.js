@@ -31,13 +31,6 @@ function build(B,scene,ramps){
  muralMat.specularColor=new B.Color3(.025,.025,.025);muralMat.alpha=1;
  muralMat.transparencyMode=B.Material.MATERIAL_OPAQUE;muralMat.forceDepthWrite=true;
  muralMat.backFaceCulling=false;
- // Babylon's fascia box projects the stencil backwards from the public side.
- // Mirror the painted atlas once for those retaining faces; perimeter murals
- // continue to use the original atlas. No changes to rideable geometry.
- const fasciaTexture=new B.DynamicTexture('fascia readable stencil',{width:1024,height:256},scene,false);
- const fasciaInk=fasciaTexture.getContext();fasciaInk.translate(1024,0);fasciaInk.scale(-1,1);
- fasciaInk.drawImage(ink.canvas,0,0);fasciaTexture.update();
- const fasciaMat=muralMat.clone('architectural readable fascia');fasciaMat.diffuseTexture=fasciaTexture;
  function cube(name,x,y,z,w,h,d,mat){
   const q=B.MeshBuilder.CreateBox(name,{width:w,height:h,depth:d},scene);
   q.position.set(x,y,z);q.material=mat;q.isPickable=false;
@@ -51,8 +44,8 @@ function build(B,scene,ramps){
   for(const sx of [-1,1]){
    cube('halfpipe deck support',r.x+sx*(r.w/2-.55),base,r.z,.7,r.h-.20,r.d-.55,cement);
   }
-  cube('halfpipe deck front fascia',r.x,r.h-.31,r.z+r.d/2-.13,r.w-.8,.44,.20,fasciaMat);
-  cube('halfpipe deck back fascia',r.x,r.h-.31,r.z-r.d/2+.13,r.w-.8,.44,.20,fasciaMat);
+  cube('halfpipe deck front fascia',r.x,r.h-.31,r.z+r.d/2-.13,r.w-.8,.44,.20,muralMat);
+  cube('halfpipe deck back fascia',r.x,r.h-.31,r.z-r.d/2+.13,r.w-.8,.44,.20,muralMat);
   for(const sx of [-1,1])cube('deck corner steel cap',r.x+sx*(r.w/2-.15),r.h+.018,r.z,.14,.036,r.d,metal);
  }
  // The outer deck retaining face sits 3.1m beyond each transition end.
@@ -62,7 +55,9 @@ function build(B,scene,ramps){
   const left=r.curve==='halfpipe-left';
   const art=B.MeshBuilder.CreatePlane('halfpipe exterior painted mural',{width:r.w-5,height:2.35},scene);
   art.position.set(r.x,2.15,left?r.z-r.d/2-3.15:r.z+r.d/2+3.15);
-  art.rotation.y=left?Math.PI:0;art.material=muralMat;
+  // Face the public outside of each halfpipe wall: the opposite orientation
+  // displays the stencil from its back and reverses all lettering.
+  art.rotation.y=left?0:Math.PI;art.material=muralMat;
   art.isPickable=false;art.checkCollisions=false;objects.push(art);
  }
  // Color-inlaid seams at the perimeter, outside the central skating area.
