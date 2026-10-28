@@ -118,7 +118,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     // knee slightly forward while the trailing foot follows the tail.
     // Both targets remain in the moving board's local stance frame.
     const grabStagger=actions.grabbing?(back?-.055:.075):0;
-    const foot=v(pushing?-.23:.015+grabStagger,.45+lift+(back?rearPop:frontLevel),side*.36+(back?0:frontFlick));
+    const foot=v(pushing?-.23:.015+grabStagger,.45+lift+(back?rearPop:frontLevel),side*(actions.grabbing?.22:.36)+(back?0:frontFlick));
     if(pushing){foot.y=.17+(pose.recovery||0)*.29;foot.z=-.32-travel*(.18*(pose.contact||0)-.20*(pose.recovery||0))}
     // During grabs bend the knees upward toward the chest, not forward
     // along the deck. This pole only changes skeletal IK, never board physics.
