@@ -65,7 +65,9 @@ let browser;
  // Start a fresh observation window: array length is not a stable cursor in
  // the capped 100-sample buffer, which may already be full on a fast renderer.
  await page.evaluate(()=>{window.__qaControllerSamples.length=0});
- await page.waitForTimeout(250);
+ // SwiftShader may render fewer than two frames in 250 ms. Wait for
+ // actual post-disconnect adapter polls, not wall-clock time.
+ await page.waitForFunction(()=>window.__qaControllerSamples.length>=2,null,{timeout:15000});
  const xboxCoast=await page.evaluate(()=>({speed:window.__SOL_DIAGNOSTICS__.state.speed,
   samples:window.__qaControllerSamples.slice()}));
  assert(xboxCoast.speed>0&&xboxCoast.samples.length>0&&
