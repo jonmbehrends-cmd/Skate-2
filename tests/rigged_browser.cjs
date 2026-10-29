@@ -51,8 +51,8 @@ let browser;
   // Let the previous gameplay landing recovery finish before asserting a new PUSH pose.
   await page.evaluate(()=>{for(let i=0;i<40;i++)__SOL_DIAGNOSTICS__.rig.update({grounded:true,speed:5},{crouch:0},{dt:1/60})});
   const signatures=new Map();
-  for(const mode of ['ride','push','crouch','ollie','push-ollie','flip','grab','grind','landing']){
-   const evidence=await page.evaluate(mode=>{const d=__SOL_DIAGNOSTICS__,state={grounded:['ride','push','crouch','landing'].includes(mode),speed:5,travelSign:1,flip:mode==='flip'?1:0};const pose={crouch:mode==='crouch'?.23:.1,pushing:mode==='push'||mode==='push-ollie',contact:.8};d.rig.update(state,pose,{grabbing:mode==='grab',grinding:mode==='grind'});d.scene.render();return {status:d.rig.status,matrices:Array.from(d.rig.skeletons[0].getTransformMatrices(d.rig.meshes[0])),vertices:d.rig.meshes[0].getTotalVertices()};},mode);
+  for(const mode of ['ride','push','push-recovery','push-cycle-end','crouch','ollie','push-ollie','flip','grab','grind','landing']){
+   const evidence=await page.evaluate(mode=>{const d=__SOL_DIAGNOSTICS__,state={grounded:['ride','push','push-recovery','push-cycle-end','crouch','landing'].includes(mode),speed:5,travelSign:1,flip:mode==='flip'?1:0};const pose={crouch:mode==='crouch'?.23:.1,pushing:['push','push-recovery','push-cycle-end','push-ollie'].includes(mode),contact:mode==='push-recovery'||mode==='push-cycle-end'?0:.8,recovery:mode==='push-recovery'?1:0,pushPhase:mode==='push'?Math.PI/2:mode==='push-recovery'?Math.PI*1.5:mode==='push-cycle-end'?2*Math.PI-.001:undefined};d.rig.update(state,pose,{grabbing:mode==='grab',grinding:mode==='grind'});d.scene.render();return {status:d.rig.status,matrices:Array.from(d.rig.skeletons[0].getTransformMatrices(d.rig.meshes[0])),vertices:d.rig.meshes[0].getTotalVertices()};},mode);
    assert(evidence.vertices>100);assert(evidence.matrices.every(Number.isFinite));
    if(mode==='ollie')assert.equal(evidence.status.mode,'ollie','Takeoff pose must render in Chromium');signatures.set(mode,JSON.stringify(evidence.matrices));
    await page.screenshot({path:path.join(out,'skeletal-'+label+'-'+mode+'-closeup.png')});
@@ -70,6 +70,12 @@ let browser;
    if(mode==='push'){
     assert(evidence.status.feet[1][1]<.25,'Hoodie pushing foot must reach pavement');
     assert(evidence.status.pushLean>.05&&evidence.status.pushLean<.09,'Hoodie chest must balance the push without excessive hunch');
+   }
+   if(mode==='push-recovery'||mode==='push-cycle-end'){
+    assert.equal(evidence.status.mode,'push');
+    const f=evidence.status.feet[1];
+    assert(Math.abs(f[0]-.015)<.035&&Math.abs(f[1]-.45)<.035&&Math.abs(f[2]+.36)<.035,
+     'Recovered push foot must plant on deck: '+JSON.stringify(f));
    }
    if(mode==='ride')assert.equal(evidence.status.pushLean,0,'Neutral ride must have no push lean');
    if(mode==='landing'){
