@@ -114,7 +114,11 @@ function vertLaunch(s,previous,contact){
  const g=Math.hypot(gx,gz);s.grounded=false;s.vy=Math.min(12,s.speed*grade/Math.hypot(1,grade));
  s.airVX=-gx/g*.55;s.airVZ=-gz/g*.55;s.airTime=0;s.rampCooldown=.5;s.grindCooldown=Math.max(s.grindCooldown||0,.6);
  s.name='NEWBERG VERT AIR';s.combo=(s.combo||0)+200;s.count=(s.count||0)+1;
- s.bowlAir={newberg:true,elapsed:0,duration:2*s.vy/19,turned:0};s.bowlStats=s.bowlStats||{launches:0,landings:0,recoveries:0};s.bowlStats.launches++;return true;
+ s.bowlAir={newberg:true,elapsed:0,duration:2*s.vy/19,turned:0};
+ // The shallow launch's actual ground-tangent pitch is presentation metadata:
+ // it allows the rider to remain upright rather than following the nearly
+ // vertical vy/very-small-inward-vx vector. Deep bowl state is unchanged.
+ if(requiredGrade<1.2){s.bowlAir.shallow=true;s.bowlAir.launchPitch=Math.atan(grade);}s.bowlStats=s.bowlStats||{launches:0,landings:0,recoveries:0};s.bowlStats.launches++;return true;
 }
 function guideAir(s,dt){const a=s.bowlAir;if(!a?.newberg||s.grounded||s.grinding)return;a.elapsed+=dt;const t=Math.min(1,a.elapsed/a.duration),turn=Math.PI*t*t*(3-2*t);s.dir+=turn-a.turned;a.turned=turn;}
 function land(s,c){
