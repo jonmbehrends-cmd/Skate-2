@@ -114,6 +114,16 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  assert(rig.status.footPose.rearPop>.09&&rig.status.footPose.frontLevel<.01,'Rear foot must initiate ollie pop');
  for(let i=0;i<22;i++)rig.update({...state,grounded:false},pose);
  assert(rig.status.footPose.frontLevel>.04&&rig.status.footPose.rearPop<.01,'Front foot must level after rear pop');
+
+// A shallow transition launch is not an ollie: both feet must stay within
+// 4 cm of the actual deck stance while the board rises with the skater.
+// This is visual-only; preserve standard ollie pop and grind behavior.
+ rig.update({...state,grounded:false,bowlAir:{newberg:true,shallow:true}},pose);
+ assert(rig.status.feet.every(f=>Math.abs(f[1]-.47)<.04),
+  'Shallow vert shoes must stay with the deck: '+JSON.stringify(rig.status.feet));
+ assert.equal(rig.status.footPose.rearPop,0,'Shallow vert should not play ollie tail-foot lift');
+ assert.equal(rig.status.footPose.frontLevel,0,'Shallow vert should not play ollie front-foot flick');
+
  rig.update({...state,grounded:false,flip:1},pose);assert.equal(rig.status.mode,'flip');
  assert(rig.status.footPose.frontFlick>.08,'Kickflip needs a leading-foot flick');
  rig.update({...state,grounded:false},pose,{grabbing:true});assert.equal(rig.status.mode,'grab');
