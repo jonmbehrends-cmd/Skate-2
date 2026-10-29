@@ -28,6 +28,14 @@ for(const [name,count] of [['perimeter guardrail top',22],['perimeter guardrail 
  assert(items.every(m=>m.isPickable===false&&m.checkCollisions===false),
   'Guardrails must never change skating collision or raycast behavior: '+name);
 }
+const cement=materials.find(m=>m.name==='architectural exposed concrete');
+const aggregate=textures.find(t=>t===cement?.albedoTexture);
+assert(cement&&aggregate,
+ 'Exposed concrete must use the shared deterministic aggregate texture');
+assert(cement.alpha===1&&cement.forceDepthWrite===true&&
+ cement.transparencyMode===B.Material.MATERIAL_OPAQUE,
+ 'Textured concrete must remain opaque and depth-writing');
+assert.equal(textures.length,2,'Only one concrete texture and one mural atlas per build');
 const metal=materials.find(m=>m.name==='galvanized park coping');
 assert(metal&&metal.alpha===1&&metal.forceDepthWrite===true&&
  metal.transparencyMode===B.Material.MATERIAL_OPAQUE,
