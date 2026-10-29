@@ -15,17 +15,11 @@ let browser;
    const d=__SOL_DIAGNOSTICS__,p=SOLNewberg,B=BABYLON,m=d.park.terrain;let max=0,samples=0;
    for(let i=0;i<250;i++){const x=-30+(i*13.731%60),z=-22+(i*9.137%44),ray=new B.Ray(new B.Vector3(x,15,z),new B.Vector3(0,-1,0),30);const hit=d.scene.pickWithRay(ray,q=>q===m);if(!hit?.hit)throw Error('Missing solid concrete at '+x+','+z);max=Math.max(max,Math.abs(hit.pickedPoint.y-p.height(x,z)));samples++;}
    for(const [x,z]of [[17,10],[-19,-11],[-18,6]]){const hit=d.scene.pickWithRay(new B.Ray(new B.Vector3(x,15,z),new B.Vector3(0,-1,0),30));if(hit?.pickedMesh!==m)throw Error('Bowl obscured by '+hit?.pickedMesh?.name);}
-   return {name:d.park.name,replica:d.park.replica,meshCount:d.scene.meshes.length,terrainVertices:m.getTotalVertices(),maxContactError:max,samples,basins:d.park.basins.length,curveRails:d.park.rails.filter(r=>r.path).length,oldCity:d.scene.meshes.filter(m=>/background building|urban facade|solid skatable concrete ramp/.test(m.name)).length,volcano:p.height(-.7,-12),deep:p.height(17,10),shallow:p.height(-19,-11),materialsReady:m.isReady(true),version:B.Engine.Version};
+   const vertexColors=m.getVerticesData(B.VertexBuffer.ColorKind)||[];
+   return {diffuseAggregate:!!m.material.diffuseTexture,opaque:m.material.alpha===1&&m.material.transparencyMode===B.Material.MATERIAL_OPAQUE,vertexColorCount:vertexColors.length,name:d.park.name,replica:d.park.replica,meshCount:d.scene.meshes.length,terrainVertices:m.getTotalVertices(),maxContactError:max,samples,basins:d.park.basins.length,curveRails:d.park.rails.filter(r=>r.path).length,oldCity:d.scene.meshes.filter(m=>/background building|urban facade|solid skatable concrete ramp/.test(m.name)).length,volcano:p.height(-.7,-12),deep:p.height(17,10),shallow:p.height(-19,-11),materialsReady:m.isReady(true),version:B.Engine.Version};
   });
-  assert.equal(geometry.name,'Newberg / Chehalem');assert.equal(geometry.oldCity,0);assert.equal(geometry.version,'8.32.1');assert(geometry.materialsReady);assert(geometry.maxContactError<.00002,JSON.stringify(geometry));assert(geometry.volcano>1.3&&geometry.deep< -3.5&&geometry.shallow< -.8);assert(geometry.curveRails>=6);
+  assert.equal(geometry.name,'Newberg / Chehalem');assert.equal(geometry.oldCity,0);assert(geometry.opaque&&!geometry.diffuseAggregate&&geometry.vertexColorCount===geometry.terrainVertices*4,'Solid opaque concrete must use anti-alias-safe vertex weathering, not repeated aggregate texture: '+JSON.stringify(geometry));assert.equal(geometry.version,'8.32.1');assert(geometry.materialsReady);assert(geometry.maxContactError<.00002,JSON.stringify(geometry));assert(geometry.volcano>1.3&&geometry.deep< -3.5&&geometry.shallow< -.8);assert(geometry.curveRails>=6);
   await page.screenshot({path:path.join(out,label+'-entrance.png')});
-  // Diagnostic-only frames to isolate the diagonal concrete banding visible
-  // in production. Preserve the exact scene/camera and restore each property.
-  await page.evaluate(()=>{const m=__SOL_DIAGNOSTICS__.park.terrain;m.receiveShadows=false;});
-  await page.screenshot({path:path.join(out,label+'-no-terrain-shadows.png')});
-  await page.evaluate(()=>{const m=__SOL_DIAGNOSTICS__.park.terrain;m.receiveShadows=true;window.__newbergAggregate=m.material.diffuseTexture;m.material.diffuseTexture=null;});
-  await page.screenshot({path:path.join(out,label+'-no-aggregate.png')});
-  await page.evaluate(()=>{const m=__SOL_DIAGNOSTICS__.park.terrain;m.material.diffuseTexture=window.__newbergAggregate;delete window.__newbergAggregate;});
   const push=await page.locator('[data-t="push"]').boundingBox();await page.mouse.move(push.x+push.width/2,push.y+push.height/2);await page.mouse.down();await page.waitForFunction(()=>__SOL_DIAGNOSTICS__.state.speed>.3);await page.mouse.up();
   await page.locator('#restart').click();
   await page.evaluate(()=>{document.addEventListener('pointerdown',e=>{if(e.target.closest('[data-t="ollie"]')){const s=__SOL_DIAGNOSTICS__.state;window.__newbergLaunch={trusted:e.isTrusted,vy:s.vy,count:s.count,grounded:s.grounded,y:s.y};}});});
