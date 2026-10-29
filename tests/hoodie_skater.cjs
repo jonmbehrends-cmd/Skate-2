@@ -46,6 +46,18 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  };
  const phaseStart=phaseFoot(0),phaseContact=phaseFoot(Math.PI/2);
  const phaseEnd=phaseFoot(2*Math.PI-.001);
+ // The trailing shoe must enter/leave pavement contact without the sharp
+ // velocity corner of the former piecewise-linear stroke.
+ const early=phaseFoot(.01);
+ assert(B.Vector3.Distance(phaseStart,early)<.001,
+  'Push shoe must ease out of its planted deck position');
+ for(const seam of [Math.PI/3,Math.PI,Math.PI*1.5]){
+  const before=phaseFoot(seam-.001),after=phaseFoot(seam+.001);
+  assert(B.Vector3.Distance(before,after)<.005,
+   'Push contact/recovery must remain continuous at phase '+seam);
+ }
+ assert(B.Vector3.Distance(phaseFoot(2*Math.PI-.001),phaseFoot(0))<.005,
+  'Push phase wrap must not introduce an ankle jump');
  assert(phaseContact.y<.25,'Contact half-cycle must lower trailing shoe to pavement');
  assert(Math.abs(phaseStart.y-.45)<.035&&Math.abs(phaseEnd.y-.45)<.035,
   'Both sides of push-cycle wrap must have planted deck foot');
