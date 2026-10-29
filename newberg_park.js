@@ -148,7 +148,7 @@ function installGrinds(){
  }};
 }
 function install(B,scene,c){
- const {skater,grabMeshes,ramps,solids,rails,pads,shadow,camera,overview,state}=c;
+ const {skater,grabMeshes,ramps,solids,rails,pads,shadow,camera,overview,state,restart}=c;
  for(const m of [...scene.meshes])if(!m.isDescendantOf(skater)&&!grabMeshes.includes(m))m.dispose();
  ramps.length=solids.length=rails.length=0;
  pads.length=0;pads.push({x:-69,z:45,w:14,d:12,h:1.15});
@@ -250,6 +250,53 @@ function install(B,scene,c){
  const place=()=>{Object.assign(state,{x:-22,z:-19,dir:.3,y:height(-22,-19),groundY:height(-22,-19),airCameraHeading:.3});skater.position.set(state.x,state.y+.045,state.z);};place();
  document.querySelector('#restart').addEventListener('click',place);
  const view=document.querySelector('#halfpipe');view.textContent='PARK VIEW';view.setAttribute('aria-label','View Newberg skatepark');view.addEventListener('click',()=>{place();state.halfpipePreviewUntil=Infinity;scene.activeCamera=overview;document.querySelector('#msg').textContent='CHEHALEM — PUSH TO RIDE';});
+ // The expanded park has distinct districts. These flat, unobstructed
+ // spawn cells are near each bowl, snake run or street line. Always reset
+ // physics and held input before repositioning the skater.
+ const spots=[
+  {id:'core',label:'CHEHALEM / ORIGINAL',x:-22,z:-19,dir:.3},
+  {id:'river',label:'WEST / RIVER FLOW',x:-89,z:0,dir:Math.PI/2},
+  {id:'competition',label:'EAST / COMPETITION',x:89,z:29,dir:-Math.PI/2},
+  {id:'snake',label:'NORTH / SNAKE RUN',x:-60,z:-65,dir:0},
+  {id:'surf',label:'SOUTH / SURF BASIN',x:0,z:65,dir:Math.PI},
+  {id:'street',label:'STREET / GRIND ISLAND',x:-86,z:45,dir:Math.PI/2}
+ ];
+ const spotsToggle=document.createElement('button');spotsToggle.type='button';
+ spotsToggle.id='spotsToggle';spotsToggle.textContent='SPOTS';
+ spotsToggle.setAttribute('aria-label','Choose a skatepark district');
+ spotsToggle.setAttribute('aria-controls','spotsPanel');
+ spotsToggle.setAttribute('aria-expanded','false');
+ const spotsPanel=document.createElement('div');spotsPanel.id='spotsPanel';spotsPanel.hidden=true;
+ spotsPanel.setAttribute('role','group');spotsPanel.setAttribute('aria-label','Skatepark district selection');
+ const heading=document.createElement('div');heading.className='spotsHeading';heading.textContent='CHOOSE YOUR LINE';
+ spotsPanel.appendChild(heading);
+ const closeSpots=()=>{spotsPanel.hidden=true;spotsToggle.setAttribute('aria-expanded','false');};
+ spotsToggle.addEventListener('click',()=>{
+  const opened=spotsPanel.hidden;spotsPanel.hidden=!opened;spotsToggle.setAttribute('aria-expanded',String(opened));
+ });
+ for(const spot of spots){
+  const button=document.createElement('button');button.type='button';button.className='spotsChoice';
+  button.dataset.spot=spot.id;button.textContent=spot.label;
+  button.addEventListener('click',()=>{
+   const earned=state.score;
+   // The same reset as RESTART clears touch pointers, stick and gamepad input,
+   // tricks, grind states, and airborne momentum before travel.
+   restart();
+   const ground=height(spot.x,spot.z);
+   Object.assign(state,{x:spot.x,z:spot.z,dir:spot.dir,y:ground,groundY:ground,
+    speed:0,vy:0,travelSign:1,score:earned,grounded:true,grinding:false,
+    rampCooldown:.5,airCameraHeading:spot.dir,halfpipePreviewUntil:0});
+   skater.position.set(spot.x,ground+.045,spot.z);
+   scene.activeCamera=camera;
+   const message=document.querySelector('#msg');
+   message.textContent=spot.label+' — PUSH TO RIDE';
+   state.messageUntil=performance.now()+2200;
+   closeSpots();
+  });
+  spotsPanel.appendChild(button);
+ }
+ document.body.append(spotsToggle,spotsPanel);
+ root.addEventListener('keydown',e=>{if(e.key==='Escape'&&!spotsPanel.hidden){closeSpots();spotsToggle.focus();}});
  root.addEventListener('keydown',e=>{if(e.code==='KeyR'&&!e.repeat&&!e.ctrlKey&&!e.metaKey&&!e.altKey)place();});
  document.querySelector('#hud span').textContent='CHEHALEM + SOL EXPANSION';
  root.SOLBowl={bowl:{x:0,z:0,radius:0,depth:3.9},height,gradient,sample,groundTravel,roll,vertLaunch,guideAir,land,mesh:()=>terrain};
@@ -262,7 +309,7 @@ function install(B,scene,c){
   const blocksCamera=group.some(m=>c.cameraObstacles.has(m.name)),batch=B.Mesh.MergeMeshes(group,true,true,undefined,false,false);
   if(batch){batch.name='SOL static fixtures '+mat.name;batch.receiveShadows=true;if(blocksCamera)c.cameraObstacles.add(batch.name);for(const m of group){const i=objects.indexOf(m);if(i>=0)objects.splice(i,1);}objects.push(batch);fixtureBatches.push({material:mat.name,before:group.length,after:1});}
  }
- root.__SOL_DIAGNOSTICS__.park={name:'Newberg / Chehalem',replica:'Photo-derived core; original SOL expansion',terrain,terrainMeshes,basins,rails,objects,shadow,fixtureBatches,width:W,depth:D,spawn:{x:-22,z:-19}};
+ root.__SOL_DIAGNOSTICS__.park={name:'Newberg / Chehalem',replica:'Photo-derived core; original SOL expansion',terrain,terrainMeshes,basins,rails,objects,shadow,fixtureBatches,width:W,depth:D,spawn:{x:-22,z:-19},spots:spots.map(({id,label,x,z})=>({id,label,x,z}))};
  for(const m of terrainMeshes){c.cameraObstacles.add(m.name);m.freezeWorldMatrix();}for(const m of objects)if(!m.isWorldMatrixFrozen)m.freezeWorldMatrix();
  return {terrain,objects};
 }
