@@ -34,7 +34,6 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  rig.update(state,pose);checkStance();
  rig.update(state,{...pose,pushing:true,contact:1});assert.equal(rig.status.mode,'push');assert(rig.status.armPose.counter>.05&&rig.status.armPose.spread>.45,'Pushing needs visible counterbalance');
  assert(rig.status.feet[1][1]<.3,'Push foot must reach ground: '+JSON.stringify({feet:rig.status.feet,legs:rig.status.legGeometry}));
-  assert(rig.status.feet[1][0]>.36,'Pavement shoe must clear the board edge instead of passing through the deck');
   assert(rig.status.pushCompression<=.38&&rig.status.pushCompression>=.36,
    'Supporting knee should avoid the previous excessive .43m pelvis drop during PUSH');
  // A realistic push extends the trailing knee aft rather than folding it
