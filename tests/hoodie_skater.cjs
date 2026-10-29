@@ -34,6 +34,13 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  rig.update(state,pose);checkStance();
  rig.update(state,{...pose,pushing:true,contact:1});assert.equal(rig.status.mode,'push');assert(rig.status.armPose.counter>.05&&rig.status.armPose.spread>.45,'Pushing needs visible counterbalance');
  assert(rig.status.feet[1][1]<.3,'Push foot must reach ground: '+JSON.stringify({feet:rig.status.feet,legs:rig.status.legGeometry}));
+ // A realistic push extends the trailing knee aft rather than folding it
+ // across the board nose. Inspect the actual imported GLB knee joint in
+ // stance-local coordinates, not merely the ankle's pavement target.
+ const pushRear=rig.status.legGeometry[1];
+ assert(pushRear.knee[0]-pushRear.hip[0]<.12&&pushRear.knee[2]-pushRear.hip[2]<-.34,
+  'Grounded PUSH knee must track aft without jutting across the nose: '+JSON.stringify(pushRear));
+
  assert(rig.status.pushLean>.07&&rig.status.pushLean<.09,'Push contact should hinge hips and chest subtly');
  rig.update(state,{...pose,pushing:true,contact:0,recovery:1});
  assert(rig.status.pushLean>.02&&rig.status.pushLean<.03,'Push recovery must relax the upper body');
@@ -77,6 +84,19 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
   'Both sides of push-cycle wrap must have planted deck foot');
  assert(B.Vector3.Distance(phaseStart,phaseEnd)<.04,
   'Push-cycle phase wrap must not snap the shoe off the deck');
+ // The knee bend plane must ease back to normal before the planted foot
+ // completes recovery. A visually better contact pose is not acceptable if
+ // the knee snaps at the next stroke or when the PUSH animation loops.
+ const phaseKnee=phase=>{
+  phaseFoot(phase);
+  return B.Vector3.FromArray(rig.status.legGeometry[1].knee);
+ };
+ assert(B.Vector3.Distance(phaseKnee(2*Math.PI-.001),phaseKnee(0))<.008,
+  'Push knee must remain continuous when the stroke wraps');
+ for(const seam of [Math.PI/3,Math.PI,Math.PI*1.5]){
+  assert(B.Vector3.Distance(phaseKnee(seam-.001),phaseKnee(seam+.001))<.008,
+   'Push knee must not snap at contact/recovery seam '+seam);
+ }
  rig.update(state,pose);
  assert.equal(rig.status.pushLean,0,'Ordinary riding must not inherit the push hinge');
  // A still-held PUSH input during takeoff must not leave the back foot on
