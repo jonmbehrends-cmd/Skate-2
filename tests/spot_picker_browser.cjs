@@ -74,6 +74,8 @@ let browser;
    }
    assert(state.activeCamera===state.followCamera,'Travel must restore gameplay-follow camera: '+JSON.stringify(state));
    assert(state.cameraDistance<30,'Long-distance district jump left FollowCamera stranded at previous spot: '+JSON.stringify(state));
+   assert(Math.abs(state.cameraPosition[0])<93.4&&Math.abs(state.cameraPosition[2])<69.4,
+    'FollowCamera started behind the park perimeter wall after travel: '+JSON.stringify({spot,state}));
    // Actual rider visibility at river/competition must be accepted by
    // inspecting the saved real Chromium screenshot gallery.
    assert(state.hoodie.includes('quaternius-hoodie')&&state.bones===62,'Licensed skater missing after travel');
