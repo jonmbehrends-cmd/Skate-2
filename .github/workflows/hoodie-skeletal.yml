@@ -20,6 +20,7 @@ jobs:
       - run: node --check hoodie_skater.js && node --check tests/rigged_browser.cjs
       - run: node tests/hoodie_skater.cjs
       - run: node tests/rigged_browser.cjs
+      - run: node --check tools/animation_profile.cjs && node tests/animation_ancestor_probe.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
