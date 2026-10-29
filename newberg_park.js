@@ -322,7 +322,7 @@ function install(B,scene,c){
   const blocksCamera=group.some(m=>c.cameraObstacles.has(m.name)),batch=B.Mesh.MergeMeshes(group,true,true,undefined,false,false);
   if(batch){batch.name='SOL static fixtures '+mat.name;batch.receiveShadows=true;if(blocksCamera)c.cameraObstacles.add(batch.name);for(const m of group){const i=objects.indexOf(m);if(i>=0)objects.splice(i,1);}objects.push(batch);fixtureBatches.push({material:mat.name,before:group.length,after:1});}
  }
- root.__SOL_DIAGNOSTICS__.park={name:'Newberg / Chehalem',replica:'Photo-derived core; original SOL expansion',terrain,terrainMeshes,basins,rails,objects,shadow,fixtureBatches,width:W,depth:D,spawn:{x:-22,z:-19},spots:spots.map(({id,label,x,z})=>({id,label,x,z}))};
+ root.__SOL_DIAGNOSTICS__.park={name:'Newberg / Chehalem',replica:'Photo-derived core; original SOL expansion',terrain,terrainMeshes,basins,rails,objects,shadow,fixtureBatches,width:W,depth:D,spawn:{x:-22,z:-19},spots:spots.map(({id,label,x,z,dir})=>({id,label,x,z,dir}))};
  for(const m of terrainMeshes){c.cameraObstacles.add(m.name);m.freezeWorldMatrix();}for(const m of objects)if(!m.isWorldMatrixFrozen)m.freezeWorldMatrix();
  return {terrain,objects};
 }
