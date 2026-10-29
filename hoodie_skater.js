@@ -103,7 +103,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    // recover gradually as the shoe swings back, without stretching bones.
    const pushCompression=pose.pushing?.18+.25*clamp(pose.contact||0,0,1)+.09*clamp(pose.recovery||0,0,1):0;
    status.pushCompression=pushCompression;
-   rig.position.y=.33-lo*scale-.16-crouch-pushCompression;
+   // Raise the airborne pelvis above the tucked ankles; keep the board\n   // transform independent so the character does not sit on its shoes.\n   rig.position.y=.33-lo*scale-.16-crouch-pushCompression+(actions.grabbing?.24:0);
    // Babylon may cache ancestor matrices between consecutive gameplay poses.
    // Refresh the scaled rig root before solving world-space IK targets.
    rig.computeWorldMatrix(true);
@@ -118,7 +118,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    const pushLean=pose.pushing&&state.grounded?
     clamp((pose.contact||0)*.075+(pose.recovery||0)*.025,0,.085):0;
    status.pushLean=pushLean;
-   pelvis.rotationQuaternion=rest.get(pelvis).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?.27:-pushLean*.5));
+   pelvis.rotationQuaternion=rest.get(pelvis).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?.78:-pushLean*.5));
    spine.rotationQuaternion=rest.get(spine).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.04:-pushLean))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pose.pushing?(pose.contact||0)*.07:0)));
    const travel=state.travelSign===-1?-1:1;
@@ -161,9 +161,9 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
                   v(.08-swing,1.25-crouch+armLift-armDrop-pushCounter,-balance)];
    status.armPose={spread:balance,lift:armLift,drop:armDrop,counter:pushCounter};
    if(actions.grabbing){
-    // Grip the near-side deck rail, rather than reaching across the middle;
+    // Grip the top edge of the near-side rail at shoe/deck height (not 19cm below\n    // the shoes); otherwise arm IK collapses the chest to reach through the board.\n    // Grip the near-side deck rail, rather than reaching across the middle;
     // the hand tracks the moving board even during a simultaneous flip.
-    targets[1]=options.board?B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.20,.34,.15),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):v(.20,.34+grabLift,.15);
+    targets[1]=options.board?B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.20,.53,.15),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):v(.20,.53+grabLift,.15);
    }
    let grabReachShift=0;
    if(actions.grabbing){
