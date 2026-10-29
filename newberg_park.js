@@ -55,7 +55,7 @@ function copingPoint(b,i){
 }
 function rawHeight(x,z){
  let y=0;
- for(const b of basins){const distance=rimDistance(b,x,z);if(distance>=0){const u=1-clamp(distance/b.run,0,1);y=Math.min(y,-b.depth*Math.sqrt(Math.max(0,1-u*u)));}}
+ // A finite, steep lip slope prevents square-root cusp cliffs and jagged\n // triangular rim artifacts on mobile's coarser outer terrain tiles.\n for(const b of basins){const distance=rimDistance(b,x,z);if(distance>=0){const t=clamp(distance/b.run,0,1);y=Math.min(y,-b.depth*(1-Math.pow(1-t,2.4)));}}
  // The entrance volcano and paired roll-over humps are continuous concrete.
  const volcano=Math.hypot((x+.7)/3.05,(z+12)/3.05);
  if(volcano<1)y=Math.max(y,1.45*Math.pow(1-clamp((volcano-.21)/.79,0,1),1.55));
