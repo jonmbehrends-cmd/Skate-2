@@ -20,7 +20,23 @@ let browser;
    for(const rail of coping)for(let i=1;i<rail.path.length;i++){
     const a=rail.path[i-1],b=rail.path[i];for(const t of [0,.5,1])if(Math.abs(p.height(a[0]+(b[0]-a[0])*t,a[2]+(b[2]-a[2])*t))>.025)throw Error('Concrete intersects or buries coping at '+rail.path[i]);
    }
-   return {name:d.park.name,replica:d.park.replica,meshCount:d.scene.meshes.length,terrainVertices:m.getTotalVertices(),maxContactError:max,samples,basins:d.park.basins.length,curveRails:d.park.rails.filter(r=>r.path).length,oldCity:d.scene.meshes.filter(m=>/background building|urban facade|solid skatable concrete ramp/.test(m.name)).length,volcano:p.height(-.7,-12),deep:p.height(17,10),shallow:p.height(-19,-11),materialsReady:m.isReady(true),version:B.Engine.Version};
+   // This independently inspects *installed WebGL grind-rail positions*, not a
+   // duplicate of the terrain's Catmull-Rom source formula. A future knot or
+   // outward-offset change must not bury the kidney coping in either hump.
+   const kidneyIndex=p.basins.findIndex(b=>b.name==='west kidney and snake run');
+   const kidneyRail=coping[kidneyIndex];
+   if(!kidneyRail?.closed)throw Error('Missing uninterrupted kidney coping loop');
+   let kidneyHumpClearance=Infinity;
+   for(let i=1;i<kidneyRail.path.length;i++){
+    const a=kidneyRail.path[i-1],b=kidneyRail.path[i];
+    for(let sub=0;sub<8;sub++){
+     const t=sub/8,x=a[0]+(b[0]-a[0])*t,z=a[2]+(b[2]-a[2])*t;
+     for(const cz of [-1.8,2.1])kidneyHumpClearance=Math.min(kidneyHumpClearance,Math.hypot((x+7.8)/3.2,(z-cz)/2.4));
+    }
+   }
+   if(kidneyHumpClearance<1.1)throw Error('Kidney coping may collide with a roll-over hump: '+kidneyHumpClearance);
+
+   return {name:d.park.name,replica:d.park.replica,meshCount:d.scene.meshes.length,terrainVertices:m.getTotalVertices(),maxContactError:max,samples,basins:d.park.basins.length,curveRails:d.park.rails.filter(r=>r.path).length,oldCity:d.scene.meshes.filter(m=>/background building|urban facade|solid skatable concrete ramp/.test(m.name)).length,volcano:p.height(-.7,-12),deep:p.height(17,10),shallow:p.height(-19,-11),materialsReady:m.isReady(true),kidneyHumpClearance,version:B.Engine.Version};
   });
   assert.equal(geometry.name,'Newberg / Chehalem');assert.equal(geometry.oldCity,0);assert.equal(geometry.version,'8.32.1');assert(geometry.materialsReady);assert(geometry.maxContactError<.00002,JSON.stringify(geometry));assert(geometry.volcano>1.3&&geometry.deep< -3.5&&geometry.shallow< -.8);assert(geometry.curveRails>=6);
   await page.screenshot({path:path.join(out,label+'-entrance.png')});
