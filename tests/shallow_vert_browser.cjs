@@ -27,7 +27,7 @@ let browser;
    {name:'beginner',x:-18.523593098311096,z:-17.410014116018257}
   ];
   for(const spot of conditions){
-   const launch=await page.evaluate(({name,x,z})=>{
+   const launch=await page.evaluate(({name,x,z,mobile})=>{
     const d=__SOL_DIAGNOSTICS__,p=SOLNewberg,s=d.state,B=BABYLON;
     if(!window.__shallowLoop){
      window.__shallowLoop=d.engine._activeRenderLoops[0];
@@ -60,7 +60,7 @@ let browser;
      d.scene.render=window.__shallowRender;d.scene.render();d.scene.render=()=>{};
     }
     return {name,takeoff,maxStep,initial:{x:initialX,z:initialZ,y:p.height(initialX,initialZ)},speed:s.speed,source:d.rig.status.source,bones:d.rig.status.bones};
-   },spot);
+   },{...spot,mobile});
    assert(launch.takeoff?.vy>0&&!launch.takeoff.grounded&&launch.takeoff.kind==='NEWBERG VERT AIR',
     'Running engine did not launch shallow '+label+'/'+spot.name+': '+JSON.stringify(launch));
    assert(launch.maxStep<.5,'Unexpected horizontal teleport '+JSON.stringify(launch));
