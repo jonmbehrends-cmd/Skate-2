@@ -76,7 +76,8 @@ const plates=named('halfpipe fascia steel anchor plate');
 assert(plates.every(m=>decks.some(d=>Math.abs(Math.abs(m.position.z-d.z)-d.d/2)<.05)),
  'Anchor plates must mount on existing fascia, not inside the skating area');
 const bands=named('halfpipe deck fascia safety stripe');
-assert(bands.every(m=>m.material===materials.find(m=>m.name==='park edge markings')),
- 'Safety bands must use the existing opaque inlaid marking material');
+assert(bands.every(m=>m.material?.name==='park edge markings'&&m.material.alpha===1&&
+ m.material.forceDepthWrite===true&&m.material.transparencyMode===B.Material.MATERIAL_OPAQUE),
+ 'Safety bands must use opaque depth-writing inlaid marking paint');
 detailed.dispose();assert(meshes.every(m=>m.disposed),'New fascia details must dispose with the park');
 console.log('PASS opaque non-colliding halfpipe fascia stripes, anchor plates and bolt heads on both decks');
