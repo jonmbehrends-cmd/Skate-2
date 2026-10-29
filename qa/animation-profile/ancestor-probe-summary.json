@@ -1,0 +1,5229 @@
+{
+  "source": "850cdc8da0f33907b152d4f762caf3b664fc87e3",
+  "harnessSha256": "00e6695a6be647400caa011e90b34568f9fa8b27eea0a88c5cfe71a81654ff2e",
+  "rawSha256": "ea0cf472731e269cb466a9b350ec4a981c75f7f18c372a3f42470d06604593ba",
+  "browser": "140.0.7339.186",
+  "purpose": "Hidden shared-transform dependency probe; no production source changed",
+  "comparisons": {
+    "omit-v2": {
+      "cases": [
+        {
+          "key": "1-ride",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "1-push",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "1-ramp",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "1-ollie",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "1-flip",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "1-shove",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "1-grab",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "1-grind",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "1-boardslide",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "1-landing",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "2-ride",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "2-push",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "2-ramp",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "2-ollie",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "2-flip",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "2-shove",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "2-grab",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "2-grind",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "2-boardslide",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "2-landing",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "4-ride",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "4-push",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "4-ramp",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "4-ollie",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "4-flip",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "4-shove",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "4-grab",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "4-grind",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "4-boardslide",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "4-landing",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "10-ride",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "10-push",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "10-ramp",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "10-ollie",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "10-flip",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "10-shove",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "10-grab",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "10-grind",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "10-boardslide",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "10-landing",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        }
+      ],
+      "equivalent": true,
+      "grabHelpersHidden": true
+    },
+    "refresh-shared": {
+      "cases": [
+        {
+          "key": "1-ride",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "1-push",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "1-ramp",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "1-ollie",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "1-flip",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "1-shove",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "1-grab",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "1-grind",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "1-boardslide",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "1-landing",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "2-ride",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "2-push",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "2-ramp",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "2-ollie",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "2-flip",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "2-shove",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "2-grab",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "2-grind",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "2-boardslide",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "2-landing",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "4-ride",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "4-push",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "4-ramp",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "4-ollie",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "4-flip",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "4-shove",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "4-grab",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "4-grind",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "4-boardslide",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "4-landing",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "10-ride",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "10-push",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "10-ramp",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "10-ollie",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "10-flip",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "10-shove",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "10-grab",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "10-grind",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "10-boardslide",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        },
+        {
+          "key": "10-landing",
+          "worldMaxDelta": 0,
+          "paletteMaxDelta": 0,
+          "contactMaxDelta": 0,
+          "equivalent": true,
+          "grabHelpersHidden": true
+        }
+      ],
+      "equivalent": true,
+      "grabHelpersHidden": true
+    }
+  },
+  "coverage": {
+    "baseline": {
+      "1-ride": {
+        "actualSubsteps": 1,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.015157972231495192,
+          "y": 0,
+          "z": 0.06473799675235736,
+          "dir": 0.23,
+          "speed": 3.989333333333333,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "ride",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "c0685bb8cd5f8f91e5c0373aac76766a6fe5c8c3fdba7bbb0a5549ce571624a1"
+      },
+      "1-push": {
+        "actualSubsteps": 1,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": -0.022353471931166043,
+          "y": 0,
+          "z": -0.06319237071090392,
+          "dir": 0.34,
+          "speed": 4.021769800024642,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "push",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "41c5e86049f2ce21294cbe2531a2458c990ddad90d200f811b125483e4dd5560"
+      },
+      "1-ramp": {
+        "actualSubsteps": 1,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": -36,
+          "y": 0,
+          "z": -23.950133333333333,
+          "dir": 0,
+          "speed": 2.992,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "ride",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "9729d72306995baef76699101cea41909ee29df836553cec9332c629c48ac902"
+      },
+      "1-ollie": {
+        "actualSubsteps": 1,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.004998500224977502,
+          "y": 1.9947222222222223,
+          "z": 0.0033323334833183353,
+          "dir": 0.56,
+          "speed": 0.3604469772314934,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "ollie",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "81846d78ecd9dcb4196e961a75416c8bc96d91f633c130f7c6ae69ee8394dd0d"
+      },
+      "1-flip": {
+        "actualSubsteps": 1,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.004998500224977502,
+          "y": 1.9947222222222223,
+          "z": 0.0033323334833183353,
+          "dir": 0.67,
+          "speed": 0.3604469772314934,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "flip",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "86aa36b4880d829320c8418695a59c09a7e83d936ff456c4efbec2b4c2bd1e04"
+      },
+      "1-shove": {
+        "actualSubsteps": 1,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.004998500224977502,
+          "y": 1.9947222222222223,
+          "z": 0.0033323334833183353,
+          "dir": 0.78,
+          "speed": 0.3604469772314934,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "ollie",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "c89524567cbb95e899239263fe51c506e7a446f4fab04787993fa55d03338240"
+      },
+      "1-grab": {
+        "actualSubsteps": 1,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.004998500224977502,
+          "y": 1.9947222222222223,
+          "z": 0.0033323334833183353,
+          "dir": 0.89,
+          "speed": 0.3604469772314934,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "grab",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": true
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": true
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": true
+          }
+        ],
+        "poseSha256": "5f396b4c18a6906c07ba170035a22a641f9d9c0117d3d50cb06df87548417a4a"
+      },
+      "1-grind": {
+        "actualSubsteps": 1,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0,
+          "y": 1.1,
+          "z": 18.963979846275457,
+          "dir": 1,
+          "speed": 3.9775,
+          "grounded": true,
+          "grinding": true
+        },
+        "mode": "grind",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "602a196a750412b73a1e02437c370c87ae39c320b9ba3e22c8c6304ce0c9dee5"
+      },
+      "1-boardslide": {
+        "actualSubsteps": 1,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0,
+          "y": 1.1,
+          "z": 19.029644101116112,
+          "dir": 1.11,
+          "speed": 3.9775,
+          "grounded": true,
+          "grinding": true
+        },
+        "mode": "grind",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "4c999d94d3e47fce3b0600da0db1664d068a19de5db173d98f7463fb1acecb11"
+      },
+      "1-landing": {
+        "actualSubsteps": 1,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.004998500224977499,
+          "y": 0,
+          "z": 0.0033323334833183327,
+          "dir": 1.22,
+          "speed": 0.3503538342411581,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "landing",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "5d3cc29b240ee5cdb2532527ac2e8623137a5c18d1b31137c284193eb194a90e"
+      },
+      "2-ride": {
+        "actualSubsteps": 2,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.045322296442833115,
+          "y": 0,
+          "z": 0.19356643719330052,
+          "dir": 0.23,
+          "speed": 3.968064,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "ride",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "e743d3e736a01c3aceb0b799cc99f075b947aa607afe9c10d30a09dd37516f2b"
+      },
+      "2-push": {
+        "actualSubsteps": 2,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": -0.06870725289151779,
+          "y": 0,
+          "z": -0.19423265471325526,
+          "dir": 0.34,
+          "speed": 4.184265337713952,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "push",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "ff94d2833fe1b02a886504206d71fc911819994424bb0a1084f4efef260cf317"
+      },
+      "2-ramp": {
+        "actualSubsteps": 2,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": -36,
+          "y": 0,
+          "z": -23.8508988,
+          "dir": 0,
+          "speed": 2.976048,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "ride",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "5847cb642ae4cff8d76acc66bb2f65a75382fecbf596527d2a475775b5fe3717"
+      },
+      "2-ollie": {
+        "actualSubsteps": 2,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.014989878795850063,
+          "y": 1.964375,
+          "z": 0.00999325253056671,
+          "dir": 0.56,
+          "speed": 0.36023077391263625,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "ollie",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "2394fb6030c3cc76b5623be99b81f47e3b116ea8bdc92252bc8480244e871470"
+      },
+      "2-flip": {
+        "actualSubsteps": 2,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.014989878795850063,
+          "y": 1.964375,
+          "z": 0.00999325253056671,
+          "dir": 0.67,
+          "speed": 0.36023077391263625,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "flip",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "164445633b3b63bf37b14a9129a3fff7420293cc82aaf43d0cdd372604e7b7bd"
+      },
+      "2-shove": {
+        "actualSubsteps": 2,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.014989878795850063,
+          "y": 1.964375,
+          "z": 0.00999325253056671,
+          "dir": 0.78,
+          "speed": 0.36023077391263625,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "ollie",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "57347c266c1dd06ec40599145b39b397d0b17b6695869f07d07fd5599c055d30"
+      },
+      "2-grab": {
+        "actualSubsteps": 2,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.014989878795850063,
+          "y": 1.964375,
+          "z": 0.00999325253056671,
+          "dir": 0.89,
+          "speed": 0.36023077391263625,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "grab",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": true
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": true
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": true
+          }
+        ],
+        "poseSha256": "12bd4a91da8f85f4d5a5786409c83ed9fce59e105c7cc5fbca7980d8024cfc94"
+      },
+      "2-grind": {
+        "actualSubsteps": 2,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0,
+          "y": 1.1,
+          "z": 18.892395418896946,
+          "dir": 1,
+          "speed": 3.9325,
+          "grounded": true,
+          "grinding": true
+        },
+        "mode": "grind",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "5bfdda57bce0c3d13c9116e7c4bfd26a4122e77d462e94e0cf9661d5745b2ece"
+      },
+      "2-boardslide": {
+        "actualSubsteps": 2,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0,
+          "y": 1.1,
+          "z": 19.08855712019359,
+          "dir": 1.11,
+          "speed": 3.9325,
+          "grounded": true,
+          "grinding": true
+        },
+        "mode": "grind",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "61f8f3ea590409c3cfb0df7fec66d28444c988cbeb195e9b429a4b09b9c4254f"
+      },
+      "2-landing": {
+        "actualSubsteps": 2,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.015687921772175227,
+          "y": 0,
+          "z": 0.007995201215422715,
+          "dir": 1.22,
+          "speed": 0.3489000799668763,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "landing",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "9fda52d96efe5381fb68b2378a0d1fc5464124ff4b99a29b7c7a4f49e3b3fcb6"
+      },
+      "4-ride": {
+        "actualSubsteps": 4,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.09028273967086664,
+          "y": 0,
+          "z": 0.38558743995204975,
+          "dir": 0.23,
+          "speed": 3.936382977024,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "ride",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "4288e5fea5fb1d59f2a8b7ebec435cf14556d490445e2e4afc92b3291796858f"
+      },
+      "4-push": {
+        "actualSubsteps": 4,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": -0.1438373417983066,
+          "y": 0,
+          "z": -0.4066224098421497,
+          "dir": 0.34,
+          "speed": 4.633137256808908,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "push",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "5b5fd20c7182e66c6f553e81dd105378da067369c86dfac737af759777f3e5c4"
+      },
+      "4-ramp": {
+        "actualSubsteps": 4,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": -36,
+          "y": 0,
+          "z": -23.7029880239808,
+          "dir": 0,
+          "speed": 2.952287232768,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "ride",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "030034340b2186f026b1981e71e6744e400b66a9401bec191da65d4e5d176e31"
+      },
+      "4-ollie": {
+        "actualSubsteps": 4,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.02996627276986391,
+          "y": 1.8812499999999999,
+          "z": 0.019977515179909276,
+          "dir": 0.56,
+          "speed": 0.3599067120658202,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "ollie",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "755abbf0028d6aa67dda42eb2ec1cee97d9621da6d7f8601a7523491069b63df"
+      },
+      "4-flip": {
+        "actualSubsteps": 4,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.02996627276986391,
+          "y": 1.8812499999999999,
+          "z": 0.019977515179909276,
+          "dir": 0.67,
+          "speed": 0.3599067120658202,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "flip",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "8e125fd7e2d5388f79bc7accb3437dd61d0dd8ee0306f21d2348fcfa0fbb64c1"
+      },
+      "4-shove": {
+        "actualSubsteps": 4,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.02996627276986391,
+          "y": 1.8812499999999999,
+          "z": 0.019977515179909276,
+          "dir": 0.78,
+          "speed": 0.3599067120658202,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "air",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "7907388c6b84b250915d2ca7da8b667e4a60e06f2a26f7208ecf10342c7b3671"
+      },
+      "4-grab": {
+        "actualSubsteps": 4,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.02996627276986391,
+          "y": 1.8812499999999999,
+          "z": 0.019977515179909276,
+          "dir": 0.89,
+          "speed": 0.3599067120658202,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "grab",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": true
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": true
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": true
+          }
+        ],
+        "poseSha256": "8f3d1258b46e45b0399f475ed375b8e5b9b624b045026fe995cdbea9767be101"
+      },
+      "4-grind": {
+        "actualSubsteps": 4,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0,
+          "y": 1.1,
+          "z": 18.7866143580762,
+          "dir": 1,
+          "speed": 3.865,
+          "grounded": true,
+          "grinding": true
+        },
+        "mode": "grind",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "5fa1e71d17f1e9411f219c01dd6d15c1bc5b93181ab07e1d89e6ede03b8d0ca9"
+      },
+      "4-boardslide": {
+        "actualSubsteps": 4,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0,
+          "y": 1.1,
+          "z": 19.17561350776818,
+          "dir": 1.11,
+          "speed": 3.865,
+          "grounded": true,
+          "grinding": true
+        },
+        "mode": "grind",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "ad92cbcd9ceb0ce527d0f40634b7eeafeaaa25e74c5a90e8e49a6c70a16ad808"
+      },
+      "4-landing": {
+        "actualSubsteps": 4,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.0319723493065847,
+          "y": 0,
+          "z": 0.013954181184620364,
+          "dir": 1.22,
+          "speed": 0.3461144617284207,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "landing",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "ca0c1a8c62af73559ad8cbd79229930db12eb5d70fe827bedea6222d2bc3c7fb"
+      },
+      "10-ride": {
+        "actualSubsteps": 10,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.22302172528067904,
+          "y": 0,
+          "z": 0.9525007373299275,
+          "dir": 0.23,
+          "speed": 3.8428494940112405,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "ride",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "4fa8ed2e3777515eec12238308dd3054075f7dc24b44aedc1c5d83f4ad3eb53b"
+      },
+      "10-push": {
+        "actualSubsteps": 10,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": -0.4394920265602121,
+          "y": 0,
+          "z": -1.2424263735137198,
+          "dir": 0.34,
+          "speed": 6.938397269854215,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "push",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "f71bf88ec34138020440b8bcc941864794314b3ee68820d16d744cbb626e65da"
+      },
+      "10-ramp": {
+        "actualSubsteps": 10,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": -36,
+          "y": 0,
+          "z": -23.26630357516498,
+          "dir": 0,
+          "speed": 2.882137120508431,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "ride",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "2503d24e84fa3e8b8f4cef11bba692d150b2932055bb58be63e05de9e6e745c8"
+      },
+      "10-ollie": {
+        "actualSubsteps": 10,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.074814667015133,
+          "y": 1.346875,
+          "z": 0.049876444676755324,
+          "dir": 0.56,
+          "speed": 0.3589362746233306,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "air",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "0a4c4817f2d44fdcfc9b7aad52189e22f2b40ea263fe0a3d6dc83e4794940e25"
+      },
+      "10-flip": {
+        "actualSubsteps": 10,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.074814667015133,
+          "y": 1.346875,
+          "z": 0.049876444676755324,
+          "dir": 0.67,
+          "speed": 0.3589362746233306,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "flip",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "4d423273402c1171c732b8f43757d0369271db64586a231e1d9e7421b60fa124"
+      },
+      "10-shove": {
+        "actualSubsteps": 10,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.074814667015133,
+          "y": 1.346875,
+          "z": 0.049876444676755324,
+          "dir": 0.78,
+          "speed": 0.3589362746233306,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "air",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "27933e6ccb302d24f259a82fa0a7d417efd703af7075bda2e52a5ef8d3c8a677"
+      },
+      "10-grab": {
+        "actualSubsteps": 10,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.074814667015133,
+          "y": 1.346875,
+          "z": 0.049876444676755324,
+          "dir": 0.89,
+          "speed": 0.3589362746233306,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "grab",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": true
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": true
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": true
+          }
+        ],
+        "poseSha256": "9b521fdd8463d03bf7796cdbfb4627616e496d49f353df631575c522a1a0d037"
+      },
+      "10-grind": {
+        "actualSubsteps": 10,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0,
+          "y": 1.1,
+          "z": 18.48021229730779,
+          "dir": 1,
+          "speed": 3.6625000000000005,
+          "grounded": true,
+          "grinding": true
+        },
+        "mode": "grind",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "66581a1ee94910b18775a21015be9e660b76e99169216ed621e44e2275c7fe66"
+      },
+      "10-boardslide": {
+        "actualSubsteps": 10,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0,
+          "y": 1.1,
+          "z": 19.42777827477792,
+          "dir": 1.11,
+          "speed": 3.6625000000000005,
+          "grounded": true,
+          "grinding": true
+        },
+        "mode": "grind",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "ec83ec44da80c878a11bb4fdac768ea9f9060e36a42a1661acd99fb4c3a95bae"
+      },
+      "10-landing": {
+        "actualSubsteps": 10,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.08004968656037391,
+          "y": 0,
+          "z": 0.031547178486019144,
+          "dir": 1.22,
+          "speed": 0.3378903404181969,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "idle",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "2beed19ce223e6b5c5ab1f202589f4747a472ea2929bb8f7b2bdb38f415265ac"
+      }
+    },
+    "omit-v2": {
+      "1-ride": {
+        "actualSubsteps": 1,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.015157972231495192,
+          "y": 0,
+          "z": 0.06473799675235736,
+          "dir": 0.23,
+          "speed": 3.989333333333333,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "ride",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "c0685bb8cd5f8f91e5c0373aac76766a6fe5c8c3fdba7bbb0a5549ce571624a1"
+      },
+      "1-push": {
+        "actualSubsteps": 1,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": -0.022353471931166043,
+          "y": 0,
+          "z": -0.06319237071090392,
+          "dir": 0.34,
+          "speed": 4.021769800024642,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "push",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "41c5e86049f2ce21294cbe2531a2458c990ddad90d200f811b125483e4dd5560"
+      },
+      "1-ramp": {
+        "actualSubsteps": 1,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": -36,
+          "y": 0,
+          "z": -23.950133333333333,
+          "dir": 0,
+          "speed": 2.992,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "ride",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "9729d72306995baef76699101cea41909ee29df836553cec9332c629c48ac902"
+      },
+      "1-ollie": {
+        "actualSubsteps": 1,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.004998500224977502,
+          "y": 1.9947222222222223,
+          "z": 0.0033323334833183353,
+          "dir": 0.56,
+          "speed": 0.3604469772314934,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "ollie",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "81846d78ecd9dcb4196e961a75416c8bc96d91f633c130f7c6ae69ee8394dd0d"
+      },
+      "1-flip": {
+        "actualSubsteps": 1,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.004998500224977502,
+          "y": 1.9947222222222223,
+          "z": 0.0033323334833183353,
+          "dir": 0.67,
+          "speed": 0.3604469772314934,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "flip",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "86aa36b4880d829320c8418695a59c09a7e83d936ff456c4efbec2b4c2bd1e04"
+      },
+      "1-shove": {
+        "actualSubsteps": 1,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.004998500224977502,
+          "y": 1.9947222222222223,
+          "z": 0.0033323334833183353,
+          "dir": 0.78,
+          "speed": 0.3604469772314934,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "ollie",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "c89524567cbb95e899239263fe51c506e7a446f4fab04787993fa55d03338240"
+      },
+      "1-grab": {
+        "actualSubsteps": 1,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.004998500224977502,
+          "y": 1.9947222222222223,
+          "z": 0.0033323334833183353,
+          "dir": 0.89,
+          "speed": 0.3604469772314934,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "grab",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": true
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": true
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": true
+          }
+        ],
+        "poseSha256": "5f396b4c18a6906c07ba170035a22a641f9d9c0117d3d50cb06df87548417a4a"
+      },
+      "1-grind": {
+        "actualSubsteps": 1,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0,
+          "y": 1.1,
+          "z": 18.963979846275457,
+          "dir": 1,
+          "speed": 3.9775,
+          "grounded": true,
+          "grinding": true
+        },
+        "mode": "grind",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "602a196a750412b73a1e02437c370c87ae39c320b9ba3e22c8c6304ce0c9dee5"
+      },
+      "1-boardslide": {
+        "actualSubsteps": 1,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0,
+          "y": 1.1,
+          "z": 19.029644101116112,
+          "dir": 1.11,
+          "speed": 3.9775,
+          "grounded": true,
+          "grinding": true
+        },
+        "mode": "grind",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "4c999d94d3e47fce3b0600da0db1664d068a19de5db173d98f7463fb1acecb11"
+      },
+      "1-landing": {
+        "actualSubsteps": 1,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.004998500224977499,
+          "y": 0,
+          "z": 0.0033323334833183327,
+          "dir": 1.22,
+          "speed": 0.3503538342411581,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "landing",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "5d3cc29b240ee5cdb2532527ac2e8623137a5c18d1b31137c284193eb194a90e"
+      },
+      "2-ride": {
+        "actualSubsteps": 2,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.045322296442833115,
+          "y": 0,
+          "z": 0.19356643719330052,
+          "dir": 0.23,
+          "speed": 3.968064,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "ride",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "e743d3e736a01c3aceb0b799cc99f075b947aa607afe9c10d30a09dd37516f2b"
+      },
+      "2-push": {
+        "actualSubsteps": 2,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": -0.06870725289151779,
+          "y": 0,
+          "z": -0.19423265471325526,
+          "dir": 0.34,
+          "speed": 4.184265337713952,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "push",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "ff94d2833fe1b02a886504206d71fc911819994424bb0a1084f4efef260cf317"
+      },
+      "2-ramp": {
+        "actualSubsteps": 2,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": -36,
+          "y": 0,
+          "z": -23.8508988,
+          "dir": 0,
+          "speed": 2.976048,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "ride",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "5847cb642ae4cff8d76acc66bb2f65a75382fecbf596527d2a475775b5fe3717"
+      },
+      "2-ollie": {
+        "actualSubsteps": 2,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.014989878795850063,
+          "y": 1.964375,
+          "z": 0.00999325253056671,
+          "dir": 0.56,
+          "speed": 0.36023077391263625,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "ollie",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "2394fb6030c3cc76b5623be99b81f47e3b116ea8bdc92252bc8480244e871470"
+      },
+      "2-flip": {
+        "actualSubsteps": 2,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.014989878795850063,
+          "y": 1.964375,
+          "z": 0.00999325253056671,
+          "dir": 0.67,
+          "speed": 0.36023077391263625,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "flip",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "164445633b3b63bf37b14a9129a3fff7420293cc82aaf43d0cdd372604e7b7bd"
+      },
+      "2-shove": {
+        "actualSubsteps": 2,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.014989878795850063,
+          "y": 1.964375,
+          "z": 0.00999325253056671,
+          "dir": 0.78,
+          "speed": 0.36023077391263625,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "ollie",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "57347c266c1dd06ec40599145b39b397d0b17b6695869f07d07fd5599c055d30"
+      },
+      "2-grab": {
+        "actualSubsteps": 2,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.014989878795850063,
+          "y": 1.964375,
+          "z": 0.00999325253056671,
+          "dir": 0.89,
+          "speed": 0.36023077391263625,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "grab",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": true
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": true
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": true
+          }
+        ],
+        "poseSha256": "12bd4a91da8f85f4d5a5786409c83ed9fce59e105c7cc5fbca7980d8024cfc94"
+      },
+      "2-grind": {
+        "actualSubsteps": 2,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0,
+          "y": 1.1,
+          "z": 18.892395418896946,
+          "dir": 1,
+          "speed": 3.9325,
+          "grounded": true,
+          "grinding": true
+        },
+        "mode": "grind",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "5bfdda57bce0c3d13c9116e7c4bfd26a4122e77d462e94e0cf9661d5745b2ece"
+      },
+      "2-boardslide": {
+        "actualSubsteps": 2,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0,
+          "y": 1.1,
+          "z": 19.08855712019359,
+          "dir": 1.11,
+          "speed": 3.9325,
+          "grounded": true,
+          "grinding": true
+        },
+        "mode": "grind",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "61f8f3ea590409c3cfb0df7fec66d28444c988cbeb195e9b429a4b09b9c4254f"
+      },
+      "2-landing": {
+        "actualSubsteps": 2,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.015687921772175227,
+          "y": 0,
+          "z": 0.007995201215422715,
+          "dir": 1.22,
+          "speed": 0.3489000799668763,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "landing",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "9fda52d96efe5381fb68b2378a0d1fc5464124ff4b99a29b7c7a4f49e3b3fcb6"
+      },
+      "4-ride": {
+        "actualSubsteps": 4,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.09028273967086664,
+          "y": 0,
+          "z": 0.38558743995204975,
+          "dir": 0.23,
+          "speed": 3.936382977024,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "ride",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "4288e5fea5fb1d59f2a8b7ebec435cf14556d490445e2e4afc92b3291796858f"
+      },
+      "4-push": {
+        "actualSubsteps": 4,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": -0.1438373417983066,
+          "y": 0,
+          "z": -0.4066224098421497,
+          "dir": 0.34,
+          "speed": 4.633137256808908,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "push",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "5b5fd20c7182e66c6f553e81dd105378da067369c86dfac737af759777f3e5c4"
+      },
+      "4-ramp": {
+        "actualSubsteps": 4,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": -36,
+          "y": 0,
+          "z": -23.7029880239808,
+          "dir": 0,
+          "speed": 2.952287232768,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "ride",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "030034340b2186f026b1981e71e6744e400b66a9401bec191da65d4e5d176e31"
+      },
+      "4-ollie": {
+        "actualSubsteps": 4,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.02996627276986391,
+          "y": 1.8812499999999999,
+          "z": 0.019977515179909276,
+          "dir": 0.56,
+          "speed": 0.3599067120658202,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "ollie",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "755abbf0028d6aa67dda42eb2ec1cee97d9621da6d7f8601a7523491069b63df"
+      },
+      "4-flip": {
+        "actualSubsteps": 4,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.02996627276986391,
+          "y": 1.8812499999999999,
+          "z": 0.019977515179909276,
+          "dir": 0.67,
+          "speed": 0.3599067120658202,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "flip",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "8e125fd7e2d5388f79bc7accb3437dd61d0dd8ee0306f21d2348fcfa0fbb64c1"
+      },
+      "4-shove": {
+        "actualSubsteps": 4,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.02996627276986391,
+          "y": 1.8812499999999999,
+          "z": 0.019977515179909276,
+          "dir": 0.78,
+          "speed": 0.3599067120658202,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "air",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "7907388c6b84b250915d2ca7da8b667e4a60e06f2a26f7208ecf10342c7b3671"
+      },
+      "4-grab": {
+        "actualSubsteps": 4,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.02996627276986391,
+          "y": 1.8812499999999999,
+          "z": 0.019977515179909276,
+          "dir": 0.89,
+          "speed": 0.3599067120658202,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "grab",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": true
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": true
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": true
+          }
+        ],
+        "poseSha256": "8f3d1258b46e45b0399f475ed375b8e5b9b624b045026fe995cdbea9767be101"
+      },
+      "4-grind": {
+        "actualSubsteps": 4,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0,
+          "y": 1.1,
+          "z": 18.7866143580762,
+          "dir": 1,
+          "speed": 3.865,
+          "grounded": true,
+          "grinding": true
+        },
+        "mode": "grind",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "5fa1e71d17f1e9411f219c01dd6d15c1bc5b93181ab07e1d89e6ede03b8d0ca9"
+      },
+      "4-boardslide": {
+        "actualSubsteps": 4,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0,
+          "y": 1.1,
+          "z": 19.17561350776818,
+          "dir": 1.11,
+          "speed": 3.865,
+          "grounded": true,
+          "grinding": true
+        },
+        "mode": "grind",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "ad92cbcd9ceb0ce527d0f40634b7eeafeaaa25e74c5a90e8e49a6c70a16ad808"
+      },
+      "4-landing": {
+        "actualSubsteps": 4,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.0319723493065847,
+          "y": 0,
+          "z": 0.013954181184620364,
+          "dir": 1.22,
+          "speed": 0.3461144617284207,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "landing",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "ca0c1a8c62af73559ad8cbd79229930db12eb5d70fe827bedea6222d2bc3c7fb"
+      },
+      "10-ride": {
+        "actualSubsteps": 10,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.22302172528067904,
+          "y": 0,
+          "z": 0.9525007373299275,
+          "dir": 0.23,
+          "speed": 3.8428494940112405,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "ride",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "4fa8ed2e3777515eec12238308dd3054075f7dc24b44aedc1c5d83f4ad3eb53b"
+      },
+      "10-push": {
+        "actualSubsteps": 10,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": -0.4394920265602121,
+          "y": 0,
+          "z": -1.2424263735137198,
+          "dir": 0.34,
+          "speed": 6.938397269854215,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "push",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "f71bf88ec34138020440b8bcc941864794314b3ee68820d16d744cbb626e65da"
+      },
+      "10-ramp": {
+        "actualSubsteps": 10,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": -36,
+          "y": 0,
+          "z": -23.26630357516498,
+          "dir": 0,
+          "speed": 2.882137120508431,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "ride",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "2503d24e84fa3e8b8f4cef11bba692d150b2932055bb58be63e05de9e6e745c8"
+      },
+      "10-ollie": {
+        "actualSubsteps": 10,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.074814667015133,
+          "y": 1.346875,
+          "z": 0.049876444676755324,
+          "dir": 0.56,
+          "speed": 0.3589362746233306,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "air",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "0a4c4817f2d44fdcfc9b7aad52189e22f2b40ea263fe0a3d6dc83e4794940e25"
+      },
+      "10-flip": {
+        "actualSubsteps": 10,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.074814667015133,
+          "y": 1.346875,
+          "z": 0.049876444676755324,
+          "dir": 0.67,
+          "speed": 0.3589362746233306,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "flip",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "4d423273402c1171c732b8f43757d0369271db64586a231e1d9e7421b60fa124"
+      },
+      "10-shove": {
+        "actualSubsteps": 10,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.074814667015133,
+          "y": 1.346875,
+          "z": 0.049876444676755324,
+          "dir": 0.78,
+          "speed": 0.3589362746233306,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "air",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "27933e6ccb302d24f259a82fa0a7d417efd703af7075bda2e52a5ef8d3c8a677"
+      },
+      "10-grab": {
+        "actualSubsteps": 10,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.074814667015133,
+          "y": 1.346875,
+          "z": 0.049876444676755324,
+          "dir": 0.89,
+          "speed": 0.3589362746233306,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "grab",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": true
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": true
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": true
+          }
+        ],
+        "poseSha256": "9b521fdd8463d03bf7796cdbfb4627616e496d49f353df631575c522a1a0d037"
+      },
+      "10-grind": {
+        "actualSubsteps": 10,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0,
+          "y": 1.1,
+          "z": 18.48021229730779,
+          "dir": 1,
+          "speed": 3.6625000000000005,
+          "grounded": true,
+          "grinding": true
+        },
+        "mode": "grind",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "66581a1ee94910b18775a21015be9e660b76e99169216ed621e44e2275c7fe66"
+      },
+      "10-boardslide": {
+        "actualSubsteps": 10,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0,
+          "y": 1.1,
+          "z": 19.42777827477792,
+          "dir": 1.11,
+          "speed": 3.6625000000000005,
+          "grounded": true,
+          "grinding": true
+        },
+        "mode": "grind",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "ec83ec44da80c878a11bb4fdac768ea9f9060e36a42a1661acd99fb4c3a95bae"
+      },
+      "10-landing": {
+        "actualSubsteps": 10,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.08004968656037391,
+          "y": 0,
+          "z": 0.031547178486019144,
+          "dir": 1.22,
+          "speed": 0.3378903404181969,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "idle",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "2beed19ce223e6b5c5ab1f202589f4747a472ea2929bb8f7b2bdb38f415265ac"
+      }
+    },
+    "refresh-shared": {
+      "1-ride": {
+        "actualSubsteps": 1,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.015157972231495192,
+          "y": 0,
+          "z": 0.06473799675235736,
+          "dir": 0.23,
+          "speed": 3.989333333333333,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "ride",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "c0685bb8cd5f8f91e5c0373aac76766a6fe5c8c3fdba7bbb0a5549ce571624a1"
+      },
+      "1-push": {
+        "actualSubsteps": 1,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": -0.022353471931166043,
+          "y": 0,
+          "z": -0.06319237071090392,
+          "dir": 0.34,
+          "speed": 4.021769800024642,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "push",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "41c5e86049f2ce21294cbe2531a2458c990ddad90d200f811b125483e4dd5560"
+      },
+      "1-ramp": {
+        "actualSubsteps": 1,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": -36,
+          "y": 0,
+          "z": -23.950133333333333,
+          "dir": 0,
+          "speed": 2.992,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "ride",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "9729d72306995baef76699101cea41909ee29df836553cec9332c629c48ac902"
+      },
+      "1-ollie": {
+        "actualSubsteps": 1,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.004998500224977502,
+          "y": 1.9947222222222223,
+          "z": 0.0033323334833183353,
+          "dir": 0.56,
+          "speed": 0.3604469772314934,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "ollie",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "81846d78ecd9dcb4196e961a75416c8bc96d91f633c130f7c6ae69ee8394dd0d"
+      },
+      "1-flip": {
+        "actualSubsteps": 1,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.004998500224977502,
+          "y": 1.9947222222222223,
+          "z": 0.0033323334833183353,
+          "dir": 0.67,
+          "speed": 0.3604469772314934,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "flip",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "86aa36b4880d829320c8418695a59c09a7e83d936ff456c4efbec2b4c2bd1e04"
+      },
+      "1-shove": {
+        "actualSubsteps": 1,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.004998500224977502,
+          "y": 1.9947222222222223,
+          "z": 0.0033323334833183353,
+          "dir": 0.78,
+          "speed": 0.3604469772314934,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "ollie",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "c89524567cbb95e899239263fe51c506e7a446f4fab04787993fa55d03338240"
+      },
+      "1-grab": {
+        "actualSubsteps": 1,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.004998500224977502,
+          "y": 1.9947222222222223,
+          "z": 0.0033323334833183353,
+          "dir": 0.89,
+          "speed": 0.3604469772314934,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "grab",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": true
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": true
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": true
+          }
+        ],
+        "poseSha256": "5f396b4c18a6906c07ba170035a22a641f9d9c0117d3d50cb06df87548417a4a"
+      },
+      "1-grind": {
+        "actualSubsteps": 1,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0,
+          "y": 1.1,
+          "z": 18.963979846275457,
+          "dir": 1,
+          "speed": 3.9775,
+          "grounded": true,
+          "grinding": true
+        },
+        "mode": "grind",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "602a196a750412b73a1e02437c370c87ae39c320b9ba3e22c8c6304ce0c9dee5"
+      },
+      "1-boardslide": {
+        "actualSubsteps": 1,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0,
+          "y": 1.1,
+          "z": 19.029644101116112,
+          "dir": 1.11,
+          "speed": 3.9775,
+          "grounded": true,
+          "grinding": true
+        },
+        "mode": "grind",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "4c999d94d3e47fce3b0600da0db1664d068a19de5db173d98f7463fb1acecb11"
+      },
+      "1-landing": {
+        "actualSubsteps": 1,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.004998500224977499,
+          "y": 0,
+          "z": 0.0033323334833183327,
+          "dir": 1.22,
+          "speed": 0.3503538342411581,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "landing",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "5d3cc29b240ee5cdb2532527ac2e8623137a5c18d1b31137c284193eb194a90e"
+      },
+      "2-ride": {
+        "actualSubsteps": 2,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.045322296442833115,
+          "y": 0,
+          "z": 0.19356643719330052,
+          "dir": 0.23,
+          "speed": 3.968064,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "ride",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "e743d3e736a01c3aceb0b799cc99f075b947aa607afe9c10d30a09dd37516f2b"
+      },
+      "2-push": {
+        "actualSubsteps": 2,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": -0.06870725289151779,
+          "y": 0,
+          "z": -0.19423265471325526,
+          "dir": 0.34,
+          "speed": 4.184265337713952,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "push",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "ff94d2833fe1b02a886504206d71fc911819994424bb0a1084f4efef260cf317"
+      },
+      "2-ramp": {
+        "actualSubsteps": 2,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": -36,
+          "y": 0,
+          "z": -23.8508988,
+          "dir": 0,
+          "speed": 2.976048,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "ride",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "5847cb642ae4cff8d76acc66bb2f65a75382fecbf596527d2a475775b5fe3717"
+      },
+      "2-ollie": {
+        "actualSubsteps": 2,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.014989878795850063,
+          "y": 1.964375,
+          "z": 0.00999325253056671,
+          "dir": 0.56,
+          "speed": 0.36023077391263625,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "ollie",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "2394fb6030c3cc76b5623be99b81f47e3b116ea8bdc92252bc8480244e871470"
+      },
+      "2-flip": {
+        "actualSubsteps": 2,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.014989878795850063,
+          "y": 1.964375,
+          "z": 0.00999325253056671,
+          "dir": 0.67,
+          "speed": 0.36023077391263625,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "flip",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "164445633b3b63bf37b14a9129a3fff7420293cc82aaf43d0cdd372604e7b7bd"
+      },
+      "2-shove": {
+        "actualSubsteps": 2,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.014989878795850063,
+          "y": 1.964375,
+          "z": 0.00999325253056671,
+          "dir": 0.78,
+          "speed": 0.36023077391263625,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "ollie",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "57347c266c1dd06ec40599145b39b397d0b17b6695869f07d07fd5599c055d30"
+      },
+      "2-grab": {
+        "actualSubsteps": 2,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.014989878795850063,
+          "y": 1.964375,
+          "z": 0.00999325253056671,
+          "dir": 0.89,
+          "speed": 0.36023077391263625,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "grab",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": true
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": true
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": true
+          }
+        ],
+        "poseSha256": "12bd4a91da8f85f4d5a5786409c83ed9fce59e105c7cc5fbca7980d8024cfc94"
+      },
+      "2-grind": {
+        "actualSubsteps": 2,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0,
+          "y": 1.1,
+          "z": 18.892395418896946,
+          "dir": 1,
+          "speed": 3.9325,
+          "grounded": true,
+          "grinding": true
+        },
+        "mode": "grind",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "5bfdda57bce0c3d13c9116e7c4bfd26a4122e77d462e94e0cf9661d5745b2ece"
+      },
+      "2-boardslide": {
+        "actualSubsteps": 2,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0,
+          "y": 1.1,
+          "z": 19.08855712019359,
+          "dir": 1.11,
+          "speed": 3.9325,
+          "grounded": true,
+          "grinding": true
+        },
+        "mode": "grind",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "61f8f3ea590409c3cfb0df7fec66d28444c988cbeb195e9b429a4b09b9c4254f"
+      },
+      "2-landing": {
+        "actualSubsteps": 2,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.015687921772175227,
+          "y": 0,
+          "z": 0.007995201215422715,
+          "dir": 1.22,
+          "speed": 0.3489000799668763,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "landing",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "9fda52d96efe5381fb68b2378a0d1fc5464124ff4b99a29b7c7a4f49e3b3fcb6"
+      },
+      "4-ride": {
+        "actualSubsteps": 4,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.09028273967086664,
+          "y": 0,
+          "z": 0.38558743995204975,
+          "dir": 0.23,
+          "speed": 3.936382977024,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "ride",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "4288e5fea5fb1d59f2a8b7ebec435cf14556d490445e2e4afc92b3291796858f"
+      },
+      "4-push": {
+        "actualSubsteps": 4,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": -0.1438373417983066,
+          "y": 0,
+          "z": -0.4066224098421497,
+          "dir": 0.34,
+          "speed": 4.633137256808908,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "push",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "5b5fd20c7182e66c6f553e81dd105378da067369c86dfac737af759777f3e5c4"
+      },
+      "4-ramp": {
+        "actualSubsteps": 4,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": -36,
+          "y": 0,
+          "z": -23.7029880239808,
+          "dir": 0,
+          "speed": 2.952287232768,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "ride",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "030034340b2186f026b1981e71e6744e400b66a9401bec191da65d4e5d176e31"
+      },
+      "4-ollie": {
+        "actualSubsteps": 4,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.02996627276986391,
+          "y": 1.8812499999999999,
+          "z": 0.019977515179909276,
+          "dir": 0.56,
+          "speed": 0.3599067120658202,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "ollie",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "755abbf0028d6aa67dda42eb2ec1cee97d9621da6d7f8601a7523491069b63df"
+      },
+      "4-flip": {
+        "actualSubsteps": 4,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.02996627276986391,
+          "y": 1.8812499999999999,
+          "z": 0.019977515179909276,
+          "dir": 0.67,
+          "speed": 0.3599067120658202,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "flip",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "8e125fd7e2d5388f79bc7accb3437dd61d0dd8ee0306f21d2348fcfa0fbb64c1"
+      },
+      "4-shove": {
+        "actualSubsteps": 4,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.02996627276986391,
+          "y": 1.8812499999999999,
+          "z": 0.019977515179909276,
+          "dir": 0.78,
+          "speed": 0.3599067120658202,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "air",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "7907388c6b84b250915d2ca7da8b667e4a60e06f2a26f7208ecf10342c7b3671"
+      },
+      "4-grab": {
+        "actualSubsteps": 4,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.02996627276986391,
+          "y": 1.8812499999999999,
+          "z": 0.019977515179909276,
+          "dir": 0.89,
+          "speed": 0.3599067120658202,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "grab",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": true
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": true
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": true
+          }
+        ],
+        "poseSha256": "8f3d1258b46e45b0399f475ed375b8e5b9b624b045026fe995cdbea9767be101"
+      },
+      "4-grind": {
+        "actualSubsteps": 4,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0,
+          "y": 1.1,
+          "z": 18.7866143580762,
+          "dir": 1,
+          "speed": 3.865,
+          "grounded": true,
+          "grinding": true
+        },
+        "mode": "grind",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "5fa1e71d17f1e9411f219c01dd6d15c1bc5b93181ab07e1d89e6ede03b8d0ca9"
+      },
+      "4-boardslide": {
+        "actualSubsteps": 4,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0,
+          "y": 1.1,
+          "z": 19.17561350776818,
+          "dir": 1.11,
+          "speed": 3.865,
+          "grounded": true,
+          "grinding": true
+        },
+        "mode": "grind",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "ad92cbcd9ceb0ce527d0f40634b7eeafeaaa25e74c5a90e8e49a6c70a16ad808"
+      },
+      "4-landing": {
+        "actualSubsteps": 4,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.0319723493065847,
+          "y": 0,
+          "z": 0.013954181184620364,
+          "dir": 1.22,
+          "speed": 0.3461144617284207,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "landing",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "ca0c1a8c62af73559ad8cbd79229930db12eb5d70fe827bedea6222d2bc3c7fb"
+      },
+      "10-ride": {
+        "actualSubsteps": 10,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.22302172528067904,
+          "y": 0,
+          "z": 0.9525007373299275,
+          "dir": 0.23,
+          "speed": 3.8428494940112405,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "ride",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "4fa8ed2e3777515eec12238308dd3054075f7dc24b44aedc1c5d83f4ad3eb53b"
+      },
+      "10-push": {
+        "actualSubsteps": 10,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": -0.4394920265602121,
+          "y": 0,
+          "z": -1.2424263735137198,
+          "dir": 0.34,
+          "speed": 6.938397269854215,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "push",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "f71bf88ec34138020440b8bcc941864794314b3ee68820d16d744cbb626e65da"
+      },
+      "10-ramp": {
+        "actualSubsteps": 10,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": -36,
+          "y": 0,
+          "z": -23.26630357516498,
+          "dir": 0,
+          "speed": 2.882137120508431,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "ride",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "2503d24e84fa3e8b8f4cef11bba692d150b2932055bb58be63e05de9e6e745c8"
+      },
+      "10-ollie": {
+        "actualSubsteps": 10,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.074814667015133,
+          "y": 1.346875,
+          "z": 0.049876444676755324,
+          "dir": 0.56,
+          "speed": 0.3589362746233306,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "air",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "0a4c4817f2d44fdcfc9b7aad52189e22f2b40ea263fe0a3d6dc83e4794940e25"
+      },
+      "10-flip": {
+        "actualSubsteps": 10,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.074814667015133,
+          "y": 1.346875,
+          "z": 0.049876444676755324,
+          "dir": 0.67,
+          "speed": 0.3589362746233306,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "flip",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "4d423273402c1171c732b8f43757d0369271db64586a231e1d9e7421b60fa124"
+      },
+      "10-shove": {
+        "actualSubsteps": 10,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.074814667015133,
+          "y": 1.346875,
+          "z": 0.049876444676755324,
+          "dir": 0.78,
+          "speed": 0.3589362746233306,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "air",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "27933e6ccb302d24f259a82fa0a7d417efd703af7075bda2e52a5ef8d3c8a677"
+      },
+      "10-grab": {
+        "actualSubsteps": 10,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.074814667015133,
+          "y": 1.346875,
+          "z": 0.049876444676755324,
+          "dir": 0.89,
+          "speed": 0.3589362746233306,
+          "grounded": false,
+          "grinding": false
+        },
+        "mode": "grab",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": true
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": true
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": true
+          }
+        ],
+        "poseSha256": "9b521fdd8463d03bf7796cdbfb4627616e496d49f353df631575c522a1a0d037"
+      },
+      "10-grind": {
+        "actualSubsteps": 10,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0,
+          "y": 1.1,
+          "z": 18.48021229730779,
+          "dir": 1,
+          "speed": 3.6625000000000005,
+          "grounded": true,
+          "grinding": true
+        },
+        "mode": "grind",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "66581a1ee94910b18775a21015be9e660b76e99169216ed621e44e2275c7fe66"
+      },
+      "10-boardslide": {
+        "actualSubsteps": 10,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0,
+          "y": 1.1,
+          "z": 19.42777827477792,
+          "dir": 1.11,
+          "speed": 3.6625000000000005,
+          "grounded": true,
+          "grinding": true
+        },
+        "mode": "grind",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "ec83ec44da80c878a11bb4fdac768ea9f9060e36a42a1661acd99fb4c3a95bae"
+      },
+      "10-landing": {
+        "actualSubsteps": 10,
+        "worldNodes": 18,
+        "paletteFloats": [
+          1008,
+          1008,
+          1008,
+          1008
+        ],
+        "state": {
+          "x": 0.08004968656037391,
+          "y": 0,
+          "z": 0.031547178486019144,
+          "dir": 1.22,
+          "speed": 0.3378903404181969,
+          "grounded": true,
+          "grinding": false
+        },
+        "mode": "idle",
+        "grabHelpers": [
+          {
+            "name": "grab upper arm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab forearm reaching board",
+            "visible": false,
+            "enabled": false
+          },
+          {
+            "name": "grab hand touching deck",
+            "visible": false,
+            "enabled": false
+          }
+        ],
+        "poseSha256": "2beed19ce223e6b5c5ab1f202589f4747a472ea2929bb8f7b2bdb38f415265ac"
+      }
+    }
+  }
+}
