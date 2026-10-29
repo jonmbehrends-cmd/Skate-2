@@ -13,12 +13,14 @@ function build(B,scene,ramps){
  }
  const cement=material('architectural exposed concrete','#a8a49b',true);
  const dark=material('recessed concrete','#474c50',true);
+ dark.alpha=1;dark.transparencyMode=B.Material.MATERIAL_OPAQUE;dark.forceDepthWrite=true;
  const metal=material('galvanized park coping','#9aa8b0',false);
  // Shared galvanized metal stays opaque and depth-writing even at grazing
  // camera angles; guardrails must never expose see-through wall geometry.
  metal.alpha=1;metal.transparencyMode=B.Material.MATERIAL_OPAQUE;
  metal.forceDepthWrite=true;
  const yellow=material('park edge markings','#d7aa50',true);
+ yellow.alpha=1;yellow.transparencyMode=B.Material.MATERIAL_OPAQUE;yellow.forceDepthWrite=true;
  // Warm, solid wall-mounted industrial fixtures: emissive appearance without
  // expensive dynamic lights or any changes to the skating collision world.
  const fixture=material('recessed wall light housing','#323b3f',false);
@@ -77,6 +79,19 @@ function build(B,scene,ramps){
   cube('halfpipe deck front fascia',r.x,r.h-.31,r.z+r.d/2-.13,r.w-.8,.44,.20,muralMat);
   cube('halfpipe deck back fascia',r.x,r.h-.31,r.z-r.d/2+.13,r.w-.8,.44,.20,muralMat);
   for(const sx of [-1,1])cube('deck corner steel cap',r.x+sx*(r.w/2-.15),r.h+.018,r.z,.14,.036,r.d,metal);
+  // Real decks need visible fascia seams, anchoring plates and bolt heads.
+  // Mount these on the existing solid retaining face, *below* the rideable
+  // deck, with no collision/picking; no fake skating obstacles are introduced.
+  for(const side of [-1,1]){
+   const faceZ=r.z+side*(r.d/2-.014);
+   cube('halfpipe deck fascia safety stripe',r.x,r.h-.12,faceZ,r.w-.85,.055,.035,yellow);
+   for(let i=-2;i<=2;i++){
+    const x=r.x+i*(r.w-4)/5;
+    cube('halfpipe fascia steel anchor plate',x,r.h-.30,faceZ,.24,.27,.048,metal);
+    for(const dx of [-.066,.066])
+     cube('halfpipe fascia recessed bolt head',x+dx,r.h-.30,faceZ+side*.029,.032,.035,.018,dark);
+   }
+  }
  }
  // The outer deck retaining face sits 3.1m beyond each transition end.
  // Place the murals 5cm beyond that solid exterior face, not behind it.

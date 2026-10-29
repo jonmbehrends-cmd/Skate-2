@@ -983,6 +983,28 @@ const server=http.createServer((req,res)=>{
   });
   await page.waitForTimeout(350);
   await page.screenshot({path:'test-artifacts/park-mural-chromium.png',animations:'disabled'});
+  // Close-up of the actual rendered fascia (not merely object counts):
+  // inspect the visible steel anchor plates, bolts and opaque edge band.
+  const fasciaQA=await page.evaluate(()=>{
+   const scene=window.__SOL_DIAGNOSTICS__.scene;
+   const count=name=>scene.meshes.filter(m=>m.name===name);
+   const bands=count('halfpipe deck fascia safety stripe');
+   const plates=count('halfpipe fascia steel anchor plate');
+   const bolts=count('halfpipe fascia recessed bolt head');
+   return {bands:bands.length,plates:plates.length,bolts:bolts.length,
+    nonColliding:[...bands,...plates,...bolts].every(m=>!m.isPickable&&!m.checkCollisions),
+    opaque:[...bands,...plates,...bolts].every(m=>m.material?.alpha===1&&m.material?.forceDepthWrite===true)};
+  });
+  assert.deepEqual([fasciaQA.bands,fasciaQA.plates,fasciaQA.bolts],[4,20,40],
+   'Real WebGL scene must include both decks of fascia hardware: '+JSON.stringify(fasciaQA));
+  assert(fasciaQA.nonColliding&&fasciaQA.opaque,
+   'Fascia hardware must remain solid, depth-writing and non-skateable: '+JSON.stringify(fasciaQA));
+  await page.evaluate(()=>{
+   const c=window.__muralQACamera,B=window.BABYLON;
+   c.setTarget(new B.Vector3(-36,4.20,-33.15));c.radius=10;c.fov=.65;
+  });
+  await page.waitForTimeout(350);
+  await page.screenshot({path:'test-artifacts/halfpipe-fascia-hardware.png',animations:'disabled'});
   await page.evaluate(()=>{
    const d=window.__SOL_DIAGNOSTICS__;
    d.scene.activeCamera=window.__muralQAOldCamera;

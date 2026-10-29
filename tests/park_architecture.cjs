@@ -53,4 +53,31 @@ assert(meshes.every(m=>m.isPickable===false&&m.checkCollisions===false),
  'All architecture remains visual-only');
 assert.equal(park.meshes.length,meshes.length);
 park.dispose();assert(meshes.every(m=>m.disposed),'Architecture must clean up its meshes');
-console.log('PASS 22 industrial wall lights, 22 pilasters, opaque lenses, outside-lane visual-only meshes');
+// Verify the two real 38m halfpipe decks receive solid, below-deck fascia
+// hardware rather than floating/pickable geometry in the transition lanes.
+const decks=[
+ {curve:'halfpipe-deck',x:-36,z:-31.55,w:38,d:3.1,h:4.5},
+ {curve:'halfpipe-deck',x:-36,z:-4.65,w:38,d:3.1,h:4.5}
+];
+const detailed=sandbox.SOLParkArchitecture.build(B,{},decks);
+for(const [name,count] of [
+ ['halfpipe deck fascia safety stripe',4],
+ ['halfpipe fascia steel anchor plate',20],
+ ['halfpipe fascia recessed bolt head',40]
+]){
+ const parts=named(name);
+ assert.equal(parts.length,count,name+' should appear on both sides of both decks');
+ assert(parts.every(m=>m.isPickable===false&&m.checkCollisions===false),
+  name+' must not change board, wheel or rider physics');
+ assert(parts.every(m=>m.position.y>4&&m.position.y<4.5&&Math.abs(m.position.x+36)<18),
+  name+' must remain below deck top and inside fascia span');
+}
+const plates=named('halfpipe fascia steel anchor plate');
+assert(plates.every(m=>decks.some(d=>Math.abs(Math.abs(m.position.z-d.z)-d.d/2)<.05)),
+ 'Anchor plates must mount on existing fascia, not inside the skating area');
+const bands=named('halfpipe deck fascia safety stripe');
+assert(bands.every(m=>m.material?.name==='park edge markings'&&m.material.alpha===1&&
+ m.material.forceDepthWrite===true&&m.material.transparencyMode===B.Material.MATERIAL_OPAQUE),
+ 'Safety bands must use opaque depth-writing inlaid marking paint');
+detailed.dispose();assert(meshes.every(m=>m.disposed),'New fascia details must dispose with the park');
+console.log('PASS opaque non-colliding halfpipe fascia stripes, anchor plates and bolt heads on both decks');
