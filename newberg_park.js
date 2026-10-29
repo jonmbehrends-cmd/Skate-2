@@ -5,23 +5,51 @@
 const enabled=typeof location!=='undefined'&&new URLSearchParams(location.search).get('park')!=='classic';
 const W=62,D=46,NX=200,NZ=150,DX=W/NX,DZ=D/NZ;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+// Hand-shaped from the builder's oblique aerial, NOT a measured plan. Each
+// connected area has one rim: overlapping primitive bowls made artificial
+// ridges and internal coping across the deep return and shallow flow channel.
 const basins=[
- {name:'deep end',x:17,z:10,rx:11,rz:10,depth:3.9,p:5},
- {name:'deep return pocket',x:7,z:16,rx:10,rz:5.8,depth:3.25,p:4},
- {name:'west kidney',x:-18,z:6,rx:9.5,rz:9,depth:1.5,p:2.5},
- {name:'snake run',x:-7,z:8,rx:12,rz:5,depth:1.35,p:3},
- {name:'shallow capsule',x:15,z:-12,rx:11,rz:6.6,depth:1.5,p:4},
- {name:'beginner pocket',x:-19,z:-11,rx:8.5,rz:6.5,depth:.95,p:3}
+ {name:'deep end',depth:3.9,run:6.5,knots:[[28,10],[28,16],[26,19.5],[20,20],[12,21],[3,21],[-1,18],[-1,14],[3,11],[9,10],[10,5],[10,0],[14,-1],[20,0],[26,1],[28,5]]},
+ {name:'west kidney and snake run',depth:1.5,run:4.4,knots:[[-27,5],[-25,-.5],[-21,-3],[-16,-2],[-13,1],[-10,3],[-4,3],[2,4],[5,7],[3,10],[-3,11],[-9,12],[-14,14],[-20,15],[-25,12]]},
+ {name:'shallow capsule',depth:1.5,run:4.2,knots:[[4,-12],[5,-16],[10,-18],[20,-18],[25,-16],[26,-12],[25,-8],[20,-6],[10,-6],[5,-8]]},
+ {name:'beginner pocket',depth:.95,run:3.6,knots:[[-27,-11],[-26,-15],[-22,-17.5],[-17,-17.5],[-12,-15],[-10.5,-11],[-12,-7],[-17,-5],[-22,-5],[-26,-7]]}
 ];
-function radius(b,x,z){return Math.pow(Math.pow(Math.abs((x-b.x)/b.rx),b.p)+Math.pow(Math.abs((z-b.z)/b.rz),b.p),1/b.p)}
-function outline(b,a){const c=Math.cos(a),s=Math.sin(a);return [b.x+b.rx*Math.sign(c)*Math.pow(Math.abs(c),2/b.p),b.z+b.rz*Math.sign(s)*Math.pow(Math.abs(s),2/b.p)]}
+function rimPoint(knots,t){
+ const n=knots.length,u=((t%1)+1)%1*n,i=Math.floor(u),f=u-i;
+ const a=knots[(i+n-1)%n],b=knots[i],c=knots[(i+1)%n],d=knots[(i+2)%n];
+ return b.map((v,k)=>.5*(2*v+(-a[k]+c[k])*f+(2*a[k]-5*v+4*c[k]-d[k])*f*f+(-a[k]+3*v-3*c[k]+d[k])*f*f*f));
+}
+for(const b of basins){
+ b.rim=Array.from({length:192},(_,i)=>rimPoint(b.knots,i/192));
+ b.bounds={minX:Math.min(...b.rim.map(p=>p[0])),maxX:Math.max(...b.rim.map(p=>p[0])),minZ:Math.min(...b.rim.map(p=>p[1])),maxZ:Math.max(...b.rim.map(p=>p[1]))};
+}
+function rimDistance(b,x,z){
+ if(x<b.bounds.minX||x>b.bounds.maxX||z<b.bounds.minZ||z>b.bounds.maxZ)return -1;
+ let inside=false,distance=Infinity;
+ for(let i=0,j=b.rim.length-1;i<b.rim.length;j=i++){
+  const a=b.rim[j],c=b.rim[i],dx=c[0]-a[0],dz=c[1]-a[1];
+  if((a[1]>z)!==(c[1]>z)&&x<(c[0]-a[0])*(z-a[1])/(c[1]-a[1])+a[0])inside=!inside;
+  const t=clamp(((x-a[0])*dx+(z-a[1])*dz)/Math.max(1e-12,dx*dx+dz*dz),0,1),ex=x-a[0]-t*dx,ez=z-a[1]-t*dz;
+  distance=Math.min(distance,ex*ex+ez*ez);
+ }return inside?Math.sqrt(distance):-1;
+}
+function copingPoint(b,i){
+ const n=b.rim.length,p=b.rim[i%n],a=b.rim[(i+n-1)%n],c=b.rim[(i+1)%n],dx=c[0]-a[0],dz=c[1]-a[1],length=Math.hypot(dx,dz);
+ // All rims wind counterclockwise in X/Z. Offset outward in the local
+ // normal, rather than stretching from a center across a concave neck.
+ // Clear a complete terrain cell diagonal so the triangulated lip cannot
+ // poke through the tube between samples and split a continuous grind.
+ return [p[0]+dz/length*.48,.045,p[1]-dx/length*.48];
+}
 function rawHeight(x,z){
  let y=0;
- for(const b of basins){const r=radius(b,x,z);if(r<1){const u=clamp((r-.33)/.67,0,1);y=Math.min(y,-b.depth*Math.sqrt(Math.max(0,1-u*u)));}}
+ for(const b of basins){const distance=rimDistance(b,x,z);if(distance>=0){const u=1-clamp(distance/b.run,0,1);y=Math.min(y,-b.depth*Math.sqrt(Math.max(0,1-u*u)));}}
  // The entrance volcano and paired roll-over humps are continuous concrete.
  const volcano=Math.hypot((x+.7)/3.05,(z+12)/3.05);
  if(volcano<1)y=Math.max(y,1.45*Math.pow(1-clamp((volcano-.21)/.79,0,1),1.55));
- for(const cz of [-1.8,2.1]){const r=Math.hypot((x+7.8)/3.2,(z-cz)/2.4);if(r<1)y=Math.max(y,.8*Math.pow(1-r*r,2));}
+ // Blend the roll-over into its actual local floor. max(floor,hump) would
+ // create a vertical step back to a recessed bowl at the hump's radius.
+ for(const cz of [-1.8,2.1]){const r=Math.hypot((x+7.8)/3.2,(z-cz)/2.4);if(r<1){const w=Math.pow(1-r*r,2);y=y*(1-w)+.8*w;}}
  return y;
 }
 const heights=new Float64Array((NX+1)*(NZ+1));
@@ -100,8 +128,8 @@ function install(B,scene,c){
  // cover every recessed bowl with grass at deck height.
  for(const [x,z,w,d] of [[-140.5,0,219,500],[140.5,0,219,500],[0,-136.5,W,227],[0,136.5,W,227]])box('Ewing Young surrounding lawn',x,-.12,z,w,.12,d,grass);
  // Coping follows the actual visible lip; omit internal overlapping-bowl seams.
- for(const b of basins){let run=[];const flush=()=>{if(run.length>2){const m=B.MeshBuilder.CreateTube('Newberg connected bowl coping',{path:run.map(p=>new B.Vector3(...p)),radius:.045,tessellation:7},scene);m.material=coping;objects.push(m);rails.push(railPath(run));}run=[];};
-  for(let i=0;i<=160;i++){let [x,z]=outline(b,i/160*Math.PI*2);x=b.x+(x-b.x)*1.025;z=b.z+(z-b.z)*1.025;if(height(x,z)<-.025){flush();continue;}run.push([x,.045,z]);}flush();
+ for(const b of basins){let run=[];const flush=()=>{if(run.length>2){const m=B.MeshBuilder.CreateTube('Newberg connected bowl coping',{path:run.map(p=>new B.Vector3(...p)),radius:.045,tessellation:7},scene);m.material=coping;objects.push(m);rails.push(railPath(run,run.length===b.rim.length+1));}run=[];};
+  for(let i=0;i<=b.rim.length;i++){const p=copingPoint(b,i);if(height(p[0],p[2])<-.025){flush();continue;}run.push(p);}flush();
  }
  for(const side of [-1,1]){
   const points=[];for(let i=0;i<=40;i++){const z=-5+i*.24,x=-7.8+side*.26;points.push([x,height(x,z)+.58,z]);}
