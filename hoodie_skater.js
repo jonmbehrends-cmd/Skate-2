@@ -102,7 +102,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    const athleticCompression=state.grounded&&!actions.grinding&&!pushingNow&&landing<=.05?
     clamp(Math.abs(state.speed||0)/7,0,1)*.045:0;
    status.athleticCompression=athleticCompression;
-   const crouch=clamp((pose.crouch||0)*.20+landingCompression+athleticCompression+takeoff*.06+(actions.grabbing?.36:0)+(actions.grinding?.12:0),0,.78);
+   const crouch=clamp((pose.crouch||0)*.20+landingCompression+athleticCompression+takeoff*.06+(actions.grabbing?.43:0)+(actions.grinding?.12:0),0,.78);
    // Settle the pelvis into an athletic, knee-flexed stance instead of a
    // locked-knee upright pose. Feet remain IK-planted on the deck.
    // The ground-reaching push shoe sits below the deck. Compress the hips
@@ -129,7 +129,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    status.pushingNow=pushingNow;
    const landingHinge=landing*.085;
    status.landingHinge=landingHinge;
-   pelvis.rotationQuaternion=rest.get(pelvis).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?.16:actions.grinding?.07:landingHinge-pushLean*.5));
+   pelvis.rotationQuaternion=rest.get(pelvis).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?.40:actions.grinding?.07:landingHinge-pushLean*.5));
    spine.rotationQuaternion=rest.get(spine).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.08:actions.grinding?-.05:-landingHinge*.4-pushLean))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pushingNow?(pose.contact||0)*.07:0)));
    const travel=state.travelSign===-1?-1:1;
@@ -226,6 +226,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
       B.Vector3.Distance(localPosition(chain[1]),localPosition(chain[2]));
     const delta=targets[1].subtract(shoulder),distance=delta.length();
     const shortfall=Math.max(0,distance-reach+.055);
+    status.grabReachGeometry={shoulder:shoulder.asArray(),target:targets[1].asArray(),distance,reach,shortfall};
     grabReachShift=shortfall;
     if(shortfall>0&&distance>.0001){
      const shiftWorld=B.Vector3.TransformNormal(delta.scale(shortfall/distance),parent.computeWorldMatrix(true));
