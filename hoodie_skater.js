@@ -141,10 +141,14 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     // down. Legacy callers without a phase retain contact/recovery fallback.
     const phase=pushing&&Number.isFinite(pose.pushPhase)?
      ((pose.pushPhase%(2*Math.PI))+2*Math.PI)%(2*Math.PI):null;
+    // Ease the planting and lift-off velocity to zero at the stroke edges.
+    // Linear ramps used to snap the shoe into a pavement hold and back onto
+    // the grip; smoothstep preserves the same contact window and foot limits.
+    const smoothStep=t=>{const u=clamp(t,0,1);return u*u*(3-2*u)};
     const groundStroke=!pushing?0:phase===null?
      1-clamp(pose.recovery||0,0,1):phase<=Math.PI?
-     clamp(phase/(Math.PI*.25),0,1):
-     clamp((Math.PI*1.5-phase)/(Math.PI*.5),0,1);
+     smoothStep(phase/(Math.PI/3)):
+     1-smoothStep((phase-Math.PI)/(Math.PI*.5));
     const foot=v(pushing?.015-.245*groundStroke:.015,
       .45+lift+(back?rearPop:frontLevel),side*.36+(back?0:frontFlick));
     if(pushing){
