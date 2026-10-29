@@ -83,28 +83,25 @@ function install(B,scene,c){
  const mats=[],objects=[];
  function material(name,color){const m=new B.StandardMaterial(name,scene);m.diffuseColor=B.Color3.FromHexString(color);m.specularColor=new B.Color3(.04,.04,.04);m.alpha=1;m.transparencyMode=B.Material.MATERIAL_OPAQUE;mats.push(m);return m;}
  const concrete=material('Newberg weathered pale concrete','#c9c4b7'),coping=material('Newberg worn iron coping','#986f50'),grass=material('Ewing Young grass','#647754'),trunk=material('Oregon tree bark','#655245'),leaf=material('Oregon deciduous canopy','#899157'),pine=material('Oregon evergreen canopy','#3d5f4a'),steel=material('Newberg black entrance rails','#424744'),roof=material('Newberg shelter roof','#7e8279');
- // Generate mipmaps for the repeated fine aggregate: without them distant and
- // obliquely viewed concrete aliases into distracting diagonal bands.
- const tex=new B.DynamicTexture('Newberg concrete aggregate',{width:512,height:512},scene,true),ctx=tex.getContext();ctx.fillStyle='#c9c4b7';ctx.fillRect(0,0,512,512);
- // Use a decorrelated 32-bit generator for 2D aggregate coordinates. The
- // previous LCG put successive (x,y) samples on visible diagonal lattices.
+ // The old high-frequency tiled aggregate produced large diagonal bands
+ // in actual desktop/mobile Chromium screenshots. Use low-frequency,
+ // deterministic vertex weathering instead: no minified texture to alias.
  let seed=1301;const rnd=()=>{let t=(seed=(seed+0x6D2B79F5)>>>0);t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return ((t^(t>>>14))>>>0)/4294967296};
- // Soft, low-frequency weathering avoids the fine random speckle aliasing
- // that appeared as diagonal stripes on oblique concrete in real Chromium.
- for(let i=0;i<420;i++){
-  const x=rnd()*512,y=rnd()*512,r=10+rnd()*30;
-  const tint=ctx.createRadialGradient(x,y,0,x,y,r);
-  tint.addColorStop(0,i%3?'rgba(73,68,58,.065)':'rgba(255,255,244,.075)');
-  tint.addColorStop(1,'rgba(0,0,0,0)');
-  ctx.fillStyle=tint;ctx.fillRect(x-r,y-r,2*r,2*r);
- }tex.update();tex.uScale=12;tex.vScale=9;tex.anisotropicFilteringLevel=4;concrete.diffuseTexture=tex;
+ function hash2(x,z){let n=Math.imul(x,0x1f123bb5)^Math.imul(z,0x5f356495);n=Math.imul(n^(n>>>16),0x7feb352d);n=Math.imul(n^(n>>>15),0x846ca68b);return ((n^(n>>>16))>>>0)/4294967296}
+ function weather(x,z){
+  const i=Math.floor(x),j=Math.floor(z),u=x-i,v=z-j;
+  const a=u*u*(3-2*u),b=v*v*(3-2*v);
+  const left=hash2(i,j)*(1-a)+hash2(i+1,j)*a;
+  const right=hash2(i,j+1)*(1-a)+hash2(i+1,j+1)*a;
+  return left*(1-b)+right*b;
+ }
  function box(name,x,y,z,w,h,d,mat){const m=B.MeshBuilder.CreateBox(name,{width:w,height:h,depth:d},scene);m.position.set(x,y,z);m.material=mat;m.receiveShadows=true;objects.push(m);return m;}
  const positions=[],indices=[],uvs=[],colors=[];
  for(let j=0;j<=NZ;j++)for(let i=0;i<=NX;i++){
   const y=heights[j*(NX+1)+i];positions.push(-W/2+i*DX,y,-D/2+j*DZ);uvs.push(i/NX,j/NZ);
   // Baked ambient occlusion makes recessed floors legible under the open sky.
   // This shades the same solid concrete, rather than adding floating overlays.
-  const occlusion=.66+.34*clamp((y+4)/4,0,1);colors.push(occlusion,occlusion,occlusion,1);
+  const occlusion=.66+.34*clamp((y+4)/4,0,1),wear=.94+.06*weather(i/14,j/12);colors.push(occlusion*wear,occlusion*wear*.997,occlusion*wear*.992,1);
  }
  for(let j=0;j<NZ;j++)for(let i=0;i<NX;i++){const k=j*(NX+1)+i;indices.push(k,k+1,k+NX+1,k+1,k+NX+2,k+NX+1);}
  const terrain=new B.Mesh('NEWBERG SHARED CONCRETE SURFACE',scene),vd=new B.VertexData();vd.positions=positions;vd.indices=indices;vd.uvs=uvs;vd.colors=colors;vd.normals=[];B.VertexData.ComputeNormals(positions,indices,vd.normals);if(vd.normals[1]<0){for(let i=0;i<indices.length;i+=3)[indices[i+1],indices[i+2]]=[indices[i+2],indices[i+1]];B.VertexData.ComputeNormals(positions,indices,vd.normals);}vd.applyToMesh(terrain);terrain.material=concrete;terrain.receiveShadows=true;objects.push(terrain);
