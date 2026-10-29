@@ -30,6 +30,15 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  assert(rig.status.pushLean>.02&&rig.status.pushLean<.03,'Push recovery must relax the upper body');
  rig.update(state,pose);
  assert.equal(rig.status.pushLean,0,'Ordinary riding must not inherit the push hinge');
+ // A still-held PUSH input during takeoff must not leave the back foot on
+ // the ground, or carry the push crouch/lean into the airborne trick.
+ rig.update({...state,grounded:false},{...pose,pushing:true,contact:1});
+ assert.equal(rig.status.mode,'ollie');
+ assert.equal(rig.status.pushingNow,false);
+ assert.equal(rig.status.pushCompression,0);
+ assert.equal(rig.status.pushLean,0);
+ assert.equal(rig.status.armPose.counter,0);
+ assert(rig.status.feet[1][1]>.45,'Airborne trailing shoe must leave pavement even when PUSH remains held');
  rig.update({...state,grounded:false},pose);assert.equal(rig.status.mode,'ollie');assert(rig.status.armPose.lift>.12,'Ollie takeoff must lift arms');
  assert(rig.status.footPose.rearPop>.09&&rig.status.footPose.frontLevel<.01,'Rear foot must initiate ollie pop');
  for(let i=0;i<22;i++)rig.update({...state,grounded:false},pose);
