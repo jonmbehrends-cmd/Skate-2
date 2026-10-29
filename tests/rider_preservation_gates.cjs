@@ -64,7 +64,12 @@ function oracle(recs){
   h.was=!!s.grounded;
   const air=!s.grounded&&!grinding,flip=air&&Math.abs(s.flip||0)>0,plain=air&&!grab&&!flip;
   const hmode=grinding?'grind':grab?'grab':flip?'flip':air&&h.takeoff>.05?'ollie':air?'air':h.landing>.05?'landing':p.pushing?'push':(p.crouch||0)>.1?'crouch':Math.abs(s.speed)>1?'ride':'idle';
-  const crouch=clamp((p.crouch||0)*.20+h.landing*.15+h.takeoff*.06+(grab?.65:0)+(grinding?.12:0),0,.78);
+  // Intentional visual-only cruising knee flex. Keep the independent scalar
+  // oracle aligned with the hoodie while still rejecting unintended changes
+  // to push, landing, grind, airborne and V2 pose arithmetic.
+  const athleticCompression=s.grounded&&!grinding&&!p.pushing&&h.landing<=.05?
+   clamp(Math.abs(s.speed||0)/7,0,1)*.045:0;
+  const crouch=clamp((p.crouch||0)*.20+h.landing*.15+h.takeoff*.06+athleticCompression+(grab?.65:0)+(grinding?.12:0),0,.78);
   const push=p.pushing?.18+.25*clamp(p.contact||0,0,1)+.09*clamp(p.recovery||0,0,1):0;
   return {v2:{landing:v.landing,mode:v2mode,tuck},
    h:{mode:hmode,drop:h.landing*.20,rearPop:plain?h.takeoff*.11:0,frontLevel:plain?(1-h.takeoff)*.05:0,crouchDelta:crouch,pushCompression:push}};
@@ -224,7 +229,7 @@ function serve(){return new Promise(res=>{const s=http.createServer((q,r)=>{cons
   near(e.h.drop,.875*.20,'hoodie: edge=1, then one linear decay');near(e.h.crouchDelta,.875*.15+.75*.06,'crouch term');assert.equal(e.h.mode,'landing');});
  await t('[GATE] anchor: repeated ground has no edges; push compression',async()=>{
   const a=await run({windows:expand(TRACES['repeated-ground'].windows),hoodie:true});
-  for(const w of [0,1,3]){const e=lastOf(a,w);near(e.v2.landing,0,'v2');near(e.h.drop,0,'hoodie');near(e.h.crouchDelta,0,'crouch');near(e.h.pushCompression,0,'push');}
+  for(const w of [0,1,3]){const e=lastOf(a,w);near(e.v2.landing,0,'v2');near(e.h.drop,0,'hoodie');near(e.h.crouchDelta,5/7*.045,'cruising crouch');near(e.h.pushCompression,0,'push');}
   const p=lastOf(a,2);near(p.h.pushCompression,.18+.25*.5+.09*.25,'push compression');assert.equal(p.v2.mode,'push');assert.equal(p.h.mode,'push');});
  await t('[GATE] anchor: V2 exponential vs hoodie linear + dt clamp',async()=>{
   const a=await run({windows:expand(TRACES['landing-decay'].windows),hoodie:true}),edge=lastOf(a,1);
