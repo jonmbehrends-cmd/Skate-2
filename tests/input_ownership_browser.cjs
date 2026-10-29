@@ -54,6 +54,10 @@ async function openGame(browser, viewport, touch = false) {
   await page.addInitScript(() => {
     window.__SOL_TEST_TRICKS = [];
     window.__SOL_TEST_CLICKS = [];
+    window.__SOL_TEST_POINTERS = [];
+    document.addEventListener('pointerdown', event => {
+      window.__SOL_TEST_POINTERS.push({ target: event.target?.dataset?.t || event.target?.id || event.target?.tagName, trusted: event.isTrusted });
+    }, true);
     document.addEventListener('click', event => {
       if (!(event.target instanceof Element)) return;
       const button = event.target.closest('#buttons button');
@@ -101,12 +105,32 @@ async function main() {
       await page.evaluate(() => {
         window.__SOL_TEST_TRICKS.length = 0;
         window.__SOL_TEST_CLICKS.length = 0;
+        window.__SOL_TEST_POINTERS.length = 0;
       });
       const kick = page.locator('[data-t="kick"]');
       const box = await kick.boundingBox();
       await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
       await page.mouse.down();
-      await page.waitForFunction(() => window.__SOL_TEST_TRICKS.length === 1, null, { timeout: 2000 });
+      try {
+        // A software-rendered first frame can delay the initial trusted pointer event.
+        // Wait for at least one dispatch, then still require exactly one below.
+        await page.waitForFunction(() => window.__SOL_TEST_TRICKS.length > 0, null, { timeout: 8000 });
+      } catch (error) {
+        const diagnostic = await page.evaluate(() => {
+          const button = document.querySelector('[data-t="kick"]');
+          const rect = button.getBoundingClientRect();
+          return {
+            tricks: window.__SOL_TEST_TRICKS,
+            clicks: window.__SOL_TEST_CLICKS,
+            pointerEvents: window.__SOL_TEST_POINTERS,
+            hitTarget: document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2)?.outerHTML.slice(0, 160),
+            inputReady: window.__SOL_DIAGNOSTICS__?.inputReady
+          };
+        });
+        throw new Error(`Initial mouse press was not dispatched: ${JSON.stringify(diagnostic)}; ${error.message}`);
+      }
+      assert.deepEqual(await page.evaluate(() => window.__SOL_TEST_TRICKS), ['kick'],
+        'Pointerdown must dispatch one KICK before release');
       await page.waitForTimeout(700);
       await page.mouse.up();
       await page.waitForTimeout(100);
