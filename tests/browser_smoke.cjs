@@ -465,7 +465,8 @@ const server=http.createServer((req,res)=>{
     window.__qaTouchLaunch={dispatch:{button:button.dataset.t,
      trusted:event.isTrusted,pointerType:event.pointerType,frame:d.scene.getFrameId(),
      grounded:s.grounded,vy:s.vy,y:s.y,groundY:s.groundY,count:s.count,
-     flip:s.flip,spin:s.spin,name:s.name,request:s.grindRequestType}};
+     flip:s.flip,spin:s.spin,name:s.name,request:s.grindRequestType,
+     grinding:s.grinding,grindType:s.grindType,railKind:s.grindRail?.kind}};
    });
    d.scene.onAfterRenderObservable.add(()=>{
     const launch=window.__qaTouchLaunch;
@@ -474,7 +475,8 @@ const server=http.createServer((req,res)=>{
     const s=d.state;
     launch.render={frame:d.scene.getFrameId(),grounded:s.grounded,
      vy:s.vy,y:s.y,groundY:s.groundY,count:s.count,
-     flip:s.flip,spin:s.spin,name:s.name};
+     flip:s.flip,spin:s.spin,name:s.name,grinding:s.grinding,
+     grindType:s.grindType,railKind:s.grindRail?.kind};
    });
   });
   async function clickAndCaptureLaunch(name){
@@ -540,14 +542,21 @@ const server=http.createServer((req,res)=>{
   });
   assert(await page.locator('[data-t="boardslide"]').count()===1,'Touch BOARD SLIDE control must exist');
   const boardLaunch=await clickAndCaptureLaunch('boardslide');
+  const boardClick=boardLaunch.clicks?.find(event=>event.button==='boardslide');
+  const boardStillRising=boardLaunch.render.vy>0&&!boardLaunch.render.grounded&&
+   boardLaunch.render.y>boardLaunch.dispatch.y&&boardLaunch.render.name==='OLLIE'&&
+   boardLaunch.render.count===1;
+  const boardCaught=boardLaunch.render.grinding&&
+   boardLaunch.render.grindType==='boardslide'&&boardLaunch.render.railKind==='rail';
   assert(boardLaunch.dispatch.request==='boardslide'&&
    boardLaunch.dispatch.trusted&&
    boardLaunch.dispatch.name==='OLLIE'&&boardLaunch.dispatch.count===1&&
    boardLaunch.dispatch.vy>0&&!boardLaunch.dispatch.grounded&&
    boardLaunch.dispatch.y>boardLaunch.dispatch.groundY&&
-   boardLaunch.render.vy>0&&!boardLaunch.render.grounded&&
-   boardLaunch.render.y>boardLaunch.dispatch.y,
-   'Touch boardslide must request a real upward ollie before rail catch: '+JSON.stringify(boardLaunch));
+   boardClick&&boardClick.trusted&&boardClick.detail>0&&
+   boardClick.count===1&&boardClick.name==='OLLIE'&&
+   (boardStillRising||boardCaught),
+   'Touch boardslide must launch upward before continuing or catching its rail: '+JSON.stringify(boardLaunch));
   // Regression: GRIND and BOARD SLIDE both launch a real ollie before rail
   // capture, but GRIND must remain a 50-50 rather than a boardslide.
   await page.locator('#restart').click();
@@ -565,14 +574,21 @@ const server=http.createServer((req,res)=>{
    });
   });
   const grindLaunch=await clickAndCaptureLaunch('grind');
+  const grindClick=grindLaunch.clicks?.find(event=>event.button==='grind');
+  const grindStillRising=grindLaunch.render.vy>0&&!grindLaunch.render.grounded&&
+   grindLaunch.render.y>grindLaunch.dispatch.y&&grindLaunch.render.name==='OLLIE'&&
+   grindLaunch.render.count===1;
+  const grindCaught=grindLaunch.render.grinding&&
+   grindLaunch.render.grindType==='50-50'&&grindLaunch.render.railKind==='rail';
   assert(grindLaunch.dispatch.request==='50-50'&&
    grindLaunch.dispatch.trusted&&
    grindLaunch.dispatch.name==='OLLIE'&&grindLaunch.dispatch.count===1&&
    !grindLaunch.dispatch.grounded&&grindLaunch.dispatch.vy>0&&
    grindLaunch.dispatch.y>grindLaunch.dispatch.groundY&&
-   grindLaunch.render.vy>0&&!grindLaunch.render.grounded&&
-   grindLaunch.render.y>grindLaunch.dispatch.y,
-   'GRIND must show an upward ollie before 50-50 rail contact: '+JSON.stringify(grindLaunch));
+   grindClick&&grindClick.trusted&&grindClick.detail>0&&
+   grindClick.count===1&&grindClick.name==='OLLIE'&&
+   (grindStillRising||grindCaught),
+   'GRIND must launch upward before continuing or catching its 50-50 rail: '+JSON.stringify(grindLaunch));
   // Wait for a real simulated rail catch; wall-clock snapshots can miss
   // a brief grind when SwiftShader advances several frames between reads.
   await page.waitForFunction(()=>!!window.__qa5050,null,{timeout:6000});
@@ -581,13 +597,17 @@ const server=http.createServer((req,res)=>{
    'GRIND must automatically land a real 50-50 on the rail after takeoff: '+JSON.stringify(grindInput));
   await page.locator('#restart').click();
   const armedGrind=await clickAndCaptureLaunch('grind');
+  const armedGrindClick=armedGrind.clicks?.find(event=>event.button==='grind');
   assert(armedGrind.dispatch.request==='50-50'&&
    armedGrind.dispatch.trusted&&
    armedGrind.dispatch.name==='OLLIE'&&armedGrind.dispatch.count===1&&
-   !armedGrind.dispatch.grounded&&armedGrind.dispatch.vy>0&&
+   !armedGrind.dispatch.grounded&&!armedGrind.dispatch.grinding&&
+   armedGrind.dispatch.vy>0&&
    armedGrind.dispatch.y>armedGrind.dispatch.groundY&&
    armedGrind.render.vy>0&&!armedGrind.render.grounded&&
-   armedGrind.render.y>armedGrind.dispatch.y,
+   armedGrind.render.y>armedGrind.dispatch.y&&
+   armedGrindClick&&armedGrindClick.trusted&&armedGrindClick.detail>0&&
+   armedGrindClick.count===1&&armedGrindClick.name==='OLLIE',
    'GRIND away from a rail must ollie and arm a 50-50, not teleport or score: '+JSON.stringify(armedGrind));
   // RESTART must cancel pending airborne grind lockout, not just movement.
   await page.locator('#restart').click();
