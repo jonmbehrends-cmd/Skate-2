@@ -77,6 +77,9 @@ let browser;
     assert(Math.abs(f[0]-.015)<.035&&Math.abs(f[1]-.45)<.035&&Math.abs(f[2]+.36)<.035,
      'Recovered push foot must plant on deck: '+JSON.stringify(f));
    }
+   if(['ride','push-recovery','ollie','grind','landing'].includes(mode))
+    assert(evidence.status.toeDirections?.length===2&&evidence.status.toeDirections.every(t=>t[0]>.95&&Math.abs(t[1])<.1&&Math.abs(t[2])<.18),
+     'Both real GLB shoes must face across the board in '+mode+': '+JSON.stringify(evidence.status.toeDirections));
    if(mode==='ride')assert.equal(evidence.status.pushLean,0,'Neutral ride must have no push lean');
    if(mode==='landing'){
     assert(evidence.status.landingCompression>.14&&evidence.status.landingHinge>.08,
