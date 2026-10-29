@@ -58,12 +58,18 @@ let browser;
    await page.screenshot({path:path.join(out,'skeletal-'+label+'-'+mode+'-closeup.png')});
    // A single three-quarter camera can conceal an anatomically implausible
    // seated or prone grab. Preserve real GLB side/opposite-side WebGL evidence.
-   if(mode==='grab'){
+   if(mode==='grab'||mode==='grind'){
     for(const [view,alpha] of [['side',0],['opposite',Math.PI]]){
      await page.evaluate(angle=>{const d=__SOL_DIAGNOSTICS__;d.scene.activeCamera.alpha=angle;d.scene.render()},alpha);
-     await page.screenshot({path:path.join(out,'skeletal-'+label+'-grab-'+view+'.png')});
+     await page.screenshot({path:path.join(out,'skeletal-'+label+'-'+mode+'-'+view+'.png')});
     }
     await page.evaluate(()=>{const d=__SOL_DIAGNOSTICS__;d.scene.activeCamera.alpha=-.9;d.scene.render()});
+   }
+   if(mode==='grind'){
+    assert(evidence.status.grindLean>.08&&evidence.status.grindLean<.09,
+     'Real hoodie grind pose must lean across the trucks');
+    assert(evidence.status.feet.every(f=>Math.abs(f[1]-.45)<.035),
+     'Real hoodie grind must keep both shoes on the board');
    }
    if(mode==='grab'){const dist=Math.hypot(...evidence.status.hands[1].map((n,i)=>n-evidence.status.grip[i]));assert(dist<.12,'Hoodie hand must touch board: '+JSON.stringify({dist,hands:evidence.status.hands,grip:evidence.status.grip,feet:evidence.status.feet}));
     assert(evidence.status.grabReachShift<.45,'Grab must not require extreme chest displacement: '+evidence.status.grabReachShift);
