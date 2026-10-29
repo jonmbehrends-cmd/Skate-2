@@ -179,7 +179,12 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     // rather than jut forward across the nose of the skateboard. Change only
     // the visual IK bend plane: ankle targets, fixed limb lengths, physics,
     // board transform and ordinary ride/air/grind poles stay untouched.
-    const kneePole=pushing?v(.36,.65,-.82):v(.8,.65,side*.50);
+    // Fade the bend plane back to the ordinary deck stance during recovery;
+    // otherwise releasing PUSH would snap the knee even though the ankle is
+    // already replanted. groundStroke is eased and continuous at phase wrap.
+    const kneePole=pushing?
+     B.Vector3.Lerp(v(.8,.65,side*.50),v(.36,.65,-.82),groundStroke):
+     v(.8,.65,side*.50);
     solve(legs[i].n,foot,kneePole);
     placeDetached(detachedFeet[i],localPosition(legs[i].n[2]));
     orient(detachedFeet[i],shoeRotation);
