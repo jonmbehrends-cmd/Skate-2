@@ -12,12 +12,16 @@ jobs:
     timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
       - run: npm install --no-save playwright@1.55.1
       - run: npx playwright install chromium
       - run: node --check newberg_park.js && node tests/check_inline.cjs
+      - run: node --check park_surface_art.js && node tests/park_surface_art.cjs
+      - run: node tests/park_realism_browser.cjs
       - run: node tests/newberg_surface.cjs
       - run: node tests/spot_picker_browser.cjs
       - run: node tests/shallow_vert_launch.cjs
