@@ -66,7 +66,10 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
   // The board runs along Z; both toes should point across it (+X).
   const deckFootRotations=detachedFeet.map((foot,i)=>{
    const toe=localPosition(toeEnds[i]).subtract(localPosition(foot));
-   const yaw=Math.atan2(toe.z,toe.x);
+   // Babylon's imported foot bind orientation reverses the apparent toe axis
+   // when reparented into the stance frame; rotate by a half turn so the
+   // *rendered* toe joints point toward +X rather than -X.
+   const yaw=Math.atan2(toe.z,toe.x)+Math.PI;
    return B.Quaternion.RotationAxis(B.Axis.Y,yaw).multiply(footRotations[i]);
   });
   
