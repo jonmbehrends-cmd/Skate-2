@@ -52,12 +52,16 @@ let browser;
    await page.waitForTimeout(130); // Let the active FollowCamera render the jumped district.
    const state=await page.evaluate(()=>{
     const d=__SOL_DIAGNOSTICS__,s=d.state,p=SOLNewberg,B=BABYLON,engine=d.engine;
+    // Use the active camera's current view/projection matrices, not the
+    // scene's previous-camera transform cache (which may still be overview).
+    const transform=d.camera.getViewMatrix(true).multiply(d.camera.getProjectionMatrix(true));
     const rendered=B.Vector3.Project(new B.Vector3(s.x,s.y+1.05,s.z),
-     B.Matrix.Identity(),d.scene.getTransformMatrix(),
-     d.scene.activeCamera.viewport.toGlobal(engine.getRenderWidth(),engine.getRenderHeight()));
+     B.Matrix.Identity(),transform,
+     d.camera.viewport.toGlobal(engine.getRenderWidth(),engine.getRenderHeight()));
     const cameraDistance=B.Vector3.Distance(d.camera.position,new B.Vector3(s.x,s.y,s.z));
     return {x:s.x,y:s.y,z:s.z,dir:s.dir,speed:s.speed,ground:p.height(s.x,s.z),score:s.score,
      cameraDistance,screen:{x:rendered.x,y:rendered.y,w:engine.getRenderWidth(),h:engine.getRenderHeight()},
+     cameraPosition:d.camera.position.asArray(),cameraRotation:d.camera.rotation.asArray(),
      grounded:s.grounded,grinding:s.grinding,air:!!s.bowlAir,grindRail:!!s.grindRail,
      pushHeld:d.input().pushHeld,pushBurstUntil:s.pushBurstUntil,activeCamera:d.scene.activeCamera.name,
      followCamera:d.camera.name,hoodie:d.rig.status.source,bones:d.rig.status.bones};
@@ -68,6 +72,9 @@ let browser;
    assert(state.score===1250&&state.grounded&&!state.grinding&&!state.air&&!state.grindRail,
     'Travel did not safely reset previous run while preserving score: '+JSON.stringify(state));
    assert(state.speed<.1&&!state.pushHeld&&state.pushBurstUntil===0,'Input/momentum was carried into a new district: '+JSON.stringify(state));
+   if(spot.id==='river'||spot.id==='competition'){
+    await page.screenshot({path:path.join(out,label+'-'+spot.id+'-after-jump.png')});
+   }
    assert(state.activeCamera===state.followCamera,'Travel must restore gameplay-follow camera: '+JSON.stringify(state));
    assert(state.cameraDistance<30,'Long-distance district jump left FollowCamera stranded at previous spot: '+JSON.stringify(state));
    assert(state.screen.x>state.screen.w*.15&&state.screen.x<state.screen.w*.85
