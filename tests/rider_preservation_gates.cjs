@@ -69,7 +69,10 @@ function oracle(recs){
   // to push, landing, grind, airborne and V2 pose arithmetic.
   const athleticCompression=s.grounded&&!grinding&&!p.pushing&&h.landing<=.05?
    clamp(Math.abs(s.speed||0)/7,0,1)*.045:0;
-  const crouch=clamp((p.crouch||0)*.20+h.landing*.15+h.takeoff*.06+athleticCompression+(grab?.65:0)+(grinding?.12:0),0,.78);
+  // Intentional hoodie-only grab visual change: keep the independent oracle
+  // aligned to 0.57m; V2 matrices, inputs, gameplay and all other scalars
+  // remain under the original frozen-input preservation gates.
+  const crouch=clamp((p.crouch||0)*.20+h.landing*.15+h.takeoff*.06+athleticCompression+(grab?.57:0)+(grinding?.12:0),0,.78);
   const push=p.pushing?.18+.25*clamp(p.contact||0,0,1)+.09*clamp(p.recovery||0,0,1):0;
   return {v2:{landing:v.landing,mode:v2mode,tuck},
    h:{mode:hmode,drop:h.landing*.20,rearPop:plain?h.takeoff*.11:0,frontLevel:plain?(1-h.takeoff)*.05:0,crouchDelta:crouch,pushCompression:push}};
