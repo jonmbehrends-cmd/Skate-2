@@ -63,7 +63,7 @@ let browser;
     d.rig.update(state,stance,{grabbing:mode==='grab',grinding:mode==='grind'});
     d.scene.render();
     const r=d.rig.status;
-    return {mode:r.mode,feet:r.feet,hands:r.hands,grip:r.grip,reach:r.grabReachShift,
+    return {mode:r.mode,feet:r.feet,hands:r.hands,grip:r.grip,reach:r.grabReachShift,hipClearance:r.legGeometry[0].hip[1]-r.legGeometry[0].foot[1],
      skinned:d.rig.meshes.filter(m=>m.skeleton&&m.isVisible).length,
      finite:Array.from(d.rig.skeletons[0].getTransformMatrices(d.rig.meshes[0])).every(Number.isFinite)};
    },mode);
@@ -72,6 +72,7 @@ let browser;
    if(mode==='grab'){
     const distance=Math.hypot(...pose.hands[1].map((n,i)=>n-pose.grip[i]));
     assert(distance<.12&&pose.reach<.45,'Grab must contact deck without extreme torso shift: '+JSON.stringify({distance,pose}));
+    assert(pose.hipClearance>.22,'Grab hips must remain above planted shoes: '+JSON.stringify(pose));
    }
    if(mode==='push')assert(pose.feet[1][1]<.25,'Grounded push foot must contact pavement');
    if(mode==='push-recovery'||mode==='push-cycle-end'){
