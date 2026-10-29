@@ -1,7 +1,9 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
-const meshes=[],materials=[];
-class Material{constructor(name){this.name=name;materials.push(this)}}
+const meshes=[],materials=[],textures=[];
+class Material{constructor(name){this.name=name;materials.push(this)}dispose(){this.disposed=true}}
 class Texture{
+ constructor(){textures.push(this)}
+ dispose(){this.disposed=true}
  getContext(){const noop=()=>{};return {fillRect:noop,save:noop,restore:noop,translate:noop,rotate:noop,beginPath:noop,moveTo:noop,lineTo:noop,stroke:noop,fillText:noop}}
  update(){}
 }
@@ -53,6 +55,10 @@ assert(meshes.every(m=>m.isPickable===false&&m.checkCollisions===false),
  'All architecture remains visual-only');
 assert.equal(park.meshes.length,meshes.length);
 park.dispose();assert(meshes.every(m=>m.disposed),'Architecture must clean up its meshes');
+assert(materials.every(m=>m.disposed),'Architecture must dispose all owned GPU materials');
+assert(textures.every(t=>t.disposed),'Architecture must release its dynamic mural atlas');
+park.dispose();assert(materials.every(m=>m.disposed)&&textures.every(t=>t.disposed),
+ 'Repeated park disposal must be harmless');
 // Verify the two real 38m halfpipe decks receive solid, below-deck fascia
 // hardware rather than floating/pickable geometry in the transition lanes.
 const decks=[
@@ -80,4 +86,6 @@ assert(bands.every(m=>m.material?.name==='park edge markings'&&m.material.alpha=
  m.material.forceDepthWrite===true&&m.material.transparencyMode===B.Material.MATERIAL_OPAQUE),
  'Safety bands must use opaque depth-writing inlaid marking paint');
 detailed.dispose();assert(meshes.every(m=>m.disposed),'New fascia details must dispose with the park');
-console.log('PASS opaque non-colliding halfpipe fascia stripes, anchor plates and bolt heads on both decks');
+assert(materials.every(m=>m.disposed),'Every park build must dispose its own materials');
+assert(textures.every(t=>t.disposed),'Every park build must dispose its own mural texture');
+console.log('PASS opaque park hardware and complete Babylon material/texture teardown');

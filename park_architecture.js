@@ -163,7 +163,18 @@ function build(B,scene,ramps){
    }
   }
  }
- return {meshes:objects,dispose(){for(const mesh of objects)mesh.dispose();}};
+ // All of these Babylon resources belong to this build. Disposing meshes alone
+ // leaves PBR/Standard materials and the dynamic mural atlas resident on the GPU
+ // when a park scene is rebuilt (especially costly on mobile WebGL).
+ const ownedMaterials=[cement,dark,metal,yellow,fixture,lamp,muralMat,flowTeal,flowOchre];
+ let disposed=false;
+ return {meshes:objects,dispose(){
+  if(disposed)return;
+  disposed=true;
+  for(const mesh of objects)mesh.dispose();
+  for(const mat of ownedMaterials)mat.dispose();
+  muralTexture.dispose();
+ }};
 }
 root.SOLParkArchitecture={build};
 })(typeof window!=='undefined'?window:globalThis);
