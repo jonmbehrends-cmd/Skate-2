@@ -233,7 +233,15 @@ function install(B,scene,c){
  document.querySelector('#hud span').textContent='CHEHALEM + SOL EXPANSION';
  root.SOLBowl={bowl:{x:0,z:0,radius:0,depth:3.9},height,gradient,sample,groundTravel,roll,vertLaunch,guideAir,land,mesh:()=>terrain};
  installGrinds();
- root.__SOL_DIAGNOSTICS__.park={name:'Newberg / Chehalem',replica:'Photo-derived core; original SOL expansion',terrain,terrainMeshes,basins,rails,objects,shadow,width:W,depth:D,spawn:{x:-22,z:-19}};
+ // Batch repeated static box fixtures by material; rider/skinned meshes,
+ // culled terrain tiles, coping and named light/trunk diagnostics are isolated.
+ // This controls CPU submissions as the park grows without adding per-frame work.
+ const fixtureBatches=[];
+ for(const mat of mats){const group=objects.filter(m=>m.material===mat&&m.getTotalVertices()===24&&m.name!=='perimeter light mast');if(group.length<2)continue;
+  const blocksCamera=group.some(m=>c.cameraObstacles.has(m.name)),batch=B.Mesh.MergeMeshes(group,true,true,undefined,false,false);
+  if(batch){batch.name='SOL static fixtures '+mat.name;batch.receiveShadows=true;if(blocksCamera)c.cameraObstacles.add(batch.name);for(const m of group){const i=objects.indexOf(m);if(i>=0)objects.splice(i,1);}objects.push(batch);fixtureBatches.push({material:mat.name,before:group.length,after:1});}
+ }
+ root.__SOL_DIAGNOSTICS__.park={name:'Newberg / Chehalem',replica:'Photo-derived core; original SOL expansion',terrain,terrainMeshes,basins,rails,objects,shadow,fixtureBatches,width:W,depth:D,spawn:{x:-22,z:-19}};
  for(const m of terrainMeshes){c.cameraObstacles.add(m.name);m.freezeWorldMatrix();}for(const m of objects)if(!m.isWorldMatrixFrozen)m.freezeWorldMatrix();
  return {terrain,objects};
 }
