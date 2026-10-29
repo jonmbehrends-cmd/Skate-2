@@ -52,18 +52,24 @@ let browser;
   await page.evaluate(()=>{for(let i=0;i<40;i++)__SOL_DIAGNOSTICS__.rig.update({grounded:true,speed:5},{crouch:0},{dt:1/60})});
   const signatures=new Map();
   for(const mode of ['ride','push','push-toe-lift','push-recovery','push-cycle-end','crouch','ollie','push-ollie','flip','grab','grind','landing']){
-   const evidence=await page.evaluate(mode=>{const d=__SOL_DIAGNOSTICS__,state={grounded:['ride','push','push-toe-lift','push-recovery','push-cycle-end','crouch','landing'].includes(mode),speed:5,travelSign:1,flip:mode==='flip'?1:0};const pose={crouch:mode==='crouch'?.23:.1,pushing:['push','push-toe-lift','push-recovery','push-cycle-end','push-ollie'].includes(mode),contact:mode==='push-toe-lift'||mode==='push-recovery'||mode==='push-cycle-end'?0:.8,recovery:mode==='push-toe-lift'?.7:mode==='push-recovery'?1:0,pushPhase:mode==='push'?Math.PI/2:mode==='push-toe-lift'?Math.PI*1.25:mode==='push-recovery'?Math.PI*1.5:mode==='push-cycle-end'?2*Math.PI-.001:undefined};d.rig.update(state,pose,{grabbing:mode==='grab',grinding:mode==='grind'});d.scene.render();return {status:d.rig.status,matrices:Array.from(d.rig.skeletons[0].getTransformMatrices(d.rig.meshes[0])),vertices:d.rig.meshes[0].getTotalVertices()};},mode);
+   const evidence=await page.evaluate(mode=>{const d=__SOL_DIAGNOSTICS__,state={grounded:['ride','push','push-toe-lift','push-recovery','push-cycle-end','crouch','landing'].includes(mode),speed:5,travelSign:1,flip:mode==='flip'?1:0,airTime:mode==='flip'?.21:0};const pose={crouch:mode==='crouch'?.23:.1,pushing:['push','push-toe-lift','push-recovery','push-cycle-end','push-ollie'].includes(mode),contact:mode==='push-toe-lift'||mode==='push-recovery'||mode==='push-cycle-end'?0:.8,recovery:mode==='push-toe-lift'?.7:mode==='push-recovery'?1:0,pushPhase:mode==='push'?Math.PI/2:mode==='push-toe-lift'?Math.PI*1.25:mode==='push-recovery'?Math.PI*1.5:mode==='push-cycle-end'?2*Math.PI-.001:undefined};d.rig.update(state,pose,{grabbing:mode==='grab',grinding:mode==='grind'});d.scene.render();return {status:d.rig.status,matrices:Array.from(d.rig.skeletons[0].getTransformMatrices(d.rig.meshes[0])),vertices:d.rig.meshes[0].getTotalVertices()};},mode);
    assert(evidence.vertices>100);assert(evidence.matrices.every(Number.isFinite));
    if(mode==='ollie')assert.equal(evidence.status.mode,'ollie','Takeoff pose must render in Chromium');signatures.set(mode,JSON.stringify(evidence.matrices));
    await page.screenshot({path:path.join(out,'skeletal-'+label+'-'+mode+'-closeup.png')});
    // A single three-quarter camera can conceal an anatomically implausible
    // seated or prone grab. Preserve real GLB side/opposite-side WebGL evidence.
-   if(mode==='grab'||mode==='grind'){
+   if(mode==='grab'||mode==='grind'||mode==='flip'){
     for(const [view,alpha] of [['side',0],['opposite',Math.PI]]){
      await page.evaluate(angle=>{const d=__SOL_DIAGNOSTICS__;d.scene.activeCamera.alpha=angle;d.scene.render()},alpha);
      await page.screenshot({path:path.join(out,'skeletal-'+label+'-'+mode+'-'+view+'.png')});
     }
     await page.evaluate(()=>{const d=__SOL_DIAGNOSTICS__;d.scene.activeCamera.alpha=-.9;d.scene.render()});
+   }
+   if(mode==='flip'){
+    assert(evidence.status.flipFootPitch>.15&&evidence.status.flipFootPitch<.17,
+     'Real hoodie kickflip must rotate the leading ankle in Chromium');
+    assert(evidence.status.toeDirections[0][1]<-.08&&Math.abs(evidence.status.toeDirections[1][1])<.1,
+     'Actual skinned GLB toes must flick down on the leading foot only');
    }
    if(mode==='grind'){
     assert(evidence.status.grindLean>.08&&evidence.status.grindLean<.09,
