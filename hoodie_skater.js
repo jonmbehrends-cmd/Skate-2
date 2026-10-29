@@ -108,7 +108,10 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    // The ground-reaching push shoe sits below the deck. Compress the hips
    // during contact so the fixed-length leg can actually reach pavement;
    // recover gradually as the shoe swings back, without stretching bones.
-   const pushCompression=pushingNow?.18+.25*clamp(pose.contact||0,0,1)+.09*clamp(pose.recovery||0,0,1):0;
+   // A deep pelvis drop makes the planted knee rise into a high-step pose.
+    // Reduce only the visual push compression while preserving the rear
+    // pavement target, stroke timing, fixed limb lengths and board physics.
+    const pushCompression=pushingNow?.15+.22*clamp(pose.contact||0,0,1)+.09*clamp(pose.recovery||0,0,1):0;
    status.pushCompression=pushCompression;
    rig.position.y=.33-lo*scale-.16-crouch-pushCompression;
    // Babylon may cache ancestor matrices between consecutive gameplay poses.

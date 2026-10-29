@@ -70,7 +70,7 @@ function oracle(recs){
   const athleticCompression=s.grounded&&!grinding&&!p.pushing&&h.landing<=.05?
    clamp(Math.abs(s.speed||0)/7,0,1)*.045:0;
   const crouch=clamp((p.crouch||0)*.20+h.landing*.15+h.takeoff*.06+athleticCompression+(grab?.65:0)+(grinding?.12:0),0,.78);
-  const push=p.pushing?.18+.25*clamp(p.contact||0,0,1)+.09*clamp(p.recovery||0,0,1):0;
+  const push=p.pushing?.15+.22*clamp(p.contact||0,0,1)+.09*clamp(p.recovery||0,0,1):0;
   return {v2:{landing:v.landing,mode:v2mode,tuck},
    h:{mode:hmode,drop:h.landing*.20,rearPop:plain?h.takeoff*.11:0,frontLevel:plain?(1-h.takeoff)*.05:0,crouchDelta:crouch,pushCompression:push}};
  });
@@ -230,7 +230,7 @@ function serve(){return new Promise(res=>{const s=http.createServer((q,r)=>{cons
  await t('[GATE] anchor: repeated ground has no edges; push compression',async()=>{
   const a=await run({windows:expand(TRACES['repeated-ground'].windows),hoodie:true});
   for(const w of [0,1,3]){const e=lastOf(a,w);near(e.v2.landing,0,'v2');near(e.h.drop,0,'hoodie');near(e.h.crouchDelta,5/7*.045,'cruising crouch');near(e.h.pushCompression,0,'push');}
-  const p=lastOf(a,2);near(p.h.pushCompression,.18+.25*.5+.09*.25,'push compression');assert.equal(p.v2.mode,'push');assert.equal(p.h.mode,'push');});
+  const p=lastOf(a,2);near(p.h.pushCompression,.15+.22*.5+.09*.25,'push compression');assert.equal(p.v2.mode,'push');assert.equal(p.h.mode,'push');});
  await t('[GATE] anchor: V2 exponential vs hoodie linear + dt clamp',async()=>{
   const a=await run({windows:expand(TRACES['landing-decay'].windows),hoodie:true}),edge=lastOf(a,1);
   near(edge.v2.landing,Math.exp(-.25),'v2 edge call is already decayed');near(edge.h.drop,.20,'hoodie edge call is exactly 1');
