@@ -56,6 +56,15 @@ let browser;
    assert(evidence.vertices>100);assert(evidence.matrices.every(Number.isFinite));
    if(mode==='ollie')assert.equal(evidence.status.mode,'ollie','Takeoff pose must render in Chromium');signatures.set(mode,JSON.stringify(evidence.matrices));
    await page.screenshot({path:path.join(out,'skeletal-'+label+'-'+mode+'-closeup.png')});
+   // A single three-quarter camera can conceal an anatomically implausible
+   // seated or prone grab. Preserve real GLB side/opposite-side WebGL evidence.
+   if(mode==='grab'){
+    for(const [view,alpha] of [['side',0],['opposite',Math.PI]]){
+     await page.evaluate(angle=>{const d=__SOL_DIAGNOSTICS__;d.scene.activeCamera.alpha=angle;d.scene.render()},alpha);
+     await page.screenshot({path:path.join(out,'skeletal-'+label+'-grab-'+view+'.png')});
+    }
+    await page.evaluate(()=>{const d=__SOL_DIAGNOSTICS__;d.scene.activeCamera.alpha=-.9;d.scene.render()});
+   }
    if(mode==='grab'){const dist=Math.hypot(...evidence.status.hands[1].map((n,i)=>n-evidence.status.grip[i]));assert(dist<.12,'Hoodie hand must touch board: '+JSON.stringify({dist,hands:evidence.status.hands,grip:evidence.status.grip,feet:evidence.status.feet}));
     assert(evidence.status.grabReachShift<.45,'Grab must not require extreme chest displacement: '+evidence.status.grabReachShift);
    }
@@ -128,8 +137,19 @@ let browser;
   results.push({label:'mobile-real-push-'+park,result:'PASS',before,after});
   await touchPage.close();
  }
- const fallback=await browser.newPage();await fallback.route('**/hoodie-character.glb',r=>r.abort());await fallback.goto(url);await fallback.waitForFunction(()=>window.__SOL_DIAGNOSTICS__);await fallback.waitForTimeout(1000);
- assert(await fallback.evaluate(()=>!__SOL_DIAGNOSTICS__.rig&&__SOL_DIAGNOSTICS__.riderV2?.meshes.some(m=>m.isVisible&&m.isEnabled()&&m.skeleton&&m.getTotalVertices()>0)),'GLB load failure must preserve visible, skinned V2 fallback');
- await fallback.close();
+ // Verify fallback visually at both viewport sizes. The production GLB
+ // intentionally fails to load; a skinned, visible V2 rider must remain.
+ for(const mobile of [false,true]){
+  const label=mobile?'mobile':'desktop';
+  const fallback=await browser.newPage({viewport:mobile?{width:390,height:844}:{width:1280,height:800},hasTouch:mobile,isMobile:mobile,deviceScaleFactor:1});
+  await fallback.route('**/hoodie-character.glb',r=>r.abort());
+  await fallback.goto(url);
+  await fallback.waitForFunction(()=>window.__SOL_DIAGNOSTICS__);
+  await fallback.waitForTimeout(1000);
+  assert(await fallback.evaluate(()=>!__SOL_DIAGNOSTICS__.rig&&__SOL_DIAGNOSTICS__.riderV2?.meshes.some(m=>m.isVisible&&m.isEnabled()&&m.skeleton&&m.getTotalVertices()>0)),
+   'GLB load failure must preserve visible, skinned V2 fallback ('+label+')');
+  await fallback.screenshot({path:path.join(out,'skeletal-'+label+'-fallback.png')});
+  await fallback.close();
+ }
  fs.writeFileSync(path.join(out,'skeletal-result.json'),JSON.stringify({url,result:'PASS',commit:process.env.GITHUB_SHA,results},null,2));console.log('PASS desktop/mobile Chromium: real GLB, skin deformation, gameplay push/flip/landing, adult hoodie IK poses, fallback, no startup errors');
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(async()=>{if(browser)await browser.close();server.close()});
