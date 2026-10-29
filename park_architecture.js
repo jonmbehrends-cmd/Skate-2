@@ -19,6 +19,7 @@ function build(B,scene,ramps){
  metal.alpha=1;metal.transparencyMode=B.Material.MATERIAL_OPAQUE;
  metal.forceDepthWrite=true;
  const yellow=material('park edge markings','#d7aa50',true);
+ yellow.alpha=1;yellow.transparencyMode=B.Material.MATERIAL_OPAQUE;yellow.forceDepthWrite=true;
  // Warm, solid wall-mounted industrial fixtures: emissive appearance without
  // expensive dynamic lights or any changes to the skating collision world.
  const fixture=material('recessed wall light housing','#323b3f',false);
