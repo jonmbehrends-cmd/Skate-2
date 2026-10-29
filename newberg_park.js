@@ -9,7 +9,7 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 // connected area has one rim: overlapping primitive bowls made artificial
 // ridges and internal coping across the deep return and shallow flow channel.
 const basins=[
- {name:'deep end',depth:3.9,run:6.5,knots:[[28,10],[28,16],[26,19.5],[20,20],[12,21],[3,21],[-1,18],[-1,14],[3,11],[9,10],[10,5],[10,0],[14,-1],[20,0],[26,1],[28,5]]},
+ {name:'deep end',depth:3.9,run:6.5,knots:[[28,10],[28,16],[26,19.5],[20,20],[12,21],[3,21],[-1,18],[-1,14],[3,11],[9,10],[10,5],[10,1],[12,-2],[16,-3],[21,-2],[26,1],[28,5]]},
  {name:'west kidney and snake run',depth:1.5,run:4.4,knots:[[-27,5],[-25,-.5],[-21,-3],[-16,-2],[-13,1],[-10,5.2],[-4,5.2],[2,4],[5,7],[3,10],[-3,11],[-9,12],[-14,14],[-20,15],[-25,12]]},
  {name:'shallow capsule',depth:1.5,run:4.2,knots:[[4,-12],[5,-16],[10,-18],[20,-18],[25,-16],[26,-12],[25,-8],[20,-6],[10,-6],[5,-8]]},
  {name:'beginner pocket',depth:.95,run:3.6,knots:[[-27,-11],[-26,-15],[-22,-17.5],[-17,-17.5],[-12,-15],[-10.5,-11],[-12,-7],[-17,-5],[-22,-5],[-26,-7]]}

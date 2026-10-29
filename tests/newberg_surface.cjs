@@ -10,6 +10,15 @@ assert.equal(p.basins.length,4);
 // A positive hump overlapping a recessed channel must fade into that floor,
 // rather than falling from deck height at the edge of its support radius.
 assert(Math.abs(p.height(-7.8,4.4)-p.height(-7.8,4.6))<.2,'Roll-over edge became a vertical step into the snake run');
+// Reproduced from the independent corner review: an overly tight rim made
+// a 36-degree normal snap across this interior valley at 8 m/s, 25 ms/step.
+let previousNormal=null;
+for(let i=0;i<15;i++){
+ const s=p.surface(10.88+.630*.2*i,2.34-.776*.2*i),normal=[-s.x,1,-s.z],length=Math.hypot(...normal);
+ for(let k=0;k<3;k++)normal[k]/=length;
+ if(previousNormal){const dot=normal.reduce((sum,v,k)=>sum+v*previousNormal[k],0);assert(Math.acos(Math.max(-1,Math.min(1,dot)))<Math.PI/12,'Deep corner changed surface normal by more than 15 degrees in one riding step');}
+ previousNormal=normal;
+}
 for(const basin of p.basins){
  const rim=basin.rim,area=rim.reduce((sum,a,i)=>{const b=rim[(i+1)%rim.length];return sum+a[0]*b[1]-a[1]*b[0]},0)/2;
  assert(area>0,'Coping offset requires counterclockwise rims');
