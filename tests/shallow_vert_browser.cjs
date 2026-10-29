@@ -50,7 +50,7 @@ let browser;
     for(let i=0;i<25;i++){
      window.__shallowClock+=25;window.__shallowLoop();
      maxStep=Math.max(maxStep,Math.hypot(s.x-last.x,s.z-last.z));last={x:s.x,z:s.z,y:s.y};
-     if(s.bowlStats.launches>0){takeoff={frame:i,x:s.x,y:s.y,z:s.z,vy:s.vy,grounded:s.grounded,kind:s.name};break;}
+     if(s.bowlStats.launches>0){takeoff={frame:i,x:s.x,y:s.y,z:s.z,vy:s.vy,grounded:s.grounded,kind:s.name,shallow:s.bowlAir?.shallow,pitch:d.skater.rotation.x};break;}
     }
     if(takeoff){
      const old=d.scene.activeCamera;
@@ -64,6 +64,8 @@ let browser;
    assert(launch.takeoff?.vy>0&&!launch.takeoff.grounded&&launch.takeoff.kind==='NEWBERG VERT AIR',
     'Running engine did not launch shallow '+label+'/'+spot.name+': '+JSON.stringify(launch));
    assert(launch.maxStep<.5,'Unexpected horizontal teleport '+JSON.stringify(launch));
+   assert(launch.takeoff.shallow&&Math.abs(launch.takeoff.pitch)<.82,
+    'Shallow takeoff must not pitch the visible hoodie nearly horizontal: '+JSON.stringify(launch));
    assert(launch.bones===62&&launch.source.includes('quaternius-hoodie'),'Production hoodie missing');
    await page.screenshot({path:path.join(out,label+'-'+spot.name+'-air.png')});
    // Continue the *same* production-loop flight through actual gravity, turn
