@@ -49,9 +49,15 @@ let browser;
    await tap(page.locator('#spotsToggle'));
    await tap(page.locator('#spotsPanel [data-spot="'+spot.id+'"]'));
    assert.equal(await page.locator('#spotsPanel').isVisible(),false,'Selection must close after travel');
+   await page.waitForTimeout(130); // Let the active FollowCamera render the jumped district.
    const state=await page.evaluate(()=>{
-    const d=__SOL_DIAGNOSTICS__,s=d.state,p=SOLNewberg;
+    const d=__SOL_DIAGNOSTICS__,s=d.state,p=SOLNewberg,B=BABYLON,engine=d.engine;
+    const rendered=B.Vector3.Project(new B.Vector3(s.x,s.y+1.05,s.z),
+     B.Matrix.Identity(),d.scene.getTransformMatrix(),
+     d.scene.activeCamera.viewport.toGlobal(engine.getRenderWidth(),engine.getRenderHeight()));
+    const cameraDistance=B.Vector3.Distance(d.camera.position,new B.Vector3(s.x,s.y,s.z));
     return {x:s.x,y:s.y,z:s.z,dir:s.dir,speed:s.speed,ground:p.height(s.x,s.z),score:s.score,
+     cameraDistance,screen:{x:rendered.x,y:rendered.y,w:engine.getRenderWidth(),h:engine.getRenderHeight()},
      grounded:s.grounded,grinding:s.grinding,air:!!s.bowlAir,grindRail:!!s.grindRail,
      pushHeld:d.input().pushHeld,pushBurstUntil:s.pushBurstUntil,activeCamera:d.scene.activeCamera.name,
      followCamera:d.camera.name,hoodie:d.rig.status.source,bones:d.rig.status.bones};
@@ -63,6 +69,10 @@ let browser;
     'Travel did not safely reset previous run while preserving score: '+JSON.stringify(state));
    assert(state.speed<.1&&!state.pushHeld&&state.pushBurstUntil===0,'Input/momentum was carried into a new district: '+JSON.stringify(state));
    assert(state.activeCamera===state.followCamera,'Travel must restore gameplay-follow camera: '+JSON.stringify(state));
+   assert(state.cameraDistance<30,'Long-distance district jump left FollowCamera stranded at previous spot: '+JSON.stringify(state));
+   assert(state.screen.x>state.screen.w*.15&&state.screen.x<state.screen.w*.85
+    &&state.screen.y>state.screen.h*.10&&state.screen.y<state.screen.h*.90,
+    'Skater must appear on-screen after district travel: '+JSON.stringify({spot,state}));
    assert(state.hoodie.includes('quaternius-hoodie')&&state.bones===62,'Licensed skater missing after travel');
    trials.push({id:spot.id,x:state.x,y:state.y,z:state.z,score:state.score});
    if(spot.id==='competition'){await page.waitForTimeout(300);await page.screenshot({path:path.join(out,label+'-competition-riding.png')});}
