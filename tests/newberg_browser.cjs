@@ -18,7 +18,7 @@ let browser;
    const coping=d.park.rails.filter(r=>!r.raised);
    if(coping.length!==4||coping.some(r=>!r.closed))throw Error('Each connected basin must have one uninterrupted closed coping loop');
    for(const rail of coping)for(let i=1;i<rail.path.length;i++){
-    const a=rail.path[i-1],b=rail.path[i];for(const t of [0,.5,1])if(p.height(a[0]+(b[0]-a[0])*t,a[2]+(b[2]-a[2])*t)<-.025)throw Error('Concrete intersects coping at '+rail.path[i]);
+    const a=rail.path[i-1],b=rail.path[i];for(const t of [0,.5,1])if(Math.abs(p.height(a[0]+(b[0]-a[0])*t,a[2]+(b[2]-a[2])*t))>.025)throw Error('Concrete intersects or buries coping at '+rail.path[i]);
    }
    return {name:d.park.name,replica:d.park.replica,meshCount:d.scene.meshes.length,terrainVertices:m.getTotalVertices(),maxContactError:max,samples,basins:d.park.basins.length,curveRails:d.park.rails.filter(r=>r.path).length,oldCity:d.scene.meshes.filter(m=>/background building|urban facade|solid skatable concrete ramp/.test(m.name)).length,volcano:p.height(-.7,-12),deep:p.height(17,10),shallow:p.height(-19,-11),materialsReady:m.isReady(true),version:B.Engine.Version};
   });

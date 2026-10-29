@@ -3,8 +3,8 @@ const assert=require('node:assert/strict');require('../newberg_park.js');const p
 assert.equal(p.height(17,10),-3.9);assert.equal(p.height(-19,-11),-.95);assert.equal(p.height(-.7,-12),1.45);assert.equal(p.height(-22,-19),0);
 // The deep return and shallow snake are continuous riding areas, not two
 // overlapping primitive floors with an artificial internal wall/lip.
-for(const [a,b,ceiling]of [[[17,10],[3,17],-3.3],[[-18,6],[2,7],-1.25]]){
- for(let i=0;i<=100;i++){const t=i/100;assert(p.height(a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t)<ceiling,'Connected channel rose into an internal ridge');}
+for(const [path,ceiling]of [[[[17,10],[3,17]],-3.3],[[[-18,6],[-13,8.5],[-7,8.7],[2,7.5]],-1.25]]){
+ for(let j=1;j<path.length;j++)for(let i=0;i<=100;i++){const a=path[j-1],b=path[j],t=i/100;assert(p.height(a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t)<ceiling,'Connected channel rose into an internal ridge');}
 }
 assert.equal(p.basins.length,4);
 // A positive hump overlapping a recessed channel must fade into that floor,
