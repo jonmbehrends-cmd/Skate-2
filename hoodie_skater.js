@@ -191,8 +191,15 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     if(back)status.pushFootRoll=footRoll;
     // The imported GLB toe axis is reversed under its bind-pose parent,
     // so a negative stance-space Z rotation raises the rendered toes.
-    const shoeRotation=footRoll?
-     B.Quaternion.RotationAxis(B.Axis.Z,-footRoll).multiply(deckFootRotations[i]):
+    // A kickflip rolls the leading ankle off the deck early in the flight;
+    // a heelflip rolls it the other way. Ease both back to a flat sole before
+    // landing. The trailing shoe and every grounded stance stay unchanged.
+    // This is a skinned-ankle motion only, not a board rotation or physics edit.
+    const flipFootPitch=flip&&!actions.grabbing&&!back?
+     Math.sign(state.flip)*.16*Math.sin(Math.PI*clamp((state.airTime||0)/.42,0,1)):0;
+    if(!back)status.flipFootPitch=flipFootPitch;
+    const shoeRotation=footRoll||flipFootPitch?
+     B.Quaternion.RotationAxis(B.Axis.Z,flipFootPitch-footRoll).multiply(deckFootRotations[i]):
      deckFootRotations[i];
     // During pavement contact the rear knee should track behind the hip,
     // rather than jut forward across the nose of the skateboard. Change only
