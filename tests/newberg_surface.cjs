@@ -70,7 +70,7 @@ for(const basin of p.basins){
 }
 for(let i=0;i<5000;i++){
  const x=-34+(i*11.317%68),z=-26+(i*7.619%52),s=p.surface(x,z),g=p.gradient(x,z);
- assert([s.height,g.x,g.z].every(Number.isFinite));assert(s.height>=-5.2&&s.height<=1.45);
+ assert([s.height,g.x,g.z].every(Number.isFinite));assert(s.height>=-6.1&&s.height<=1.45);
  if(Math.abs(x)>p.width/2||Math.abs(z)>p.depth/2)assert.equal(p.sample(x,z),null);
  else assert.equal(p.sample(x,z).height,s.height);
 }

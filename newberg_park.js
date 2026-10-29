@@ -20,10 +20,10 @@ const basins=[
  {name:'beginner pocket',depth:.95,run:3.6,knots:[[-27,-11],[-26,-15],[-22,-17.5],[-17,-17.5],[-12,-15],[-10.5,-11],[-12,-7],[-17,-5],[-22,-5],[-26,-7]]},
  // Original expansion, not a claim about the real Chehalem site. Every area
  // has one continuous rim and ample flat connections around both ends.
- {name:'west river flow',depth:3.1,run:8,knots:[[-39,-10],[-39,8],[-47,21],[-59,27],[-75,24],[-84,13],[-84,-5],[-77,-21],[-65,-27],[-53,-23],[-47,-14]]},
- {name:'east competition bowl',depth:5.2,run:9,knots:[[84,-12],[85,10],[81,30],[70,38],[53,36],[42,26],[39,11],[42,-4],[40,-19],[49,-30],[65,-32],[78,-26]]},
- {name:'north long snake',depth:2.1,run:5.8,knots:[[-73,-43],[-65,-54],[-48,-58],[-27,-54],[-9,-48],[9,-52],[28,-58],[49,-56],[67,-48],[72,-39],[61,-35],[47,-41],[29,-45],[12,-39],[-7,-35],[-25,-40],[-46,-47],[-61,-42]]},
- {name:'south surf basin',depth:2.8,run:7.2,knots:[[-42,41],[-24,34],[-5,36],[12,33],[29,38],[37,47],[31,57],[15,61],[-5,57],[-26,61],[-43,56],[-50,48]]}
+ {name:'west river flow',depth:4.2,run:5.4,knots:[[-39,-10],[-39,8],[-47,21],[-59,27],[-75,24],[-84,13],[-84,-5],[-77,-21],[-65,-27],[-53,-23],[-47,-14]]},
+ {name:'east competition bowl',depth:6.1,run:7.2,knots:[[84,-12],[85,10],[81,30],[70,38],[53,36],[42,26],[39,11],[42,-4],[40,-19],[49,-30],[65,-32],[78,-26]]},
+ {name:'north long snake',depth:3.2,run:4.2,knots:[[-73,-43],[-65,-54],[-48,-58],[-27,-54],[-9,-48],[9,-52],[28,-58],[49,-56],[67,-48],[72,-39],[61,-35],[47,-41],[29,-45],[12,-39],[-7,-35],[-25,-40],[-46,-47],[-61,-42]]},
+ {name:'south surf basin',depth:4.6,run:5.6,knots:[[-42,41],[-24,34],[-5,36],[12,33],[29,38],[37,47],[31,57],[15,61],[-5,57],[-26,61],[-43,56],[-50,48]]}
 ];
 function rimPoint(knots,t){
  const n=knots.length,u=((t%1)+1)%1*n,i=Math.floor(u),f=u-i;
@@ -170,7 +170,7 @@ function install(B,scene,c){
   const y=heights[j*(NX+1)+i];positions.push(xs[i],y,zs[j]);uvs.push((xs[i]+W/2)/W,(zs[j]+D/2)/D);
   // Baked ambient occlusion makes recessed floors legible under the open sky.
   // This shades the same solid concrete, rather than adding floating overlays.
-  const weather=.975+.025*Math.sin(xs[i]*.23+Math.sin(zs[j]*.17))*Math.cos(zs[j]*.19),occlusion=(.70+.30*clamp((y+5.2)/5.2,0,1))*weather;colors.push(occlusion,occlusion,occlusion,1);
+  const weather=.975+.025*Math.sin(xs[i]*.23+Math.sin(zs[j]*.17))*Math.cos(zs[j]*.19),occlusion=(.82+.18*clamp((y+5.2)/5.2,0,1))*weather;colors.push(occlusion,occlusion,occlusion,1);
  }
  for(let j=j0;j<j1;j++)for(let i=i0;i<i1;i++){const k=(j-j0)*stride+i-i0;indices.push(k,k+1,k+stride,k+1,k+stride+1,k+stride);}
  const core=i0===100&&j0===75,m=new B.Mesh(core?'NEWBERG SHARED CONCRETE SURFACE':'EXPANSION SHARED CONCRETE '+i0+','+j0,scene),vd=new B.VertexData();vd.positions=positions;vd.indices=indices;vd.uvs=uvs;vd.colors=colors;vd.normals=[];B.VertexData.ComputeNormals(positions,indices,vd.normals);if(vd.normals[1]<0){for(let i=0;i<indices.length;i+=3)[indices[i+1],indices[i+2]]=[indices[i+2],indices[i+1]];B.VertexData.ComputeNormals(positions,indices,vd.normals);}vd.applyToMesh(m);m.material=concrete;m.receiveShadows=true;objects.push(m);terrainMeshes.push(m);
@@ -242,8 +242,10 @@ function install(B,scene,c){
  for(const mat of [trunk,leaf,pine]){const members=trees.filter(m=>m.material===mat);const batch=B.Mesh.MergeMeshes(members,true,true,undefined,false,false);if(batch){batch.name='Ewing Young woodland '+mat.name;batch.isPickable=false;objects.push(batch);}}
  const signTex=new B.DynamicTexture('Chehalem entrance sign',{width:1024,height:256},scene,false),ink=signTex.getContext();ink.fillStyle='#354d42';ink.fillRect(0,0,1024,256);ink.fillStyle='#f1e9d3';ink.textAlign='center';ink.font='bold 100px sans-serif';ink.fillText('SOL SKATE',512,115);ink.font='36px sans-serif';ink.fillText('CHEHALEM CORE / ORIGINAL EXPANSION',512,193);signTex.update();const signMat=material('Chehalem park sign','#ffffff');signMat.diffuseTexture=signTex;signMat.emissiveColor=new B.Color3(.12,.12,.12);box('Chehalem entrance sign',-99,1.35,-40,6,1.5,.1,signMat);
  scene.clearColor=new B.Color4(.73,.82,.86,1);scene.fogColor=new B.Color3(.73,.82,.86);scene.fogDensity=.0018;
- scene.imageProcessingConfiguration.vignetteWeight=.35;scene.imageProcessingConfiguration.contrast=1.12;
- const sky=scene.getLightByName('sky'),sun=scene.getLightByName('sun');if(sky){sky.intensity=.64;sky.diffuse=new B.Color3(.87,.94,1);}if(sun){sun.direction=new B.Vector3(-.32,-1,.26);sun.diffuse=new B.Color3(1,.94,.83);sun.intensity=1.18;}
+ // Copilot daylight proposal: lift shaded concrete midtones while retaining
+ // the warm directional key, texture detail and the existing light count.
+ scene.imageProcessingConfiguration.vignetteWeight=.18;scene.imageProcessingConfiguration.contrast=1.05;scene.imageProcessingConfiguration.exposure=1.12;
+ const sky=scene.getLightByName('sky'),sun=scene.getLightByName('sun');if(sky){sky.intensity=.82;sky.diffuse=new B.Color3(.87,.94,1);}if(sun){sun.direction=new B.Vector3(-.32,-1,.26);sun.diffuse=new B.Color3(1,.94,.83);sun.intensity=1.28;}
  camera.radius=9;camera.heightOffset=3.6;camera.rotationOffset=165;
  overview.setTarget(new B.Vector3(0,-.7,0));overview.alpha=-1.08;overview.beta=.83;overview.fov=.95;
  const fitOverview=()=>{overview.radius=205*Math.max(1,1/scene.getEngine().getAspectRatio(overview));};fitOverview();root.addEventListener('resize',fitOverview);

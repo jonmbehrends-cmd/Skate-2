@@ -70,7 +70,7 @@ let browser;
   assert(geometry.opaque&&geometry.maxError<.00004,'Render/contact mismatch: '+JSON.stringify(geometry));
   assert(geometry.maxSeamStep<.025,'Tile seam has a vertical step: '+JSON.stringify(geometry));
   assert(geometry.floors.every(f=>f.height<-.5),'Expansion must contain actual recessed terrain: '+JSON.stringify(geometry.floors));
-  assert(geometry.minHeight>=-5.20001&&geometry.minHeight< -4.5,'Large bowl depth missing or invalid');
+  assert(geometry.minHeight>=-6.10001&&geometry.minHeight< -5.9,'Large bowl depth missing or invalid');
   assert(geometry.hoodieSource.includes('quaternius-hoodie')&&geometry.hoodieBones===62,'Production licensed rider missing');
   const flatbars=await page.evaluate(()=>{
    const p=SOLNewberg,bars=__SOL_DIAGNOSTICS__.park.rails.filter(r=>r.raised&&r.path.length===2),records=[];
