@@ -122,16 +122,21 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    for(let i=0;i<legs.length;i++){
     const back=i===1,side=back?-1:1;
     const pushing=back&&pushingNow;
-    // Recover the trailing shoe onto its original deck stance before PUSH
-    // releases. The previous recovery target crossed toward the board center
-    // while remaining offset outside its side; this caused a visible snap
-    // when the input ended. Keep the contact stroke on pavement, then plant.
-    const pushRecovery=pushing?clamp(pose.recovery||0,0,1):0;
-    const foot=v(pushing?-.23+.245*pushRecovery:.015,
+    // The existing physics push phase also drives the shoe's visual stroke:
+    // step down, push on pavement, then lift and replant on the deck. The
+    // last quarter stays planted so the phase wrap cannot pop the shoe back
+    // down. Legacy callers without a phase retain contact/recovery fallback.
+    const phase=pushing&&Number.isFinite(pose.pushPhase)?
+     ((pose.pushPhase%(2*Math.PI))+2*Math.PI)%(2*Math.PI):null;
+    const groundStroke=!pushing?0:phase===null?
+     1-clamp(pose.recovery||0,0,1):phase<=Math.PI?
+     clamp(phase/(Math.PI*.25),0,1):
+     clamp((Math.PI*1.5-phase)/(Math.PI*.5),0,1);
+    const foot=v(pushing?.015-.245*groundStroke:.015,
       .45+lift+(back?rearPop:frontLevel),side*.36+(back?0:frontFlick));
     if(pushing){
-     foot.y=.17+.28*pushRecovery;
-     foot.z=-.36-travel*.14*clamp(pose.contact||0,0,1)*(1-pushRecovery);
+     foot.y=.45-.28*groundStroke;
+     foot.z=-.36-travel*.14*clamp(pose.contact||0,0,1)*groundStroke;
     }
     solve(legs[i].n,foot,v(.8,.65,side*.50));placeDetached(detachedFeet[i],localPosition(legs[i].n[2]));orient(detachedFeet[i],footRotations[i]);
    }
