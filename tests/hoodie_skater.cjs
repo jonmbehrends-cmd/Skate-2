@@ -66,6 +66,8 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  assert(rig.status.footPose.frontFlick>.08,'Kickflip needs a leading-foot flick');
  rig.update({...state,grounded:false},pose,{grabbing:true});assert.equal(rig.status.mode,'grab');
  const gripDistance=B.Vector3.Distance(B.Vector3.FromArray(rig.status.hands[1]),B.Vector3.FromArray(rig.status.grip));assert(gripDistance<.1,'Hand must reach board: '+JSON.stringify({gripDistance,hands:rig.status.hands,grip:rig.status.grip,feet:rig.status.feet,legGeometry:rig.status.legGeometry}));
+ assert(rig.status.legGeometry.every(g=>g.hip[1]-g.foot[1]>.22),
+  'Grab pelvis must stay above the shoes rather than collapsing into a seated deck pose: '+JSON.stringify(rig.status.legGeometry));
  assert(Math.abs(rig.status.grip[2]+.31)<.01,'Grab should reach the near-side deck rail, not across the deck');
  assert(Number.isFinite(rig.status.grabReachShift)&&rig.status.grabReachShift<.45,
   'Grab should not translate the chest excessively: '+rig.status.grabReachShift);
