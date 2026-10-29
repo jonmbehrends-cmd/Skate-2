@@ -29,8 +29,8 @@ let browser;
   assert.equal(await page.locator('#spotsToggle').getAttribute('aria-expanded'),'false');
   const layout=await page.evaluate(()=>{
    const rect=id=>{const r=document.querySelector(id).getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height}};
-   const a=rect('#spotsToggle'),b=rect('#halfpipe'),c=rect('#restart'),overlap=(r,s)=>r.x<s.x+s.w&&r.x+r.w>s.x&&r.y<s.y+s.h&&r.y+r.h>s.y;
-   return {spots:a,park:b,restart:c,overlaps:overlap(a,b)||overlap(a,c)};
+   const a=rect('#spotsToggle'),b=rect('#halfpipe'),c=rect('#restart'),d=rect('[data-t="grind"]'),e=rect('[data-t="boardslide"]'),overlap=(r,s)=>r.x<s.x+s.w&&r.x+r.w>s.x&&r.y<s.y+s.h&&r.y+r.h>s.y;
+   return {spots:a,park:b,restart:c,grind:d,boardslide:e,overlaps:[b,c,d,e].some(o=>overlap(a,o))};
   });
   assert(!layout.overlaps,'District menu obstructs existing fixed controls: '+JSON.stringify(layout));
   const tap=async locator=>{if(mobile)await locator.tap();else await locator.click();};
@@ -45,7 +45,7 @@ let browser;
   // must land on solid flat terrain without retaining a grind or a stale push.
   await tap(page.locator('#halfpipe'));
   for(const spot of spots){
-   await page.evaluate(()=>{const s=__SOL_DIAGNOSTICS__.state;s.score=1250;s.speed=0;s.grinding=true;s.vy=4;s.pushBurstUntil=performance.now()+1500;});
+   await page.evaluate(()=>{const s=__SOL_DIAGNOSTICS__.state;s.score=1250;s.speed=0;s.vy=0;s.grindRequestType='50-50';s.grindRequestUntil=performance.now()+1200;s.pushBurstUntil=performance.now()+1500;});
    await tap(page.locator('#spotsToggle'));
    await tap(page.locator('#spotsPanel [data-spot="'+spot.id+'"]'));
    assert.equal(await page.locator('#spotsPanel').isVisible(),false,'Selection must close after travel');
