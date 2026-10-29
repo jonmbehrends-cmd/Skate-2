@@ -262,5 +262,7 @@ function install(B,scene,c){
  for(const m of terrainMeshes){c.cameraObstacles.add(m.name);m.freezeWorldMatrix();}for(const m of objects)if(!m.isWorldMatrixFrozen)m.freezeWorldMatrix();
  return {terrain,objects};
 }
-root.SOLNewberg={enabled,install,height,gradient,sample,groundTravel,roll,surface,basins,railPath,pointAt,width:W,depth:D};
+// Expose the same launch predicate used by SOLBowl after install so pure
+// geometry regressions can execute it before initializing WebGL.
+root.SOLNewberg={enabled,install,height,gradient,sample,groundTravel,roll,vertLaunch,surface,basins,railPath,pointAt,width:W,depth:D};
 })(typeof window!=='undefined'?window:globalThis);
