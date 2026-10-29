@@ -95,7 +95,22 @@ function roll(s,dt){const g=gradient(s.x,s.z),grade=g.x*Math.sin(s.dir)+g.z*Math
 function vertLaunch(s,previous,contact){
  if(!previous.newberg||!contact.newberg||!s.grounded||s.grinding||s.rampCooldown>0||s.speed<4||contact.height<-.85||previous.height>-.08)return false;
  const sign=s.travelSign===-1?-1:1,gx=previous.slopeX||0,gz=previous.slope||0,grade=(gx*Math.sin(s.dir)+gz*Math.cos(s.dir))*sign;
- if(grade<1.2)return false;
+ // Deep/competition bowls keep the original 1.2 gradient gate. The three
+ // shallow bowls have gentler *physical* lips (0.63-0.86 maximum grade), so
+ // 1.2 makes an automatic shallow launch mathematically unreachable. Relax
+ // only near the inside edge of those specific bowls and only when climbing.
+ // This cannot trigger on unrelated street banks, volcanoes, or flat ground.
+ let requiredGrade=1.2;
+ if(grade>0&&grade<requiredGrade){
+  for(const b of basins){
+   if(b.depth>1.5)continue;
+   const edge=rimDistance(b,s.x,s.z);
+   if(edge>=0&&edge<=Math.max(.5,Math.min(.9,s.speed*.05))){
+    requiredGrade=Math.min(requiredGrade,Math.max(.42,.70*2.4*b.depth/b.run));
+   }
+  }
+ }
+ if(grade<requiredGrade)return false;
  const g=Math.hypot(gx,gz);s.grounded=false;s.vy=Math.min(12,s.speed*grade/Math.hypot(1,grade));
  s.airVX=-gx/g*.55;s.airVZ=-gz/g*.55;s.airTime=0;s.rampCooldown=.5;s.grindCooldown=Math.max(s.grindCooldown||0,.6);
  s.name='NEWBERG VERT AIR';s.combo=(s.combo||0)+200;s.count=(s.count||0)+1;
