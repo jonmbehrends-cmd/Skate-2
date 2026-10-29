@@ -67,6 +67,7 @@ let browser;
      skinned:d.rig.meshes.filter(m=>m.skeleton&&m.isVisible).length,
      finite:Array.from(d.rig.skeletons[0].getTransformMatrices(d.rig.meshes[0])).every(Number.isFinite)};
    },mode);
+   // Preserve the actual GLB pose screenshot even when an anatomy assertion fails.\n   await page.screenshot({path:path.join(out,'hoodie-'+label+'-'+mode+'.png')});
    assert.equal(pose.mode,['push-recovery','push-cycle-end'].includes(mode)?'push':mode,'Newberg hoodie pose: '+JSON.stringify(pose));
    assert(pose.skinned>=4&&pose.finite,'Visible deforming GLB required: '+mode);
    if(mode==='grab'){
@@ -80,7 +81,6 @@ let browser;
      'Recovered push foot must plant on deck before release: '+JSON.stringify(f));
    }
    if(mode==='landing')assert(pose.feet.every(f=>Math.abs(f[1]-.45)<.035),'Landing shoes must stay on deck');
-   await page.screenshot({path:path.join(out,'hoodie-'+label+'-'+mode+'.png')});
    poses.push({mode,feet:pose.feet,hands:pose.hands,reach:pose.reach});
   }
   assert.deepEqual(errors,[]);assert.deepEqual(failedRequests,[]);
@@ -98,8 +98,8 @@ let browser;
    const d=__SOL_DIAGNOSTICS__;
    return {hoodie:!!d.rig,visible:d.riderV2.meshes.filter(m=>m.isVisible&&m.isEnabled()&&m.skeleton&&m.getTotalVertices()>0).length,park:d.park.name};
   });
+  // Save the fallback frame before validating visibility so a regression is inspectable.\n  await page.screenshot({path:path.join(out,'hoodie-'+(mobile?'mobile':'desktop')+'-fallback.png')});
   assert(!fallback.hoodie&&fallback.visible>0&&fallback.park==='Newberg / Chehalem',JSON.stringify(fallback));
-  await page.screenshot({path:path.join(out,'hoodie-'+(mobile?'mobile':'desktop')+'-fallback.png')});
   await page.close();
  }
  fs.writeFileSync(path.join(out,'hoodie-result.json'),JSON.stringify({result:'PASS',url,results},null,2));
