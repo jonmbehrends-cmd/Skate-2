@@ -139,9 +139,9 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    // above the deck while the shoulder follows the reach.
    if(actions.grabbing){
     const hip=localPosition(pelvis);
-    aim(pelvis,spine,hip.add(v(.38,.18,-.03)));
+    aim(pelvis,spine,hip.add(v(.20,.05,-.02)));
     const chest=localPosition(spine);
-    aim(spine,arms[1].n[0],chest.add(v(.34,-.06,-.12)));
+    aim(spine,arms[1].n[0],chest.add(v(.12,-.18,-.10)));
    }
    const travel=state.travelSign===-1?-1:1;
    const lift=air?(flip?.22:actions.grabbing?0:.15+takeoff*.12):0;
