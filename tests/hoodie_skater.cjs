@@ -18,6 +18,10 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
    'Ride stance must stay centered and narrower than the old .86m split');
   assert(rig.status.legGeometry.every(g=>Number.isFinite(g.upper)&&Number.isFinite(g.lower)),
    'Leg IK must retain finite anatomical segment lengths');
+  // Check the actual GLB toe joints, not just ankle IK: a correctly planted
+  // ankle can still leave a shoe rotated lengthwise off the board.
+  assert(rig.status.toeDirections?.length===2&&rig.status.toeDirections.every(t=>t[0]>.95&&Math.abs(t[1])<.1&&Math.abs(t[2])<.18),
+   'Both shoe toes must point across the deck with level soles: '+JSON.stringify(rig.status.toeDirections));
  };
  checkStance();
  const original=JSON.stringify(state);
