@@ -89,8 +89,8 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    const mode=actions.grinding?'grind':actions.grabbing?'grab':flip?'flip':air&&takeoff>.05?'ollie':air?'air':landing>.05?'landing':pushingNow?'push':(pose.crouch||0)>.1?'crouch':Math.abs(state.speed)>1?'ride':'idle';
    status.mode=mode;
    for(const [n,r] of rest){n.position.copyFrom(r.p);n.rotationQuaternion=r.q.clone()}
-   // In a grab, tuck the knees up toward the deck instead of curling the
-   // spine forward. Keep the chest comparatively upright as the hips lower;
+   // For grabs, hinge the actual pelvis toward the deck while keeping the
+   // hips above the shoes. Avoid the seated-on-grip pose in side views;
    // hip/chest lean and arm IK still bring the hand onto the moving deck.
    // Absorb impact through both knees rather than landing stiff-legged. The
    // landing pulse is visual-only and decays to neutral riding in ~0.2s.
@@ -102,7 +102,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    const athleticCompression=state.grounded&&!actions.grinding&&!pushingNow&&landing<=.05?
     clamp(Math.abs(state.speed||0)/7,0,1)*.045:0;
    status.athleticCompression=athleticCompression;
-   const crouch=clamp((pose.crouch||0)*.20+landingCompression+athleticCompression+takeoff*.06+(actions.grabbing?.65:0)+(actions.grinding?.12:0),0,.78);
+   const crouch=clamp((pose.crouch||0)*.20+landingCompression+athleticCompression+takeoff*.06+(actions.grabbing?.39:0)+(actions.grinding?.12:0),0,.78);
    // Settle the pelvis into an athletic, knee-flexed stance instead of a
    // locked-knee upright pose. Feet remain IK-planted on the deck.
    // The ground-reaching push shoe sits below the deck. Compress the hips
@@ -138,10 +138,10 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    const grindLean=actions.grinding?travel*.085:0;
    status.grindLean=grindLean;
    pelvis.rotationQuaternion=rest.get(pelvis).q
-    .multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.12:actions.grinding?.07:landingHinge-pushLean*.5))
+    .multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.92:actions.grinding?.07:landingHinge-pushLean*.5))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Z,grindLean));
    spine.rotationQuaternion=rest.get(spine).q
-    .multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.12:actions.grinding?-.05:-landingHinge*.4-pushLean))
+    .multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.22:actions.grinding?-.05:-landingHinge*.4-pushLean))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pushingNow?(pose.contact||0)*.07:0)))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Z,-grindLean*.4));
    // Unlike an ollie, a shallow transition vert air carries the whole board
@@ -232,7 +232,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    if(actions.grabbing){
     // Grip the near-side deck rail, rather than reaching across the middle;
     // the hand tracks the moving board even during a simultaneous flip.
-    targets[1]=options.board?B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.18,.34,-.31),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):v(.18,.34,-.31);
+    targets[1]=options.board?B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(-.18,.34,-.31),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):v(-.18,.34,-.31);
    }
    let grabReachShift=0;
    if(actions.grabbing){
@@ -257,6 +257,12 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    status.legGeometry=legs.map(l=>{const p=l.n.map(localPosition);return {hip:p[0].asArray(),knee:p[1].asArray(),foot:p[2].asArray(),upper:B.Vector3.Distance(p[0],p[1]),lower:B.Vector3.Distance(p[1],p[2])}});
    status.grip=actions.grabbing?targets[1].asArray():null;
    status.grabReachShift=grabReachShift;
+   // Instrument real imported joint geometry for desktop/mobile anatomy QA.
+   status.grabAnatomy=actions.grabbing?{
+    hipClearance:Math.min(...status.legGeometry.map(l=>l.hip[1]-l.foot[1])),
+    torsoHeight:localPosition(spine).y-localPosition(pelvis).y,
+    reachShift:grabReachShift
+   }:null;
   }
   update({grounded:true,speed:0},{crouch:0});
   for(const mesh of meshes){mesh.receiveShadows=true;mesh.alwaysSelectAsActiveMesh=true;options.shadow?.addShadowCaster(mesh)}
