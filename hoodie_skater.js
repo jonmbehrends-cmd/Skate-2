@@ -89,8 +89,8 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    const mode=actions.grinding?'grind':actions.grabbing?'grab':flip?'flip':air&&takeoff>.05?'ollie':air?'air':landing>.05?'landing':pushingNow?'push':(pose.crouch||0)>.1?'crouch':Math.abs(state.speed)>1?'ride':'idle';
    status.mode=mode;
    for(const [n,r] of rest){n.position.copyFrom(r.p);n.rotationQuaternion=r.q.clone()}
-   // The rider faces across the board (+X). Forward hip hinge is around
-   // stance Z, not X: X rolls the torso sideways into a seated/reclined pose.
+   // The imported pelvis/chest local axes differ from the stance frame;
+   // tune the Z hinge from real joint reach and side-view Chromium evidence.
    // hip/chest lean and arm IK still bring the hand onto the moving deck.
    // Absorb impact through both knees rather than landing stiff-legged. The
    // landing pulse is visual-only and decays to neutral riding in ~0.2s.
@@ -139,11 +139,11 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    status.grindLean=grindLean;
    pelvis.rotationQuaternion=rest.get(pelvis).q
     .multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.18:actions.grinding?.07:landingHinge-pushLean*.5))
-    .multiply(B.Quaternion.RotationAxis(B.Axis.Z,actions.grabbing?-.75:grindLean));
+    .multiply(B.Quaternion.RotationAxis(B.Axis.Z,actions.grabbing?.65:grindLean));
    spine.rotationQuaternion=rest.get(spine).q
     .multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.08:actions.grinding?-.05:-landingHinge*.4-pushLean))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pushingNow?(pose.contact||0)*.07:0)))
-    .multiply(B.Quaternion.RotationAxis(B.Axis.Z,actions.grabbing?-.12:-grindLean*.4));
+    .multiply(B.Quaternion.RotationAxis(B.Axis.Z,actions.grabbing?.10:-grindLean*.4));
    // Unlike an ollie, a shallow transition vert air carries the whole board
    // with both soles. Avoid the ordinary 12-27cm ollie-foot separation that
    // makes the skater visibly float above the board immediately at takeoff.
