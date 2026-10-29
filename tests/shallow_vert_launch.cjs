@@ -34,6 +34,8 @@ for(const name of ['west kidney and snake run','shallow capsule','beginner pocke
    launched++;
    assert(!state.grounded&&state.vy>0&&state.bowlAir?.newberg,
     'Shallow launch must enter a real airborne state: '+name);
+   assert(state.bowlAir.shallow===true&&Math.abs(state.bowlAir.launchPitch-Math.atan(grade))<1e-10,
+    'Shallow air should retain the real lip pitch for visuals: '+name);
    assert(state.vy<=12&&Number.isFinite(state.airVX)&&Number.isFinite(state.airVZ),
     'Shallow launch must preserve bounded finite momentum: '+name);
    sample={x,z,grade,vy:state.vy};
@@ -50,6 +52,11 @@ const candidate={newberg:true,height:-.4,slope:1.0,slopeX:0};
 const contact={newberg:true,height:-.2};
 assert.equal(park.vertLaunch(makeState(17,18,0),candidate,contact),false,
  'Deep bowl must retain the original >=1.2 uphill-grade requirement');
+const deep=makeState(17,18,0);
+assert.equal(park.vertLaunch(deep,{...candidate,slope:1.3},contact),true,
+ 'Original deep-bowl vert threshold must still accept steep approaches');
+assert(!deep.bowlAir.shallow&&deep.bowlAir.launchPitch===undefined,
+ 'Deep-bowl visual/physics state must not inherit shallow-only changes');
 assert.equal(park.vertLaunch(makeState(0,-60,0),candidate,contact),false,
  'Flat street routes must not inherit shallow-bowl air thresholds');
 const shallow=results.find(r=>r.name==='shallow capsule').sample;
