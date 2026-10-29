@@ -54,10 +54,12 @@ let browser;
    for(let i=0;i<40;i++)d.rig.update({grounded:true,speed:5},{crouch:0},{dt:1/60});
   });
   const poses=[];
-  for(const mode of ['ride','push','push-recovery','ollie','flip','grab','grind','landing']){
+  for(const mode of ['ride','push','push-recovery','push-cycle-end','ollie','flip','grab','grind','landing']){
    const pose=await page.evaluate(mode=>{
-    const d=__SOL_DIAGNOSTICS__,state={grounded:['ride','push','push-recovery','landing'].includes(mode),speed:5,travelSign:1,flip:mode==='flip'?1:0};
-    const stance={crouch:.1,pushing:mode==='push'||mode==='push-recovery',contact:mode==='push-recovery'?0:.8,recovery:mode==='push-recovery'?1:0};
+    const d=__SOL_DIAGNOSTICS__,state={grounded:['ride','push','push-recovery','push-cycle-end','landing'].includes(mode),speed:5,travelSign:1,flip:mode==='flip'?1:0};
+    const stance={crouch:.1,pushing:['push','push-recovery','push-cycle-end'].includes(mode),
+     contact:mode==='push'?.8:0,recovery:mode==='push-recovery'?1:0,
+     pushPhase:mode==='push'?Math.PI/2:mode==='push-recovery'?Math.PI*1.5:mode==='push-cycle-end'?2*Math.PI-.001:undefined};
     d.rig.update(state,stance,{grabbing:mode==='grab',grinding:mode==='grind'});
     d.scene.render();
     const r=d.rig.status;
@@ -65,14 +67,14 @@ let browser;
      skinned:d.rig.meshes.filter(m=>m.skeleton&&m.isVisible).length,
      finite:Array.from(d.rig.skeletons[0].getTransformMatrices(d.rig.meshes[0])).every(Number.isFinite)};
    },mode);
-   assert.equal(pose.mode,mode==='push-recovery'?'push':mode,'Newberg hoodie pose: '+JSON.stringify(pose));
+   assert.equal(pose.mode,['push-recovery','push-cycle-end'].includes(mode)?'push':mode,'Newberg hoodie pose: '+JSON.stringify(pose));
    assert(pose.skinned>=4&&pose.finite,'Visible deforming GLB required: '+mode);
    if(mode==='grab'){
     const distance=Math.hypot(...pose.hands[1].map((n,i)=>n-pose.grip[i]));
     assert(distance<.12&&pose.reach<.45,'Grab must contact deck without extreme torso shift: '+JSON.stringify({distance,pose}));
    }
    if(mode==='push')assert(pose.feet[1][1]<.25,'Grounded push foot must contact pavement');
-   if(mode==='push-recovery'){
+   if(mode==='push-recovery'||mode==='push-cycle-end'){
     const f=pose.feet[1];
     assert(Math.abs(f[0]-.015)<.035&&Math.abs(f[1]-.45)<.035&&Math.abs(f[2]+.36)<.035,
      'Recovered push foot must plant on deck before release: '+JSON.stringify(f));
