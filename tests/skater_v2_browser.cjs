@@ -7,7 +7,7 @@ const server=http.createServer((req,res)=>{const url=new URL(req.url,'http://loc
  const result={poses:{},errors:[]};
  try{const page=await browser.newPage({viewport:{width:960,height:720}});page.on('pageerror',e=>result.errors.push(e.message));
   await page.route('https://cdn.babylonjs.com/babylon.js',r=>r.fulfill({path:require.resolve('babylonjs'),contentType:'application/javascript'}));
-  await page.goto('http://127.0.0.1:'+server.address().port);await page.waitForFunction(()=>window.__SOL_DIAGNOSTICS__?.riderV2?.diagnostics.frames>2,null,{timeout:30000});
+  await page.goto('http://127.0.0.1:'+server.address().port+'/?park=classic');await page.waitForFunction(()=>window.__SOL_DIAGNOSTICS__?.riderV2?.diagnostics.frames>2,null,{timeout:30000});
   await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__;window.__qaLoops=d.engine._activeRenderLoops.slice();d.engine.stopRenderLoop();});
   for(const mode of ['ride','push','ollie','flip','shove','grab','grind','boardslide','landing']){
    result.poses[mode]=await page.evaluate(async mode=>{
