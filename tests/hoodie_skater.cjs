@@ -50,7 +50,16 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
   return B.Vector3.FromArray(rig.status.feet[1]);
  };
  const phaseStart=phaseFoot(0),phaseContact=phaseFoot(Math.PI/2);
+ assert.equal(rig.status.pushFootRoll,0,'Pavement-contact shoe must stay flat');
+ const phaseRecovery=phaseFoot(Math.PI*1.25);
+ assert(phaseRecovery.y>.26&&phaseRecovery.y<.4,'Toe roll should occur while the shoe is lifting off pavement');
+ assert(rig.status.pushFootRoll>.12&&rig.status.pushFootRoll<.15,
+  'Return stroke must briefly roll the pushing shoe upward');
+ assert(rig.status.toeDirections[1][1]>.1&&rig.status.toeDirections[1][0]>.9,
+  'Actual GLB toe joints must lift in the recovery stroke without twisting sideways: '+JSON.stringify(rig.status.toeDirections));
  const phaseEnd=phaseFoot(2*Math.PI-.001);
+ assert.equal(rig.status.pushFootRoll,0,'Push recovery must replant a flat sole before the phase wraps');
+ assert(Math.abs(rig.status.toeDirections[1][1])<.1,'Replanted shoe must be level with the grip');
  // The trailing shoe must enter/leave pavement contact without the sharp
  // velocity corner of the former piecewise-linear stroke.
  const early=phaseFoot(.01);
