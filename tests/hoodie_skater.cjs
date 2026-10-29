@@ -134,12 +134,17 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  rig.update({...state,grounded:false},pose,{grinding:true});assert.equal(rig.status.mode,'grind');
  assert(rig.status.armPose.grindCounter>.08,'Forward 50-50 grind needs asymmetric arm balance');
  assert(rig.status.armPose.spread>.75,'Grind arms should spread for lateral stability');
+ assert(rig.status.grindLean>.08&&rig.status.grindLean<.09,
+  'Forward grind should lean hips across the trucks without excessive tilt');
  assert(rig.status.feet.every(f=>Math.abs(f[1]-.45)<.035),'Grind shoes must remain planted on deck');
  assert.equal(rig.status.pushLean,0,'Grind must not inherit the grounded push hinge');
  rig.update({...state,grounded:false,travelSign:-1},pose,{grinding:true});
  assert(rig.status.armPose.grindCounter<-.08,'Fakie grind must reverse arm counterbalance');
+ assert(rig.status.grindLean<-.08&&rig.status.grindLean>-.09,
+  'Fakie grind must reverse the hip lean, not invert the controls');
  assert(rig.status.feet.every(f=>Math.abs(f[1]-.45)<.035),'Fakie grind must keep both shoes planted');
  rig.update(state,pose);assert.equal(rig.status.mode,'landing');
+ assert.equal(rig.status.grindLean,0,'Grind balance must reset immediately on landing');
  assert(rig.status.landingCompression>.14&&rig.status.landingHinge>.08,
   'Landing should visibly absorb impact through knees and hips');
  assert(rig.status.armPose.drop>.19&&rig.status.armPose.spread>.6,

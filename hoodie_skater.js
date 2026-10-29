@@ -129,10 +129,21 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    status.pushingNow=pushingNow;
    const landingHinge=landing*.085;
    status.landingHinge=landingHinge;
-   pelvis.rotationQuaternion=rest.get(pelvis).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.12:actions.grinding?.07:landingHinge-pushLean*.5));
-   spine.rotationQuaternion=rest.get(spine).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.12:actions.grinding?-.05:-landingHinge*.4-pushLean))
-    .multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pushingNow?(pose.contact||0)*.07:0)));
    const travel=state.travelSign===-1?-1:1;
+   // A 50-50 grind is not a rigid, upright statue: weight shifts across the
+   // trucks while the upper body counterbalances. Rotate the actual GLB
+   // pelvis/chest in the board's lateral plane, without moving either shoe,
+   // changing the board transform, or applying forces to the simulation.
+   // Reverse the balance for fakie; return to neutral immediately on exit.
+   const grindLean=actions.grinding?travel*.085:0;
+   status.grindLean=grindLean;
+   pelvis.rotationQuaternion=rest.get(pelvis).q
+    .multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.12:actions.grinding?.07:landingHinge-pushLean*.5))
+    .multiply(B.Quaternion.RotationAxis(B.Axis.Z,grindLean));
+   spine.rotationQuaternion=rest.get(spine).q
+    .multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.12:actions.grinding?-.05:-landingHinge*.4-pushLean))
+    .multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pushingNow?(pose.contact||0)*.07:0)))
+    .multiply(B.Quaternion.RotationAxis(B.Axis.Z,-grindLean*.4));
    // Unlike an ollie, a shallow transition vert air carries the whole board
    // with both soles. Avoid the ordinary 12-27cm ollie-foot separation that
    // makes the skater visibly float above the board immediately at takeoff.
