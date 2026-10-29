@@ -62,9 +62,12 @@ let browser;
   xboxDisconnectHeld.grabUntil===0&&!xboxDisconnectHeld.input.connected&&
   !xboxDisconnectHeld.input.boost&&!xboxDisconnectHeld.input.grabHeld,
   'Disconnect must release RT/RB without erasing rolling momentum: '+JSON.stringify({xboxHeld,xboxDisconnectHeld}));
+ // Start a fresh observation window: array length is not a stable cursor in
+ // the capped 100-sample buffer, which may already be full on a fast renderer.
+ await page.evaluate(()=>{window.__qaControllerSamples.length=0});
  await page.waitForTimeout(250);
- const xboxCoast=await page.evaluate(sampleCount=>({speed:window.__SOL_DIAGNOSTICS__.state.speed,
-  samples:window.__qaControllerSamples.slice(sampleCount)}),xboxDisconnectHeld.sampleCount);
+ const xboxCoast=await page.evaluate(()=>({speed:window.__SOL_DIAGNOSTICS__.state.speed,
+  samples:window.__qaControllerSamples.slice()}));
  assert(xboxCoast.speed>0&&xboxCoast.samples.length>0&&
   xboxCoast.samples.every(input=>!input.connected&&!input.boost&&!input.grabHeld),
   'Controller inputs must remain released while existing momentum continues: '+JSON.stringify({xboxDisconnectHeld,xboxCoast}));
