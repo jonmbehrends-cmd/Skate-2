@@ -8,6 +8,11 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  assert.equal(rig.status.bones,62);assert(rig.meshes.length>=4);assert.equal(fallback.isVisible,false);
  const state={grounded:true,speed:4,travelSign:1},pose={crouch:0};
  rig.update(state,pose);assert.equal(rig.status.mode,'ride');
+ assert(rig.status.athleticCompression>.02&&rig.status.athleticCompression<.045,
+  'Cruising stance should soften the knees without excessive crouch');
+ rig.update({...state,speed:0},pose);
+ assert.equal(rig.status.athleticCompression,0,'Idle stance must not inherit cruising compression');
+ rig.update(state,pose);
  // Both shoes should sit within the deck, with knees flexed instead of a
  // wide, straight-legged split. Check board-local coordinates before and
  // after the parent is moved and banked.
