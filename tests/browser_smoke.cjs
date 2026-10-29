@@ -449,6 +449,13 @@ const server=http.createServer((req,res)=>{
   await page.evaluate(()=>{
    const d=window.__SOL_DIAGNOSTICS__;
    window.__qaTouchLaunch=null;
+   document.addEventListener('pointerdown',event=>{
+    const prime=window.__qaPrimeNextTrick,button=event.target.closest('#buttons button');
+    if(prime&&button?.dataset.t===prime.name){
+     Object.assign(d.state,prime.state);
+     window.__qaPrimeNextTrick=null;
+    }
+   },true);
    document.addEventListener('click',event=>{
     const button=event.target.closest('#buttons button');
     if(!button||!window.__qaTouchLaunch)return;
@@ -464,7 +471,7 @@ const server=http.createServer((req,res)=>{
     const s=d.state;
     window.__qaTouchLaunch={dispatch:{button:button.dataset.t,
      trusted:event.isTrusted,pointerType:event.pointerType,frame:d.scene.getFrameId(),
-     grounded:s.grounded,vy:s.vy,y:s.y,groundY:s.groundY,count:s.count,
+     grounded:s.grounded,x:s.x,z:s.z,vy:s.vy,y:s.y,groundY:s.groundY,count:s.count,
      flip:s.flip,spin:s.spin,name:s.name,request:s.grindRequestType,
      grinding:s.grinding,grindType:s.grindType,railKind:s.grindRail?.kind}};
    });
@@ -479,8 +486,12 @@ const server=http.createServer((req,res)=>{
      grindType:s.grindType,railKind:s.grindRail?.kind};
    });
   });
-  async function clickAndCaptureLaunch(name){
-   await page.evaluate(()=>{window.__qaTouchLaunch=null});
+  async function clickAndCaptureLaunch(name,state){
+   // Rolling fixtures must be positioned at the trusted input boundary; browser
+   // action preparation can otherwise let the rider coast past the test rail.
+   await page.evaluate(({name,state})=>{window.__qaTouchLaunch=null;
+    window.__qaPrimeNextTrick=state?{name,state}:null;
+   },{name,state});
    await page.locator('[data-t="'+name+'"]').click();
    await page.waitForFunction(()=>!!window.__qaTouchLaunch?.render,null,{timeout:1800});
    return page.evaluate(()=>window.__qaTouchLaunch);
@@ -619,14 +630,19 @@ const server=http.createServer((req,res)=>{
       d.scene.onAfterRenderObservable.remove(observer)}
    });
   });
-  const grindLaunch=await clickAndCaptureLaunch('grind');
+  const grindLaunch=await clickAndCaptureLaunch('grind',{
+   x:0,z:19,y:0,groundY:0,dir:0,speed:5,travelSign:1,
+   grounded:true,grinding:false,vy:0,grindCooldown:0,grindRequestType:null,
+   grindRequestUntil:0,airTime:0,grindRail:null
+  });
   const grindClick=grindLaunch.clicks?.find(event=>event.button==='grind');
   const grindStillRising=grindLaunch.render.vy>0&&!grindLaunch.render.grounded&&
    grindLaunch.render.y>grindLaunch.dispatch.y&&grindLaunch.render.name==='OLLIE'&&
    grindLaunch.render.count===1;
   const grindCaught=grindLaunch.render.grinding&&
    grindLaunch.render.grindType==='50-50'&&grindLaunch.render.railKind==='rail';
-  assert(grindLaunch.dispatch.request==='50-50'&&
+  assert(grindLaunch.dispatch.x===0&&grindLaunch.dispatch.z===19&&
+   grindLaunch.dispatch.request==='50-50'&&
    grindLaunch.dispatch.trusted&&
    grindLaunch.dispatch.name==='OLLIE'&&grindLaunch.dispatch.count===1&&
    !grindLaunch.dispatch.grounded&&grindLaunch.dispatch.vy>0&&
@@ -654,7 +670,7 @@ const server=http.createServer((req,res)=>{
      telemetry:window.__qa5050Telemetry};
    });
    throw new Error('Timed out waiting 6000ms for a real 50-50 rail catch: '+
-    JSON.stringify({diagnostic,cause:error.message}));
+    JSON.stringify({launch:grindLaunch,diagnostic,cause:error.message}));
   }
   const grindInput=await page.evaluate(()=>window.__qa5050);
   assert(grindInput.attached===true&&grindInput.type==='50-50'&&grindInput.rail==='rail',
@@ -710,10 +726,34 @@ const server=http.createServer((req,res)=>{
   },null,{timeout:8000});
   const riding=await page.evaluate(()=>window.__qaRiding);
   assert(Math.abs(riding.z+18.1)>1.2,'Halfpipe riding must advance across its flat bottom: '+JSON.stringify(riding));
+  // Persist real substep events before asynchronous browser round trips can
+  // miss the short clearance/landing windows. Never alter physics or poses.
+  await page.evaluate(()=>{
+   const original=SOLSkater.pose;
+   SOLSkater.pose=function(s,...args){
+    const result=original.call(this,s,...args),t=window.__qaVertTrace;
+    if(!t||s!==__SOL_DIAGNOSTICS__.state)return result;
+    const snapshot=()=>({name:s.name,grounded:s.grounded,y:s.y,vy:s.vy,
+     takeoffY:s.vertTakeoffY,previousY:s.vertTakeoffPreviousY,postY:s.vertLaunchPostY,
+     airVZ:s.airVZ,airVX:s.airVX,z:s.z,speed:s.speed,travelSign:s.travelSign,
+     message:document.querySelector('#msg').textContent});
+    if(!t.air&&s.name==='HALFPIPE VERT AIR'&&!s.grounded&&s.vy>0)t.air=snapshot();
+    if(t.air&&s.name==='HALFPIPE VERT AIR'&&!s.grounded&&s.y>4.5)t.clearance=snapshot();
+    const inside=t.side==='left'?s.z> -29.7:s.z< -6.4&&s.z> -15.5;
+    if(t.air&&!t.landing&&s.grounded&&!s.grinding&&inside&&s.y>=0&&s.y<4.5){
+     const r={x:-36,z:t.side==='left'?-25.8:-10.4,w:38,d:8.4,h:4.5,curve:t.side==='left'?'halfpipe-left':'halfpipe-right'};
+     t.landing={...snapshot(),expected:SOLTerrain.profile(r,(s.z-(r.z-r.d/2))/r.d).height};
+    }
+    const flat=t.side==='left'?s.z> -21.55&&s.z< -15.5:s.z< -14.65&&s.z> -20.7;
+    if(t.landing&&!t.follow&&s.grounded&&!s.grinding&&flat&&s.speed>.5)t.follow=snapshot();
+    return result;
+   };
+  });
   // Reproduce the actual left coping launch through the live physics loop.
   // A high bank without vert-air can pass geometry-only tests, so assert the
   // skater really leaves the lip upward and moves back into the halfpipe.
   const vertStart=await page.evaluate(()=>{
+   window.__qaVertTrace={side:'left'};
    const s=window.__SOL_DIAGNOSTICS__.state;
    const r={x:-36,z:-25.8,w:38,d:8.4,h:4.5,curve:'halfpipe-left'};
    const z=-29.76,ground=window.SOLTerrain.profile(r,(z-(r.z-r.d/2))/r.d).height;
@@ -722,38 +762,19 @@ const server=http.createServer((req,res)=>{
     rampCooldown:0,grindCooldown:0,flip:0,spin:0});
    return {z,ground};
   });
-  await page.waitForFunction(()=>{
-   const s=window.__SOL_DIAGNOSTICS__.state;
-   return s.name==='HALFPIPE VERT AIR'&&!s.grounded;
-  },null,{timeout:6000});
-  const vertAir=await page.evaluate(()=>{
-   const s=window.__SOL_DIAGNOSTICS__.state;
-   return {name:s.name,grounded:s.grounded,y:s.y,vy:s.vy,
-    takeoffY:s.vertTakeoffY,previousY:s.vertTakeoffPreviousY,postY:s.vertLaunchPostY,
-    airVZ:s.airVZ,airVX:s.airVX,z:s.z,speed:s.speed};
-  });
+  await page.waitForFunction(()=>!!window.__qaVertTrace?.air,null,{timeout:6000});
+  const vertAir=await page.evaluate(()=>window.__qaVertTrace.air);
   assert(vertAir.name==='HALFPIPE VERT AIR'&&!vertAir.grounded&&
    vertAir.takeoffY>2.4&&vertAir.takeoffY<4.5&&Math.abs(vertAir.takeoffY-vertAir.previousY)<.08&&Math.abs(vertAir.postY-vertAir.takeoffY)<.08&&Number.isFinite(vertAir.vy)&&vertAir.airVZ>0&&
    Math.abs(vertAir.airVX)<1,
    'Halfpipe must launch vertically above left coping and return inward: '+
     JSON.stringify({vertStart,vertAir}));
   // Clearance must be achieved by upward flight, not by a one-frame Y snap.
-  await page.waitForFunction(()=>{
-   const s=window.__SOL_DIAGNOSTICS__.state;
-   return s.name==='HALFPIPE VERT AIR'&&!s.grounded&&s.y>4.5;
-  },null,{timeout:6000});
+  await page.waitForFunction(()=>!!window.__qaVertTrace?.clearance,null,{timeout:6000});
   // A vertical launch is incomplete until the skater returns to the riding
   // surface. Catch missed collisions and airborne states that never resolve.
-  await page.waitForFunction(()=>{
-   const s=window.__SOL_DIAGNOSTICS__.state;
-   return s.grounded&&!s.grinding&&s.z> -29.7&&s.y>=0&&s.y<4.5;
-  },null,{timeout:6000});
-  const vertLanding=await page.evaluate(()=>{
-   const s=window.__SOL_DIAGNOSTICS__.state;
-   const r={x:-36,z:-25.8,w:38,d:8.4,h:4.5,curve:'halfpipe-left'};
-   const expected=window.SOLTerrain.profile(r,(s.z-(r.z-r.d/2))/r.d).height;
-   return {grounded:s.grounded,z:s.z,y:s.y,expected,speed:s.speed,travelSign:s.travelSign,message:document.querySelector('#msg').textContent};
-  });
+  await page.waitForFunction(()=>!!window.__qaVertTrace?.landing,null,{timeout:6000});
+  const vertLanding=await page.evaluate(()=>window.__qaVertTrace.landing);
   assert(vertLanding.grounded&&Math.abs(vertLanding.y-vertLanding.expected)<.15&&
    vertLanding.speed>.65&&!vertLanding.message.includes('BAIL'),
    'Halfpipe vert air must land on the physical transition with rolling momentum: '+
@@ -761,16 +782,8 @@ const server=http.createServer((req,res)=>{
   // A clean landing is not enough: the board must keep rolling inward,
   // down the transition and onto the flat without an automatic bail.
   // Observe the real physics loop, not a forced position or a reset.
-  await page.waitForFunction(()=>{
-   const s=window.__SOL_DIAGNOSTICS__.state;
-   if(s.grounded&&!s.grinding&&s.z> -21.55&&s.z< -15.5&&s.speed>.5){
-    window.__qaLeftFollowthrough={z:s.z,y:s.y,speed:s.speed,grounded:s.grounded,
-     travelSign:s.travelSign,message:document.querySelector('#msg').textContent};
-    return true;
-   }
-   return false;
-  },null,{timeout:12000});
-  const leftFollowthrough=await page.evaluate(()=>window.__qaLeftFollowthrough);
+  await page.waitForFunction(()=>!!window.__qaVertTrace?.follow,null,{timeout:12000});
+  const leftFollowthrough=await page.evaluate(()=>window.__qaVertTrace.follow);
   assert(leftFollowthrough.grounded&&leftFollowthrough.speed>.5&&
    !leftFollowthrough.message.includes('BAIL'),
    'Left vert landing must roll down onto the halfpipe flat: '+JSON.stringify(leftFollowthrough));
@@ -778,6 +791,7 @@ const server=http.createServer((req,res)=>{
   // that only launches/lands on one end is not a working halfpipe; both
   // directions must preserve continuous transition physics.
   const rightVertStart=await page.evaluate(()=>{
+   window.__qaVertTrace={side:'right'};
    const s=window.__SOL_DIAGNOSTICS__.state;
    const r={x:-36,z:-10.4,w:38,d:8.4,h:4.5,curve:'halfpipe-right'};
    const z=-6.44,ground=window.SOLTerrain.profile(r,(z-(r.z-r.d/2))/r.d).height;
@@ -787,16 +801,8 @@ const server=http.createServer((req,res)=>{
     controlSteer:0,controlThrottle:0});
    return {z,ground};
   });
-  await page.waitForFunction(()=>{
-   const s=window.__SOL_DIAGNOSTICS__.state;
-   return s.name==='HALFPIPE VERT AIR'&&!s.grounded&&s.airVZ<0;
-  },null,{timeout:6000});
-  const rightVertAir=await page.evaluate(()=>{
-   const s=window.__SOL_DIAGNOSTICS__.state;
-   return {name:s.name,grounded:s.grounded,y:s.y,vy:s.vy,
-    takeoffY:s.vertTakeoffY,previousY:s.vertTakeoffPreviousY,
-    postY:s.vertLaunchPostY,airVZ:s.airVZ,airVX:s.airVX,z:s.z,speed:s.speed};
-  });
+  await page.waitForFunction(()=>!!window.__qaVertTrace?.air,null,{timeout:6000});
+  const rightVertAir=await page.evaluate(()=>window.__qaVertTrace.air);
   assert(rightVertAir.name==='HALFPIPE VERT AIR'&&!rightVertAir.grounded&&
    rightVertAir.takeoffY>2.4&&rightVertAir.takeoffY<4.5&&
    Math.abs(rightVertAir.takeoffY-rightVertAir.previousY)<.08&&
@@ -805,21 +811,9 @@ const server=http.createServer((req,res)=>{
    Math.abs(rightVertAir.airVX)<1,
    'Right coping must launch vertically and travel inward without a Y snap: '+
     JSON.stringify({rightVertStart,rightVertAir}));
-  await page.waitForFunction(()=>{
-   const s=window.__SOL_DIAGNOSTICS__.state;
-   return s.name==='HALFPIPE VERT AIR'&&!s.grounded&&s.y>4.5;
-  },null,{timeout:6000});
-  await page.waitForFunction(()=>{
-   const s=window.__SOL_DIAGNOSTICS__.state;
-   return s.grounded&&!s.grinding&&s.z< -6.4&&s.z> -15.5&&s.y>=0&&s.y<4.5;
-  },null,{timeout:6000});
-  const rightVertLanding=await page.evaluate(()=>{
-   const s=window.__SOL_DIAGNOSTICS__.state;
-   const r={x:-36,z:-10.4,w:38,d:8.4,h:4.5,curve:'halfpipe-right'};
-   const expected=window.SOLTerrain.profile(r,(s.z-(r.z-r.d/2))/r.d).height;
-   return {grounded:s.grounded,z:s.z,y:s.y,expected,speed:s.speed,
-    travelSign:s.travelSign,message:document.querySelector('#msg').textContent};
-  });
+  await page.waitForFunction(()=>!!window.__qaVertTrace?.clearance,null,{timeout:6000});
+  await page.waitForFunction(()=>!!window.__qaVertTrace?.landing,null,{timeout:6000});
+  const rightVertLanding=await page.evaluate(()=>window.__qaVertTrace.landing);
   assert(rightVertLanding.grounded&&
    Math.abs(rightVertLanding.y-rightVertLanding.expected)<.15&&
    rightVertLanding.speed>.65&&!rightVertLanding.message.includes('BAIL'),
@@ -827,16 +821,8 @@ const server=http.createServer((req,res)=>{
     JSON.stringify({rightVertStart,rightVertAir,rightVertLanding}));
   // Repeat the same follow-through on the mirrored wall. This catches
   // landing-direction regressions that still satisfy a one-frame Y check.
-  await page.waitForFunction(()=>{
-   const s=window.__SOL_DIAGNOSTICS__.state;
-   if(s.grounded&&!s.grinding&&s.z< -14.65&&s.z> -20.7&&s.speed>.5){
-    window.__qaRightFollowthrough={z:s.z,y:s.y,speed:s.speed,grounded:s.grounded,
-     travelSign:s.travelSign,message:document.querySelector('#msg').textContent};
-    return true;
-   }
-   return false;
-  },null,{timeout:12000});
-  const rightFollowthrough=await page.evaluate(()=>window.__qaRightFollowthrough);
+  await page.waitForFunction(()=>!!window.__qaVertTrace?.follow,null,{timeout:12000});
+  const rightFollowthrough=await page.evaluate(()=>window.__qaVertTrace.follow);
   assert(rightFollowthrough.grounded&&rightFollowthrough.speed>.5&&
    !rightFollowthrough.message.includes('BAIL'),
    'Right vert landing must roll down onto the halfpipe flat: '+JSON.stringify(rightFollowthrough));
