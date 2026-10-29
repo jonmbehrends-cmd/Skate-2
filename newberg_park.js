@@ -251,15 +251,17 @@ function install(B,scene,c){
  document.querySelector('#restart').addEventListener('click',place);
  const view=document.querySelector('#halfpipe');view.textContent='PARK VIEW';view.setAttribute('aria-label','View Newberg skatepark');view.addEventListener('click',()=>{place();state.halfpipePreviewUntil=Infinity;scene.activeCamera=overview;document.querySelector('#msg').textContent='CHEHALEM — PUSH TO RIDE';});
  // The expanded park has distinct districts. These flat, unobstructed
- // spawn cells are near each bowl, snake run or street line. Always reset
+ // spawn cells aim toward each area while keeping the follow-camera BEHIND
+ // the player inside park bounds; never start the camera behind perimeter walls.
+ // Always reset
  // physics and held input before repositioning the skater.
  const spots=[
   {id:'core',label:'CHEHALEM / ORIGINAL',x:-22,z:-19,dir:.3},
-  {id:'river',label:'WEST / RIVER FLOW',x:-89,z:0,dir:Math.PI/2},
-  {id:'competition',label:'EAST / COMPETITION',x:89,z:29,dir:-Math.PI/2},
-  {id:'snake',label:'NORTH / SNAKE RUN',x:-60,z:-65,dir:0},
-  {id:'surf',label:'SOUTH / SURF BASIN',x:0,z:65,dir:Math.PI},
-  {id:'street',label:'STREET / GRIND ISLAND',x:-86,z:45,dir:Math.PI/2}
+  {id:'river',label:'WEST / RIVER FLOW',x:-65,z:-36,dir:0},
+  {id:'competition',label:'EAST / COMPETITION',x:64,z:-42,dir:0},
+  {id:'snake',label:'NORTH / SNAKE RUN',x:-80,z:-49,dir:Math.PI/2},
+  {id:'surf',label:'SOUTH / SURF BASIN',x:-55,z:48,dir:Math.PI/2},
+  {id:'street',label:'STREET / GRIND ISLAND',x:-82,z:51,dir:Math.PI/2}
  ];
  const spotsToggle=document.createElement('button');spotsToggle.type='button';
  spotsToggle.id='spotsToggle';spotsToggle.textContent='SPOTS';
