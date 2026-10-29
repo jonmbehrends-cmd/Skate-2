@@ -156,11 +156,10 @@ function install(B,scene,c){
  function material(name,color){const m=new B.StandardMaterial(name,scene);m.diffuseColor=B.Color3.FromHexString(color);m.specularColor=new B.Color3(.04,.04,.04);m.alpha=1;m.transparencyMode=B.Material.MATERIAL_OPAQUE;mats.push(m);return m;}
  const concrete=material('Newberg weathered pale concrete','#d5d0c5'),coping=material('Newberg worn iron coping','#707974'),grass=material('Ewing Young grass','#647754'),trunk=material('Oregon tree bark','#655245'),leaf=material('Oregon deciduous canopy','#899157'),pine=material('Oregon evergreen canopy','#3d5f4a'),steel=material('Newberg black entrance rails','#424744'),roof=material('Newberg shelter roof','#7e8279');
  coping.specularColor=new B.Color3(.45,.46,.43);coping.specularPower=48;
- // Independent integer hash per pixel avoids correlated canvas RNG streaks.
- // Mipmaps and anisotropy keep this fine aggregate stable at grazing angles.
- const tex=new B.DynamicTexture('Newberg concrete aggregate',{width:512,height:512},scene,true,B.Texture.TRILINEAR_SAMPLINGMODE),ctx=tex.getContext(),pixels=ctx.createImageData(512,512);
+ // Three shared textures, including mipmaps, total approximately 3 MiB.
+ // Terrain topology and the shared wheel-contact heightfield are unchanged.
+ const surfaceArt=root.SOLParkSurfaceArt?.install(B,scene,concrete,grass,W,D);
  const hash=(x,z)=>{let n=Math.imul(x,374761393)^Math.imul(z,668265263);n=Math.imul(n^(n>>>13),1274126177);return ((n^(n>>>16))>>>0)/4294967296;};
- for(let z=0;z<512;z++)for(let x=0;x<512;x++){const k=(z*512+x)*4,n=hash(x,z),v=239+Math.round(n*13)-(n<.012?13:0);pixels.data[k]=v;pixels.data[k+1]=v;pixels.data[k+2]=v;pixels.data[k+3]=255;}ctx.putImageData(pixels,0,0);tex.update();tex.uScale=W/12;tex.vScale=D/12;tex.anisotropicFilteringLevel=8;concrete.diffuseTexture=tex;
  let seed=1301;const rnd=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296};
  function box(name,x,y,z,w,h,d,mat){const m=B.MeshBuilder.CreateBox(name,{width:w,height:h,depth:d},scene);m.position.set(x,y,z);m.material=mat;m.receiveShadows=true;objects.push(m);return m;}
  const terrainMeshes=[];
@@ -170,7 +169,7 @@ function install(B,scene,c){
   const y=heights[j*(NX+1)+i];positions.push(xs[i],y,zs[j]);uvs.push((xs[i]+W/2)/W,(zs[j]+D/2)/D);
   // Baked ambient occlusion makes recessed floors legible under the open sky.
   // This shades the same solid concrete, rather than adding floating overlays.
-  const weather=.975+.025*Math.sin(xs[i]*.23+Math.sin(zs[j]*.17))*Math.cos(zs[j]*.19),occlusion=(.82+.18*clamp((y+5.2)/5.2,0,1))*weather;colors.push(occlusion,occlusion,occlusion,1);
+  const weather=.975+.025*Math.sin(xs[i]*.23+Math.sin(zs[j]*.17))*Math.cos(zs[j]*.19),occlusion=(.82+.18*clamp((y+5.2)/5.2,0,1))*weather,tint=root.SOLParkSurfaceArt?.tint(xs[i],zs[j])||[1,1,1];colors.push(...tint.map(v=>v*occlusion),1);
  }
  for(let j=j0;j<j1;j++)for(let i=i0;i<i1;i++){const k=(j-j0)*stride+i-i0;indices.push(k,k+1,k+stride,k+1,k+stride+1,k+stride);}
  const core=i0===100&&j0===75,m=new B.Mesh(core?'NEWBERG SHARED CONCRETE SURFACE':'EXPANSION SHARED CONCRETE '+i0+','+j0,scene),vd=new B.VertexData();vd.positions=positions;vd.indices=indices;vd.uvs=uvs;vd.colors=colors;vd.normals=[];B.VertexData.ComputeNormals(positions,indices,vd.normals);if(vd.normals[1]<0){for(let i=0;i<indices.length;i+=3)[indices[i+1],indices[i+2]]=[indices[i+2],indices[i+1]];B.VertexData.ComputeNormals(positions,indices,vd.normals);}vd.applyToMesh(m);m.material=concrete;m.receiveShadows=true;objects.push(m);terrainMeshes.push(m);
@@ -178,7 +177,17 @@ function install(B,scene,c){
  const terrain=terrainMeshes[4];
  // Keep lawn outside the concrete footprint; a single ground plane would
  // cover every recessed bowl with grass at deck height.
- for(const [x,z,w,d] of [[-171.5,0,157,500],[171.5,0,157,500],[0,-159.5,W,181],[0,159.5,W,181]])box('Ewing Young surrounding lawn',x,-.12,z,w,.12,d,grass);
+ const lawns=[];
+ for(const [x,z,w,d] of [[-171.5,0,157,500],[171.5,0,157,500],[0,-159.5,W,181],[0,159.5,W,181]]){
+  const m=B.MeshBuilder.CreateGround('Ewing Young surrounding lawn',{width:w,height:d,subdivisions:24},scene),p=m.getVerticesData(B.VertexBuffer.PositionKind);
+  for(let i=0;i<p.length;i+=3){
+   const wx=p[i]+x,wz=p[i+2]+z,fade=clamp(Math.max((Math.abs(wx)-140)/50,(Math.abs(wz)-110)/45),0,1);
+   const hills=7*Math.exp(-(((wx+190)/78)**2+((wz+90)/100)**2))+5*Math.exp(-(((wx-200)/95)**2+((wz-50)/140)**2))+6*Math.exp(-(((wx+60)/130)**2+((wz-195)/75)**2));
+   p[i+1]=-.06+fade*fade*(3-2*fade)*hills;
+  }
+  m.setVerticesData(B.VertexBuffer.PositionKind,p);const n=[];B.VertexData.ComputeNormals(p,m.getIndices(),n);m.setVerticesData(B.VertexBuffer.NormalKind,n);m.position.set(x,0,z);m.material=grass;m.receiveShadows=true;lawns.push(m);
+ }
+ const lawnBatch=B.Mesh.MergeMeshes(lawns,true,true,undefined,false,false);if(lawnBatch){lawnBatch.name='Ewing Young surrounding lawn';objects.push(lawnBatch);}
  // Coping follows the actual visible lip; omit internal overlapping-bowl seams.
  for(const b of basins){let run=[];const flush=()=>{if(run.length>2){const m=B.MeshBuilder.CreateTube('Newberg connected bowl coping',{path:run.map(p=>new B.Vector3(...p)),radius:.045,tessellation:7},scene);m.material=coping;objects.push(m);rails.push(railPath(run,run.length===b.rim.length+1));}run=[];};
   for(let i=0;i<=b.rim.length;i++){const p=copingPoint(b,i);if(height(p[0],p[2])<-.025){flush();continue;}run.push(p);}flush();
@@ -206,7 +215,7 @@ function install(B,scene,c){
  const joints=[];
  for(let x=-90;x<=90;x+=6)for(let z=-66;z<66;z+=1){if([height(x,z),height(x,z+.5),height(x,z+1)].every(h=>Math.abs(h)<.0001))joints.push([new B.Vector3(x,.004,z),new B.Vector3(x,.004,z+1)]);}
  for(let z=-66;z<=66;z+=6)for(let x=-90;x<90;x+=1){if([height(x,z),height(x+.5,z),height(x+1,z)].every(h=>Math.abs(h)<.0001))joints.push([new B.Vector3(x,.004,z),new B.Vector3(x+1,.004,z)]);}
- const jointMesh=B.MeshBuilder.CreateLineSystem('concrete saw-cut slab joints',{lines:joints},scene);jointMesh.color=new B.Color3(.57,.58,.55);jointMesh.isPickable=false;objects.push(jointMesh);
+ const jointMesh=B.MeshBuilder.CreateLineSystem('concrete saw-cut slab joints',{lines:joints,useVertexAlpha:true},scene);jointMesh.color=new B.Color3(.42,.43,.40);jointMesh.alpha=.22;jointMesh.isPickable=false;objects.push(jointMesh);
  // Painted navigation, built into the flat promenades. Shared atlas and one
  // merged mesh keep markings inexpensive; clipping avoids any raised ground.
  const routeTex=new B.DynamicTexture('SOL route stencil atlas',{width:1024,height:256},scene,true),paint=routeTex.getContext();paint.clearRect(0,0,1024,256);paint.fillStyle='#457a78';paint.font='900 88px sans-serif';paint.textAlign='center';paint.fillText('SOL  /  KEEP FLOWING  >',512,159);routeTex.update();
@@ -218,8 +227,14 @@ function install(B,scene,c){
  for(const [x,z,w,d]of [[-93.4,0,.8,D],[93.4,0,.8,D],[0,-69.4,W,.8],[0,69.4,W,.8]]){const wall=box('expansion perimeter seat wall',x,.3,z,w,.6,d,stone);c.cameraObstacles.add(wall.name);}
  function wallArt(name,x,z,w,turn,label,accent){
   const t=new B.DynamicTexture(name+' mural',{width:1024,height:256},scene,true),g=t.getContext();g.fillStyle='#263c3a';g.fillRect(0,0,1024,256);
-  for(let i=0;i<12;i++){g.fillStyle=i%2?accent:'#dcc9a1';g.beginPath();g.moveTo(i*110-180,256);g.lineTo(i*110+100,0);g.lineTo(i*110+155,0);g.lineTo(i*110-125,256);g.fill();}
-  g.fillStyle='#203534';g.fillRect(180,54,664,148);g.fillStyle='#f6eed9';g.textAlign='center';g.font='900 76px sans-serif';g.fillText(label,512,156);t.update();
+  // Original river/contour graphics, painted onto the existing wall panels.
+  // Subdued pigments and uneven coverage replace repeated hazard stripes.
+  g.strokeStyle=accent;g.lineWidth=27;g.globalAlpha=.72;
+  for(let j=0;j<3;j++){g.beginPath();for(let i=0;i<=80;i++){const x=i*1024/80,y=80+j*57+Math.sin(i*.12+j*.8)*37;if(i)g.lineTo(x,y);else g.moveTo(x,y);}g.stroke();}
+  g.globalAlpha=.95;g.fillStyle='#203534';g.fillRect(175,66,674,124);g.fillStyle='#eee5ce';g.textAlign='center';g.font='700 65px sans-serif';g.fillText(label,512,149);
+  g.font='18px sans-serif';g.fillText('S O L   /   O R I G I N A L   E X P A N S I O N',512,179);
+  for(let i=0;i<3100;i++){const x=hash(i,19)*1024,y=hash(i,43)*256;g.globalAlpha=.04+hash(i,71)*.13;g.fillStyle=hash(i,91)>.5?'#e7e0d0':'#263c3a';g.fillRect(x,y,1+hash(i,3)*4,1+hash(i,7)*2);}
+  g.globalAlpha=1;t.update();
   const m=material(name+' ink','#ffffff');m.diffuseTexture=t;m.emissiveColor=new B.Color3(.08,.08,.08);const panel=box(name,x,1.3,z,w,2.1,.18,m);panel.rotation.y=turn;
  }
  wallArt('north snake mural',0,-70.1,24,0,'LONG WAY HOME','#d3915d');
@@ -232,14 +247,26 @@ function install(B,scene,c){
   const a=i/18*Math.PI*2,r=1/Math.max(Math.abs(Math.cos(a))/98,Math.abs(Math.sin(a))/74),x=Math.cos(a)*r,z=Math.sin(a)*r;
   box('perimeter light mast',x,3.3,z,.12,6.6,.12,steel);box('perimeter light head',x,6.6,z,1.4,.12,.5,roof);
  }
- const trees=[];
+ const trees=[],treeShadows=[];
+ const shadeTex=new B.DynamicTexture('woodland soft contact shade',{width:64,height:64},scene,true),shadeCtx=shadeTex.getContext(),shade=shadeCtx.createRadialGradient(32,32,2,32,32,31);
+ shade.addColorStop(0,'rgba(18,27,16,.24)');shade.addColorStop(.5,'rgba(18,27,16,.13)');shade.addColorStop(1,'rgba(18,27,16,0)');shadeCtx.fillStyle=shade;shadeCtx.fillRect(0,0,64,64);shadeTex.update();shadeTex.hasAlpha=true;
+ const shadeMat=material('woodland ground contact shade','#000000');shadeMat.diffuseTexture=shadeTex;shadeMat.useAlphaFromDiffuseTexture=true;shadeMat.transparencyMode=B.Material.MATERIAL_ALPHABLEND;shadeMat.disableLighting=true;shadeMat.emissiveColor=B.Color3.Black();
+ function crown(name,x,y,z,diameter,squash,key,mat){
+  const m=B.MeshBuilder.CreateSphere(name,{diameter,segments:8},scene),vertices=m.getVerticesData(B.VertexBuffer.PositionKind);
+  // A spatial function gives coincident seam vertices the same displacement.
+  // This avoids both UV seam cracks and identical perfect ball silhouettes.
+  for(let k=0;k<vertices.length;k+=3){const a=vertices[k],b=vertices[k+1],c=vertices[k+2],n=1+.09*Math.sin(a*2.7+b*1.3+key)*Math.cos(c*2.1-key);vertices[k]*=n;vertices[k+1]*=n;vertices[k+2]*=n;}
+  m.setVerticesData(B.VertexBuffer.PositionKind,vertices);const normals=[];B.VertexData.ComputeNormals(vertices,m.getIndices(),normals);m.setVerticesData(B.VertexBuffer.NormalKind,normals);m.position.set(x,y,z);m.scaling.y=squash;m.material=mat;trees.push(m);
+ }
  for(let i=0;i<54;i++){
   const angle=i/54*Math.PI*2,r=(1+rnd()*.12)/Math.max(Math.abs(Math.cos(angle))/108,Math.abs(Math.sin(angle))/84),x=Math.cos(angle)*r,z=Math.sin(angle)*r,h=8+rnd()*10;
   const t=B.MeshBuilder.CreateCylinder('Newberg perimeter tree trunk',{height:h*.65,diameterTop:.18,diameterBottom:.58,tessellation:6},scene);t.position.set(x,h*.325,z);t.material=trunk;trees.push(t);
-  if(i%3===0){for(let j=0;j<3;j++){const m=B.MeshBuilder.CreateCylinder('Newberg fir canopy',{height:h*.52,diameterTop:0,diameterBottom:4.2-j*.6,tessellation:8},scene);m.position.set(x,h*(.53+j*.14),z);m.material=pine;trees.push(m);}}
-  else{for(let j=0;j<2;j++){const m=B.MeshBuilder.CreateSphere('Newberg broadleaf canopy',{diameter:5+j,segments:6},scene);m.position.set(x+(j-.5)*1.6,h*.65+j,z);m.scaling.y=1.3;m.material=leaf;trees.push(m);}}
+  if(i%3===0){for(let j=0;j<5;j++)crown('Newberg fir canopy',x+Math.sin(i+j)*.25,h*(.47+j*.095),z+Math.cos(i+j)*.25,4.5-j*.85,.62,i*9+j,pine);}
+  else{for(let j=0;j<4;j++){const a=j*2.4+i;crown('Newberg broadleaf canopy',x+Math.cos(a)*1.5,h*.64+Math.sin(j)*1.6,z+Math.sin(a)*1.5,4.1+hash(i,j)*1.7,.8+hash(j,i)*.45,i*7+j,leaf);}}
+  const contact=B.MeshBuilder.CreateGround('woodland contact shade',{width:7,height:8},scene);contact.position.set(x,-.054,z);contact.rotation.y=i*.73;contact.material=shadeMat;contact.isPickable=false;treeShadows.push(contact);
  }
  for(const mat of [trunk,leaf,pine]){const members=trees.filter(m=>m.material===mat);const batch=B.Mesh.MergeMeshes(members,true,true,undefined,false,false);if(batch){batch.name='Ewing Young woodland '+mat.name;batch.isPickable=false;objects.push(batch);}}
+ const shadeBatch=B.Mesh.MergeMeshes(treeShadows,true,true,undefined,false,false);if(shadeBatch){shadeBatch.name='Ewing Young woodland contact shade';shadeBatch.isPickable=false;objects.push(shadeBatch);}
  const signTex=new B.DynamicTexture('Chehalem entrance sign',{width:1024,height:256},scene,false),ink=signTex.getContext();ink.fillStyle='#354d42';ink.fillRect(0,0,1024,256);ink.fillStyle='#f1e9d3';ink.textAlign='center';ink.font='bold 100px sans-serif';ink.fillText('SOL SKATE',512,115);ink.font='36px sans-serif';ink.fillText('CHEHALEM CORE / ORIGINAL EXPANSION',512,193);signTex.update();const signMat=material('Chehalem park sign','#ffffff');signMat.diffuseTexture=signTex;signMat.emissiveColor=new B.Color3(.12,.12,.12);box('Chehalem entrance sign',-99,1.35,-40,6,1.5,.1,signMat);
  scene.clearColor=new B.Color4(.73,.82,.86,1);scene.fogColor=new B.Color3(.73,.82,.86);scene.fogDensity=.0018;
  // Copilot daylight proposal: lift shaded concrete midtones while retaining
@@ -324,7 +351,7 @@ function install(B,scene,c){
   const blocksCamera=group.some(m=>c.cameraObstacles.has(m.name)),batch=B.Mesh.MergeMeshes(group,true,true,undefined,false,false);
   if(batch){batch.name='SOL static fixtures '+mat.name;batch.receiveShadows=true;if(blocksCamera)c.cameraObstacles.add(batch.name);for(const m of group){const i=objects.indexOf(m);if(i>=0)objects.splice(i,1);}objects.push(batch);fixtureBatches.push({material:mat.name,before:group.length,after:1});}
  }
- root.__SOL_DIAGNOSTICS__.park={name:'Newberg / Chehalem',replica:'Photo-derived core; original SOL expansion',terrain,terrainMeshes,basins,rails,objects,shadow,fixtureBatches,width:W,depth:D,spawn:{x:-22,z:-19},spots:spots.map(({id,label,x,z,dir})=>({id,label,x,z,dir}))};
+ root.__SOL_DIAGNOSTICS__.park={name:'Newberg / Chehalem',replica:'Photo-derived core; original SOL expansion',terrain,terrainMeshes,basins,rails,objects,shadow,fixtureBatches,surfaceArt,width:W,depth:D,spawn:{x:-22,z:-19},spots:spots.map(({id,label,x,z,dir})=>({id,label,x,z,dir}))};
  for(const m of terrainMeshes){c.cameraObstacles.add(m.name);m.freezeWorldMatrix();}for(const m of objects)if(!m.isWorldMatrixFrozen)m.freezeWorldMatrix();
  return {terrain,objects};
 }
