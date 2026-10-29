@@ -43,6 +43,8 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  assert(rig.status.grabLift>.55&&board.position.y>.55,'Airborne grab must bring visual board toward rider');
  const gripDistance=B.Vector3.Distance(B.Vector3.FromArray(rig.status.hands[1]),B.Vector3.FromArray(rig.status.grip));assert(gripDistance<.1,'Hand must reach board: '+JSON.stringify({gripDistance,hands:rig.status.hands,grip:rig.status.grip,feet:rig.status.feet,legGeometry:rig.status.legGeometry}));
  assert(Math.abs(rig.status.grip[0]-.20)<.01&&Math.abs(rig.status.grip[2]-.15)<.01,'Grab should reach the near-side rail at mid-deck, not across the tail');
+ assert(Math.abs(rig.status.grip[1]-(board.position.y+.34))<.03,
+  'Hand must target the actual grip-tape plane, not an invisible elevated grab point');
  assert(rig.status.feet[0][0]-rig.status.feet[1][0]>.08,
   'Grab should stagger the leading and trailing shoes rather than make a symmetric seated pose');
  assert(rig.status.feet.every(f=>f[1]>.50),
