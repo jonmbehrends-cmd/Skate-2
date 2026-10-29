@@ -170,8 +170,10 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
      Math.sin(recoveryProgress):0;
     const footRoll=.14*recoverySin*recoverySin;
     if(back)status.pushFootRoll=footRoll;
+    // The imported GLB toe axis is reversed under its bind-pose parent,
+    // so a negative stance-space Z rotation raises the rendered toes.
     const shoeRotation=footRoll?
-     B.Quaternion.RotationAxis(B.Axis.Z,footRoll).multiply(deckFootRotations[i]):
+     B.Quaternion.RotationAxis(B.Axis.Z,-footRoll).multiply(deckFootRotations[i]):
      deckFootRotations[i];
     solve(legs[i].n,foot,v(.8,.65,side*.50));
     placeDetached(detachedFeet[i],localPosition(legs[i].n[2]));
