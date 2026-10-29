@@ -7,7 +7,7 @@ let browser;
 (async()=>{
  await new Promise(r=>server.listen(0,'127.0.0.1',r));
  browser=await chromium.launch({args:['--use-gl=angle','--use-angle=swiftshader','--enable-webgl','--enable-unsafe-swiftshader','--ignore-gpu-blocklist','--no-sandbox']});
- const url=process.env.SOL_GAME_URL||'http://127.0.0.1:'+server.address().port+'/';
+ const url=process.env.SOL_GAME_URL||'http://127.0.0.1:'+server.address().port+'/?park=classic';
  const results=[];
  for(const mobile of [false,true]){
   const label=mobile?'mobile':'desktop';

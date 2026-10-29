@@ -112,7 +112,7 @@ const server=http.createServer((req,res)=>{
   // installed Babylon UMD bundle locally during browser verification.
   const babylonBundle=require.resolve('babylonjs');
   await page.route('https://cdn.babylonjs.com/babylon.js',route=>route.fulfill({path:babylonBundle,contentType:'application/javascript'}));
-  await page.goto('http://127.0.0.1:'+server.address().port+'/',{waitUntil:'domcontentloaded',timeout:30000});
+  await page.goto('http://127.0.0.1:'+server.address().port+'/?park=classic',{waitUntil:'domcontentloaded',timeout:30000});
   try{await page.waitForFunction(()=>!!window.__SOL_DIAGNOSTICS__,null,{timeout:30000});}
   catch(e){const startup=await page.evaluate(()=>({error:document.querySelector('#error')?.textContent,babylon:!!window.BABYLON,grind:!!window.SOLGrind,html:document.readyState}));throw Error('Game startup failed: '+JSON.stringify({startup,errors,cause:String(e)}));}
   // Touch regression: every visible control must receive a tap at its center

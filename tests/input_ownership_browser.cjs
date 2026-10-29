@@ -68,7 +68,7 @@ async function openGame(browser, viewport, touch = false) {
   page.on('pageerror', error => errors.push(error.message));
   await page.route('https://cdn.babylonjs.com/babylon.js', route =>
     route.fulfill({ path: require.resolve('babylonjs'), contentType: 'application/javascript' }));
-  await page.goto(`http://127.0.0.1:${server.address().port}/index.html`, {
+  await page.goto(`http://127.0.0.1:${server.address().port}/index.html?park=classic`, {
     waitUntil: 'domcontentloaded',
     timeout: 60000
   });

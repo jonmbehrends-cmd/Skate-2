@@ -9,7 +9,7 @@ const server=http.createServer((req,res)=>{const url=new URL(req.url,'http://loc
  try{for(const [label,viewport] of [['desktop',{width:1280,height:800}],['mobile',{width:390,height:844}]]){
   const page=await browser.newPage({viewport,hasTouch:label==='mobile',isMobile:label==='mobile'}),errors=[];
   page.on('pageerror',e=>errors.push(e.message));await page.route('https://cdn.babylonjs.com/babylon.js',r=>r.fulfill({path:require.resolve('babylonjs'),contentType:'application/javascript'}));
-  await page.goto('http://127.0.0.1:'+server.address().port);await page.waitForFunction(()=>window.__SOL_DIAGNOSTICS__?.riderV2?.diagnostics.frames>2);
+  await page.goto('http://127.0.0.1:'+server.address().port+'/?park=classic');await page.waitForFunction(()=>window.__SOL_DIAGNOSTICS__?.riderV2?.diagnostics.frames>2);
   await page.evaluate(()=>window.__SOL_DIAGNOSTICS__.scene.whenReadyAsync());
   await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__;window.__qaLoop=d.engine._activeRenderLoops[0];d.engine.stopRenderLoop();});
   const textures=await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__,B=BABYLON;return d.scene.meshes.filter(m=>['solid skatable concrete ramp','SOLID RAMP SIDE WALL','park continuous concrete','HALFPIPE FLAT BOTTOM'].includes(m.name)).map(m=>({name:m.name,ready:m.isReady(true),texture:m.material.diffuseTexture?.isReady()??true,opaque:m.material.alpha===1&&!m.material.needAlphaBlending(),normalY:m.name==='solid skatable concrete ramp'?m.getVerticesData(B.VertexBuffer.NormalKind)[1]:null}));});

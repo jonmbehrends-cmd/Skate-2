@@ -8,7 +8,7 @@ let browser;
  browser=await chromium.launch({args:['--use-gl=angle','--use-angle=swiftshader','--enable-webgl','--enable-unsafe-swiftshader','--ignore-gpu-blocklist','--no-sandbox']});
  const page=await browser.newPage({viewport:{width:390,height:844},hasTouch:true,isMobile:true}),errors=[];
  page.on('pageerror',e=>errors.push(e.message));
- const url='http://127.0.0.1:'+server.address().port+'/';
+ const url='http://127.0.0.1:'+server.address().port+'/?park=classic';
  // Keep the real WebGL test deterministic when GitHub runners cannot reach Babylon CDN.
  // Serve the same installed Babylon UMD bundle as tests/browser_smoke.cjs.
  const babylonBundle=require.resolve('babylonjs');

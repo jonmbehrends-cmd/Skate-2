@@ -19,7 +19,7 @@ let browser;
   const page=await browser.newPage({viewport:{width:320,height:240}}),errors=[];
   page.on('pageerror',e=>errors.push(e.message));
   await page.addInitScript(()=>Object.defineProperty(navigator,'getGamepads',{value:()=>[]}));
-  await page.goto('http://127.0.0.1:'+server.address().port);
+  await page.goto('http://127.0.0.1:'+server.address().port+'/?park=classic');
   await page.waitForFunction(()=>window.__SOL_DIAGNOSTICS__?.rig?.status.ready,null,{timeout:60000});
   await page.evaluate(()=>window.__SOL_DIAGNOSTICS__.scene.whenReadyAsync());
   const cases=await page.evaluate(variant=>{
