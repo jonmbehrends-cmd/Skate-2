@@ -21,6 +21,7 @@ jobs:
       - run: node tests/hoodie_skater.cjs
       - run: node tests/rigged_browser.cjs
       - run: node --check tools/animation_profile.cjs && node tests/animation_ancestor_probe.cjs
+      - run: node --check tests/rider_preservation_gates.cjs && node tests/rider_preservation_gates.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
