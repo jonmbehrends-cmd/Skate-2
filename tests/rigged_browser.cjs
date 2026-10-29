@@ -65,6 +65,11 @@ let browser;
     // reversed knee or a shoe mesh that is visually off the deck.
     await page.evaluate(()=>{const d=__SOL_DIAGNOSTICS__;d.scene.activeCamera.alpha=1.3;d.scene.render()});
     await page.screenshot({path:path.join(out,'skeletal-'+label+'-grab-opposite-closeup.png')});
+    // A second, tighter rear-quarter frame exposes shoe/deck separation and
+    // backward knee folds that can be hidden in the full-screen HUD shot.
+    await page.evaluate(()=>{const d=__SOL_DIAGNOSTICS__,B=BABYLON;const c=d.scene.activeCamera;c.radius=2.45;c.setTarget(new B.Vector3(0,1.1,0));d.scene.render()});
+    await page.screenshot({path:path.join(out,'skeletal-'+label+'-grab-feet-detail.png')});
+    await page.evaluate(()=>{const d=__SOL_DIAGNOSTICS__,B=BABYLON;const c=d.scene.activeCamera;c.radius=4.3;c.setTarget(new B.Vector3(0,1.2,0));d.scene.render()});
     const opposite=await page.screenshot({type:'jpeg',quality:55});
     console.log('SOL_GRAB_OPPOSITE_JPEG_'+label.toUpperCase()+'='+opposite.toString('base64'));
     await page.evaluate(()=>{const d=__SOL_DIAGNOSTICS__;d.scene.activeCamera.alpha=-.9;d.scene.render()});
