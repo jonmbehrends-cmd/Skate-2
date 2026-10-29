@@ -241,7 +241,7 @@ document.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});
 addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey)return;if(['Space','KeyW','KeyA','KeyD','KeyG','KeyR'].includes(e.code))e.preventDefault();keys.add(e.code);updateKeys();if(e.repeat)return;if(e.code==='KeyR')restart();if(e.code==='Space')trick('ollie');if(e.code==='KeyG')trick('grind')});
 addEventListener('keyup',e=>{keys.delete(e.code);updateKeys()});
 addEventListener('blur',releaseInputs);document.addEventListener('visibilitychange',()=>{if(document.hidden)releaseInputs()});
- if(newberg)SOLNewberg.install(B,scene,{skater,grabMeshes:[grabUpper,grabForearm,grabHand],ramps,solids,rails,pads,shadow,camera,overview:halfpipePreviewCamera,state,cameraObstacles,restart});
+ if(newberg)SOLNewberg.install(B,scene,{skater,grabMeshes:[grabUpper,grabForearm,grabHand],ramps,solids,rails,pads,shadow,camera,cameraAnchor,overview:halfpipePreviewCamera,state,cameraObstacles,restart});
  }catch(e){err.style.display='block';err.setAttribute('role','alert');err.textContent='';
 const heading=document.createElement('h2');heading.textContent='SOL SKATE could not start 3D';err.appendChild(heading);
 const detail=document.createElement('p');detail.textContent=e.message==='WebGL not supported'?'This browser is not providing the 3D graphics support the game needs. Try the game in Chrome or Safari, or play the simpler compatibility version below.':e.message;err.appendChild(detail);
