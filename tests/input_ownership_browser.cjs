@@ -68,7 +68,7 @@ async function openGame(browser, viewport, touch = false) {
     waitUntil: 'domcontentloaded',
     timeout: 60000
   });
-  await page.waitForFunction(() => !!window.__SOL_DIAGNOSTICS__, null, { timeout: 30000 });
+  await page.waitForFunction(() => window.__SOL_DIAGNOSTICS__?.inputReady === true, null, { timeout: 30000 });
   return { page, errors };
 }
 
