@@ -66,7 +66,30 @@ let browser;
    assert(launch.maxStep<.5,'Unexpected horizontal teleport '+JSON.stringify(launch));
    assert(launch.bones===62&&launch.source.includes('quaternius-hoodie'),'Production hoodie missing');
    await page.screenshot({path:path.join(out,label+'-'+spot.name+'-air.png')});
-   results.push({label,...launch});
+   // Continue the *same* production-loop flight through actual gravity, turn
+   // and collision; detect the first touchdown, not an artificial reset.
+   const landing=await page.evaluate(()=>{
+    const d=__SOL_DIAGNOSTICS__,s=d.state,p=SOLNewberg,B=BABYLON;
+    let peak=s.y,maxStep=0,landed=false;
+    let lastX=s.x,lastZ=s.z;
+    for(let i=0;i<150;i++){
+     window.__shallowClock+=25;window.__shallowLoop();
+     maxStep=Math.max(maxStep,Math.hypot(s.x-lastX,s.z-lastZ));
+     lastX=s.x;lastZ=s.z;peak=Math.max(peak,s.y);
+     if(s.bowlStats?.landings>0){landed=true;break;}
+    }
+    window.__shallowCamera.setTarget(new B.Vector3(s.x,s.y+.8,s.z));
+    d.scene.render=window.__shallowRender;d.scene.render();d.scene.render=()=>{};
+    return {landed,grounded:s.grounded,peak,maxStep,recoveries:s.bowlStats?.recoveries,
+     y:s.y,ground:p.height(s.x,s.z),landings:s.bowlStats?.landings};
+   });
+   assert(landing.landed&&landing.grounded&&landing.landings>0,
+    'Shallow vert must re-enter and land, not fly out of park: '+JSON.stringify({label,spot,launch,landing}));
+   assert(landing.peak-launch.takeoff.y>.18&&landing.maxStep<.5&&Math.abs(landing.y-landing.ground)<.0001,
+    'Shallow vert had a teleport or no meaningful flight: '+JSON.stringify({label,spot,launch,landing}));
+   assert(landing.recoveries===0,'Shallow vert must not need forced recovery: '+JSON.stringify(landing));
+   await page.screenshot({path:path.join(out,label+'-'+spot.name+'-landing.png')});
+   results.push({label,...launch,landing});
   }
   assert.deepEqual(errors,[],'Browser page errors');
   await page.close();
