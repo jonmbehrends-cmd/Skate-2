@@ -83,8 +83,8 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    // landing pulse is visual-only and decays to neutral riding in ~0.2s.
    const landingCompression=landing*.15;
    status.landingCompression=landingCompression;
-   const crouch=clamp((pose.crouch||0)*.20+landingCompression+takeoff*.06+(actions.grabbing?.65:0)+(actions.grinding?.12:0),0,.78);
-   // Settle the pelvis into an athletic, knee-flexed stance instead of a
+   const crouch=clamp((pose.crouch||0)*.20+landingCompression+takeoff*.06+(actions.grabbing?.42:0)+(actions.grinding?.12:0),0,.78);
+   // Keep grab hips high enough above the shoes to avoid a seated/folded pose;\n   // the wrist IK still tracks the actual deck rail without moving gameplay.\n   // Settle the pelvis into an athletic, knee-flexed stance instead of a
    // locked-knee upright pose. Feet remain IK-planted on the deck.
    // The ground-reaching push shoe sits below the deck. Compress the hips
    // during contact so the fixed-length leg can actually reach pavement;
