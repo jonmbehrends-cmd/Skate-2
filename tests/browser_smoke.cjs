@@ -567,9 +567,55 @@ const server=http.createServer((req,res)=>{
   await page.evaluate(()=>{
    const d=window.__SOL_DIAGNOSTICS__,s=d.state;
    window.__qa5050=null;
+   const telemetry=window.__qa5050Telemetry={
+    findCalls:0,railContacts:0,attachAttempts:0,successfulCatches:[],
+    renderFrames:0,lastFind:null,lastRender:null
+   };
+   const originalFind=window.SOLGrind.find;
+   window.SOLGrind.find=function(state,rails,dt,stable,assist){
+    const contact=originalFind.apply(this,arguments);
+    if(state===s){
+     telemetry.findCalls++;
+     if(contact?.rail?.kind==='rail')telemetry.railContacts++;
+     if(telemetry.findCalls%10===0||contact){
+      telemetry.lastFind={x:state.x,z:state.z,y:state.y,vy:state.vy,
+       speed:state.speed,grounded:state.grounded,grinding:state.grinding,
+       request:state.grindRequestType,stable,assist,dt,
+       contact:contact?{kind:contact.rail?.kind,type:state.grindType}:null};
+     }
+    }
+    return contact;
+   };
+   const originalAttach=window.SOLGrind.attach;
+   window.SOLGrind.attach=function(state,contact){
+    const attached=originalAttach.apply(this,arguments);
+    if(state===s){
+     telemetry.attachAttempts++;
+     if(attached){
+      const event={attached,source:'attach',type:state.grindType,
+       rail:state.grindRail?.kind,x:state.x,z:state.z,y:state.y,
+       vy:state.vy,speed:state.speed,frame:d.scene.getFrameId(),
+       request:state.grindRequestType};
+      telemetry.successfulCatches.push(event);
+      if(telemetry.successfulCatches.length>8)telemetry.successfulCatches.shift();
+      if(event.type==='50-50'&&event.rail==='rail')window.__qa5050=event;
+     }
+    }
+    return attached;
+   };
    const observer=d.scene.onAfterRenderObservable.add(()=>{
-    if(s.grinding){window.__qa5050={type:s.grindType,rail:s.grindRail?.kind,
-      y:s.y,grindTime:s.grindTime,request:s.grindRequestType};
+    telemetry.renderFrames++;
+    telemetry.lastRender={frame:d.scene.getFrameId(),x:s.x,z:s.z,y:s.y,
+     vy:s.vy,speed:s.speed,grounded:s.grounded,grinding:s.grinding,
+     type:s.grindType,rail:s.grindRail?.kind,request:s.grindRequestType};
+    if(window.__qa5050){
+     d.scene.onAfterRenderObservable.remove(observer);
+     return;
+    }
+    if(s.grinding&&s.grindType==='50-50'&&s.grindRail?.kind==='rail'){
+     window.__qa5050={attached:true,source:'after-render',
+      type:s.grindType,rail:s.grindRail?.kind,y:s.y,grindTime:s.grindTime,
+      request:s.grindRequestType,frame:d.scene.getFrameId()};
       d.scene.onAfterRenderObservable.remove(observer)}
    });
   });
@@ -591,10 +637,29 @@ const server=http.createServer((req,res)=>{
    'GRIND must launch upward before continuing or catching its 50-50 rail: '+JSON.stringify(grindLaunch));
   // Wait for a real simulated rail catch; wall-clock snapshots can miss
   // a brief grind when SwiftShader advances several frames between reads.
-  await page.waitForFunction(()=>!!window.__qa5050,null,{timeout:6000});
+  try{
+   await page.waitForFunction(()=>!!window.__qa5050,null,{timeout:6000});
+  }catch(error){
+   if(error.name!=='TimeoutError')throw error;
+   const diagnostic=await page.evaluate(()=>{
+    const s=window.__SOL_DIAGNOSTICS__.state;
+    return {state:{x:s.x,z:s.z,y:s.y,vy:s.vy,speed:s.speed,
+      grounded:s.grounded,grinding:s.grinding,grindType:s.grindType,
+      grindRail:s.grindRail&&{kind:s.grindRail.kind,axis:s.grindRail.axis,
+       x:s.grindRail.x,z:s.grindRail.z,y:s.grindRail.y,len:s.grindRail.len},
+      grindRequestType:s.grindRequestType,grindRequestUntil:s.grindRequestUntil,
+      grindCooldown:s.grindCooldown,grindAirborneUntil:s.grindAirborneUntil,
+      count:s.count,name:s.name},
+     frame:window.__SOL_DIAGNOSTICS__.scene.getFrameId(),
+     telemetry:window.__qa5050Telemetry};
+   });
+   throw new Error('Timed out waiting 6000ms for a real 50-50 rail catch: '+
+    JSON.stringify({diagnostic,cause:error.message}));
+  }
   const grindInput=await page.evaluate(()=>window.__qa5050);
-  assert(grindInput.type==='50-50'&&grindInput.rail==='rail',
+  assert(grindInput.attached===true&&grindInput.type==='50-50'&&grindInput.rail==='rail',
    'GRIND must automatically land a real 50-50 on the rail after takeoff: '+JSON.stringify(grindInput));
+  const grindTelemetry=await page.evaluate(()=>window.__qa5050Telemetry);
   await page.locator('#restart').click();
   const armedGrind=await clickAndCaptureLaunch('grind');
   const armedGrindClick=armedGrind.clicks?.find(event=>event.button==='grind');
@@ -1243,6 +1308,6 @@ const server=http.createServer((req,res)=>{
   await page.screenshot({path:'test-artifacts/ledge-wall-slide.png',animations:'disabled'});
 
   assert.equal(errors.length,0,'Browser errors: '+errors.join('; '));
-  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',touchHitTargets,controllerQA,gamepadIntegration,visualQA,facadeQA,fixtureQA,wallContact,wallSlide,spawnView,spawnPixels,cheekNormals,impactNormals,rampGravity,screenshotQA,floorOcclusionQA,status,spin,push,touchTricks,clickFallback,boardLaunch,grindLaunch,armedGrind,resetState,teleportState,riding,vertStart,vertAir,vertLanding,leftFollowthrough,rightVertStart,rightVertAir,rightVertLanding,rightFollowthrough,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
+  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',touchHitTargets,controllerQA,gamepadIntegration,visualQA,facadeQA,fixtureQA,wallContact,wallSlide,spawnView,spawnPixels,cheekNormals,impactNormals,rampGravity,screenshotQA,floorOcclusionQA,status,spin,push,touchTricks,clickFallback,boardLaunch,grindLaunch,grindInput,grindTelemetry,armedGrind,resetState,teleportState,riding,vertStart,vertAir,vertLanding,leftFollowthrough,rightVertStart,rightVertAir,rightVertLanding,rightFollowthrough,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
  }finally{await browser.close()}
 })().catch(e=>{fs.mkdirSync('test-artifacts',{recursive:true});fs.writeFileSync('test-artifacts/browser-result.txt','FAIL: '+(e&&e.stack||String(e)));console.error(e);process.exitCode=1}).finally(()=>server.close());
