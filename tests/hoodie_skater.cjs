@@ -35,6 +35,19 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  const released=rig.status.feet[1];
  assert(B.Vector3.Distance(B.Vector3.FromArray(recovered),B.Vector3.FromArray(released))<.04,
   'Releasing PUSH after recovery must not snap the trailing foot across the deck');
+ const phaseFoot=phase=>{
+  rig.update(state,{...pose,pushing:true,pushPhase:phase,
+   contact:Math.max(0,Math.sin(phase)),recovery:Math.max(0,-Math.sin(phase))});
+  return B.Vector3.FromArray(rig.status.feet[1]);
+ };
+ const phaseStart=phaseFoot(0),phaseContact=phaseFoot(Math.PI/2);
+ const phaseEnd=phaseFoot(2*Math.PI-.001);
+ assert(phaseContact.y<.25,'Contact half-cycle must lower trailing shoe to pavement');
+ assert(Math.abs(phaseStart.y-.45)<.035&&Math.abs(phaseEnd.y-.45)<.035,
+  'Both sides of push-cycle wrap must have planted deck foot');
+ assert(B.Vector3.Distance(phaseStart,phaseEnd)<.04,
+  'Push-cycle phase wrap must not snap the shoe off the deck');
+ rig.update(state,pose);
  assert.equal(rig.status.pushLean,0,'Ordinary riding must not inherit the push hinge');
  // A still-held PUSH input during takeoff must not leave the back foot on
  // the ground, or carry the push crouch/lean into the airborne trick.
