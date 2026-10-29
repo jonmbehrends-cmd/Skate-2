@@ -145,6 +145,12 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  assert(Math.abs(rig.status.grip[2]+.31)<.01,'Grab should reach the near-side deck rail, not across the deck');
  assert(Number.isFinite(rig.status.grabReachShift)&&rig.status.grabReachShift<.45,
   'Grab should not translate the chest excessively: '+rig.status.grabReachShift);
+ const anatomy=rig.status.grabAnatomy;
+ console.log('GRAB_ANATOMY',JSON.stringify({anatomy,legs:rig.status.legGeometry}));
+ assert(anatomy&&Object.values(anatomy).every(Number.isFinite),
+  'Grab must expose actual GLB hip/chest/arm measurements');
+ assert(anatomy.hipClearance>.18,'Grab hips should clear the shoes: '+JSON.stringify(anatomy));
+ assert(anatomy.torsoHeight>.06,'Grab chest should remain above hips: '+JSON.stringify(anatomy));
  rig.update({...state,grounded:false},pose,{grinding:true});assert.equal(rig.status.mode,'grind');
  assert(rig.status.armPose.grindCounter>.08,'Forward 50-50 grind needs asymmetric arm balance');
  assert(rig.status.armPose.spread>.75,'Grind arms should spread for lateral stability');
