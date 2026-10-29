@@ -7,8 +7,8 @@ const actions=[],ctx={document:doc,window:{},state:{},joy:{x:0,y:0,id:null},keys
 vm.runInNewContext(html.slice(start,end),ctx);
 win.fire('keydown',{code:'KeyW'});win.fire('keydown',{code:'KeyA'});win.fire('keyup',{code:'KeyA'});assert.equal(ctx.keyboard.y,-1,'Releasing steer preserves forward input');assert.equal(ctx.keyboard.x,0);
 win.fire('keydown',{code:'Space',repeat:false});win.fire('keydown',{code:'Space',repeat:true});assert.equal(actions.filter(x=>x==='ollie').length,1,'Key repeat cannot stack tricks');
-push.fire('pointerdown',{isTrusted:true,pointerId:9});assert(ctx.pushHeld);assert.equal(push.captured,9);push.fire('lostpointercapture');assert.equal(ctx.pushHeld,false);
-grab.fire('pointerdown');assert(ctx.state.touchGrabHeld);ctx.state.grabUntil=1000;grab.fire('pointercancel');assert.equal(ctx.state.grabHeld,false);assert.equal(ctx.state.grabUntil,0);
+push.fire('pointerdown',{isTrusted:true,pointerId:9});assert(ctx.pushHeld);assert.equal(push.captured,9);push.fire('lostpointercapture',{pointerId:9});assert.equal(ctx.pushHeld,false);
+grab.fire('pointerdown',{pointerId:10});assert(ctx.state.touchGrabHeld);ctx.state.grabUntil=1000;grab.fire('pointercancel',{pointerId:10});assert.equal(ctx.state.grabHeld,false);assert.equal(ctx.state.grabUntil,0);
 stick.fire('pointerdown',{pointerId:1,clientX:90,clientY:20});assert(ctx.joy.x>0);stick.fire('lostpointercapture',{pointerId:1});assert.equal(ctx.joy.x,0);assert.equal(ctx.joy.id,null);
 push.fire('pointerdown');ctx.state.padGrabHeld=true;win.fire('blur');assert.equal(ctx.pushHeld,false);assert.equal(ctx.state.padGrabHeld,false);assert.equal(ctx.keyboard.y,0);assert.equal(ctx.keys.size,0);
 console.log('PASS: independent keyboard holds, key repeat, touch capture/cancel, joystick capture loss and focus reset');
