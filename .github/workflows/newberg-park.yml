@@ -20,6 +20,7 @@ jobs:
       - run: node --check newberg_park.js && node tests/check_inline.cjs
       - run: node tests/newberg_surface.cjs
       - run: node tests/newberg_browser.cjs
+      - run: node tests/newberg_hoodie_browser.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
