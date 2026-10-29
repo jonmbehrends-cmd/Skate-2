@@ -161,7 +161,21 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
      foot.y=.45-.28*groundStroke;
      foot.z=-.36-travel*.14*clamp(pose.contact||0,0,1)*groundStroke;
     }
-    solve(legs[i].n,foot,v(.8,.65,side*.50));placeDetached(detachedFeet[i],localPosition(legs[i].n[2]));orient(detachedFeet[i],deckFootRotations[i]);
+    // During the airborne return stroke, lift the pushing shoe's toes
+    // briefly before planting the sole flat on the grip again. The roll
+    // eases to zero at both ends of recovery, and never affects contact,
+    // cruising, fakie stance, ollies or the board's physics transform.
+    const recoveryProgress=phase===null?0:(phase-Math.PI)*2;
+    const recoverySin=pushing&&phase>Math.PI&&phase<Math.PI*1.5?
+     Math.sin(recoveryProgress):0;
+    const footRoll=.14*recoverySin*recoverySin;
+    if(back)status.pushFootRoll=footRoll;
+    const shoeRotation=footRoll?
+     B.Quaternion.RotationAxis(B.Axis.Z,footRoll).multiply(deckFootRotations[i]):
+     deckFootRotations[i];
+    solve(legs[i].n,foot,v(.8,.65,side*.50));
+    placeDetached(detachedFeet[i],localPosition(legs[i].n[2]));
+    orient(detachedFeet[i],shoeRotation);
    }
    // Keep the shoulders active throughout a trick. A skater raises both
    // arms during the pop, counter-swings while pushing, and spreads/drops
