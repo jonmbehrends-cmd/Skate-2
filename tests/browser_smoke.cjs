@@ -446,6 +446,43 @@ const server=http.createServer((req,res)=>{
   assert(push.speed>.05&&push.phase>0,'PUSH must animate foot and increase speed: '+JSON.stringify({push,errors}));
   // Verify every mobile trick button through real pointer events. The click
   // fallback must not trigger a second trick after pointerdown.
+  await page.evaluate(()=>{
+   const d=window.__SOL_DIAGNOSTICS__;
+   window.__qaTouchLaunch=null;
+   document.addEventListener('click',event=>{
+    const button=event.target.closest('#buttons button');
+    if(!button||!window.__qaTouchLaunch)return;
+    const s=d.state,launch=window.__qaTouchLaunch;
+    launch.clicks=launch.clicks||[];
+    launch.clicks.push({button:button.dataset.t,detail:event.detail,
+     trusted:event.isTrusted,frame:d.scene.getFrameId(),count:s.count,
+     name:s.name,vy:s.vy,grounded:s.grounded});
+   });
+   document.addEventListener('pointerdown',event=>{
+    const button=event.target.closest('#buttons button');
+    if(!button)return;
+    const s=d.state;
+    window.__qaTouchLaunch={dispatch:{button:button.dataset.t,
+     trusted:event.isTrusted,pointerType:event.pointerType,frame:d.scene.getFrameId(),
+     grounded:s.grounded,vy:s.vy,y:s.y,groundY:s.groundY,count:s.count,
+     flip:s.flip,spin:s.spin,name:s.name,request:s.grindRequestType}};
+   });
+   d.scene.onAfterRenderObservable.add(()=>{
+    const launch=window.__qaTouchLaunch;
+    if(!launch?.dispatch||launch.render||
+       d.scene.getFrameId()<=launch.dispatch.frame)return;
+    const s=d.state;
+    launch.render={frame:d.scene.getFrameId(),grounded:s.grounded,
+     vy:s.vy,y:s.y,groundY:s.groundY,count:s.count,
+     flip:s.flip,spin:s.spin,name:s.name};
+   });
+  });
+  async function clickAndCaptureLaunch(name){
+   await page.evaluate(()=>{window.__qaTouchLaunch=null});
+   await page.locator('[data-t="'+name+'"]').click();
+   await page.waitForFunction(()=>!!window.__qaTouchLaunch?.render,null,{timeout:1800});
+   return page.evaluate(()=>window.__qaTouchLaunch);
+  }
   const touchTricks=[];
   for(const [name,expectedFlip,expectedSpin,expectedCount] of [
    ['ollie',0,0,1],['kick',1,0,1],['heel',-1,0,1],
@@ -456,27 +493,45 @@ const server=http.createServer((req,res)=>{
      grounded:true,grinding:false,travelSign:1,flip:0,spin:0,count:0,
      combo:0,grabUntil:0,grabHeld:false,touchGrabHeld:false,grindCooldown:0});
    });
-   await page.locator('[data-t="'+name+'"]').click();
-   const outcome=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
-    return {airborne:!s.grounded,vy:s.vy,flip:s.flip,spin:s.spin,
-     count:s.count,name:s.name};});
-   assert(outcome.airborne&&outcome.vy>0&&outcome.flip===expectedFlip&&
-    outcome.spin===expectedSpin&&outcome.count===expectedCount,
-    'Mobile '+name+' must activate once with correct physics: '+JSON.stringify(outcome));
-   touchTricks.push({button:name,...outcome});
+   const launch=await clickAndCaptureLaunch(name);
+   const dispatch=launch.dispatch,render=launch.render;
+   const expectedName=name==='grab'?'INDY GRAB':name.toUpperCase();
+   assert(dispatch&&dispatch.button===name&&dispatch.trusted&&dispatch.vy>0&&
+    !dispatch.grounded&&dispatch.y>dispatch.groundY&&
+    dispatch.name===expectedName&&dispatch.count===expectedCount&&
+    dispatch.flip===expectedFlip&&dispatch.spin===expectedSpin,
+    'Mobile '+name+' must record an upward launch at pointer dispatch: '+JSON.stringify(launch));
+   const click=launch.clicks?.find(event=>event.button===name);
+   assert(click&&click.trusted&&click.detail>0&&click.count===expectedCount&&
+    click.name===expectedName,
+    'Mobile '+name+' compatibility click must not dispatch another trick: '+JSON.stringify(launch));
+   assert(render&&render.frame>dispatch.frame&&render.vy>0&&!render.grounded&&
+     render.y>dispatch.y&&render.name===expectedName&&
+     render.count===expectedCount&&render.flip===expectedFlip&&render.spin===expectedSpin,
+     'Mobile '+name+' first render must continue the upward launch: '+JSON.stringify(launch));
+   touchTricks.push({button:name,launch});
+  }
+  fs.mkdirSync('test-artifacts',{recursive:true});
+  fs.writeFileSync('test-artifacts/touch-trick-launches.json',
+   JSON.stringify(touchTricks,null,2));
+  if(process.env.SOL_OLLIE_LAUNCH_ONLY==='1'){
+   console.log('PASS mobile trick launch dispatch/render evidence',JSON.stringify(touchTricks));
+   return;
   }
   // Programmatic click is a separate accessibility/fallback path: it must
   // still work when a pointerdown event was not dispatched.
   // Wait beyond the pointer de-duplication window before exercising fallback.
   await page.waitForTimeout(500);
-  await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
+  const clickFallback=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
    Object.assign(s,{grounded:true,grinding:false,y:0,groundY:0,vy:0,
     flip:0,spin:0,count:0,combo:0,grabUntil:0,grabHeld:false});
    document.querySelector('[data-t="ollie"]').click();
+   return {airborne:!s.grounded,count:s.count,vy:s.vy,y:s.y,
+    groundY:s.groundY,name:s.name,flip:s.flip,spin:s.spin};
   });
-  const clickFallback=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
-   return {airborne:!s.grounded,count:s.count,vy:s.vy};});
-  assert(clickFallback.airborne&&clickFallback.count===1&&clickFallback.vy>0,
+  assert(clickFallback.airborne&&clickFallback.count===1&&clickFallback.vy>0&&
+   clickFallback.y>clickFallback.groundY&&clickFallback.name==='OLLIE'&&
+   clickFallback.flip===0&&clickFallback.spin===0,
    'Mobile click fallback must activate OLLIE once: '+JSON.stringify(clickFallback));
   await page.locator('#restart').click();
   // Exercise the actual mobile boardslide button while it is visible.
@@ -484,11 +539,15 @@ const server=http.createServer((req,res)=>{
    Object.assign(s,{x:0,z:19,y:0,groundY:0,dir:0,speed:5,travelSign:1,grounded:true,grinding:false,vy:0,grindCooldown:0,grindRequestType:null});
   });
   assert(await page.locator('[data-t="boardslide"]').count()===1,'Touch BOARD SLIDE control must exist');
-  await page.locator('[data-t="boardslide"]').click();
-  const boardInput=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
-   return {type:s.grindRequestType,airborne:!s.grounded,vy:s.vy,y:s.y}});
-  assert(boardInput.type==='boardslide'&&boardInput.airborne&&(boardInput.vy>0||boardInput.y>.1),
-   'Touch boardslide must request a real ollie-assisted rail catch: '+JSON.stringify(boardInput));
+  const boardLaunch=await clickAndCaptureLaunch('boardslide');
+  assert(boardLaunch.dispatch.request==='boardslide'&&
+   boardLaunch.dispatch.trusted&&
+   boardLaunch.dispatch.name==='OLLIE'&&boardLaunch.dispatch.count===1&&
+   boardLaunch.dispatch.vy>0&&!boardLaunch.dispatch.grounded&&
+   boardLaunch.dispatch.y>boardLaunch.dispatch.groundY&&
+   boardLaunch.render.vy>0&&!boardLaunch.render.grounded&&
+   boardLaunch.render.y>boardLaunch.dispatch.y,
+   'Touch boardslide must request a real upward ollie before rail catch: '+JSON.stringify(boardLaunch));
   // Regression: GRIND and BOARD SLIDE both launch a real ollie before rail
   // capture, but GRIND must remain a 50-50 rather than a boardslide.
   await page.locator('#restart').click();
@@ -496,13 +555,6 @@ const server=http.createServer((req,res)=>{
    Object.assign(s,{x:0,z:19,y:0,groundY:0,dir:0,speed:5,travelSign:1,
     grounded:true,grinding:false,vy:0,grindCooldown:0,grindRequestType:null});
   });
-  await page.locator('[data-t="grind"]').click();
-  const grindLaunch=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
-   return {request:s.grindRequestType,grounded:s.grounded,vy:s.vy,y:s.y,grinding:s.grinding,name:s.name};});
-  assert(grindLaunch.request==='50-50'&&!grindLaunch.grounded&&grindLaunch.vy>0&&!grindLaunch.grinding,
-   'GRIND must ollie upward before 50-50 rail contact, never snap from ground: '+JSON.stringify(grindLaunch));
-  // Wait for a real simulated rail catch; wall-clock snapshots can miss
-  // a brief grind when SwiftShader advances several frames between reads.
   await page.evaluate(()=>{
    const d=window.__SOL_DIAGNOSTICS__,s=d.state;
    window.__qa5050=null;
@@ -512,15 +564,30 @@ const server=http.createServer((req,res)=>{
       d.scene.onAfterRenderObservable.remove(observer)}
    });
   });
+  const grindLaunch=await clickAndCaptureLaunch('grind');
+  assert(grindLaunch.dispatch.request==='50-50'&&
+   grindLaunch.dispatch.trusted&&
+   grindLaunch.dispatch.name==='OLLIE'&&grindLaunch.dispatch.count===1&&
+   !grindLaunch.dispatch.grounded&&grindLaunch.dispatch.vy>0&&
+   grindLaunch.dispatch.y>grindLaunch.dispatch.groundY&&
+   grindLaunch.render.vy>0&&!grindLaunch.render.grounded&&
+   grindLaunch.render.y>grindLaunch.dispatch.y,
+   'GRIND must show an upward ollie before 50-50 rail contact: '+JSON.stringify(grindLaunch));
+  // Wait for a real simulated rail catch; wall-clock snapshots can miss
+  // a brief grind when SwiftShader advances several frames between reads.
   await page.waitForFunction(()=>!!window.__qa5050,null,{timeout:6000});
   const grindInput=await page.evaluate(()=>window.__qa5050);
   assert(grindInput.type==='50-50'&&grindInput.rail==='rail',
    'GRIND must automatically land a real 50-50 on the rail after takeoff: '+JSON.stringify(grindInput));
   await page.locator('#restart').click();
-  await page.locator('[data-t="grind"]').click();
-  const armedGrind=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
-   return {type:s.grindRequestType,grounded:s.grounded,vy:s.vy,y:s.y,count:s.count,grinding:s.grinding};});
-  assert(armedGrind.type==='50-50'&&!armedGrind.grounded&&armedGrind.vy>0&&!armedGrind.grinding,
+  const armedGrind=await clickAndCaptureLaunch('grind');
+  assert(armedGrind.dispatch.request==='50-50'&&
+   armedGrind.dispatch.trusted&&
+   armedGrind.dispatch.name==='OLLIE'&&armedGrind.dispatch.count===1&&
+   !armedGrind.dispatch.grounded&&armedGrind.dispatch.vy>0&&
+   armedGrind.dispatch.y>armedGrind.dispatch.groundY&&
+   armedGrind.render.vy>0&&!armedGrind.render.grounded&&
+   armedGrind.render.y>armedGrind.dispatch.y,
    'GRIND away from a rail must ollie and arm a 50-50, not teleport or score: '+JSON.stringify(armedGrind));
   // RESTART must cancel pending airborne grind lockout, not just movement.
   await page.locator('#restart').click();
@@ -1156,6 +1223,6 @@ const server=http.createServer((req,res)=>{
   await page.screenshot({path:'test-artifacts/ledge-wall-slide.png',animations:'disabled'});
 
   assert.equal(errors.length,0,'Browser errors: '+errors.join('; '));
-  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',touchHitTargets,controllerQA,gamepadIntegration,visualQA,facadeQA,fixtureQA,wallContact,wallSlide,spawnView,spawnPixels,cheekNormals,impactNormals,rampGravity,screenshotQA,floorOcclusionQA,status,spin,push,touchTricks,clickFallback,resetState,teleportState,riding,vertStart,vertAir,vertLanding,leftFollowthrough,rightVertStart,rightVertAir,rightVertLanding,rightFollowthrough,boardInput,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
+  fs.writeFileSync('test-artifacts/browser-result.txt',JSON.stringify({result:'PASS',touchHitTargets,controllerQA,gamepadIntegration,visualQA,facadeQA,fixtureQA,wallContact,wallSlide,spawnView,spawnPixels,cheekNormals,impactNormals,rampGravity,screenshotQA,floorOcclusionQA,status,spin,push,touchTricks,clickFallback,boardLaunch,grindLaunch,armedGrind,resetState,teleportState,riding,vertStart,vertAir,vertLanding,leftFollowthrough,rightVertStart,rightVertAir,rightVertLanding,rightFollowthrough,boardslide,touchCoping,copingEntry,coping,bowl,parkWalls},null,2));console.log('PASS Chromium WebGL geometry, independent aerial yaw, joystick, push, halfpipe, bowl raycast and visual screenshots',status,spin,push,riding,bowl);
  }finally{await browser.close()}
 })().catch(e=>{fs.mkdirSync('test-artifacts',{recursive:true});fs.writeFileSync('test-artifacts/browser-result.txt','FAIL: '+(e&&e.stack||String(e)));console.error(e);process.exitCode=1}).finally(()=>server.close());
