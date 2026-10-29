@@ -30,6 +30,15 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  assert(rig.status.pushLean>.02&&rig.status.pushLean<.03,'Push recovery must relax the upper body');
  rig.update(state,pose);
  assert.equal(rig.status.pushLean,0,'Ordinary riding must not inherit the push hinge');
+ // A still-held PUSH input during takeoff must not leave the back foot on
+ // the ground, or carry the push crouch/lean into the airborne trick.
+ rig.update({...state,grounded:false},{...pose,pushing:true,contact:1});
+ assert.equal(rig.status.mode,'ollie');
+ assert.equal(rig.status.pushingNow,false);
+ assert.equal(rig.status.pushCompression,0);
+ assert.equal(rig.status.pushLean,0);
+ assert.equal(rig.status.armPose.counter,0);
+ assert(rig.status.feet[1][1]>.45,'Airborne trailing shoe must leave pavement even when PUSH remains held');
  rig.update({...state,grounded:false},pose);assert.equal(rig.status.mode,'ollie');assert(rig.status.armPose.lift>.12,'Ollie takeoff must lift arms');
  assert(rig.status.footPose.rearPop>.09&&rig.status.footPose.frontLevel<.01,'Rear foot must initiate ollie pop');
  for(let i=0;i<22;i++)rig.update({...state,grounded:false},pose);
@@ -49,8 +58,16 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  rig.update({...state,grounded:false,travelSign:-1},pose,{grinding:true});
  assert(rig.status.armPose.grindCounter<-.08,'Fakie grind must reverse arm counterbalance');
  assert(rig.status.feet.every(f=>Math.abs(f[1]-.45)<.035),'Fakie grind must keep both shoes planted');
- rig.update(state,pose);assert.equal(rig.status.mode,'landing');assert(rig.status.armPose.drop>.1&&rig.status.armPose.spread>.6,'Landing needs widened, lowered arms');
+ rig.update(state,pose);assert.equal(rig.status.mode,'landing');
+ assert(rig.status.landingCompression>.14&&rig.status.landingHinge>.08,
+  'Landing should visibly absorb impact through knees and hips');
+ assert(rig.status.armPose.drop>.19&&rig.status.armPose.spread>.6,
+  'Landing needs widened, lowered arms to recover balance');
+ assert(rig.status.feet.every(f=>Math.abs(f[1]-.45)<.035),
+  'Landing must keep both shoes on the deck');
  for(let i=0;i<30;i++)rig.update(state,pose);assert.equal(rig.status.mode,'ride');
+ assert.equal(rig.status.landingCompression,0,'Landing knee compression must fully recover');
+ assert.equal(rig.status.landingHinge,0,'Landing hip hinge must fully recover');
  assert.equal(JSON.stringify(state),original,'Visuals must not mutate physics');
  assert(scene.animationGroups.every(g=>!g.isPlaying),'Source locomotion clips must stay stopped');
  rig.dispose();assert.equal(fallback.isVisible,true);engine.dispose();

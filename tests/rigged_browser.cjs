@@ -51,19 +51,34 @@ let browser;
   // Let the previous gameplay landing recovery finish before asserting a new PUSH pose.
   await page.evaluate(()=>{for(let i=0;i<40;i++)__SOL_DIAGNOSTICS__.rig.update({grounded:true,speed:5},{crouch:0},{dt:1/60})});
   const signatures=new Map();
-  for(const mode of ['ride','push','crouch','ollie','flip','grab','grind','landing']){
-   const evidence=await page.evaluate(mode=>{const d=__SOL_DIAGNOSTICS__,state={grounded:['ride','push','crouch','landing'].includes(mode),speed:5,travelSign:1,flip:mode==='flip'?1:0};const pose={crouch:mode==='crouch'?.23:.1,pushing:mode==='push',contact:.8};d.rig.update(state,pose,{grabbing:mode==='grab',grinding:mode==='grind'});d.scene.render();return {status:d.rig.status,matrices:Array.from(d.rig.skeletons[0].getTransformMatrices(d.rig.meshes[0])),vertices:d.rig.meshes[0].getTotalVertices()};},mode);
+  for(const mode of ['ride','push','crouch','ollie','push-ollie','flip','grab','grind','landing']){
+   const evidence=await page.evaluate(mode=>{const d=__SOL_DIAGNOSTICS__,state={grounded:['ride','push','crouch','landing'].includes(mode),speed:5,travelSign:1,flip:mode==='flip'?1:0};const pose={crouch:mode==='crouch'?.23:.1,pushing:mode==='push'||mode==='push-ollie',contact:.8};d.rig.update(state,pose,{grabbing:mode==='grab',grinding:mode==='grind'});d.scene.render();return {status:d.rig.status,matrices:Array.from(d.rig.skeletons[0].getTransformMatrices(d.rig.meshes[0])),vertices:d.rig.meshes[0].getTotalVertices()};},mode);
    assert(evidence.vertices>100);assert(evidence.matrices.every(Number.isFinite));
    if(mode==='ollie')assert.equal(evidence.status.mode,'ollie','Takeoff pose must render in Chromium');signatures.set(mode,JSON.stringify(evidence.matrices));
    await page.screenshot({path:path.join(out,'skeletal-'+label+'-'+mode+'-closeup.png')});
    if(mode==='grab'){const dist=Math.hypot(...evidence.status.hands[1].map((n,i)=>n-evidence.status.grip[i]));assert(dist<.12,'Hoodie hand must touch board: '+JSON.stringify({dist,hands:evidence.status.hands,grip:evidence.status.grip,feet:evidence.status.feet}));
     assert(evidence.status.grabReachShift<.45,'Grab must not require extreme chest displacement: '+evidence.status.grabReachShift);
    }
+   if(mode==='push-ollie'){
+    assert.equal(evidence.status.mode,'ollie','Held PUSH must transition into airborne ollie');
+    assert.equal(evidence.status.pushingNow,false,'No grounded push after takeoff');
+    assert.equal(evidence.status.pushCompression,0);
+    assert.equal(evidence.status.pushLean,0);
+    assert.equal(evidence.status.armPose.counter,0);
+    assert(evidence.status.feet[1][1]>.45,'Airborne back shoe must not remain planted on pavement');
+   }
    if(mode==='push'){
     assert(evidence.status.feet[1][1]<.25,'Hoodie pushing foot must reach pavement');
     assert(evidence.status.pushLean>.05&&evidence.status.pushLean<.09,'Hoodie chest must balance the push without excessive hunch');
    }
    if(mode==='ride')assert.equal(evidence.status.pushLean,0,'Neutral ride must have no push lean');
+   if(mode==='landing'){
+    assert(evidence.status.landingCompression>.14&&evidence.status.landingHinge>.08,
+     'Landing must absorb impact through knees and hips in real Chromium');
+    assert(evidence.status.armPose.drop>.19,'Landing arms must lower for balance');
+    assert(evidence.status.feet.every(f=>Math.abs(f[1]-.45)<.035),
+     'Landing shoes must remain planted on the deck');
+   }
   }
   assert(new Set(signatures.values()).size>=6,'Skate, crouch, ollie, flip, grab and landing must deform the skin differently');
   assert.deepEqual(errors,[]);assert.deepEqual(requests,[]);
