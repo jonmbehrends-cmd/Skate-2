@@ -13,6 +13,7 @@ function build(B,scene,ramps){
  }
  const cement=material('architectural exposed concrete','#a8a49b',true);
  const dark=material('recessed concrete','#474c50',true);
+ dark.alpha=1;dark.transparencyMode=B.Material.MATERIAL_OPAQUE;dark.forceDepthWrite=true;
  const metal=material('galvanized park coping','#9aa8b0',false);
  // Shared galvanized metal stays opaque and depth-writing even at grazing
  // camera angles; guardrails must never expose see-through wall geometry.
