@@ -15,6 +15,11 @@ let browser;
    const d=__SOL_DIAGNOSTICS__,p=SOLNewberg,B=BABYLON,m=d.park.terrain;let max=0,samples=0;
    for(let i=0;i<250;i++){const x=-30+(i*13.731%60),z=-22+(i*9.137%44),ray=new B.Ray(new B.Vector3(x,15,z),new B.Vector3(0,-1,0),30);const hit=d.scene.pickWithRay(ray,q=>q===m);if(!hit?.hit)throw Error('Missing solid concrete at '+x+','+z);max=Math.max(max,Math.abs(hit.pickedPoint.y-p.height(x,z)));samples++;}
    for(const [x,z]of [[17,10],[-19,-11],[-18,6]]){const hit=d.scene.pickWithRay(new B.Ray(new B.Vector3(x,15,z),new B.Vector3(0,-1,0),30));if(hit?.pickedMesh!==m)throw Error('Bowl obscured by '+hit?.pickedMesh?.name);}
+   const coping=d.park.rails.filter(r=>!r.raised);
+   if(coping.length!==4||coping.some(r=>!r.closed))throw Error('Each connected basin must have one uninterrupted closed coping loop');
+   for(const rail of coping)for(let i=1;i<rail.path.length;i++){
+    const a=rail.path[i-1],b=rail.path[i];for(const t of [0,.5,1])if(Math.abs(p.height(a[0]+(b[0]-a[0])*t,a[2]+(b[2]-a[2])*t))>.025)throw Error('Concrete intersects or buries coping at '+rail.path[i]);
+   }
    return {name:d.park.name,replica:d.park.replica,meshCount:d.scene.meshes.length,terrainVertices:m.getTotalVertices(),maxContactError:max,samples,basins:d.park.basins.length,curveRails:d.park.rails.filter(r=>r.path).length,oldCity:d.scene.meshes.filter(m=>/background building|urban facade|solid skatable concrete ramp/.test(m.name)).length,volcano:p.height(-.7,-12),deep:p.height(17,10),shallow:p.height(-19,-11),materialsReady:m.isReady(true),version:B.Engine.Version};
   });
   assert.equal(geometry.name,'Newberg / Chehalem');assert.equal(geometry.oldCity,0);assert.equal(geometry.version,'8.32.1');assert(geometry.materialsReady);assert(geometry.maxContactError<.00002,JSON.stringify(geometry));assert(geometry.volcano>1.3&&geometry.deep< -3.5&&geometry.shallow< -.8);assert(geometry.curveRails>=6);
@@ -38,7 +43,10 @@ let browser;
    const grounded={...s,x:q.p[0],z:q.p[2],y:SOLNewberg.height(q.p[0],q.p[2]),grounded:true,grinding:false,grindCooldown:0};
    if(SOLGrind.find(grounded,[rail],.025,true,true))throw Error('Grounded rider snapped onto elevated dragon rail');
    const rising={...grounded,grounded:false,y:q.p[1],vy:3};if(SOLGrind.find(rising,[rail],.025,true,false))throw Error('Unassisted rising catch bypassed ollie');
-   return {type:s.grindType,advanced:s.grindArc>before,error,finite:[s.x,s.y,s.z,s.dir].every(Number.isFinite),groundSnapRejected:true,risingCatchRejected:true};
+   const closed=__SOL_DIAGNOSTICS__.park.rails.find(r=>r.closed),end=SOLNewberg.pointAt(closed,closed.total-.05),wrap={x:end.p[0],y:end.p[1]+.1,z:end.p[2],dir:Math.atan2(end.dx,end.dz),speed:5,travelSign:1,grounded:false,grinding:false,grindCooldown:0,vy:-1,grindRequestType:'50-50',combo:0};
+   const seam=SOLGrind.find(wrap,[closed],.025,true,true);if(!seam)throw Error('Closed coping seam catch missed');SOLGrind.attach(wrap,seam);SOLGrind.advance(wrap,.025);
+   if(!wrap.grinding||wrap.grindArc<=closed.total)throw Error('Coping grind exited at the arbitrary spline seam');
+   return {type:s.grindType,advanced:s.grindArc>before,error,finite:[s.x,s.y,s.z,s.dir].every(Number.isFinite),groundSnapRejected:true,risingCatchRejected:true,closedSeamWrapped:true};
   });assert(grinds.advanced&&grinds.finite&&grinds.error<1e-8&&grinds.type==='50-50',JSON.stringify(grinds));
   const rolling=await page.evaluate(()=>{
    const d=__SOL_DIAGNOSTICS__,s=d.state,loop=d.engine._activeRenderLoops[0],render=d.scene.render,realNow=performance.now.bind(performance);d.engine.stopRenderLoop();let now=realNow();Object.defineProperty(performance,'now',{configurable:true,value:()=>now});d.scene.render=()=>{};
