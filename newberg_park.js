@@ -261,7 +261,7 @@ function install(B,scene,c){
   {id:'competition',label:'EAST / COMPETITION',x:70,z:45,dir:Math.PI},
   {id:'snake',label:'NORTH / SNAKE RUN',x:-80,z:-49,dir:Math.PI/2},
   {id:'surf',label:'SOUTH / SURF BASIN',x:-55,z:48,dir:Math.PI/2},
-  {id:'street',label:'STREET / GRIND ISLAND',x:-82,z:51,dir:Math.PI/2}
+  {id:'street',label:'STREET / GRIND ISLAND',x:-79,z:58,dir:Math.PI/2+.4}
  ];
  const spotsToggle=document.createElement('button');spotsToggle.type='button';
  spotsToggle.id='spotsToggle';spotsToggle.textContent='SPOTS';
