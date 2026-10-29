@@ -96,7 +96,13 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    // landing pulse is visual-only and decays to neutral riding in ~0.2s.
    const landingCompression=landing*.15;
    status.landingCompression=landingCompression;
-   const crouch=clamp((pose.crouch||0)*.20+landingCompression+takeoff*.06+(actions.grabbing?.65:0)+(actions.grinding?.12:0),0,.78);
+   // A rider at cruising speed keeps soft knees rather than locking upright.
+   // This small, bounded skin-only compression never affects deck contact,
+   // pushing, tricks, grinds or the landing recovery animation.
+   const athleticCompression=state.grounded&&!actions.grinding&&!pushingNow&&landing<=.05?
+    clamp(Math.abs(state.speed||0)/7,0,1)*.045:0;
+   status.athleticCompression=athleticCompression;
+   const crouch=clamp((pose.crouch||0)*.20+landingCompression+athleticCompression+takeoff*.06+(actions.grabbing?.65:0)+(actions.grinding?.12:0),0,.78);
    // Settle the pelvis into an athletic, knee-flexed stance instead of a
    // locked-knee upright pose. Feet remain IK-planted on the deck.
    // The ground-reaching push shoe sits below the deck. Compress the hips
