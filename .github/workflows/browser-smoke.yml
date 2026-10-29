@@ -34,6 +34,8 @@ jobs:
         run: node tests/audio_feedback_browser.cjs
       - name: Verify deterministic halfpipe pump physics
         run: node tests/pump_physics.cjs
+      - name: Verify input ownership in desktop and mobile Chromium
+        run: node tests/input_ownership_browser.cjs
       - name: Test mobile Chromium WebGL gameplay
         id: smoke
         continue-on-error: true
