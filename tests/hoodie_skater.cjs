@@ -141,7 +141,7 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
   hipNode.computeWorldMatrix(true);chestNode.computeWorldMatrix(true);shoulderNode.computeWorldMatrix(true);
   const hip=local(hipNode),chest=local(chestNode),shoulder=local(shoulderNode);
   const dist=B.Vector3.Distance(shoulder,new B.Vector3(.18,.34,-.31));
-  if(chest.y-hip.y>.23&&hip.y>.72)sweep.push({ha:+ha.toFixed(2),ca:+ca.toFixed(2),dist:+dist.toFixed(3),shoulder:shoulder.asArray().map(v=>+v.toFixed(3)),hipY:+hip.y.toFixed(3),torso:+(chest.y-hip.y).toFixed(3)});
+  sweep.push({ha:+ha.toFixed(2),ca:+ca.toFixed(2),dist:+dist.toFixed(3),shoulder:shoulder.asArray().map(v=>+v.toFixed(3)),hipY:+hip.y.toFixed(3),torso:+(chest.y-hip.y).toFixed(3)});
  }
  console.log('GRAB_SWEEP',JSON.stringify(sweep.sort((a,b)=>a.dist-b.dist).slice(0,15)));
  rig.root.position.y=rootY;hipNode.rotationQuaternion=hipRest;chestNode.rotationQuaternion=chestRest;
