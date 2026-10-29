@@ -25,6 +25,14 @@ let browser;
   await page.waitForFunction(()=>window.__SOL_DIAGNOSTICS__?.park?.spots?.length===6&&window.__SOL_DIAGNOSTICS__?.rig?.status.ready,null,{timeout:60000});
   const spots=await page.evaluate(()=>__SOL_DIAGNOSTICS__.park.spots);
   assert.deepEqual(spots.map(s=>s.id),['core','river','competition','snake','surf','street']);
+  const safety=await page.evaluate(()=>__SOL_DIAGNOSTICS__.park.spots.map(spot=>{
+   const p=SOLNewberg,c=__SOL_DIAGNOSTICS__.camera,angle=spot.dir+c.rotationOffset*Math.PI/180;
+   return {id:spot.id,ground:p.height(spot.x,spot.z),
+    expectedCameraX:spot.x+Math.sin(angle)*c.radius,
+    expectedCameraZ:spot.z+Math.cos(angle)*c.radius};
+  }));
+  assert(safety.every(s=>Math.abs(s.ground)<.05&&Math.abs(s.expectedCameraX)<92.5&&Math.abs(s.expectedCameraZ)<68),
+   'District preflight: nonflat arrival or camera behind perimeter: '+JSON.stringify(safety));
   assert.equal(await page.locator('#spotsPanel').isVisible(),false);
   assert.equal(await page.locator('#spotsToggle').getAttribute('aria-expanded'),'false');
   const layout=await page.evaluate(()=>{
@@ -64,6 +72,7 @@ let browser;
      followCamera:d.camera.name,hoodie:d.rig.status.source,bones:d.rig.status.bones};
    });
    assert(Math.abs(state.x-spot.x)<.04&&Math.abs(state.z-spot.z)<.04,'Travel went to wrong district: '+JSON.stringify({spot,state}));
+   assert(Math.abs(state.dir-spot.dir)<.05,'Travel must face into selected riding area: '+JSON.stringify({spot,state}));
    assert(Math.abs(state.y-state.ground)<.02,'Travel must land on authoritative concrete: '+JSON.stringify({spot,state}));
    assert(Math.abs(state.ground)<.05,'District spawn should be on a level deck, not partway up a transition: '+JSON.stringify({spot,state}));
    assert(state.score===1250&&state.grounded&&!state.grinding&&!state.air&&!state.grindRail,
