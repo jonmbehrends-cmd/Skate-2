@@ -19,6 +19,7 @@ jobs:
       - run: npx playwright install chromium
       - run: node --check newberg_park.js && node tests/check_inline.cjs
       - run: node tests/newberg_surface.cjs
+      - run: node tests/spot_picker_browser.cjs
       - run: node tests/shallow_vert_launch.cjs
       - run: node tests/shallow_vert_browser.cjs
       - run: node tests/newberg_browser.cjs
