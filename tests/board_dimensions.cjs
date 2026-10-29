@@ -1,0 +1,17 @@
+'use strict';
+const assert=require('node:assert/strict');require('../board_dimensions.js');require('../wheels.js');
+const api=SOLBoardDimensions,d=api.make(),near=(a,b)=>assert(Math.abs(a-b)<1e-12,`${a} != ${b}`);
+assert.equal(api.current,null,'Candidate must not change the default game');
+near(d.deckL,.8*2.05/1.78);near(d.deckW,.203*2.05/1.78);
+near(d.V(d.G),d.G);near(d.V(.06)-d.wheelD/2,d.G);
+near(d.V(.33)+(.45-.33),d.standY);
+near(d.wheelX+d.wheelW/2,d.deckW/2);
+assert(Object.isFrozen(d)&&Object.isFrozen(d.grip)&&Object.isFrozen(api.LEGACY.grip));
+for(const options of [{stature:0},{rider:NaN},{footGap:-1},{gripTopY:Infinity}])assert.throws(()=>api.make(options),RangeError);
+assert.throws(()=>d.pushDX(NaN),RangeError);
+api.current=d;
+const points=SOLWheels.sample(0,0,0,0,()=>({height:0})).points;
+assert.deepEqual(points.map(p=>[p.side,p.forward]),[[-d.wheelX,-d.truckZ],[d.wheelX,-d.truckZ],[-d.wheelX,d.truckZ],[d.wheelX,d.truckZ]]);
+api.current=null;
+assert.equal(SOLWheels.sample(0,0,0,0,()=>({height:0})).points[0].forward,-.52);
+console.log('PASS board scale ratios, fixed ground plane, contact anchors, immutable dimensions, invalid inputs and legacy default');

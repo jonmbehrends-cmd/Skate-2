@@ -6,6 +6,9 @@
 const DEFAULT_URL='assets/quaternius-hoodie/hoodie-character.glb';
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 async function attach(B,scene,parent,legacyMeshes,options={}){
+ const BD=root.SOLBoardDimensions?.current||null,RY=BD?BD.riderShiftY:0,PS=BD?BD.pushScale:1;
+ const STAND_Y=BD?BD.standY:.45,FOOT_Z=BD?BD.footZ:.36,PUSH_DROP=BD?BD.pushDrop:.28,PUSH_EXT=BD?BD.pushExt:.14;
+ const GRIP=BD?BD.grip:[.18,.34,-.31];
  if(!B.SceneLoader?.IsPluginForExtensionAvailable('.glb'))throw Error('Babylon glTF plugin is not registered');
  const url=options.url||DEFAULT_URL,cut=url.startsWith('data:')?-1:url.lastIndexOf('/');
  const container=await B.SceneLoader.LoadAssetContainerAsync(url.slice(0,cut+1),url.slice(cut+1),scene,null,'.glb');
@@ -32,7 +35,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
   const hi=Math.max(...meshes.map(m=>m.getBoundingInfo().boundingBox.maximumWorld.y));
   if(!Number.isFinite(hi-lo)||hi-lo<.1)throw Error('Invalid character bounds');
   const scale=2.05/(hi-lo);
-  rig.scaling.setAll(scale);rig.position.y=.33-lo*scale;rig.rotation.y=Math.PI/2;
+  rig.scaling.setAll(scale);rig.position.y=.33+RY-lo*scale;rig.rotation.y=Math.PI/2;
   rig.parent=parent;
   const rest=new Map(container.transformNodes.map(n=>[n,{p:n.position.clone(),q:n.rotationQuaternion?.clone()||B.Quaternion.FromEulerVector(n.rotation)}]));
   const v=(x,y,z)=>new B.Vector3(x,y,z);
@@ -76,6 +79,8 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
   function placeDetached(node,target){const inv=B.Matrix.Invert(node.parent.computeWorldMatrix(true));node.position.copyFrom(B.Vector3.TransformCoordinates(world(target),inv));node.computeWorldMatrix(true)}
   function orient(node,q){const pq=B.Quaternion.Identity(),parentQ=B.Quaternion.Identity();node.parent.computeWorldMatrix(true).decompose(undefined,pq);parent.computeWorldMatrix(true).decompose(undefined,parentQ);node.rotationQuaternion=pq.conjugate().multiply(parentQ.multiply(q));node.computeWorldMatrix(true)}
   const status={ready:true,mode:'idle',height:2.05,bones:container.skeletons[0].bones.length,source:DEFAULT_URL,feet:[],hands:[],meshes:meshes.length};
+  const toeReach=Math.max(...detachedFeet.map((f,i)=>B.Vector3.Distance(localPosition(toeEnds[i]),localPosition(f))));
+  const PUSH_DX=BD?BD.pushDX(toeReach):.245;
   let wasGrounded=true,landing=0,takeoff=0;
   function update(state,pose,actions={}){
    const dt=clamp(actions.dt||1/60,0,.05);
@@ -111,9 +116,9 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    // A deep pelvis drop makes the planted knee rise into a high-step pose.
     // Reduce only the visual push compression while preserving the rear
     // pavement target, stroke timing, fixed limb lengths and board physics.
-    const pushCompression=pushingNow?.15+.22*clamp(pose.contact||0,0,1)+.09*clamp(pose.recovery||0,0,1):0;
+    const pushCompression=pushingNow?(.15+.22*clamp(pose.contact||0,0,1)+.09*clamp(pose.recovery||0,0,1))*PS:0;
    status.pushCompression=pushCompression;
-   rig.position.y=.33-lo*scale-.16-crouch-pushCompression;
+   rig.position.y=.33+RY-lo*scale-.16-crouch-pushCompression;
    // Babylon may cache ancestor matrices between consecutive gameplay poses.
    // Refresh the scaled rig root before solving world-space IK targets.
    rig.computeWorldMatrix(true);
@@ -174,11 +179,11 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
      1-clamp(pose.recovery||0,0,1):phase<=Math.PI?
      smoothStep(phase/(Math.PI/3)):
      1-smoothStep((phase-Math.PI)/(Math.PI*.5));
-    const foot=v(pushing?.015-.245*groundStroke:.015,
-      .45+lift+(back?rearPop:frontLevel),side*.36+(back?0:frontFlick));
+    const foot=v(pushing?.015-PUSH_DX*groundStroke:.015,
+      STAND_Y+lift+(back?rearPop:frontLevel),side*FOOT_Z+(back?0:frontFlick));
     if(pushing){
-     foot.y=.45-.28*groundStroke;
-     foot.z=-.36-travel*.14*clamp(pose.contact||0,0,1)*groundStroke;
+     foot.y=STAND_Y-PUSH_DROP*groundStroke;
+     foot.z=-FOOT_Z-travel*PUSH_EXT*clamp(pose.contact||0,0,1)*groundStroke;
     }
     // During the airborne return stroke, lift the pushing shoe's toes
     // briefly before planting the sole flat on the grip again. The roll
@@ -209,8 +214,8 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     // otherwise releasing PUSH would snap the knee even though the ankle is
     // already replanted. groundStroke is eased and continuous at phase wrap.
     const kneePole=pushing?
-     B.Vector3.Lerp(v(.8,.65,side*.50),v(.36,.65,-.82),groundStroke):
-     v(.8,.65,side*.50);
+     B.Vector3.Lerp(v(.8,.65+RY,side*.50),v(.36,.65+RY,-.82),groundStroke):
+     v(.8,.65+RY,side*.50);
     solve(legs[i].n,foot,kneePole);
     placeDetached(detachedFeet[i],localPosition(legs[i].n[2]));
     orient(detachedFeet[i],shoeRotation);
@@ -226,13 +231,13 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    // Counter-rotate the arms across the rail during a 50-50 grind. This is
    // skeletal balance only: the board's grind collision and forces are unchanged.
    const grindCounter=actions.grinding?travel*.09:0;
-   const targets=[v(.12+swing,1.25-crouch+armLift-armDrop+pushCounter+grindCounter,balance),
-                  v(.08-swing,1.25-crouch+armLift-armDrop-pushCounter-grindCounter,-balance)];
+   const targets=[v(.12+swing,1.25+RY-crouch+armLift-armDrop+pushCounter+grindCounter,balance),
+                  v(.08-swing,1.25+RY-crouch+armLift-armDrop-pushCounter-grindCounter,-balance)];
    status.armPose={spread:balance,lift:armLift,drop:armDrop,counter:pushCounter,grindCounter};
    if(actions.grabbing){
     // Grip the near-side deck rail, rather than reaching across the middle;
     // the hand tracks the moving board even during a simultaneous flip.
-    targets[1]=options.board?B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.18,.34,-.31),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):v(.18,.34,-.31);
+    targets[1]=options.board?B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(...GRIP),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):v(...GRIP);
    }
    let grabReachShift=0;
    if(actions.grabbing){
@@ -251,7 +256,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
      spine.position.addInPlace(shiftLocal);spine.computeWorldMatrix(true);
     }
    }
-   for(let i=0;i<arms.length;i++)solve(arms[i].n,targets[i],v(.65,1.0-crouch,i===0?.6:-.6));
+   for(let i=0;i<arms.length;i++)solve(arms[i].n,targets[i],v(.65,1.0+RY-crouch,i===0?.6:-.6));
    status.feet=legs.map(l=>localPosition(l.n[2]).asArray());status.hands=arms.map(l=>localPosition(l.n[2]).asArray());
    status.toeDirections=detachedFeet.map((foot,i)=>localPosition(toeEnds[i]).subtract(localPosition(foot)).normalize().asArray());
    status.legGeometry=legs.map(l=>{const p=l.n.map(localPosition);return {hip:p[0].asArray(),knee:p[1].asArray(),foot:p[2].asArray(),upper:B.Vector3.Distance(p[0],p[1]),lower:B.Vector3.Distance(p[1],p[2])}});

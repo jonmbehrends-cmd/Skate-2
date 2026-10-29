@@ -4,8 +4,9 @@
  */
 (function(root){'use strict';
 const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
-const WB=.52,TRACK=.27;
+const dims=()=>{const d=root.SOLBoardDimensions?.current;return d?{WB:d.truckZ,TRACK:d.wheelX}:{WB:.52,TRACK:.27};};
 function sample(x,z,dir,y,surface){
+  const {WB,TRACK}=dims();
   const fX=Math.sin(dir),fZ=Math.cos(dir),rX=Math.cos(dir),rZ=-Math.sin(dir);
   const points=[];
   for(const forward of [-WB,WB])for(const side of [-TRACK,TRACK]){
