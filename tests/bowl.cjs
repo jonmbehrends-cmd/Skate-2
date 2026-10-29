@@ -5,7 +5,7 @@ const html=fs.readFileSync('index.html','utf8');
 const source=html.slice(html.indexOf('let targetSteer='),html.indexOf("if(now>state.messageUntil)msg.textContent='';"));
 assert(source.includes('SOLBowl.land(state,landingContact)'));
 const state={x:0,z:-106,y:-7.62,groundY:-7.62,dir:0,speed:17,travelSign:1,vy:0,grounded:true,grinding:false,rampCooldown:0,grindCooldown:0,flip:0,spin:0,combo:0,count:0,score:0,airTime:0};
-const ctx={state,SOLBowl,SOLMotion,SOLTerrain,SOLLanding,SOLWheels,SOLObstacles,SOLGrind,joy:{x:0,y:-1},keyboard:{x:0,y:0},gpX:0,gpY:0,boost:false,pushHeld:false,solids:[],ramps:[],rails:[],pads:[],msg:{textContent:''},now:0};
+const ctx={newberg:false,state,SOLBowl,SOLMotion,SOLTerrain,SOLLanding,SOLWheels,SOLObstacles,SOLGrind,joy:{x:0,y:-1},keyboard:{x:0,y:0},gpX:0,gpY:0,boost:false,pushHeld:false,solids:[],ramps:[],rails:[],pads:[],msg:{textContent:''},now:0};
 ctx.groundContact=(x,z)=>SOLBowl.sample(x,z)||{height:0,slope:0,ramp:null};
 const tick=vm.runInNewContext('(function(dt){'+source+'})',ctx);
 for(const heading of [0,Math.PI/2,.73])for(const dt of [1/120,1/60,.025]){
