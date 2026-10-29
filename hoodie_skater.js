@@ -175,7 +175,12 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     const shoeRotation=footRoll?
      B.Quaternion.RotationAxis(B.Axis.Z,-footRoll).multiply(deckFootRotations[i]):
      deckFootRotations[i];
-    solve(legs[i].n,foot,v(.8,.65,side*.50));
+    // During pavement contact the rear knee should track behind the hip,
+    // rather than jut forward across the nose of the skateboard. Change only
+    // the visual IK bend plane: ankle targets, fixed limb lengths, physics,
+    // board transform and ordinary ride/air/grind poles stay untouched.
+    const kneePole=pushing?v(.36,.65,-.82):v(.8,.65,side*.50);
+    solve(legs[i].n,foot,kneePole);
     placeDetached(detachedFeet[i],localPosition(legs[i].n[2]));
     orient(detachedFeet[i],shoeRotation);
    }
