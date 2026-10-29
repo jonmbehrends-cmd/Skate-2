@@ -21,8 +21,9 @@ let browser;
    const bytes=d.park.surfaceArt?.textureBytes||0,vertices=d.scene.meshes.reduce((s,m)=>s+m.getTotalVertices(),0);
    const sample=SOLNewberg.sample(17,10),t=sceneTex=>sceneTex?.getSize();
    const joints=d.scene.getMeshByName('concrete saw-cut slab joints');
-   const lawn=d.scene.getMeshByName('Ewing Young surrounding lawn'),lp=lawn.getVerticesData(B.VertexBuffer.PositionKind),lm=lawn.computeWorldMatrix(true);
-   for(let i=0;i<lp.length;i+=3){const v=B.Vector3.TransformCoordinates(new B.Vector3(lp[i],lp[i+1],lp[i+2]),lm);if(Math.abs(v.x)<SOLNewberg.width/2-.001&&Math.abs(v.z)<SOLNewberg.depth/2-.001)throw Error('Surrounding landscape caps the riding rectangle');}
+   const lawn=d.scene.getMeshByName('Ewing Young surrounding lawn');
+   if(d.park.surfaceArt&&!lawn)throw Error('Missing candidate surrounding landscape');
+   if(lawn){const lp=lawn.getVerticesData(B.VertexBuffer.PositionKind),lm=lawn.computeWorldMatrix(true);for(let i=0;i<lp.length;i+=3){const v=B.Vector3.TransformCoordinates(new B.Vector3(lp[i],lp[i+1],lp[i+2]),lm);if(Math.abs(v.x)<SOLNewberg.width/2-.001&&Math.abs(v.z)<SOLNewberg.depth/2-.001)throw Error('Surrounding landscape caps the riding rectangle');}}
    return {positions,indices,rails,meshCount:d.scene.meshes.length,vertices,bytes,districts:d.park.surfaceArt?.districts||[],diffuse:t(terrain[0].material.diffuseTexture),normal:t(terrain[0].material.bumpTexture),joints:{alpha:joints.alpha,blended:joints.material.needAlphaBlending()},sample};
   });
   const signature=createHash('sha256').update(JSON.stringify([geometry.positions,geometry.indices,geometry.rails,geometry.sample])).digest('hex');delete geometry.positions;delete geometry.indices;delete geometry.rails;
