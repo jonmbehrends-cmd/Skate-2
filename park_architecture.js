@@ -12,6 +12,36 @@ function build(B,scene,ramps){
   return m;
  }
  const cement=material('architectural exposed concrete','#a8a49b',true);
+ // The exposed retaining walls and halfpipe supports were flat, single-color
+ // blocks. A single deterministic, tileable 256px aggregate map adds concrete
+ // grain and hairline formwork marks without extra meshes or asset requests.
+ // Keep the palette near white: PBR multiplies this texture by cement's tint.
+ const aggregate=new B.DynamicTexture('architectural poured concrete aggregate',
+  {width:256,height:256},scene,false);
+ const aggregateInk=aggregate.getContext();
+ aggregateInk.fillStyle='#f7f6f3';aggregateInk.fillRect(0,0,256,256);
+ let seed=0x5a17c0de;
+ const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296};
+ for(let i=0;i<1800;i++){
+  const x=Math.floor(random()*256),y=Math.floor(random()*256);
+  const size=random()>.87?3:1;
+  aggregateInk.fillStyle=i%4===0?'rgba(78,85,86,.16)':'rgba(113,110,103,.09)';
+  aggregateInk.fillRect(x,y,size,size);
+ }
+ // Light mineral veining, not dark cracks that could read as false edges.
+ for(let i=0;i<28;i++){
+  const x=random()*256,y=random()*256;
+  aggregateInk.beginPath();
+  aggregateInk.strokeStyle='rgba(91,92,86,.075)';
+  aggregateInk.lineWidth=.65;
+  aggregateInk.moveTo(x,y);
+  aggregateInk.lineTo(x+4+random()*16,y-1+random()*3);
+  aggregateInk.stroke();
+ }
+ aggregate.update();
+ cement.albedoTexture=aggregate;
+ cement.alpha=1;cement.transparencyMode=B.Material.MATERIAL_OPAQUE;
+ cement.forceDepthWrite=true;
  const dark=material('recessed concrete','#474c50',true);
  dark.alpha=1;dark.transparencyMode=B.Material.MATERIAL_OPAQUE;dark.forceDepthWrite=true;
  const metal=material('galvanized park coping','#9aa8b0',false);
@@ -174,6 +204,7 @@ function build(B,scene,ramps){
   for(const mesh of objects)mesh.dispose();
   for(const mat of ownedMaterials)mat.dispose();
   muralTexture.dispose();
+  aggregate.dispose();
  }};
 }
 root.SOLParkArchitecture={build};
