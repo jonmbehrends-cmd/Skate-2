@@ -105,7 +105,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    // Keep the hips high enough for a real knee bend; the grab is coordinated
    // with a forward torso hinge and feet staying planted on the airborne deck.
    // A pelvis-only 0.65m squat produced an almost seated/prone silhouette.
-   const grabCompression=actions.grabbing?.42:0;
+   const grabCompression=actions.grabbing?.20:0;
    status.grabCompression=grabCompression;
    const crouch=clamp((pose.crouch||0)*.20+landingCompression+athleticCompression+takeoff*.06+grabCompression+(actions.grinding?.12:0),0,.78);
    // Settle the pelvis into an athletic, knee-flexed stance instead of a
@@ -131,8 +131,8 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    status.pushingNow=pushingNow;
    const landingHinge=landing*.085;
    status.landingHinge=landingHinge;
-   pelvis.rotationQuaternion=rest.get(pelvis).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.22:actions.grinding?.07:landingHinge-pushLean*.5));
-   spine.rotationQuaternion=rest.get(spine).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.30:actions.grinding?-.05:-landingHinge*.4-pushLean))
+   pelvis.rotationQuaternion=rest.get(pelvis).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.35:actions.grinding?.07:landingHinge-pushLean*.5));
+   spine.rotationQuaternion=rest.get(spine).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.90:actions.grinding?-.05:-landingHinge*.4-pushLean))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pushingNow?(pose.contact||0)*.07:0)));
    const travel=state.travelSign===-1?-1:1;
    const lift=air?(flip?.22:actions.grabbing?0:.15+takeoff*.12):0;
@@ -196,6 +196,9 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     const reach=B.Vector3.Distance(shoulder,localPosition(chain[1]))+
       B.Vector3.Distance(localPosition(chain[1]),localPosition(chain[2]));
     const delta=targets[1].subtract(shoulder),distance=delta.length();
+    status.grabShoulderBefore=shoulder.asArray();
+    status.grabArmReach=reach;
+    status.grabShoulderDistance=distance;
     const shortfall=Math.max(0,distance-reach+.055);
     grabReachShift=shortfall;
     if(shortfall>0&&distance>.0001){
