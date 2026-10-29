@@ -102,7 +102,12 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    const athleticCompression=state.grounded&&!actions.grinding&&!pushingNow&&landing<=.05?
     clamp(Math.abs(state.speed||0)/7,0,1)*.045:0;
    status.athleticCompression=athleticCompression;
-   const crouch=clamp((pose.crouch||0)*.20+landingCompression+athleticCompression+takeoff*.06+(actions.grabbing?.65:0)+(actions.grinding?.12:0),0,.78);
+   // Airborne grabs need an athletic knee tuck, not a seated 65 cm drop.
+   // Keep the pelvis nearer the board while the arm IK reaches the rail;
+   // do not alter the skateboard or any authoritative physics transform.
+   const grabCompression=actions.grabbing?.34:0;
+   status.grabCompression=grabCompression;
+   const crouch=clamp((pose.crouch||0)*.20+landingCompression+athleticCompression+takeoff*.06+grabCompression+(actions.grinding?.12:0),0,.78);
    // Settle the pelvis into an athletic, knee-flexed stance instead of a
    // locked-knee upright pose. Feet remain IK-planted on the deck.
    // The ground-reaching push shoe sits below the deck. Compress the hips
