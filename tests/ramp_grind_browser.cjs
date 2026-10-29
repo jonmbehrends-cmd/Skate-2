@@ -26,15 +26,19 @@ const server=http.createServer((req,res)=>{const url=new URL(req.url,'http://loc
    const used=new Set(scene.materials.flatMap(m=>m.getActiveTextures()));
    const duplicates=scene.textures.filter(t=>t instanceof B.DynamicTexture&&!used.has(t)).map(t=>t.name);
    const source=scene.getMaterialByName('concrete').diffuseTexture;
-   const concreteMaterials=scene.materials.filter(m=>m.name==='warm plaza poured concrete'||
-    m.name.startsWith('solid opaque textured ramp concrete ')||m.name==='halfpipe continuous opaque textured riding concrete');
+   const rampConcrete=scene.materials.filter(m=>m.name.startsWith('solid opaque textured ramp concrete ')||
+    m.name==='halfpipe continuous opaque textured riding concrete');
+   const plaza=scene.getMaterialByName('warm plaza poured concrete');
    return {textures:scene.textures.length,unusedDynamicTextures:duplicates,
-    sharedConcrete:concreteMaterials.every(m=>m.diffuseTexture===source),
+    sharedConcrete:rampConcrete.every(m=>m.diffuseTexture===source),
+    plazaDedicated:plaza.diffuseTexture!==source&&plaza.diffuseTexture?.isReady()&&
+      plaza.diffuseTexture.name==='poured concrete panel joints'&&plaza.alpha===1&&plaza.forceDepthWrite,
     sourceReady:source.isReady(),concreteTextureCopies:scene.textures.filter(t=>t.name===source.name).length,
     bowlTexture:scene.getMaterialByName('warm pale opaque textured bowl concrete').diffuseTexture.name};
   });
   assert.deepEqual(resources.unusedDynamicTextures,[],'No discarded DynamicTexture clones may remain registered');
   assert(resources.sharedConcrete&&resources.sourceReady,'Concrete materials must retain the ready shared original');
+  assert(resources.plazaDedicated,'Plaza must use a ready, opaque, depth-writing joint texture');
   assert.equal(resources.concreteTextureCopies,1,'Only one concrete microtexture must remain');
   assert.equal(resources.bowlTexture,'bowl painted concrete art','Bowl keeps its dedicated painted finish');
   result[label]={textures,resources,deckVertices,views:[],input:{}};

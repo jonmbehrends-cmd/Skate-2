@@ -73,29 +73,69 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    const mode=actions.grinding?'grind':actions.grabbing?'grab':flip?'flip':air&&takeoff>.05?'ollie':air?'air':landing>.05?'landing':pose.pushing?'push':(pose.crouch||0)>.1?'crouch':Math.abs(state.speed)>1?'ride':'idle';
    status.mode=mode;
    for(const [n,r] of rest){n.position.copyFrom(r.p);n.rotationQuaternion=r.q.clone()}
-   const crouch=clamp((pose.crouch||0)*.20+landing*.08+takeoff*.06+(actions.grabbing?.35:0),0,.46);
-   rig.position.y=.33-lo*scale-.10-crouch-(pose.pushing?.18:0);
+   // In a grab, tuck the knees up toward the deck instead of curling the
+   // spine forward. Keep the chest comparatively upright as the hips lower;
+   // hip/chest lean and arm IK still bring the hand onto the moving deck.
+   const crouch=clamp((pose.crouch||0)*.20+landing*.08+takeoff*.06+(actions.grabbing?.65:0)+(actions.grinding?.12:0),0,.78);
+   // Settle the pelvis into an athletic, knee-flexed stance instead of a
+   // locked-knee upright pose. Feet remain IK-planted on the deck.
+   // The ground-reaching push shoe sits below the deck. Compress the hips
+   // during contact so the fixed-length leg can actually reach pavement;
+   // recover gradually as the shoe swings back, without stretching bones.
+   const pushCompression=pose.pushing?.18+.25*clamp(pose.contact||0,0,1)+.09*clamp(pose.recovery||0,0,1):0;
+   status.pushCompression=pushCompression;
+   rig.position.y=.33-lo*scale-.16-crouch-pushCompression;
+   // Babylon may cache ancestor matrices between consecutive gameplay poses.
+   // Refresh the scaled rig root before solving world-space IK targets.
+   rig.computeWorldMatrix(true);
    rig.rotation.x=0;rig.rotation.z=0;
    // Bend from the hips during a grab so the shoulder can physically reach
    // the moving deck; leg IK below re-plants both feet after this rotation.
-   pelvis.rotationQuaternion=rest.get(pelvis).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.35:0));
-   spine.rotationQuaternion=rest.get(spine).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.40:0)).multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pose.contact||0)*.07));
+   // A grounded push needs a small forward hip hinge and chest counterbalance.
+   // Drive both from the actual contact/recovery phase, not the board's speed:
+   // this keeps riding, ollies and landings neutral without touching physics.
+   const pushLean=pose.pushing&&state.grounded?
+    clamp((pose.contact||0)*.075+(pose.recovery||0)*.025,0,.085):0;
+   status.pushLean=pushLean;
+   pelvis.rotationQuaternion=rest.get(pelvis).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.12:actions.grinding?.07:-pushLean*.5));
+   spine.rotationQuaternion=rest.get(spine).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.12:actions.grinding?-.05:-pushLean))
+    .multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pose.pushing?(pose.contact||0)*.07:0)));
    const travel=state.travelSign===-1?-1:1;
    const lift=air?(flip?.22:actions.grabbing?.10:.15+takeoff*.12):0;
+   // Ollie pop starts at the tail: the rear knee tucks first, then the front
+   // knee levels the board. A kickflip briefly flicks the leading shoe out.
+   // These are skin-only targets and never change deck rotation or collision.
+   const rearPop=air&&!actions.grabbing&&!flip?takeoff*.11:0;
+   const frontLevel=air&&!actions.grabbing&&!flip?(1-takeoff)*.05:0;
+   const frontFlick=flip&&!actions.grabbing?.085:0;
+   status.footPose={rearPop,frontLevel,frontFlick};
    for(let i=0;i<legs.length;i++){
     const back=i===1,side=back?-1:1;
     const pushing=back&&pose.pushing;
-    const foot=v(pushing?-.23:.015,.45+lift,side*.43);
+    const foot=v(pushing?-.23:.015,.45+lift+(back?rearPop:frontLevel),side*.36+(back?0:frontFlick));
     if(pushing){foot.y=.17+(pose.recovery||0)*.29;foot.z=-.32-travel*(.18*(pose.contact||0)-.20*(pose.recovery||0))}
-    solve(legs[i].n,foot,v(.8,.8,side*.50));placeDetached(detachedFeet[i],localPosition(legs[i].n[2]));orient(detachedFeet[i],footRotations[i]);
+    solve(legs[i].n,foot,v(.8,.65,side*.50));placeDetached(detachedFeet[i],localPosition(legs[i].n[2]));orient(detachedFeet[i],footRotations[i]);
    }
-   const balance=actions.grinding?.78:air?.60:.39;
-   const swing=pose.pushing?(pose.contact||0)*.23-(pose.recovery||0)*.15:0;
-   const targets=[v(.12+swing,1.25-crouch,balance),v(.08-swing,1.25-crouch,-balance)];
+   // Keep the shoulders active throughout a trick. A skater raises both
+   // arms during the pop, counter-swings while pushing, and spreads/drops
+   // them to absorb a landing; this is visual-only (no forces or input edits).
+   const balance=actions.grinding?.78:air?.60:landing>.05?.64:pose.pushing?.49:.39;
+   const swing=pose.pushing?(pose.contact||0)*.25-(pose.recovery||0)*.17:0;
+   const armLift=air&&!actions.grabbing?takeoff*.18+(flip?.06:0):0;
+   const armDrop=landing*.13;
+   const pushCounter=pose.pushing?.10:0;
+   // Counter-rotate the arms across the rail during a 50-50 grind. This is
+   // skeletal balance only: the board's grind collision and forces are unchanged.
+   const grindCounter=actions.grinding?travel*.09:0;
+   const targets=[v(.12+swing,1.25-crouch+armLift-armDrop+pushCounter+grindCounter,balance),
+                  v(.08-swing,1.25-crouch+armLift-armDrop-pushCounter-grindCounter,-balance)];
+   status.armPose={spread:balance,lift:armLift,drop:armDrop,counter:pushCounter,grindCounter};
    if(actions.grabbing){
-    // Grip is attached to the actual moving deck, including a simultaneous flip.
-    targets[1]=options.board?B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.23,.30,-.15),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):v(.23,.30,-.15);
+    // Grip the near-side deck rail, rather than reaching across the middle;
+    // the hand tracks the moving board even during a simultaneous flip.
+    targets[1]=options.board?B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.18,.34,-.31),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):v(.18,.34,-.31);
    }
+   let grabReachShift=0;
    if(actions.grabbing){
     // Two-bone IK cannot reach a deck below the shoulder if the torso stays
     // upright. Bring the chest toward the board only by the missing reach,
@@ -105,6 +145,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
       B.Vector3.Distance(localPosition(chain[1]),localPosition(chain[2]));
     const delta=targets[1].subtract(shoulder),distance=delta.length();
     const shortfall=Math.max(0,distance-reach+.055);
+    grabReachShift=shortfall;
     if(shortfall>0&&distance>.0001){
      const shiftWorld=B.Vector3.TransformNormal(delta.scale(shortfall/distance),parent.computeWorldMatrix(true));
      const shiftLocal=B.Vector3.TransformNormal(shiftWorld,B.Matrix.Invert(spine.parent.computeWorldMatrix(true)));
@@ -115,6 +156,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    status.feet=legs.map(l=>localPosition(l.n[2]).asArray());status.hands=arms.map(l=>localPosition(l.n[2]).asArray());
    status.legGeometry=legs.map(l=>{const p=l.n.map(localPosition);return {hip:p[0].asArray(),knee:p[1].asArray(),foot:p[2].asArray(),upper:B.Vector3.Distance(p[0],p[1]),lower:B.Vector3.Distance(p[1],p[2])}});
    status.grip=actions.grabbing?targets[1].asArray():null;
+   status.grabReachShift=grabReachShift;
   }
   update({grounded:true,speed:0},{crouch:0});
   for(const mesh of meshes){mesh.receiveShadows=true;mesh.alwaysSelectAsActiveMesh=true;options.shadow?.addShadowCaster(mesh)}
