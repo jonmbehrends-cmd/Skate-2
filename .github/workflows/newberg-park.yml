@@ -22,6 +22,7 @@ jobs:
       - run: node tests/shallow_vert_launch.cjs
       - run: node tests/shallow_vert_browser.cjs
       - run: node tests/newberg_browser.cjs
+      - run: node tests/spot_picker_browser.cjs
       - run: node tests/expansion_browser.cjs
       - run: node tests/newberg_hoodie_browser.cjs
       - uses: actions/upload-artifact@v4
