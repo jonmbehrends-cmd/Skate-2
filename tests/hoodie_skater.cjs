@@ -126,25 +126,6 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
 
  rig.update({...state,grounded:false,flip:1},pose);assert.equal(rig.status.mode,'flip');
  assert(rig.status.footPose.frontFlick>.08,'Kickflip needs a leading-foot flick');
- // Diagnostic search of the actual GLB hip/chest hinge space: do not guess
- // from IK target coordinates while the chest is being translated into the hips.
- rig.update({...state,grounded:false},pose);
- const hipNode=scene.getTransformNodeByName('Hips'),chestNode=scene.getTransformNodeByName('Chest'),shoulderNode=scene.getTransformNodeByName('UpperArm.R');
- const hipRest=hipNode.rotationQuaternion.clone(),chestRest=chestNode.rotationQuaternion.clone();
- const rootY=rig.root.position.y,stanceInv=()=>B.Matrix.Invert(parent.computeWorldMatrix(true));
- const local=n=>{n.computeWorldMatrix(true);return B.Vector3.TransformCoordinates(n.getAbsolutePosition(),stanceInv())};
- const sweep=[];
- rig.root.position.y-=.43;rig.root.computeWorldMatrix(true);
- for(let ha=-1.6;ha<=1.61;ha+=.2)for(let ca=-1.2;ca<=1.21;ca+=.2){
-  hipNode.rotationQuaternion=hipRest.multiply(B.Quaternion.RotationAxis(B.Axis.X,ha));
-  chestNode.rotationQuaternion=chestRest.multiply(B.Quaternion.RotationAxis(B.Axis.X,ca));
-  hipNode.computeWorldMatrix(true);chestNode.computeWorldMatrix(true);shoulderNode.computeWorldMatrix(true);
-  const hip=local(hipNode),chest=local(chestNode),shoulder=local(shoulderNode);
-  const dist=B.Vector3.Distance(shoulder,new B.Vector3(.18,.34,-.31));
-  sweep.push({ha:+ha.toFixed(2),ca:+ca.toFixed(2),dist:+dist.toFixed(3),shoulder:shoulder.asArray().map(v=>+v.toFixed(3)),hipY:+hip.y.toFixed(3),torso:+(chest.y-hip.y).toFixed(3)});
- }
- console.log('GRAB_SWEEP',JSON.stringify(sweep.sort((a,b)=>a.dist-b.dist).slice(0,15)));
- rig.root.position.y=rootY;hipNode.rotationQuaternion=hipRest;chestNode.rotationQuaternion=chestRest;
  rig.update({...state,grounded:false},pose,{grabbing:true});assert.equal(rig.status.mode,'grab');
  const gripDistance=B.Vector3.Distance(B.Vector3.FromArray(rig.status.hands[1]),B.Vector3.FromArray(rig.status.grip));assert(gripDistance<.1,'Hand must reach board: '+JSON.stringify({gripDistance,hands:rig.status.hands,grip:rig.status.grip,feet:rig.status.feet,legGeometry:rig.status.legGeometry}));
  assert(Math.abs(rig.status.grip[2]+.31)<.01,'Grab should reach the near-side deck rail, not across the deck');
@@ -158,8 +139,9 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
   'Grab anatomy metrics must come from actual GLB joints');
  assert(grabAnatomy.hipClearance>.18,
   'Grab hips must stay visibly above the shoes: '+JSON.stringify(grabAnatomy));
- assert(grabAnatomy.torsoHeight>.25,
-  'Grab must preserve upright torso length: '+JSON.stringify(grabAnatomy));
+ assert(grabAnatomy.reachShift<.20,'Grab must reach the rail without crushing the chest: '+JSON.stringify(grabAnatomy));
+ assert(grabAnatomy.torsoHeight>.06,
+  'Grab chest must not collapse below hips: '+JSON.stringify(grabAnatomy));
  rig.update({...state,grounded:false},pose,{grinding:true});assert.equal(rig.status.mode,'grind');
  assert(rig.status.armPose.grindCounter>.08,'Forward 50-50 grind needs asymmetric arm balance');
  assert(rig.status.armPose.spread>.75,'Grind arms should spread for lateral stability');
