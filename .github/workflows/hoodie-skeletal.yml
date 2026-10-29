@@ -20,6 +20,7 @@ jobs:
       - run: node --check hoodie_skater.js && node --check tests/rigged_browser.cjs
       - run: node tests/hoodie_skater.cjs
       - run: node tests/rigged_browser.cjs
+        if: ${{ !cancelled() }} # Preserve real GLB screenshots even if anatomy assertions fail.
       - run: node --check tools/animation_profile.cjs && node tests/animation_ancestor_probe.cjs
       - run: node --check tests/rider_preservation_gates.cjs && node tests/rider_preservation_gates.cjs
       - uses: actions/upload-artifact@v4
