@@ -124,8 +124,22 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  assert.equal(rig.status.footPose.rearPop,0,'Shallow vert should not play ollie tail-foot lift');
  assert.equal(rig.status.footPose.frontLevel,0,'Shallow vert should not play ollie front-foot flick');
 
- rig.update({...state,grounded:false,flip:1},pose);assert.equal(rig.status.mode,'flip');
+ rig.update({...state,grounded:false,flip:1,airTime:0},pose);
+ assert.equal(rig.status.flipFootPitch,0,'Flip ankle starts neutral at takeoff');
+ rig.update({...state,grounded:false,flip:1,airTime:.21},pose);assert.equal(rig.status.mode,'flip');
  assert(rig.status.footPose.frontFlick>.08,'Kickflip needs a leading-foot flick');
+ assert(rig.status.flipFootPitch>.15&&rig.status.flipFootPitch<.17,
+  'Kickflip must roll the leading ankle during the early airborne flick');
+ assert(rig.status.toeDirections[0][1]<-.08,
+  'Actual GLB leading toes must flick down on kickflip: '+JSON.stringify(rig.status.toeDirections));
+ assert(Math.abs(rig.status.toeDirections[1][1])<.1,
+  'Trailing shoe must remain level during a kickflip');
+ rig.update({...state,grounded:false,flip:-1,airTime:.21},pose);
+ assert(rig.status.flipFootPitch<-.15&&rig.status.toeDirections[0][1]>.08,
+  'Heelflip must roll the real leading ankle in the opposite direction');
+ rig.update({...state,grounded:false,flip:1,airTime:.42},pose);
+ assert(Math.abs(rig.status.flipFootPitch)<.001&&Math.abs(rig.status.toeDirections[0][1])<.1,
+  'Flip ankle must settle flat before landing');
  rig.update({...state,grounded:false},pose,{grabbing:true});assert.equal(rig.status.mode,'grab');
  const gripDistance=B.Vector3.Distance(B.Vector3.FromArray(rig.status.hands[1]),B.Vector3.FromArray(rig.status.grip));assert(gripDistance<.1,'Hand must reach board: '+JSON.stringify({gripDistance,hands:rig.status.hands,grip:rig.status.grip,feet:rig.status.feet,legGeometry:rig.status.legGeometry}));
  assert(Math.abs(rig.status.grip[2]+.31)<.01,'Grab should reach the near-side deck rail, not across the deck');
