@@ -75,7 +75,7 @@ let browser;
     await page.evaluate(()=>{const d=__SOL_DIAGNOSTICS__;d.scene.activeCamera.alpha=-.9;d.scene.render()});
    }
    if(mode==='grab'){const dist=Math.hypot(...evidence.status.hands[1].map((n,i)=>n-evidence.status.grip[i]));assert(dist<.12,'Hoodie hand must touch board: '+JSON.stringify({dist,hands:evidence.status.hands,grip:evidence.status.grip,feet:evidence.status.feet}));
-    assert(evidence.status.grabReachShift<.45,'Grab must not require extreme chest displacement: '+evidence.status.grabReachShift);
+    if(evidence.status.grabReachShift>=.45)visualFailures.push(label+': extreme chest displacement '+evidence.status.grabReachShift);
     // Real Chromium visual-anatomy acceptance, checked AFTER screenshot capture.
     // A numerically reached hand/ankle target must not hide a seated rider.
     const anatomy=evidence.status.anatomy;
