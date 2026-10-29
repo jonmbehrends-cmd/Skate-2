@@ -49,8 +49,16 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  rig.update({...state,grounded:false,travelSign:-1},pose,{grinding:true});
  assert(rig.status.armPose.grindCounter<-.08,'Fakie grind must reverse arm counterbalance');
  assert(rig.status.feet.every(f=>Math.abs(f[1]-.45)<.035),'Fakie grind must keep both shoes planted');
- rig.update(state,pose);assert.equal(rig.status.mode,'landing');\n assert(rig.status.landingCompression>.14&&rig.status.landingHinge>.08,\n  'Landing should visibly absorb impact through knees and hips');\n assert(rig.status.armPose.drop>.19&&rig.status.armPose.spread>.6,\n  'Landing needs widened, lowered arms to recover balance');\n assert(rig.status.feet.every(f=>Math.abs(f[1]-.45)<.035),\n  'Landing must keep both shoes on the deck');
- for(let i=0;i<30;i++)rig.update(state,pose);assert.equal(rig.status.mode,'ride');\n assert.equal(rig.status.landingCompression,0,'Landing knee compression must fully recover');\n assert.equal(rig.status.landingHinge,0,'Landing hip hinge must fully recover');
+ rig.update(state,pose);assert.equal(rig.status.mode,'landing');
+ assert(rig.status.landingCompression>.14&&rig.status.landingHinge>.08,
+  'Landing should visibly absorb impact through knees and hips');
+ assert(rig.status.armPose.drop>.19&&rig.status.armPose.spread>.6,
+  'Landing needs widened, lowered arms to recover balance');
+ assert(rig.status.feet.every(f=>Math.abs(f[1]-.45)<.035),
+  'Landing must keep both shoes on the deck');
+ for(let i=0;i<30;i++)rig.update(state,pose);assert.equal(rig.status.mode,'ride');
+ assert.equal(rig.status.landingCompression,0,'Landing knee compression must fully recover');
+ assert.equal(rig.status.landingHinge,0,'Landing hip hinge must fully recover');
  assert.equal(JSON.stringify(state),original,'Visuals must not mutate physics');
  assert(scene.animationGroups.every(g=>!g.isPlaying),'Source locomotion clips must stay stopped');
  rig.dispose();assert.equal(fallback.isVisible,true);engine.dispose();
