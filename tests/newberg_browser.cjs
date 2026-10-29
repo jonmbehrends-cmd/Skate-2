@@ -19,6 +19,13 @@ let browser;
   });
   assert.equal(geometry.name,'Newberg / Chehalem');assert.equal(geometry.oldCity,0);assert.equal(geometry.version,'8.32.1');assert(geometry.materialsReady);assert(geometry.maxContactError<.00002,JSON.stringify(geometry));assert(geometry.volcano>1.3&&geometry.deep< -3.5&&geometry.shallow< -.8);assert(geometry.curveRails>=6);
   await page.screenshot({path:path.join(out,label+'-entrance.png')});
+  // Diagnostic-only frames to isolate the diagonal concrete banding visible
+  // in production. Preserve the exact scene/camera and restore each property.
+  await page.evaluate(()=>{const m=__SOL_DIAGNOSTICS__.park.terrain;m.receiveShadows=false;});
+  await page.screenshot({path:path.join(out,label+'-no-terrain-shadows.png')});
+  await page.evaluate(()=>{const m=__SOL_DIAGNOSTICS__.park.terrain;m.receiveShadows=true;window.__newbergAggregate=m.material.diffuseTexture;m.material.diffuseTexture=null;});
+  await page.screenshot({path:path.join(out,label+'-no-aggregate.png')});
+  await page.evaluate(()=>{const m=__SOL_DIAGNOSTICS__.park.terrain;m.material.diffuseTexture=window.__newbergAggregate;delete window.__newbergAggregate;});
   const push=await page.locator('[data-t="push"]').boundingBox();await page.mouse.move(push.x+push.width/2,push.y+push.height/2);await page.mouse.down();await page.waitForFunction(()=>__SOL_DIAGNOSTICS__.state.speed>.3);await page.mouse.up();
   await page.locator('#restart').click();
   await page.evaluate(()=>{document.addEventListener('pointerdown',e=>{if(e.target.closest('[data-t="ollie"]')){const s=__SOL_DIAGNOSTICS__.state;window.__newbergLaunch={trusted:e.isTrusted,vy:s.vy,count:s.count,grounded:s.grounded,y:s.y};}});});
