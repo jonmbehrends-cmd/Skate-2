@@ -133,12 +133,17 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    spine.rotationQuaternion=rest.get(spine).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.12:actions.grinding?-.05:-landingHinge*.4-pushLean))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pushingNow?(pose.contact||0)*.07:0)));
    const travel=state.travelSign===-1?-1:1;
-   const lift=air?(flip?.22:actions.grabbing?.10:.15+takeoff*.12):0;
+   // Unlike an ollie, a shallow transition vert air carries the whole board
+   // with both soles. Avoid the ordinary 12-27cm ollie-foot separation that
+   // makes the skater visibly float above the board immediately at takeoff.
+   // Deep vert, grabs, flips, grinds, pushing and all physics are unchanged.
+   const shallowVertAir=air&&!!state.bowlAir?.shallow;
+   const lift=air?(shallowVertAir?.02:flip?.22:actions.grabbing?.10:.15+takeoff*.12):0;
    // Ollie pop starts at the tail: the rear knee tucks first, then the front
    // knee levels the board. A kickflip briefly flicks the leading shoe out.
    // These are skin-only targets and never change deck rotation or collision.
-   const rearPop=air&&!actions.grabbing&&!flip?takeoff*.11:0;
-   const frontLevel=air&&!actions.grabbing&&!flip?(1-takeoff)*.05:0;
+   const rearPop=air&&!shallowVertAir&&!actions.grabbing&&!flip?takeoff*.11:0;
+   const frontLevel=air&&!shallowVertAir&&!actions.grabbing&&!flip?(1-takeoff)*.05:0;
    const frontFlick=flip&&!actions.grabbing?.085:0;
    status.footPose={rearPop,frontLevel,frontFlick};
    for(let i=0;i<legs.length;i++){
