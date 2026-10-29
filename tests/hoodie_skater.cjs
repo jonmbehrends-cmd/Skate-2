@@ -42,6 +42,13 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  assert(Number.isFinite(rig.status.grabReachShift)&&rig.status.grabReachShift<.45,
   'Grab should not translate the chest excessively: '+rig.status.grabReachShift);
  rig.update({...state,grounded:false},pose,{grinding:true});assert.equal(rig.status.mode,'grind');
+ assert(rig.status.armPose.grindCounter>.08,'Forward 50-50 grind needs asymmetric arm balance');
+ assert(rig.status.armPose.spread>.75,'Grind arms should spread for lateral stability');
+ assert(rig.status.feet.every(f=>Math.abs(f[1]-.45)<.035),'Grind shoes must remain planted on deck');
+ assert.equal(rig.status.pushLean,0,'Grind must not inherit the grounded push hinge');
+ rig.update({...state,grounded:false,travelSign:-1},pose,{grinding:true});
+ assert(rig.status.armPose.grindCounter<-.08,'Fakie grind must reverse arm counterbalance');
+ assert(rig.status.feet.every(f=>Math.abs(f[1]-.45)<.035),'Fakie grind must keep both shoes planted');
  rig.update(state,pose);assert.equal(rig.status.mode,'landing');assert(rig.status.armPose.drop>.1&&rig.status.armPose.spread>.6,'Landing needs widened, lowered arms');
  for(let i=0;i<30;i++)rig.update(state,pose);assert.equal(rig.status.mode,'ride');
  assert.equal(JSON.stringify(state),original,'Visuals must not mutate physics');
