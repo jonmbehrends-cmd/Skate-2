@@ -129,8 +129,19 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  rig.update({...state,grounded:false},pose,{grabbing:true});assert.equal(rig.status.mode,'grab');
  const gripDistance=B.Vector3.Distance(B.Vector3.FromArray(rig.status.hands[1]),B.Vector3.FromArray(rig.status.grip));assert(gripDistance<.1,'Hand must reach board: '+JSON.stringify({gripDistance,hands:rig.status.hands,grip:rig.status.grip,feet:rig.status.feet,legGeometry:rig.status.legGeometry}));
  assert(Math.abs(rig.status.grip[2]+.31)<.01,'Grab should reach the near-side deck rail, not across the deck');
+ console.log('GRAB_ANATOMY',JSON.stringify({geometry:rig.status.grabReachGeometry,anatomy:rig.status.grabAnatomy,legs:rig.status.legGeometry}));
  assert(Number.isFinite(rig.status.grabReachShift)&&rig.status.grabReachShift<.45,
   'Grab should not translate the chest excessively: '+rig.status.grabReachShift);
+ // Guard the *rendered joint* geometry: a solved hand-to-deck target is not
+ // sufficient when the rider's pelvis collapses into a seated pose.
+ const grabAnatomy=rig.status.grabAnatomy;
+ assert(grabAnatomy&&Object.values(grabAnatomy).every(Number.isFinite),
+  'Grab anatomy metrics must come from actual GLB joints');
+ assert(grabAnatomy.hipClearance>.18,
+  'Grab hips must stay visibly above the shoes: '+JSON.stringify(grabAnatomy));
+ assert(grabAnatomy.reachShift<.20,'Grab must reach the rail without crushing the chest: '+JSON.stringify(grabAnatomy));
+ assert(grabAnatomy.torsoHeight>.06,
+  'Grab chest must not collapse below hips: '+JSON.stringify(grabAnatomy));
  rig.update({...state,grounded:false},pose,{grinding:true});assert.equal(rig.status.mode,'grind');
  assert(rig.status.armPose.grindCounter>.08,'Forward 50-50 grind needs asymmetric arm balance');
  assert(rig.status.armPose.spread>.75,'Grind arms should spread for lateral stability');
