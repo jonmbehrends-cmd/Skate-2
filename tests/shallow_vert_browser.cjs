@@ -50,7 +50,7 @@ let browser;
     for(let i=0;i<25;i++){
      window.__shallowClock+=25;window.__shallowLoop();
      maxStep=Math.max(maxStep,Math.hypot(s.x-last.x,s.z-last.z));last={x:s.x,z:s.z,y:s.y};
-     if(s.bowlStats.launches>0){takeoff={frame:i,x:s.x,y:s.y,z:s.z,vy:s.vy,grounded:s.grounded,kind:s.name,shallow:s.bowlAir?.shallow,pitch:d.skater.rotation.x};break;}
+     if(s.bowlStats.launches>0){takeoff={frame:i,x:s.x,y:s.y,z:s.z,vy:s.vy,grounded:s.grounded,kind:s.name,shallow:s.bowlAir?.shallow,pitch:d.skater.rotation.x,feetY:d.rig.status.feet.map(f=>f[1]),rearPop:d.rig.status.footPose.rearPop};break;}
     }
     if(takeoff){
      const old=d.scene.activeCamera;
@@ -63,6 +63,8 @@ let browser;
    },{...spot,mobile});
    assert(launch.takeoff?.vy>0&&!launch.takeoff.grounded&&launch.takeoff.kind==='NEWBERG VERT AIR',
     'Running engine did not launch shallow '+label+'/'+spot.name+': '+JSON.stringify(launch));
+   assert(launch.takeoff.feetY.every(y=>Math.abs(y-.47)<.05)&&launch.takeoff.rearPop===0,
+    'Shallow-air shoes must stay with the rising board: '+JSON.stringify(launch));
    assert(launch.maxStep<.5,'Unexpected horizontal teleport '+JSON.stringify(launch));
    assert(launch.takeoff.shallow&&Math.abs(launch.takeoff.pitch)<.82,
     'Shallow takeoff must not pitch the visible hoodie nearly horizontal: '+JSON.stringify(launch));
