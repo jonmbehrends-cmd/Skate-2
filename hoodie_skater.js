@@ -103,7 +103,9 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    // recover gradually as the shoe swings back, without stretching bones.
    const pushCompression=pose.pushing?.18+.25*clamp(pose.contact||0,0,1)+.09*clamp(pose.recovery||0,0,1):0;
    status.pushCompression=pushCompression;
-   // Raise the airborne pelvis above the tucked ankles; keep the board\n   // transform independent so the character does not sit on its shoes.\n   rig.position.y=.33-lo*scale-.16-crouch-pushCompression+(actions.grabbing?.24:0);
+   // Raise the airborne pelvis above the tucked ankles; keep the board
+   // transform independent so the character does not sit on its shoes.
+   rig.position.y=.33-lo*scale-.16-crouch-pushCompression+(actions.grabbing?.24:0);
    // Babylon may cache ancestor matrices between consecutive gameplay poses.
    // Refresh the scaled rig root before solving world-space IK targets.
    rig.computeWorldMatrix(true);
@@ -161,7 +163,9 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
                   v(.08-swing,1.25-crouch+armLift-armDrop-pushCounter,-balance)];
    status.armPose={spread:balance,lift:armLift,drop:armDrop,counter:pushCounter};
    if(actions.grabbing){
-    // Grip the top edge of the near-side rail at shoe/deck height (not 19cm below\n    // the shoes); otherwise arm IK collapses the chest to reach through the board.\n    // Grip the near-side deck rail, rather than reaching across the middle;
+    // Grip the top edge of the near-side rail at shoe/deck height (not 19cm below
+    // the shoes); otherwise arm IK collapses the chest to reach through the board.
+    // Grip the near-side deck rail, rather than reaching across the middle;
     // the hand tracks the moving board even during a simultaneous flip.
     targets[1]=options.board?B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.20,.53,.15),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):v(.20,.53+grabLift,.15);
    }
