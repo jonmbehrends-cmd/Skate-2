@@ -67,7 +67,8 @@ let browser;
      skinned:d.rig.meshes.filter(m=>m.skeleton&&m.isVisible).length,
      finite:Array.from(d.rig.skeletons[0].getTransformMatrices(d.rig.meshes[0])).every(Number.isFinite)};
    },mode);
-   // Preserve the actual GLB pose screenshot even when an anatomy assertion fails.\n   await page.screenshot({path:path.join(out,'hoodie-'+label+'-'+mode+'.png')});
+   // Preserve the actual GLB pose screenshot even when an anatomy assertion fails.
+   await page.screenshot({path:path.join(out,'hoodie-'+label+'-'+mode+'.png')});
    assert.equal(pose.mode,['push-recovery','push-cycle-end'].includes(mode)?'push':mode,'Newberg hoodie pose: '+JSON.stringify(pose));
    assert(pose.skinned>=4&&pose.finite,'Visible deforming GLB required: '+mode);
    if(mode==='grab'){
@@ -98,7 +99,8 @@ let browser;
    const d=__SOL_DIAGNOSTICS__;
    return {hoodie:!!d.rig,visible:d.riderV2.meshes.filter(m=>m.isVisible&&m.isEnabled()&&m.skeleton&&m.getTotalVertices()>0).length,park:d.park.name};
   });
-  // Save the fallback frame before validating visibility so a regression is inspectable.\n  await page.screenshot({path:path.join(out,'hoodie-'+(mobile?'mobile':'desktop')+'-fallback.png')});
+  // Save the fallback frame before validating visibility so a regression is inspectable.
+  await page.screenshot({path:path.join(out,'hoodie-'+(mobile?'mobile':'desktop')+'-fallback.png')});
   assert(!fallback.hoodie&&fallback.visible>0&&fallback.park==='Newberg / Chehalem',JSON.stringify(fallback));
   await page.close();
  }
