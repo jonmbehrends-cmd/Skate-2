@@ -7,6 +7,7 @@
 (function(root){'use strict';
 function attach(B,scene,rig){
  const data=root.SOLSkaterV2Data;if(!data)return null;
+ const BD=root.SOLBoardDimensions?.current||null,RY=BD?BD.riderShiftY:0;
  const V=B.Vector3,M=B.Matrix,Q=B.Quaternion,SCALE=1.15;
  const skeleton=new B.Skeleton('Gemini V2 retargeted rider','sol-v2',scene);
  const bind={},bones={},meshes=[];
@@ -54,7 +55,7 @@ function attach(B,scene,rig){
   // pelvis over planted feet rather than lifting the shoes off the skateboard.
   const ollieTuck=ollie?Math.sin(Math.PI*Math.min(1,Math.max(0,(state.airTime||0))/.55))*.13:0;
   own.ollieTuck=ollieTuck;
-  const anchor=point(0,1.19+rig.body.position.y-own.landing*.10-(grabbing?.35:0)-ollieTuck,0,stance);
+  const anchor=point(0,1.19+RY+rig.body.position.y-own.landing*.10-(grabbing?.35:0)-ollieTuck,0,stance);
   base.setTranslation(base.getTranslation().add(anchor.subtract(pelvis)));
   for(const name of Object.keys(bones))set(name,bind[name].multiply(base));
   const bend=V.TransformNormal(new V(0,0,1),body).normalize(),feet=[];
@@ -64,7 +65,7 @@ function attach(B,scene,rig){
    // Only flip/shove tricks separate the shoes from the board; a clean ollie
    // retains deck contact throughout ascent and descent.
    const trickLift=air&&!grabbing&&(state.flip||state.spin)?.14:0;
-   let foot=point((back?1:-1)*flick*.09,.385+trickLift,sign*.43,stance);
+   let foot=point((back?1:-1)*flick*.09,.385+RY+trickLift,sign*.43*(BD?BD.zr:1),stance);
    if(back&&pose.pushing){foot.x+=pose.contact*.36;foot.y-=pose.contact*.22;foot.z-=(state.travelSign===-1?-1:1)*pose.contact*.45;foot.y+=pose.recovery*.20;}
    const hip=bind['thigh.'+side].multiply(base).getTranslation();
    const knee=ik(hip,foot,.430581*SCALE,(side==='L'?.37054:.374833)*SCALE,bend);
@@ -76,7 +77,7 @@ function attach(B,scene,rig){
    let wrist=point(sign*.04,-.30,.025,rig.elbows[i].getWorldMatrix().multiply(inverse));
    let elbow;
    if(grabbing&&i===1){
-    const deck=rig.boardPivot.getWorldMatrix().multiply(inverse),grip=point(.23,.27,-.15,deck);
+    const deck=rig.boardPivot.getWorldMatrix().multiply(inverse),grip=point(BD?BD.mapX(.23):.23,BD?BD.mapY(.27):.27,BD?BD.mapZ(-.15):-.15,deck);
     // Hand extends from wrist to palm; put the palm on the deck edge.
     wrist=grip.add(new V(0,.10,0));elbow=ik(shoulder,wrist,.322645*SCALE,.302159*SCALE,new V(.7,0,-1));
     own.grabError=0;own.grip=grip.asArray();
