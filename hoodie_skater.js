@@ -158,10 +158,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
      1-clamp(pose.recovery||0,0,1):phase<=Math.PI?
      smoothStep(phase/(Math.PI/3)):
      1-smoothStep((phase-Math.PI)/(Math.PI*.5));
-    // Move the pushing shoe fully beyond the deck edge during pavement
-    // contact. The former 0.245m offset left the skinned foot intersecting
-    // the board despite the ankle target being below grip height.
-    const foot=v(pushing?.015+.43*groundStroke:.015,
+    const foot=v(pushing?.015-.245*groundStroke:.015,
       .45+lift+(back?rearPop:frontLevel),side*.36+(back?0:frontFlick));
     if(pushing){
      foot.y=.45-.28*groundStroke;
