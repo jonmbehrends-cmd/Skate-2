@@ -217,7 +217,7 @@ document.querySelectorAll('#buttons button').forEach(b=>{
  for(const evt of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(evt,e=>{if(b.dataset.t==='push'){touchPushPointers.delete(e.pointerId);pushHeld=touchPushPointers.size>0}if(b.dataset.t==='grab'){touchGrabPointers.delete(e.pointerId);state.touchGrabHeld=touchGrabPointers.size>0;state.grabHeld=state.touchGrabHeld||!!state.padGrabHeld;if(!state.grabHeld)state.grabUntil=0}});
 });
 // Browser acceptance may send a pointer only after all button handlers are registered.
-window.__SOL_DIAGNOSTICS__.inputReady=true;
+if(window.__SOL_DIAGNOSTICS__)window.__SOL_DIAGNOSTICS__.inputReady=true;
 function releaseInputs(){keys.clear();keyboard.x=keyboard.y=0;joy.x=joy.y=0;joy.id=null;touchPushPointers.clear();touchGrabPointers.clear();pushHeld=boost=false;gpX=gpY=0;state.touchGrabHeld=state.padGrabHeld=state.grabHeld=false;state.grabUntil=state.pushBurstUntil=state.grindRequestUntil=state.grindAirborneUntil=0;state.grindRequestType=null;state.controlSteer=state.controlThrottle=0;if(window.SOLPad)SOLPad.reset();const n=document.querySelector('#nub');if(n)n.style.transform=''}
 addEventListener('sol-controls-help-state',event=>{releaseInputs();if(window.SOLPad?.setSuspended)SOLPad.setSuspended(!!event.detail?.open)});function updateKeys(){keyboard.x=Number(keys.has('KeyD'))-Number(keys.has('KeyA'));keyboard.y=keys.has('KeyW')?-1:0}
 document.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});
