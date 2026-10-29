@@ -87,7 +87,7 @@ function install(B,scene,c){
  // obliquely viewed concrete aliases into distracting diagonal bands.
  const tex=new B.DynamicTexture('Newberg concrete aggregate',{width:512,height:512},scene,true),ctx=tex.getContext();ctx.fillStyle='#c9c4b7';ctx.fillRect(0,0,512,512);
  let seed=1301;const rnd=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296};
- for(let i=0;i<16000;i++){ctx.fillStyle=i%3?'rgba(73,68,58,.055)':'rgba(255,255,244,.11)';ctx.fillRect(rnd()*512,rnd()*512,1+rnd()*2,1+rnd()*2);}tex.update();tex.uScale=12;tex.vScale=9;concrete.diffuseTexture=tex;
+ for(let i=0;i<16000;i++){ctx.fillStyle=i%3?'rgba(73,68,58,.055)':'rgba(255,255,244,.11)';ctx.fillRect(rnd()*512,rnd()*512,1+rnd()*2,1+rnd()*2);}tex.update();tex.uScale=6;tex.vScale=4;tex.anisotropicFilteringLevel=4;concrete.diffuseTexture=tex;
  function box(name,x,y,z,w,h,d,mat){const m=B.MeshBuilder.CreateBox(name,{width:w,height:h,depth:d},scene);m.position.set(x,y,z);m.material=mat;m.receiveShadows=true;objects.push(m);return m;}
  const positions=[],indices=[],uvs=[],colors=[];
  for(let j=0;j<=NZ;j++)for(let i=0;i<=NX;i++){
