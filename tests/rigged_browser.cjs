@@ -93,6 +93,41 @@ let browser;
   assert.deepEqual(errors,[]);assert.deepEqual(requests,[]);
   results.push({label,result:'PASS',ready,distinctPoses:new Set(signatures.values()).size});await page.close();
  }
+ // A synthetic pointerdown can bypass mobile hit-testing and release timing.
+ // Exercise an actual Chromium touch tap on the visible PUSH button in both
+ // parks, including the default Newberg experience, and require acceleration.
+ for(const park of ['classic','newberg']){
+  const touchPage=await browser.newPage({viewport:{width:390,height:844},hasTouch:true,isMobile:true,deviceScaleFactor:1});
+  const touchUrl=new URL(url);touchUrl.searchParams.set('park',park);
+  await touchPage.goto(touchUrl.toString());
+  await touchPage.waitForFunction(park=>{
+   const d=window.__SOL_DIAGNOSTICS__;
+   return !!(d?.inputReady&&d.rig?.status.ready&&(park==='classic'||d.park?.name));
+  },park,{timeout:20000});
+  const pushButton=touchPage.locator('[data-t="push"]'),rect=await pushButton.boundingBox();
+  assert(rect&&rect.width>=44&&rect.height>=44,'PUSH must have a real mobile hit target in '+park);
+  const x=rect.x+rect.width/2,y=rect.y+rect.height/2;
+  const topmost=await touchPage.evaluate(({x,y})=>{
+   const button=document.querySelector('[data-t="push"]');
+   return button===document.elementFromPoint(x,y);
+  },{x,y});
+  assert(topmost,'PUSH is covered by another element in '+park+' at '+JSON.stringify({x,y}));
+  const before=await touchPage.evaluate(()=>__SOL_DIAGNOSTICS__.state.speed);
+  await touchPage.touchscreen.tap(x,y);
+  const accelerated=await touchPage.waitForFunction(before=>
+   __SOL_DIAGNOSTICS__.state.speed>Math.max(.65,before+.5),before,{timeout:1600}).then(()=>true,()=>false);
+  await touchPage.screenshot({path:path.join(out,'skeletal-mobile-'+park+'-real-push.png')});
+  const after=await touchPage.evaluate(()=>({
+   speed:__SOL_DIAGNOSTICS__.state.speed,
+   grounded:__SOL_DIAGNOSTICS__.state.grounded,
+   onRamp:__SOL_DIAGNOSTICS__.state.onRamp,
+   burst:__SOL_DIAGNOSTICS__.state.pushBurstUntil,
+   mode:__SOL_DIAGNOSTICS__.rig?.status.mode
+  }));
+  assert(accelerated,'Real mobile PUSH tap did not accelerate in '+park+': '+JSON.stringify({before,after}));
+  results.push({label:'mobile-real-push-'+park,result:'PASS',before,after});
+  await touchPage.close();
+ }
  const fallback=await browser.newPage();await fallback.route('**/hoodie-character.glb',r=>r.abort());await fallback.goto(url);await fallback.waitForFunction(()=>window.__SOL_DIAGNOSTICS__);await fallback.waitForTimeout(1000);
  assert(await fallback.evaluate(()=>!__SOL_DIAGNOSTICS__.rig&&__SOL_DIAGNOSTICS__.riderV2?.meshes.some(m=>m.isVisible&&m.isEnabled()&&m.skeleton&&m.getTotalVertices()>0)),'GLB load failure must preserve visible, skinned V2 fallback');
  await fallback.close();
