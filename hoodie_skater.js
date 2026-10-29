@@ -70,7 +70,10 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    if(!state.grounded&&wasGrounded)takeoff=1;else takeoff=Math.max(0,takeoff-dt*5);
    wasGrounded=!!state.grounded;
    const air=!state.grounded&&!actions.grinding,flip=air&&Math.abs(state.flip||0)>0;
-   const mode=actions.grinding?'grind':actions.grabbing?'grab':flip?'flip':air&&takeoff>.05?'ollie':air?'air':landing>.05?'landing':pose.pushing?'push':(pose.crouch||0)>.1?'crouch':Math.abs(state.speed)>1?'ride':'idle';
+   // A PUSH input may overlap takeoff for one frame. Never pin the trailing
+   // shoe to pavement or keep push counterbalance once the board is airborne.
+   const pushingNow=!!pose.pushing&&!!state.grounded&&!actions.grinding;
+   const mode=actions.grinding?'grind':actions.grabbing?'grab':flip?'flip':air&&takeoff>.05?'ollie':air?'air':landing>.05?'landing':pushingNow?'push':(pose.crouch||0)>.1?'crouch':Math.abs(state.speed)>1?'ride':'idle';
    status.mode=mode;
    for(const [n,r] of rest){n.position.copyFrom(r.p);n.rotationQuaternion=r.q.clone()}
    // In a grab, tuck the knees up toward the deck instead of curling the
@@ -86,7 +89,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    // The ground-reaching push shoe sits below the deck. Compress the hips
    // during contact so the fixed-length leg can actually reach pavement;
    // recover gradually as the shoe swings back, without stretching bones.
-   const pushCompression=pose.pushing?.18+.25*clamp(pose.contact||0,0,1)+.09*clamp(pose.recovery||0,0,1):0;
+   const pushCompression=pushingNow?.18+.25*clamp(pose.contact||0,0,1)+.09*clamp(pose.recovery||0,0,1):0;
    status.pushCompression=pushCompression;
    rig.position.y=.33-lo*scale-.16-crouch-pushCompression;
    // Babylon may cache ancestor matrices between consecutive gameplay poses.
@@ -98,14 +101,15 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    // A grounded push needs a small forward hip hinge and chest counterbalance.
    // Drive both from the actual contact/recovery phase, not the board's speed:
    // this keeps riding, ollies and landings neutral without touching physics.
-   const pushLean=pose.pushing&&state.grounded?
+   const pushLean=pushingNow?
     clamp((pose.contact||0)*.075+(pose.recovery||0)*.025,0,.085):0;
    status.pushLean=pushLean;
+   status.pushingNow=pushingNow;
    const landingHinge=landing*.085;
    status.landingHinge=landingHinge;
    pelvis.rotationQuaternion=rest.get(pelvis).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.12:actions.grinding?.07:landingHinge-pushLean*.5));
    spine.rotationQuaternion=rest.get(spine).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.12:actions.grinding?-.05:-landingHinge*.4-pushLean))
-    .multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pose.pushing?(pose.contact||0)*.07:0)));
+    .multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pushingNow?(pose.contact||0)*.07:0)));
    const travel=state.travelSign===-1?-1:1;
    const lift=air?(flip?.22:actions.grabbing?.10:.15+takeoff*.12):0;
    // Ollie pop starts at the tail: the rear knee tucks first, then the front
@@ -117,7 +121,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    status.footPose={rearPop,frontLevel,frontFlick};
    for(let i=0;i<legs.length;i++){
     const back=i===1,side=back?-1:1;
-    const pushing=back&&pose.pushing;
+    const pushing=back&&pushingNow;
     const foot=v(pushing?-.23:.015,.45+lift+(back?rearPop:frontLevel),side*.36+(back?0:frontFlick));
     if(pushing){foot.y=.17+(pose.recovery||0)*.29;foot.z=-.32-travel*(.18*(pose.contact||0)-.20*(pose.recovery||0))}
     solve(legs[i].n,foot,v(.8,.65,side*.50));placeDetached(detachedFeet[i],localPosition(legs[i].n[2]));orient(detachedFeet[i],footRotations[i]);
@@ -125,11 +129,11 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    // Keep the shoulders active throughout a trick. A skater raises both
    // arms during the pop, counter-swings while pushing, and spreads/drops
    // them to absorb a landing; this is visual-only (no forces or input edits).
-   const balance=actions.grinding?.78:air?.60:landing>.05?.64:pose.pushing?.49:.39;
-   const swing=pose.pushing?(pose.contact||0)*.25-(pose.recovery||0)*.17:0;
+   const balance=actions.grinding?.78:air?.60:landing>.05?.64:pushingNow?.49:.39;
+   const swing=pushingNow?(pose.contact||0)*.25-(pose.recovery||0)*.17:0;
    const armLift=air&&!actions.grabbing?takeoff*.18+(flip?.06:0):0;
    const armDrop=landing*.20;
-   const pushCounter=pose.pushing?.10:0;
+   const pushCounter=pushingNow?.10:0;
    // Counter-rotate the arms across the rail during a 50-50 grind. This is
    // skeletal balance only: the board's grind collision and forces are unchanged.
    const grindCounter=actions.grinding?travel*.09:0;
