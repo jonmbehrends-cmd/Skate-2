@@ -89,8 +89,8 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    const mode=actions.grinding?'grind':actions.grabbing?'grab':flip?'flip':air&&takeoff>.05?'ollie':air?'air':landing>.05?'landing':pushingNow?'push':(pose.crouch||0)>.1?'crouch':Math.abs(state.speed)>1?'ride':'idle';
    status.mode=mode;
    for(const [n,r] of rest){n.position.copyFrom(r.p);n.rotationQuaternion=r.q.clone()}
-   // Bend the hips toward the front of the deck (positive local X in this GLB),
-   // not backward into the seated/reclined pose; keep hips above the shoes.
+   // The rider faces across the board (+X). Forward hip hinge is around
+   // stance Z, not X: X rolls the torso sideways into a seated/reclined pose.
    // hip/chest lean and arm IK still bring the hand onto the moving deck.
    // Absorb impact through both knees rather than landing stiff-legged. The
    // landing pulse is visual-only and decays to neutral riding in ~0.2s.
@@ -138,12 +138,12 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    const grindLean=actions.grinding?travel*.085:0;
    status.grindLean=grindLean;
    pelvis.rotationQuaternion=rest.get(pelvis).q
-    .multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?.65:actions.grinding?.07:landingHinge-pushLean*.5))
-    .multiply(B.Quaternion.RotationAxis(B.Axis.Z,grindLean));
+    .multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.18:actions.grinding?.07:landingHinge-pushLean*.5))
+    .multiply(B.Quaternion.RotationAxis(B.Axis.Z,actions.grabbing?-.75:grindLean));
    spine.rotationQuaternion=rest.get(spine).q
-    .multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?.16:actions.grinding?-.05:-landingHinge*.4-pushLean))
+    .multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.08:actions.grinding?-.05:-landingHinge*.4-pushLean))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pushingNow?(pose.contact||0)*.07:0)))
-    .multiply(B.Quaternion.RotationAxis(B.Axis.Z,-grindLean*.4));
+    .multiply(B.Quaternion.RotationAxis(B.Axis.Z,actions.grabbing?-.12:-grindLean*.4));
    // Unlike an ollie, a shallow transition vert air carries the whole board
    // with both soles. Avoid the ordinary 12-27cm ollie-foot separation that
    // makes the skater visibly float above the board immediately at takeoff.
@@ -232,7 +232,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    if(actions.grabbing){
     // Grip the near-side deck rail, rather than reaching across the middle;
     // the hand tracks the moving board even during a simultaneous flip.
-    targets[1]=options.board?B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(-.18,.34,-.31),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):v(-.18,.34,-.31);
+    targets[1]=options.board?B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.18,.34,-.31),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):v(.18,.34,-.31);
    }
    let grabReachShift=0;
    if(actions.grabbing){
