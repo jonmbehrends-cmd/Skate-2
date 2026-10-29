@@ -35,8 +35,24 @@ pad.buttons[11].pressed=true;poll(2528);
 assert.equal(actions.filter(a=>a==='boardslide').length,2,'R3 must rearm after release');
 pad.buttons[11].pressed=false;poll(2529);
 pad.buttons[5].pressed=true;assert.equal(poll(2530).grabHeld,true);pad.buttons[5].pressed=false;assert.equal(poll(2540).grabHeld,false,'RB release ends hold');
-pad.connected=false;assert.equal(poll(2550).grabHeld,false,'Disconnect clears grab hold');
-console.log('PASS: Xbox LB grind, RB hold/release and disconnect');
+pad.buttons[7].pressed=true;pad.buttons[7].value=.8;
+p=poll(2545);assert(p.boost&&p.grabHeld===false,'RT push can be held independently of RB');
+pad.buttons[5].pressed=true;p=poll(2546);assert(p.boost&&p.grabHeld,'RT and RB may be held together');
+pad.connected=false;p=poll(2550);
+assert.equal(p.grabHeld,false,'Disconnect clears RB hold');
+assert.equal(p.boost,false,'Disconnect clears RT push');
+const olliesBeforeReconnect=actions.filter(a=>a==='ollie').length;
+pad.buttons.forEach(b=>{b.pressed=false;b.value=0});
+pad.buttons[0].pressed=true;pad.buttons[0].value=1;pad.connected=true;
+assert.equal(poll(2560).connected,true);
+poll(2570);
+assert.equal(actions.filter(a=>a==='ollie').length,olliesBeforeReconnect,
+ 'A held while reconnecting must not trigger an ollie');
+pad.buttons[0].pressed=false;pad.buttons[0].value=0;poll(2580);
+pad.buttons[0].pressed=true;pad.buttons[0].value=1;poll(2590);
+assert.equal(actions.filter(a=>a==='ollie').length,olliesBeforeReconnect+1,
+ 'A must trigger again after a release and re-press following reconnect');
+console.log('PASS: disconnect releases simultaneous RT/RB holds; reconnect suppresses held A until re-press');
 
 context.navigator.getGamepads=()=>{throw new Error('SecurityError: gamepad permission denied')};assert.equal(poll(2600).connected,false,'Denied Gamepad API must not crash touch gameplay');
 
