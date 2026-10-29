@@ -23,6 +23,30 @@ assert.equal(p.basins.length,8);
 // A positive hump overlapping a recessed channel must fade into that floor,
 // rather than falling from deck height at the edge of its support radius.
 assert(Math.abs(p.height(-7.8,4.4)-p.height(-7.8,4.6))<.2,'Roll-over edge became a vertical step into the snake run');
+
+// Claude's independent geometry review found only ~15% clearance between the
+// kidney coping and the upper roll-over hump. Catmull-Rom interpolation dips
+// below the knot's z=5.2 coordinate, so checking knot positions alone misses
+// the near-burial. Guard the entire interpolated outward-offset loop at 1/8
+// of each segment, including interpolated points between 192 rim vertices.
+{
+ const kidney=p.basins.find(b=>b.name==='west kidney and snake run');
+ assert(kidney&&kidney.rim.length===192,'Expected contiguous kidney coping');
+ const rim=kidney.rim,n=rim.length,offset=.48;
+ const coping=rim.map((point,i)=>{
+  const a=rim[(i+n-1)%n],c=rim[(i+1)%n],dx=c[0]-a[0],dz=c[1]-a[1],length=Math.hypot(dx,dz);
+  assert(length>0,'Kidney coping tangent collapsed');
+  return [point[0]+dz/length*offset,point[1]-dx/length*offset];
+ });
+ let minimum=Infinity;
+ for(let i=0;i<n;i++)for(let sub=0;sub<8;sub++){
+  const a=coping[i],b=coping[(i+1)%n],t=sub/8;
+  const x=a[0]+(b[0]-a[0])*t,z=a[1]+(b[1]-a[1])*t;
+  for(const cz of [-1.8,2.1])minimum=Math.min(minimum,Math.hypot((x+7.8)/3.2,(z-cz)/2.4));
+ }
+ assert(minimum>=1.1,'Kidney coping approaches roll-over hump footprint: normalized separation '+minimum);
+}
+
 // Reproduced from the independent corner review: an overly tight rim made
 // a 36-degree normal snap across this interior valley at 8 m/s, 25 ms/step.
 let previousNormal=null;
