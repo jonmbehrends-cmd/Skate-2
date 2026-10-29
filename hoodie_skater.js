@@ -163,11 +163,11 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
                   v(.08-swing,1.25-crouch+armLift-armDrop-pushCounter,-balance)];
    status.armPose={spread:balance,lift:armLift,drop:armDrop,counter:pushCounter};
    if(actions.grabbing){
-    // Grip the top edge of the near-side rail at shoe/deck height (not 19cm below
-    // the shoes); otherwise arm IK collapses the chest to reach through the board.
+    // Target the physical grip-tape surface at .34m above the board pivot;
+   // a floating hand .19m above the deck is NOT a valid grab fix.
     // Grip the near-side deck rail, rather than reaching across the middle;
     // the hand tracks the moving board even during a simultaneous flip.
-    targets[1]=options.board?B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.20,.53,.15),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):v(.20,.53+grabLift,.15);
+    targets[1]=options.board?B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.20,.34,.15),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):v(.20,.34+grabLift,.15);
    }
    let grabReachShift=0;
    if(actions.grabbing){
