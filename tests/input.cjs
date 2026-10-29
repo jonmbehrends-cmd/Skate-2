@@ -1,5 +1,5 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
-const html=fs.readFileSync('index.html','utf8'),start=html.indexOf("const stick=document.querySelector('#stick')"),end=html.indexOf('}catch(e){err.style.display=',start);
+const html=fs.readFileSync('index.html','utf8'),start=html.indexOf("const stick=document.querySelector('#stick')"),endMarker="document.addEventListener('visibilitychange',()=>{if(document.hidden)releaseInputs()});",end=html.indexOf(endMarker,start)+endMarker.length;
 function target(t){return {dataset:{t},style:{},handlers:{},addEventListener(type,fn){(this.handlers[type]??=[]).push(fn)},fire(type,e={}){for(const f of this.handlers[type]||[])f({preventDefault(){},...e})},setPointerCapture(id){this.captured=id},getBoundingClientRect(){return {left:0,top:0,width:100,height:100}}}}
 const stick=target(),nub=target(),push=target('push'),grab=target('grab'),doc=target(),win=target();
 doc.querySelector=s=>s==='#stick'?stick:s==='#nub'?nub:null;doc.querySelectorAll=()=>[push,grab];

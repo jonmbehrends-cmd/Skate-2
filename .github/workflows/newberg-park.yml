@@ -1,0 +1,27 @@
+name: Newberg park acceptance
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  newberg:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save playwright@1.55.1
+      - run: npx playwright install chromium
+      - run: node --check newberg_park.js && node tests/check_inline.cjs
+      - run: node tests/newberg_surface.cjs
+      - run: node tests/newberg_browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: newberg-desktop-mobile-evidence
+          path: test-artifacts/newberg/
