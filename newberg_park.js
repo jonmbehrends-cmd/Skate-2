@@ -40,6 +40,21 @@ const ramp={curve:'newberg-flow'};
 function sample(x,z){if(Math.abs(x)>W/2||Math.abs(z)>D/2)return null;const s=surface(x,z);return {height:s.height,slope:s.z,slopeX:s.x,bowl:true,newberg:true,ramp:Math.hypot(s.x,s.z)>.09?ramp:null};}
 function groundTravel(s,dt){const g=gradient(s.x,s.z),sign=s.travelSign===-1?-1:1,x=Math.sin(s.dir)*sign,z=Math.cos(s.dir)*sign,metric=Math.hypot(1,g.x*x+g.z*z);return {dx:x*s.speed*dt/metric,dz:z*s.speed*dt/metric};}
 function roll(s,dt){const g=gradient(s.x,s.z),grade=g.x*Math.sin(s.dir)+g.z*Math.cos(s.dir),v=(s.travelSign===-1?-1:1)*s.speed-9.81*grade/Math.hypot(1,grade)*dt;s.travelSign=v<0?-1:1;s.speed=Math.min(17,Math.abs(v));}
+function vertLaunch(s,previous,contact){
+ if(!previous.newberg||!contact.newberg||!s.grounded||s.grinding||s.rampCooldown>0||s.speed<4||contact.height<-.85||previous.height>-.08)return false;
+ const sign=s.travelSign===-1?-1:1,gx=previous.slopeX||0,gz=previous.slope||0,grade=(gx*Math.sin(s.dir)+gz*Math.cos(s.dir))*sign;
+ if(grade<1.2)return false;
+ const g=Math.hypot(gx,gz);s.grounded=false;s.vy=Math.min(12,s.speed*grade/Math.hypot(1,grade));
+ s.airVX=-gx/g*.55;s.airVZ=-gz/g*.55;s.airTime=0;s.rampCooldown=.5;s.grindCooldown=Math.max(s.grindCooldown||0,.6);
+ s.name='NEWBERG VERT AIR';s.combo=(s.combo||0)+200;s.count=(s.count||0)+1;
+ s.bowlAir={newberg:true,elapsed:0,duration:2*s.vy/19,turned:0};s.bowlStats=s.bowlStats||{launches:0,landings:0,recoveries:0};s.bowlStats.launches++;return true;
+}
+function guideAir(s,dt){const a=s.bowlAir;if(!a?.newberg||s.grounded||s.grinding)return;a.elapsed+=dt;const t=Math.min(1,a.elapsed/a.duration),turn=Math.PI*t*t*(3-2*t);s.dir+=turn-a.turned;a.turned=turn;}
+function land(s,c){
+ if(!s.bowlAir?.newberg||!c.newberg||s.vy>=0||s.y>c.height)return false;
+ const g=gradient(s.x,s.z),vx=s.airVX||0,vz=s.airVZ||0,dot=(s.vy-g.x*vx-g.z*vz)/(1+g.x*g.x+g.z*g.z),tx=vx+dot*g.x,tz=vz+dot*g.z,ty=s.vy-dot;
+ s.speed=Math.min(17,Math.hypot(tx,ty,tz));s.travelSign=tx*Math.sin(s.dir)+tz*Math.cos(s.dir)<0?-1:1;s.y=s.groundY=c.height;s.vy=0;s.grounded=true;s.bowlAir=null;s.name='NEWBERG REENTRY';s.bowlStats.landings++;return true;
+}
 function railPath(points,closed=false){const lengths=[0];for(let i=1;i<points.length;i++)lengths.push(lengths.at(-1)+Math.hypot(...points[i].map((v,k)=>v-points[i-1][k])));return {kind:'bowl-coping',path:points,lengths,total:lengths.at(-1),closed};}
 function pointAt(r,d){let t=r.closed?((d%r.total)+r.total)%r.total:clamp(d,0,r.total);let i=1;while(i<r.lengths.length-1&&r.lengths[i]<t)i++;const a=r.path[i-1],b=r.path[i],f=(t-r.lengths[i-1])/(r.lengths[i]-r.lengths[i-1]);return {p:a.map((v,k)=>v+(b[k]-v)*f),dx:b[0]-a[0],dz:b[2]-a[2]};}
 function installGrinds(){
@@ -119,7 +134,7 @@ function install(B,scene,c){
  const view=document.querySelector('#halfpipe');view.textContent='PARK VIEW';view.setAttribute('aria-label','View Newberg skatepark');view.addEventListener('click',()=>{place();state.halfpipePreviewUntil=Infinity;scene.activeCamera=overview;document.querySelector('#msg').textContent='CHEHALEM — PUSH TO RIDE';});
  root.addEventListener('keydown',e=>{if(e.code==='KeyR'&&!e.repeat&&!e.ctrlKey&&!e.metaKey&&!e.altKey)place();});
  document.querySelector('#hud span').textContent='NEWBERG · CHEHALEM';
- root.SOLBowl={bowl:{x:0,z:0,radius:0,depth:3.9},height,gradient,sample,groundTravel,roll,vertLaunch:()=>false,guideAir:()=>{},land:()=>false,mesh:()=>terrain};
+ root.SOLBowl={bowl:{x:0,z:0,radius:0,depth:3.9},height,gradient,sample,groundTravel,roll,vertLaunch,guideAir,land,mesh:()=>terrain};
  installGrinds();
  root.__SOL_DIAGNOSTICS__.park={name:'Newberg / Chehalem',replica:'photo-derived; dimensions estimated',terrain,basins,rails,objects,shadow,spawn:{x:-22,z:-19}};
  c.cameraObstacles.add(terrain.name);

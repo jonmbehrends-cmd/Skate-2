@@ -43,10 +43,15 @@ let browser;
   const rolling=await page.evaluate(()=>{
    const d=__SOL_DIAGNOSTICS__,s=d.state,loop=d.engine._activeRenderLoops[0],render=d.scene.render,realNow=performance.now.bind(performance);d.engine.stopRenderLoop();let now=realNow();Object.defineProperty(performance,'now',{configurable:true,value:()=>now});d.scene.render=()=>{};
    try{Object.assign(s,{x:17,z:18,y:SOLNewberg.height(17,18),groundY:SOLNewberg.height(17,18),grounded:true,grinding:false,speed:0,dir:0,travelSign:1,flip:0,spin:0,count:0,combo:0,pushBurstUntil:0,controlSteer:0,controlThrottle:0});
-    for(let i=0;i<60;i++){now+=25;loop();}return {x:s.x,z:s.z,y:s.y,expectedY:SOLNewberg.height(s.x,s.z),speed:s.speed,grounded:s.grounded,travelSign:s.travelSign};
+    for(let i=0;i<60;i++){now+=25;loop();}const rollback={x:s.x,z:s.z,y:s.y,expectedY:SOLNewberg.height(s.x,s.z),speed:s.speed,grounded:s.grounded,travelSign:s.travelSign};
+    Object.assign(s,{x:17,z:18.9,y:SOLNewberg.height(17,18.9),groundY:SOLNewberg.height(17,18.9),grounded:true,grinding:false,speed:14,dir:0,travelSign:1,vy:0,rampCooldown:0,grindCooldown:0,bowlAir:null,bowlStats:{launches:0,landings:0,recoveries:0}});let takeoff=null,peak=s.y;
+    for(let i=0;i<240;i++){const beforeY=s.y;now+=25;loop();peak=Math.max(peak,s.y);if(!takeoff&&s.bowlStats.launches)takeoff={beforeY,y:s.y,vy:s.vy};if(s.bowlStats.landings)break;}
+    return {...rollback,vert:{takeoff,peak,stats:s.bowlStats,grounded:s.grounded,finite:[s.x,s.y,s.z,s.speed].every(Number.isFinite)}};
    }finally{Object.defineProperty(performance,'now',{configurable:true,value:realNow});d.scene.render=render;}
   });
   assert(rolling.grounded&&rolling.z<17.9&&rolling.travelSign===-1&&rolling.speed>0&&Math.abs(rolling.y-rolling.expectedY)<1e-7,'Bowl must roll downhill on actual concrete: '+JSON.stringify(rolling));
+  assert(rolling.vert.takeoff?.vy>0&&rolling.vert.peak>0&&rolling.vert.stats.landings>0&&rolling.vert.grounded&&rolling.vert.finite,'Deep end needs real vert takeoff and reentry: '+JSON.stringify(rolling.vert));
+  assert(rolling.vert.takeoff.y-rolling.vert.takeoff.beforeY<.4&&rolling.vert.stats.recoveries===0,'Vert must take off continuously without floor recovery: '+JSON.stringify(rolling.vert));
   assert.deepEqual(errors,[]);results.push({label,geometry,launch,reset,pixels,grinds,rolling});await page.close();
  }
  fs.writeFileSync(path.join(out,'result.json'),JSON.stringify({result:'PASS',results},null,2));console.log('PASS Newberg actual production page, desktop/mobile geometry, trusted PUSH/OLLIE, landing, overview, curved rail',results);
