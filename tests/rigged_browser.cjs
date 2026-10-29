@@ -64,6 +64,13 @@ let browser;
     assert(evidence.status.pushLean>.05&&evidence.status.pushLean<.09,'Hoodie chest must balance the push without excessive hunch');
    }
    if(mode==='ride')assert.equal(evidence.status.pushLean,0,'Neutral ride must have no push lean');
+   if(mode==='landing'){
+    assert(evidence.status.landingCompression>.14&&evidence.status.landingHinge>.08,
+     'Landing must absorb impact through knees and hips in real Chromium');
+    assert(evidence.status.armPose.drop>.19,'Landing arms must lower for balance');
+    assert(evidence.status.feet.every(f=>Math.abs(f[1]-.45)<.035),
+     'Landing shoes must remain planted on the deck');
+   }
   }
   assert(new Set(signatures.values()).size>=6,'Skate, crouch, ollie, flip, grab and landing must deform the skin differently');
   assert.deepEqual(errors,[]);assert.deepEqual(requests,[]);
