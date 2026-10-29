@@ -261,7 +261,11 @@ function install(B,scene,c){
  for(let i=0;i<54;i++){
   const angle=i/54*Math.PI*2,r=(1+rnd()*.12)/Math.max(Math.abs(Math.cos(angle))/108,Math.abs(Math.sin(angle))/84),x=Math.cos(angle)*r,z=Math.sin(angle)*r,h=8+rnd()*10;
   const t=B.MeshBuilder.CreateCylinder('Newberg perimeter tree trunk',{height:h*.65,diameterTop:.18,diameterBottom:.58,tessellation:6},scene);t.position.set(x,h*.325,z);t.material=trunk;trees.push(t);
-  if(i%3===0){for(let j=0;j<5;j++)crown('Newberg fir canopy',x+Math.sin(i+j)*.25,h*(.47+j*.095),z+Math.cos(i+j)*.25,4.5-j*.85,.62,i*9+j,pine);}
+  if(i%3===0){for(let j=0;j<5;j++){
+   const m=B.MeshBuilder.CreateCylinder('Newberg fir canopy',{height:h*(.29-j*.016),diameterTop:.04,diameterBottom:4.8-j*.86,tessellation:12},scene),p=m.getVerticesData(B.VertexBuffer.PositionKind);
+   for(let k=0;k<p.length;k+=3){const a=Math.atan2(p[k+2],p[k]),r=1+.14*Math.sin(a*5+i+j)+.07*Math.cos(a*7-j);p[k]*=r;p[k+2]*=r;if(p[k+1]<0)p[k+1]+=.16*Math.sin(a*4+i);}
+   m.setVerticesData(B.VertexBuffer.PositionKind,p);const normals=[];B.VertexData.ComputeNormals(p,m.getIndices(),normals);m.setVerticesData(B.VertexBuffer.NormalKind,normals);m.position.set(x+Math.sin(i+j)*.15,h*(.47+j*.105),z+Math.cos(i+j)*.15);m.material=pine;trees.push(m);
+  }}
   else{for(let j=0;j<4;j++){const a=j*2.4+i;crown('Newberg broadleaf canopy',x+Math.cos(a)*1.5,h*.64+Math.sin(j)*1.6,z+Math.sin(a)*1.5,4.1+hash(i,j)*1.7,.8+hash(j,i)*.45,i*7+j,leaf);}}
   const contact=B.MeshBuilder.CreateGround('woodland contact shade',{width:7,height:8},scene);contact.position.set(x,-.054,z);contact.rotation.y=i*.73;contact.material=shadeMat;contact.isPickable=false;treeShadows.push(contact);
  }

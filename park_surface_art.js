@@ -41,8 +41,8 @@ function install(B,scene,concrete,grass,W,D){
  const data=build(),textures=[];
  function texture(name,bytes,size,repeatX,repeatZ){const t=new B.DynamicTexture(name,{width:size,height:size},scene,true,B.Texture.TRILINEAR_SAMPLINGMODE),c=t.getContext(),p=c.createImageData(size,size);p.data.set(bytes);c.putImageData(p,0,0);t.update();t.uScale=repeatX;t.vScale=repeatZ;t.anisotropicFilteringLevel=8;textures.push(t);return t;}
  concrete.diffuseTexture=texture('cured concrete aggregate',data.diffuse,data.size,W/12,D/12);
- concrete.bumpTexture=texture('subtle concrete micro-pitting',data.normal,data.size,W/12,D/12);concrete.bumpTexture.gammaSpace=false;concrete.bumpTexture.level=.18;
- concrete.specularColor=new B.Color3(.085,.085,.08);concrete.specularPower=24;
+ concrete.bumpTexture=texture('subtle concrete micro-pitting',data.normal,data.size,W/12,D/12);concrete.bumpTexture.gammaSpace=false;concrete.bumpTexture.level=.04;
+ concrete.specularColor=new B.Color3(.045,.045,.04);concrete.specularPower=20;
  const size=256,pixels=new Uint8ClampedArray(size*size*4);
  for(let z=0;z<size;z++)for(let x=0;x<size;x++){const k=(z*size+x)*4,v=224+noise(x/size*8,z/size*8,8)*23+hash(x,z)*8;pixels[k]=v;pixels[k+1]=v;pixels[k+2]=v;pixels[k+3]=255;}
  grass.diffuseTexture=texture('woodland lawn variation',pixels,size,32,32);
