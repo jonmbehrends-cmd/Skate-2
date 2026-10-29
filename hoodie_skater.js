@@ -122,8 +122,17 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    for(let i=0;i<legs.length;i++){
     const back=i===1,side=back?-1:1;
     const pushing=back&&pushingNow;
-    const foot=v(pushing?-.23:.015,.45+lift+(back?rearPop:frontLevel),side*.36+(back?0:frontFlick));
-    if(pushing){foot.y=.17+(pose.recovery||0)*.29;foot.z=-.32-travel*(.18*(pose.contact||0)-.20*(pose.recovery||0))}
+    // Recover the trailing shoe onto its original deck stance before PUSH
+    // releases. The previous recovery target crossed toward the board center
+    // while remaining offset outside its side; this caused a visible snap
+    // when the input ended. Keep the contact stroke on pavement, then plant.
+    const pushRecovery=pushing?clamp(pose.recovery||0,0,1):0;
+    const foot=v(pushing?-.23+.245*pushRecovery:.015,
+      .45+lift+(back?rearPop:frontLevel),side*.36+(back?0:frontFlick));
+    if(pushing){
+     foot.y=.17+.28*pushRecovery;
+     foot.z=-.36-travel*.14*clamp(pose.contact||0,0,1)*(1-pushRecovery);
+    }
     solve(legs[i].n,foot,v(.8,.65,side*.50));placeDetached(detachedFeet[i],localPosition(legs[i].n[2]));orient(detachedFeet[i],footRotations[i]);
    }
    // Keep the shoulders active throughout a trick. A skater raises both
