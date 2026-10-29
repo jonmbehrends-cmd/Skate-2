@@ -257,7 +257,7 @@ function install(B,scene,c){
  // physics and held input before repositioning the skater.
  const spots=[
   {id:'core',label:'CHEHALEM / ORIGINAL',x:-22,z:-19,dir:.3},
-  {id:'river',label:'WEST / RIVER FLOW',x:-65,z:-36,dir:0},
+  {id:'river',label:'WEST / RIVER FLOW',x:-65,z:-43,dir:0},
   {id:'competition',label:'EAST / COMPETITION',x:64,z:-42,dir:0},
   {id:'snake',label:'NORTH / SNAKE RUN',x:-80,z:-49,dir:Math.PI/2},
   {id:'surf',label:'SOUTH / SURF BASIN',x:-55,z:48,dir:Math.PI/2},
