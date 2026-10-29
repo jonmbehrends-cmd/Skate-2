@@ -102,7 +102,12 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    const athleticCompression=state.grounded&&!actions.grinding&&!pushingNow&&landing<=.05?
     clamp(Math.abs(state.speed||0)/7,0,1)*.045:0;
    status.athleticCompression=athleticCompression;
-   const crouch=clamp((pose.crouch||0)*.20+landingCompression+athleticCompression+takeoff*.06+(actions.grabbing?.65:0)+(actions.grinding?.12:0),0,.78);
+   // Keep the hips high enough for a real knee bend; the grab is coordinated
+   // with a forward torso hinge and feet staying planted on the airborne deck.
+   // A pelvis-only 0.65m squat produced an almost seated/prone silhouette.
+   const grabCompression=actions.grabbing?.42:0;
+   status.grabCompression=grabCompression;
+   const crouch=clamp((pose.crouch||0)*.20+landingCompression+athleticCompression+takeoff*.06+grabCompression+(actions.grinding?.12:0),0,.78);
    // Settle the pelvis into an athletic, knee-flexed stance instead of a
    // locked-knee upright pose. Feet remain IK-planted on the deck.
    // The ground-reaching push shoe sits below the deck. Compress the hips
@@ -126,11 +131,11 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    status.pushingNow=pushingNow;
    const landingHinge=landing*.085;
    status.landingHinge=landingHinge;
-   pelvis.rotationQuaternion=rest.get(pelvis).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.12:actions.grinding?.07:landingHinge-pushLean*.5));
-   spine.rotationQuaternion=rest.get(spine).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.12:actions.grinding?-.05:-landingHinge*.4-pushLean))
+   pelvis.rotationQuaternion=rest.get(pelvis).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.22:actions.grinding?.07:landingHinge-pushLean*.5));
+   spine.rotationQuaternion=rest.get(spine).q.multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.30:actions.grinding?-.05:-landingHinge*.4-pushLean))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pushingNow?(pose.contact||0)*.07:0)));
    const travel=state.travelSign===-1?-1:1;
-   const lift=air?(flip?.22:actions.grabbing?.10:.15+takeoff*.12):0;
+   const lift=air?(flip?.22:actions.grabbing?0:.15+takeoff*.12):0;
    // Ollie pop starts at the tail: the rear knee tucks first, then the front
    // knee levels the board. A kickflip briefly flicks the leading shoe out.
    // These are skin-only targets and never change deck rotation or collision.
