@@ -16,7 +16,7 @@ let browser;
    for(let i=0;i<250;i++){const x=-30+(i*13.731%60),z=-22+(i*9.137%44),ray=new B.Ray(new B.Vector3(x,15,z),new B.Vector3(0,-1,0),30);const hit=d.scene.pickWithRay(ray,q=>q===m);if(!hit?.hit)throw Error('Missing solid concrete at '+x+','+z);max=Math.max(max,Math.abs(hit.pickedPoint.y-p.height(x,z)));samples++;}
    for(const [x,z]of [[17,10],[-19,-11],[-18,6]]){const hit=d.scene.pickWithRay(new B.Ray(new B.Vector3(x,15,z),new B.Vector3(0,-1,0),30));if(hit?.pickedMesh!==m)throw Error('Bowl obscured by '+hit?.pickedMesh?.name);}
    const coping=d.park.rails.filter(r=>!r.raised);
-   if(coping.length!==4||coping.some(r=>!r.closed))throw Error('Each connected basin must have one uninterrupted closed coping loop');
+   if(coping.length!==8||coping.some(r=>!r.closed))throw Error('Each connected basin must have one uninterrupted closed coping loop');
    for(const rail of coping)for(let i=1;i<rail.path.length;i++){
     const a=rail.path[i-1],b=rail.path[i];for(const t of [0,.5,1])if(Math.abs(p.height(a[0]+(b[0]-a[0])*t,a[2]+(b[2]-a[2])*t))>.025)throw Error('Concrete intersects or buries coping at '+rail.path[i]);
    }

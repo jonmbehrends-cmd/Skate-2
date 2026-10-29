@@ -6,7 +6,20 @@ assert.equal(p.height(17,10),-3.9);assert.equal(p.height(-19,-11),-.95);assert.e
 for(const [path,ceiling]of [[[[17,10],[3,17]],-3.3],[[[-18,6],[-13,8.5],[-7,8.7],[2,7.5]],-1.25]]){
  for(let j=1;j<path.length;j++)for(let i=0;i<=100;i++){const a=path[j-1],b=path[j],t=i/100;assert(p.height(a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t)<ceiling,'Connected channel rose into an internal ridge');}
 }
-assert.equal(p.basins.length,4);
+assert.equal(p.basins.length,8);
+// The expanded competition bowl must have a finite, skateable rim grade.
+// A square-root cusp at the lip previously produced sawtooth cliffs and
+// fractured-looking coping in actual Chromium overview screenshots.
+{
+ const east=p.basins.find(b=>b.name==='east competition bowl');
+ const n=east.rim.length,idx=east.rim.reduce((best,v,i)=>v[0]>east.rim[best][0]?i:best,0);
+ const p0=east.rim[idx],a=east.rim[(idx+n-1)%n],b=east.rim[(idx+1)%n];
+ const tx=b[0]-a[0],tz=b[1]-a[1],len=Math.hypot(tx,tz),nx=-tz/len,nz=tx/len;
+ const inside=p.height(p0[0]+nx*.25,p0[1]+nz*.25);
+ const outside=p.height(p0[0]-nx*.25,p0[1]-nz*.25);
+ assert(Math.abs(inside-outside)<1.05,'Competition bowl lip formed a jagged, near-vertical cusp: '+JSON.stringify({inside,outside}));
+}
+
 // A positive hump overlapping a recessed channel must fade into that floor,
 // rather than falling from deck height at the edge of its support radius.
 assert(Math.abs(p.height(-7.8,4.4)-p.height(-7.8,4.6))<.2,'Roll-over edge became a vertical step into the snake run');
@@ -33,8 +46,8 @@ for(const basin of p.basins){
 }
 for(let i=0;i<5000;i++){
  const x=-34+(i*11.317%68),z=-26+(i*7.619%52),s=p.surface(x,z),g=p.gradient(x,z);
- assert([s.height,g.x,g.z].every(Number.isFinite));assert(s.height>=-3.9&&s.height<=1.45);
- if(Math.abs(x)>31||Math.abs(z)>23)assert.equal(p.sample(x,z),null);
+ assert([s.height,g.x,g.z].every(Number.isFinite));assert(s.height>=-5.2&&s.height<=1.45);
+ if(Math.abs(x)>p.width/2||Math.abs(z)>p.depth/2)assert.equal(p.sample(x,z),null);
  else assert.equal(p.sample(x,z).height,s.height);
 }
 for(const [x,z,dir]of [[17,18,0],[25,10,Math.PI/2]]){

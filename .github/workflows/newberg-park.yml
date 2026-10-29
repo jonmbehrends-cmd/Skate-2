@@ -9,7 +9,7 @@ permissions:
 jobs:
   newberg:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -20,6 +20,7 @@ jobs:
       - run: node --check newberg_park.js && node tests/check_inline.cjs
       - run: node tests/newberg_surface.cjs
       - run: node tests/newberg_browser.cjs
+      - run: node tests/expansion_browser.cjs
       - run: node tests/newberg_hoodie_browser.cjs
       - uses: actions/upload-artifact@v4
         if: always()
