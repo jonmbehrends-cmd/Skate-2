@@ -86,7 +86,8 @@ let browser;
    }
    return {count:bars.length,records};
   });
-  assert.equal(flatbars.count,4);assert.equal(flatbars.records.length,8);
+  // Four promenade flatbars plus the new southwest island grind edge.
+  assert.equal(flatbars.count,5);assert.equal(flatbars.records.length,10);
   assert(flatbars.records.every(r=>r.grinding&&r.distance>.8&&r.error<1e-8),'Expanded flatbar traversal failed: '+JSON.stringify(flatbars));
 
   // The held gesture and release are trusted browser input, including actual
