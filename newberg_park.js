@@ -148,7 +148,7 @@ function installGrinds(){
  }};
 }
 function install(B,scene,c){
- const {skater,grabMeshes,ramps,solids,rails,pads,shadow,camera,overview,state,restart}=c;
+ const {skater,grabMeshes,ramps,solids,rails,pads,shadow,camera,cameraAnchor,overview,state,restart}=c;
  for(const m of [...scene.meshes])if(!m.isDescendantOf(skater)&&!grabMeshes.includes(m))m.dispose();
  ramps.length=solids.length=rails.length=0;
  pads.length=0;pads.push({x:-69,z:45,w:14,d:12,h:1.15});
@@ -287,6 +287,17 @@ function install(B,scene,c){
     speed:0,vy:0,travelSign:1,score:earned,grounded:true,grinding:false,
     rampCooldown:.5,airCameraHeading:spot.dir,halfpipePreviewUntil:0});
    skater.position.set(spot.x,ground+.045,spot.z);
+   // FollowCamera normally catches up at at most 16 m/s. A district jump
+   // can span 150 m, leaving the skater entirely off-screen for seconds.
+   // Snap the *existing* camera and its independent heading anchor once,
+   // then return all regular camera smoothing and obstacle handling to the
+   // unchanged game loop.
+   cameraAnchor.position.copyFrom(skater.position);
+   cameraAnchor.rotation.y=spot.dir;
+   const followYaw=spot.dir+camera.rotationOffset*Math.PI/180;
+   camera.position.set(spot.x+Math.sin(followYaw)*camera.radius,
+    ground+camera.heightOffset,spot.z+Math.cos(followYaw)*camera.radius);
+   camera.setTarget(new B.Vector3(spot.x,ground+1.15,spot.z));
    scene.activeCamera=camera;
    const message=document.querySelector('#msg');
    message.textContent=spot.label+' — PUSH TO RIDE';
