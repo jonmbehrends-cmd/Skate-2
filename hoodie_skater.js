@@ -52,7 +52,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
   for(const n of [...container.meshes,...container.transformNodes])if(!n.parent)n.parent=rig;
   const nodes=new Map(container.transformNodes.map(n=>[n.name,n]));
   function joint(name){const n=nodes.get(name);if(!n)throw Error('Missing skater joint: '+name);return n}
-  const pelvis=joint('Hips'),spine=joint('Chest');
+  const pelvis=joint('Hips'),spine=joint('Chest'),head=nodes.get('Head');
   const legs=[['L','UpperLeg.L','LowerLeg.L','LowerLeg.L_end'],['R','UpperLeg.R','LowerLeg.R','LowerLeg.R_end']].map(([side,...names])=>({side,n:names.map(joint)}));
   const detachedFeet=[joint('Foot.L'),joint('Foot.R')];
   const toeEnds=[joint('Foot.L_end'),joint('Foot.R_end')];
@@ -129,8 +129,14 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
   });
   
   function placeDetached(node,target){const inv=B.Matrix.Invert(node.parent.computeWorldMatrix(true));node.position.copyFrom(B.Vector3.TransformCoordinates(world(target),inv));node.computeWorldMatrix(true)}
+  // Move a skin joint in the moving board's stance frame, not global axes.
+  function shiftJoint(node,delta){
+   const worldDelta=B.Vector3.TransformNormal(delta,parent.computeWorldMatrix(true));
+   const localDelta=B.Vector3.TransformNormal(worldDelta,B.Matrix.Invert(node.parent.computeWorldMatrix(true)));
+   node.position.addInPlace(localDelta);node.computeWorldMatrix(true);
+  }
   function orient(node,q){const pq=B.Quaternion.Identity(),parentQ=B.Quaternion.Identity();node.parent.computeWorldMatrix(true).decompose(undefined,pq);parent.computeWorldMatrix(true).decompose(undefined,parentQ);node.rotationQuaternion=pq.conjugate().multiply(parentQ.multiply(q));node.computeWorldMatrix(true)}
-  const status={ready:true,mode:'idle',height:2.05,bones:container.skeletons[0].bones.length,source:DEFAULT_URL,feet:[],hands:[],meshes:meshes.length,shadowFillMaterials,apparelContrastMaterials};
+  const status={ready:true,mode:'idle',height:2.05,bones:container.skeletons[0].bones.length,source:DEFAULT_URL,feet:[],hands:[],meshes:meshes.length,shadowFillMaterials,apparelContrastMaterials,headJoint:!!head};
   let wasGrounded=true,landing=0,takeoff=0;
   function update(state,pose,actions={}){
    const dt=clamp(actions.dt||1/60,0,.05);
@@ -144,6 +150,16 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    const mode=actions.grinding?'grind':actions.grabbing?'grab':flip?'flip':air&&takeoff>.05?'ollie':air?'air':landing>.05?'landing':pushingNow?'push':(pose.crouch||0)>.1?'crouch':Math.abs(state.speed)>1?'ride':'idle';
    status.mode=mode;
    for(const [n,r] of rest){n.position.copyFrom(r.p);n.rotationQuaternion=r.q.clone()}
+   // Experimental anatomical retarget: the imported 2.05m figure has only
+   // ~0.466m shoulder-to-wrist reach. Increase the local elbow and wrist
+   // offsets modestly so the skinned arms, not the chest, approach the rail.
+   // This is intentionally confined to draft visual QA; inspect sleeve seams.
+   const armLengthScale=1.25;
+   for(const arm of arms)for(const node of arm.n.slice(1)){
+    const bind=rest.get(node).p;
+    node.position.copyFrom(bind.scale(armLengthScale));
+   }
+   status.armLengthScale=armLengthScale;
    // Airborne grabs need clearance under the hips and visibly tucked knees.
    // Do not lower the pelvis all the way to the deck: that made the hoodie
    // appear seated even though the wrist was precisely on its IK target.
@@ -193,12 +209,18 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    const grindLean=actions.grinding?travel*.085:0;
    status.grindLean=grindLean;
    pelvis.rotationQuaternion=rest.get(pelvis).q
-    .multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?.38:actions.grinding?.07:landingHinge-pushLean*.5))
+    .multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?.24:actions.grinding?.07:landingHinge-pushLean*.5))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Z,grindLean));
    spine.rotationQuaternion=rest.get(spine).q
-    .multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?.18:actions.grinding?-.05:-landingHinge*.4-pushLean))
+    .multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?.10:actions.grinding?-.05:-landingHinge*.4-pushLean))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pushingNow?(pose.contact||0)*.07:0)))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Z,-grindLean*.4));
+   // Counter-pitch the imported head joint to look toward the landing;
+   // this changes only the skinned gaze, not the deck, hands or physics.
+   const headGazePitch=actions.grabbing?-.20:0;
+   status.headGazePitch=headGazePitch;
+   if(head)head.rotationQuaternion=rest.get(head).q.multiply(
+    B.Quaternion.RotationAxis(B.Axis.X,headGazePitch));
    // A grab hinges the actual pelvis/torso toward the rail instead of
    // translating the chest down through the hips to make the wrist reach.
    // The aim only changes skinned joints; the board and physics stay fixed.
@@ -207,15 +229,26 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.24,.55,-.31),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):
     v(.24,.55,-.31)):null;
    if(grabTarget){
-    const shoulderGoal=grabTarget.add(v(.12,.52,.10));
+    const shoulderGoal=grabTarget.add(v(.12,.55,.10));
     aim(pelvis,arms[1].n[0],shoulderGoal);
-   }
+    // Rebalance the actual skinned torso under the reaching shoulder.
+    // Move hips toward the chest, lift the chest, and retain both shoulder
+    // origins so fixed-length arm IK can still grip the moving board rail.
+    // The leg solver below replants both shoes. No gameplay forces change.
+    const chestBefore=localPosition(spine);
+    const shouldersBefore=arms.map(arm=>localPosition(arm.n[0]));
+    shiftJoint(pelvis,v(.16,-.05,-.15));
+    shiftJoint(spine,chestBefore.add(v(0,.13,0)).subtract(localPosition(spine)));
+    for(let i=0;i<arms.length;i++)
+     shiftJoint(arms[i].n[0],shouldersBefore[i].subtract(localPosition(arms[i].n[0])));
+    status.grabTorsoCorrection={hipForward:.16,hipTowardGrab:.15,hipDrop:.05,chestLift:.13};
+   }else status.grabTorsoCorrection=null;
    // Unlike an ollie, a shallow transition vert air carries the whole board
    // with both soles. Avoid the ordinary 12-27cm ollie-foot separation that
    // makes the skater visibly float above the board immediately at takeoff.
    // Deep vert, grabs, flips, grinds, pushing and all physics are unchanged.
    const shallowVertAir=air&&!!state.bowlAir?.shallow;
-   const lift=air?(shallowVertAir?.02:flip?.22:actions.grabbing?.12:.15+takeoff*.12):0;
+   const lift=air?(shallowVertAir?.02:flip?.22:actions.grabbing?.02:.15+takeoff*.12):0;
    // Ollie pop starts at the tail: the rear knee tucks first, then the front
    // knee levels the board. A kickflip briefly flicks the leading shoe out.
    // These are skin-only targets and never change deck rotation or collision.
@@ -306,6 +339,11 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
                   v(.08-swing,1.25-crouch+armLift-armDrop-pushCounter-grindCounter,-balance)];
    status.armPose={spread:balance,lift:armLift,drop:armDrop,counter:pushCounter,grindCounter};
    if(actions.grabbing){
+    // The free arm stays bent alongside the rider as a compact counterbalance,
+    // rather than pointing rigidly backwards across the entire board.
+    // Bend the balancing elbow in front of the rib cage rather than leaving
+    // the hand extended behind the skater during a rail grab.
+    targets[0]=v(.32,1.09-crouch*.24,.20);
     // Grip the near-side deck rail, rather than reaching across the middle;
     // the hand tracks the moving board even during a simultaneous flip.
     // The grab wrist stays 10 cm above the deck-top rail so fingers can touch without wrist penetration.
@@ -342,6 +380,9 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     hipClearance:Math.min(...status.legGeometry.map(g=>g.hip[1]-g.foot[1])),
     kneeLift:Math.min(...status.legGeometry.map(g=>g.knee[1]-g.hip[1])),
     chestAboveHip:localPosition(spine).y-localPosition(pelvis).y,
+    torsoForward:localPosition(spine).x-localPosition(pelvis).x,
+    torsoLateral:localPosition(spine).z-localPosition(pelvis).z,
+    balanceHandReach:B.Vector3.Distance(localPosition(arms[0].n[2]),localPosition(spine)),
     reachShift:grabReachShift
    }:null;
   }
