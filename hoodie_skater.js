@@ -30,11 +30,13 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    const base=material.albedoColor||material.diffuseColor;
    const previous=material.emissiveColor;
    if(!base||!previous)continue;
-   const floor=base.scale(.055);
+   // A tiny neutral baseline keeps nearly-black dyed fabric from vanishing;
+   // the color-proportional term retains its original hue in shadow.
+   const floor=base.scale(.08).add(new B.Color3(.014,.014,.014));
    material.emissiveColor=new B.Color3(
-    Math.max(previous.r,Math.min(.08,floor.r)),
-    Math.max(previous.g,Math.min(.08,floor.g)),
-    Math.max(previous.b,Math.min(.08,floor.b)));
+    Math.max(previous.r,Math.min(.10,floor.r)),
+    Math.max(previous.g,Math.min(.10,floor.g)),
+    Math.max(previous.b,Math.min(.10,floor.b)));
    shadowFillMaterials++;
   }
   for(const a of container.animationGroups)a.stop();
