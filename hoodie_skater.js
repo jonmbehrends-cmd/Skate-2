@@ -150,6 +150,16 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    const mode=actions.grinding?'grind':actions.grabbing?'grab':flip?'flip':air&&takeoff>.05?'ollie':air?'air':landing>.05?'landing':pushingNow?'push':(pose.crouch||0)>.1?'crouch':Math.abs(state.speed)>1?'ride':'idle';
    status.mode=mode;
    for(const [n,r] of rest){n.position.copyFrom(r.p);n.rotationQuaternion=r.q.clone()}
+   // Experimental anatomical retarget: the imported 2.05m figure has only
+   // ~0.466m shoulder-to-wrist reach. Increase the local elbow and wrist
+   // offsets modestly so the skinned arms, not the chest, approach the rail.
+   // This is intentionally confined to draft visual QA; inspect sleeve seams.
+   const armLengthScale=1.25;
+   for(const arm of arms)for(const node of arm.n.slice(1)){
+    const bind=rest.get(node).p;
+    node.position.copyFrom(bind.scale(armLengthScale));
+   }
+   status.armLengthScale=armLengthScale;
    // Airborne grabs need clearance under the hips and visibly tucked knees.
    // Do not lower the pelvis all the way to the deck: that made the hoodie
    // appear seated even though the wrist was precisely on its IK target.
