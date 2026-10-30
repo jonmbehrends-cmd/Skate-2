@@ -127,7 +127,7 @@ const server=http.createServer((req,res)=>{
     if(controls.some(el=>!el))throw Error('A touch control or utility button is missing');
     const stick=document.querySelector('#stick').getBoundingClientRect();
     const dock=document.querySelector('#buttons').getBoundingClientRect();
-    const docked=stick.right<innerWidth*.48&&dock.left>innerWidth*.52;
+    const docked=stick.right<innerWidth*.48&&dock.left>innerWidth*.50;
     return {docked,controls:controls.map(el=>{
      const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;
      const hit=document.elementFromPoint(x,y);
