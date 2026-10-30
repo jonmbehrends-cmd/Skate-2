@@ -21,7 +21,7 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
   const base=material.albedoColor||material.diffuseColor;
   if(!base||!material.emissiveColor)return false;
   return ['r','g','b'].some(channel=>base[channel]>.01&&
-   material.emissiveColor[channel]>=Math.min(.08,base[channel]*.055)-1e-6);
+   material.emissiveColor[channel]>=Math.min(.10,base[channel]*.08+.014)-1e-6);
  }), 'Imported apparel must receive a color-proportional shadow fill');
  assert(importedMaterials.every(material=>material.alpha===1),
   'Shadow readability must not make opaque hoodie apparel transparent');
