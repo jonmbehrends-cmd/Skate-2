@@ -36,8 +36,16 @@ let browser;
    }
    if(kidneyHumpClearance<1.1)throw Error('Kidney coping may collide with a roll-over hump: '+kidneyHumpClearance);
 
-   return {name:d.park.name,replica:d.park.replica,meshCount:d.scene.meshes.length,terrainVertices:m.getTotalVertices(),maxContactError:max,samples,basins:d.park.basins.length,curveRails:d.park.rails.filter(r=>r.path).length,oldCity:d.scene.meshes.filter(m=>/background building|urban facade|solid skatable concrete ramp/.test(m.name)).length,volcano:p.height(-.7,-12),deep:p.height(17,10),shallow:p.height(-19,-11),materialsReady:m.isReady(true),kidneyHumpClearance,version:B.Engine.Version};
+   const murals=d.park.objects.filter(o=>/^(north snake|south surf|west flow|east competition) mural$/.test(o.name)).map(o=>({
+    name:o.name,alpha:o.material.alpha,blending:o.material.needAlphaBlending(),
+    textureReady:o.material.diffuseTexture?.isReady(),texture:o.material.diffuseTexture?.getSize(),
+    outside:Math.abs(o.position.x)>SOLNewberg.width/2||Math.abs(o.position.z)>SOLNewberg.depth/2
+   }));
+   return {murals,name:d.park.name,replica:d.park.replica,meshCount:d.scene.meshes.length,terrainVertices:m.getTotalVertices(),maxContactError:max,samples,basins:d.park.basins.length,curveRails:d.park.rails.filter(r=>r.path).length,oldCity:d.scene.meshes.filter(m=>/background building|urban facade|solid skatable concrete ramp/.test(m.name)).length,volcano:p.height(-.7,-12),deep:p.height(17,10),shallow:p.height(-19,-11),materialsReady:m.isReady(true),kidneyHumpClearance,version:B.Engine.Version};
   });
+  assert.equal(geometry.murals.length,4,'Four distinct perimeter murals must render');
+  assert(geometry.murals.every(m=>m.alpha===1&&!m.blending&&m.textureReady&&m.texture?.width===1024&&m.texture?.height===256&&m.outside),
+   'Mural art must stay on fully opaque perimeter panels outside the skateable surface: '+JSON.stringify(geometry.murals));
   assert.equal(geometry.name,'Newberg / Chehalem');assert.equal(geometry.oldCity,0);assert.equal(geometry.version,'8.32.1');assert(geometry.materialsReady);assert(geometry.maxContactError<.00002,JSON.stringify(geometry));assert(geometry.volcano>1.3&&geometry.deep< -3.5&&geometry.shallow< -.8);assert(geometry.curveRails>=6);
   await page.screenshot({path:path.join(out,label+'-entrance.png')});
   const push=await page.locator('[data-t="push"]').boundingBox();await page.mouse.move(push.x+push.width/2,push.y+push.height/2);await page.mouse.down();await page.waitForFunction(()=>__SOL_DIAGNOSTICS__.state.speed>.3);await page.mouse.up();
@@ -47,6 +55,35 @@ let browser;
   const launch=await page.evaluate(()=>window.__newbergLaunch);assert(launch.trusted&&launch.vy>0&&launch.count===1&&!launch.grounded,JSON.stringify(launch));
   await page.waitForFunction(()=>__SOL_DIAGNOSTICS__.state.grounded,null,{timeout:10000});
   await page.locator('#halfpipe').click();const overviewPng=await page.screenshot({path:path.join(out,label+'-overview.png')});
+  // Real WebGL desktop/mobile evidence from both sides of the park.
+  // Keep the camera outside bowl riding lines; restore the overview before
+  // the existing pixel, physics and collision acceptance checks.
+  for(const [id,position,target] of [
+   ['north',[0,4,-48],[0,1.3,-70.1]],
+   ['south',[0,4,48],[0,1.3,70.1]],
+   ['west',[-71,4,0],[-94.1,1.3,0]],
+   ['east',[71,4,12],[94.1,1.3,12]],
+   ['west-wayfinding',[-71,5,0],[-89,.05,0]],
+   ['east-wayfinding',[68,5,-35],[86,.05,-35]]
+  ]){
+   await page.evaluate(({position,target})=>{
+    const d=__SOL_DIAGNOSTICS__,B=BABYLON;
+    window.__muralOriginalCamera ||= d.scene.activeCamera;
+    const previous=d.scene.getCameraByName('district mural QA');
+    previous?.dispose();
+    const camera=new B.FreeCamera('district mural QA',B.Vector3.FromArray(position),d.scene);
+    camera.fov=.9;camera.setTarget(B.Vector3.FromArray(target));
+    d.scene.activeCamera=camera;d.scene.render();
+   },{position,target});
+   await page.screenshot({path:path.join(out,label+'-mural-'+id+'.png')});
+  }
+  await page.evaluate(()=>{
+   const d=__SOL_DIAGNOSTICS__;
+   d.scene.activeCamera=window.__muralOriginalCamera;
+   d.scene.getCameraByName('district mural QA')?.dispose();
+   delete window.__muralOriginalCamera;
+   d.scene.render();
+  });
   const pixels=await page.evaluate(async data=>{
    const d=__SOL_DIAGNOSTICS__,B=BABYLON,img=new Image();img.src='data:image/png;base64,'+data;await img.decode();const canvas=document.createElement('canvas');canvas.width=img.width;canvas.height=img.height;const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0);
    return [[17,10],[0,-5]].map(([x,z])=>{const q=B.Vector3.Project(new B.Vector3(x,SOLNewberg.height(x,z),z),B.Matrix.Identity(),d.scene.getTransformMatrix(),d.scene.activeCamera.viewport.toGlobal(d.engine.getRenderWidth(),d.engine.getRenderHeight()));const px=ctx.getImageData(Math.round(q.x),Math.round(q.y),1,1).data;return {rgb:Array.from(px).slice(0,3),luma:.2126*px[0]+.7152*px[1]+.0722*px[2]};});
