@@ -232,7 +232,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    // makes the skater visibly float above the board immediately at takeoff.
    // Deep vert, grabs, flips, grinds, pushing and all physics are unchanged.
    const shallowVertAir=air&&!!state.bowlAir?.shallow;
-   const lift=air?(shallowVertAir?.02:flip?.22:actions.grabbing?.12:.15+takeoff*.12):0;
+   const lift=air?(shallowVertAir?.02:flip?.22:actions.grabbing?.02:.15+takeoff*.12):0;
    // Ollie pop starts at the tail: the rear knee tucks first, then the front
    // knee levels the board. A kickflip briefly flicks the leading shoe out.
    // These are skin-only targets and never change deck rotation or collision.
