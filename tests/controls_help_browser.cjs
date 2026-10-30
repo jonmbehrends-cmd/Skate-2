@@ -47,7 +47,7 @@ async function loadGame(browser, viewport, touch) {
     waitUntil: 'domcontentloaded'
   });
   await page.waitForFunction(() => !!window.__SOL_DIAGNOSTICS__, null, { timeout: 30000 });
-  await page.locator('#controls-help-toggle').waitFor();
+  await page.locator('#controls-help-toggle').waitFor({state:'attached'});
   await page.evaluate(()=>{
     window.__helpSamples=[];
     window.__SOL_DIAGNOSTICS__.scene.onAfterRenderObservable.add(()=>{
