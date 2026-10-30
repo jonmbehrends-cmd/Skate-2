@@ -29,4 +29,23 @@ assert(!html.includes("mesh.material=(r.curve||'').startsWith('halfpipe')?woodSu
 assert(html.includes("halfpipeConcrete.forceDepthWrite=true")&&
  html.includes("halfpipeConcrete.transparencyMode=B.Material.MATERIAL_OPAQUE"),
  'Halfpipe floor must remain opaque and depth-writing');
+// Daylight readability is deliberately a classic-park-only presentation pass.
+// Keep the scene legible without flattening the concrete or making ramps translucent.
+const scalar=key=>{
+ const m=html.match(new RegExp('scene\\.imageProcessingConfiguration\\.'+key+'=([0-9.]+)'));
+ assert(m,'Missing image-processing '+key);
+ return Number(m[1]);
+};
+assert(scalar('exposure')>=1.10&&scalar('exposure')<=1.20,
+ 'Classic daylight exposure should be brighter without clipping highlights');
+assert(scalar('contrast')>=1.04&&scalar('contrast')<=1.12,
+ 'Classic daylight contrast should retain detail in shaded transitions');
+assert(scalar('vignetteWeight')<=.55,
+ 'Dark vignette must not obscure the outer concrete transitions');
+assert(html.includes("surfaceTexture('concrete microtexture','#b3b8b8',1841)"),
+ 'Classic concrete should use the brighter opaque aggregate texture');
+assert(html.includes("surfaceTexture('asphalt grain','#71787c',901)"),
+ 'Classic asphalt should remain visibly distinct but not near-black');
+assert(html.includes("light.intensity=.84;light.groundColor=new B.Color3(.34,.39,.36)"),
+ 'Brighter sky fill must reach shaded coping and transition walls');
 console.log('PASS concrete clones share the source texture and dispose only replaced duplicates');
