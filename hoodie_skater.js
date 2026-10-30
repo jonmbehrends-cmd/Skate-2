@@ -219,19 +219,19 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.24,.55,-.31),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):
     v(.24,.55,-.31)):null;
    if(grabTarget){
-    const shoulderGoal=grabTarget.add(v(.10,.85,.08));
+    const shoulderGoal=grabTarget.add(v(.12,.55,.10));
     aim(pelvis,arms[1].n[0],shoulderGoal);
-    // Keep the shoulder goal above the deck to avoid folding the chest flat.\n     // Rebalance the actual skinned torso under the reaching shoulder.
+    // Rebalance the actual skinned torso under the reaching shoulder.
     // Move hips toward the chest, lift the chest, and retain both shoulder
     // origins so fixed-length arm IK can still grip the moving board rail.
     // The leg solver below replants both shoes. No gameplay forces change.
     const chestBefore=localPosition(spine);
     const shouldersBefore=arms.map(arm=>localPosition(arm.n[0]));
-    shiftJoint(pelvis,v(.12,-.03,-.12));
+    shiftJoint(pelvis,v(.16,-.05,-.15));
     shiftJoint(spine,chestBefore.add(v(0,.13,0)).subtract(localPosition(spine)));
     for(let i=0;i<arms.length;i++)
      shiftJoint(arms[i].n[0],shouldersBefore[i].subtract(localPosition(arms[i].n[0])));
-    status.grabTorsoCorrection={hipForward:.12,hipTowardGrab:.12,hipDrop:.03,chestLift:.13};
+    status.grabTorsoCorrection={hipForward:.16,hipTowardGrab:.15,hipDrop:.05,chestLift:.13};
    }else status.grabTorsoCorrection=null;
    // Unlike an ollie, a shallow transition vert air carries the whole board
    // with both soles. Avoid the ordinary 12-27cm ollie-foot separation that
