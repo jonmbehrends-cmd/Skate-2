@@ -3,8 +3,11 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
 (async()=>{
  const engine=new B.NullEngine(),scene=new B.Scene(engine),parent=new B.TransformNode('stance',scene);
  const fallback=B.MeshBuilder.CreateBox('V2 fallback',{},scene);fallback.parent=parent;
+ // Production passes a live board pivot. Exercise that path, not only the
+ // static fallback grip target, so board pitch/yaw cannot detach the hand.
+ const board=new B.TransformNode('live board pivot',scene);board.parent=parent;
  const url='data:;base64,'+fs.readFileSync('assets/quaternius-hoodie/hoodie-character.glb').toString('base64');
- const rig=await SOLHoodieSkater.attach(B,scene,parent,[fallback],{url});
+ const rig=await SOLHoodieSkater.attach(B,scene,parent,[fallback],{url,board});
  assert.equal(rig.status.bones,62);assert(rig.meshes.length>=4);assert.equal(fallback.isVisible,false);
  const state={grounded:true,speed:4,travelSign:1},pose={crouch:0};
  rig.update(state,pose);assert.equal(rig.status.mode,'ride');
@@ -145,6 +148,23 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  assert(Math.abs(rig.status.grip[2]+.31)<.01,'Grab should reach the near-side deck rail, not across the deck');
  assert(Number.isFinite(rig.status.grabReachShift)&&rig.status.grabReachShift<.45,
   'Grab should not translate the chest excessively: '+rig.status.grabReachShift);
+ // Rotate and offset the actual board relative to the skater's stance while
+ // the whole stance is banked in world space. The grip must follow the deck
+ // through the real board-pivot transform and the hand IK must still reach.
+ board.position.set(.08,.04,-.03);
+ board.rotationQuaternion=B.Quaternion.FromEulerAngles(.16,.12,-.11);
+ const boardPoseBefore=JSON.stringify({p:board.position.asArray(),q:board.rotationQuaternion.asArray()});
+ rig.update({...state,grounded:false,travelSign:-1},pose,{grabbing:true});
+ const expectedGrip=B.Vector3.TransformCoordinates(
+  B.Vector3.TransformCoordinates(new B.Vector3(.18,.34,-.31),board.computeWorldMatrix(true)),
+  B.Matrix.Invert(parent.computeWorldMatrix(true)));
+ assert(B.Vector3.Distance(B.Vector3.FromArray(rig.status.grip),expectedGrip)<.002,
+  'Grab target must track the pitched, yawed, offset board pivot in stance space');
+ assert(B.Vector3.Distance(B.Vector3.FromArray(rig.status.hands[1]),expectedGrip)<.1,
+  'Actual hoodie wrist must follow the tilted deck rail during fakie grab');
+ assert.equal(JSON.stringify({p:board.position.asArray(),q:board.rotationQuaternion.asArray()}),boardPoseBefore,
+  'Skin-only grab solver must not write board transforms');
+ board.position.set(0,0,0);board.rotationQuaternion=B.Quaternion.Identity();
  rig.update({...state,grounded:false},pose,{grinding:true});assert.equal(rig.status.mode,'grind');
  assert(rig.status.armPose.grindCounter>.08,'Forward 50-50 grind needs asymmetric arm balance');
  assert(rig.status.armPose.spread>.75,'Grind arms should spread for lateral stability');
