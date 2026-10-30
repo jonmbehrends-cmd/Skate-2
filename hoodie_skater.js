@@ -212,7 +212,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     // pavement. The two-bone solver still preserves imported limb lengths.
     const kneePole=pushing?
      B.Vector3.Lerp(v(.8,.65,side*.50),v(.36,.65,-.82),groundStroke):
-     actions.grabbing?v(.72,1.18,side*.50):v(.8,.65,side*.50);
+     actions.grabbing?v(.72,.88,side*.50):v(.8,.65,side*.50);
     solve(legs[i].n,foot,kneePole);
     placeDetached(detachedFeet[i],localPosition(legs[i].n[2]));
     orient(detachedFeet[i],shoeRotation);
