@@ -102,7 +102,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    const athleticCompression=state.grounded&&!actions.grinding&&!pushingNow&&landing<=.05?
     clamp(Math.abs(state.speed||0)/7,0,1)*.045:0;
    status.athleticCompression=athleticCompression;
-   const crouch=clamp((pose.crouch||0)*.20+landingCompression+athleticCompression+takeoff*.06+(actions.grabbing?.50:0)+(actions.grinding?.12:0),0,.78);
+   const crouch=clamp((pose.crouch||0)*.20+landingCompression+athleticCompression+takeoff*.06+(actions.grabbing?.32:0)+(actions.grinding?.12:0),0,.78);
    // Settle the pelvis into an athletic, knee-flexed stance instead of a
    // locked-knee upright pose. Feet remain IK-planted on the deck.
    // The ground-reaching push shoe sits below the deck. Compress the hips
@@ -149,7 +149,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    // makes the skater visibly float above the board immediately at takeoff.
    // Deep vert, grabs, flips, grinds, pushing and all physics are unchanged.
    const shallowVertAir=air&&!!state.bowlAir?.shallow;
-   const lift=air?(shallowVertAir?.02:flip?.22:actions.grabbing?.10:.15+takeoff*.12):0;
+   const lift=air?(shallowVertAir?.02:flip?.22:actions.grabbing?.12:.15+takeoff*.12):0;
    // Ollie pop starts at the tail: the rear knee tucks first, then the front
    // knee levels the board. A kickflip briefly flicks the leading shoe out.
    // These are skin-only targets and never change deck rotation or collision.
@@ -212,7 +212,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     // pavement. The two-bone solver still preserves imported limb lengths.
     const kneePole=pushing?
      B.Vector3.Lerp(v(.8,.65,side*.50),v(.36,.65,-.82),groundStroke):
-     actions.grabbing?v(.72,.72,side*.50):v(.8,.65,side*.50);
+     actions.grabbing?v(.58,.95,side*.55):v(.8,.65,side*.50);
     solve(legs[i].n,foot,kneePole);
     placeDetached(detachedFeet[i],localPosition(legs[i].n[2]));
     orient(detachedFeet[i],shoeRotation);
@@ -234,10 +234,10 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    if(actions.grabbing){
     // Grip the near-side deck rail, rather than reaching across the middle;
     // the hand tracks the moving board even during a simultaneous flip.
-    // The deck-top side rail is near shoe height (.45), not below the deck
-    // at .34. A realistic rail grip shortens the vertical reach without
+    // The grab wrist stays 10 cm above the deck-top rail so fingers can touch without wrist penetration.
+    // This improves clearance and shortens reach without
     // stretching arms or moving the board/physics body.
-    targets[1]=options.board?B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.24,.45,-.31),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):v(.24,.45,-.31);
+    targets[1]=options.board?B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.24,.55,-.31),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):v(.24,.55,-.31);
    }
    let grabReachShift=0;
    if(actions.grabbing){
