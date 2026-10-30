@@ -213,7 +213,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.24,.55,-.31),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):
     v(.24,.55,-.31)):null;
    if(grabTarget){
-    const shoulderGoal=grabTarget.add(v(.12,.52,.10));
+    const shoulderGoal=grabTarget.add(v(.12,.65,.10));
     aim(pelvis,arms[1].n[0],shoulderGoal);
     // Rebalance the actual skinned torso under the reaching shoulder.
     // Move hips toward the chest, lift the chest, and retain both shoulder
@@ -222,10 +222,10 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     const chestBefore=localPosition(spine);
     const shouldersBefore=arms.map(arm=>localPosition(arm.n[0]));
     shiftJoint(pelvis,v(.16,-.05,-.15));
-    shiftJoint(spine,chestBefore.add(v(0,.09,0)).subtract(localPosition(spine)));
+    shiftJoint(spine,chestBefore.add(v(0,.12,0)).subtract(localPosition(spine)));
     for(let i=0;i<arms.length;i++)
      shiftJoint(arms[i].n[0],shouldersBefore[i].subtract(localPosition(arms[i].n[0])));
-    status.grabTorsoCorrection={hipForward:.16,hipTowardGrab:.15,hipDrop:.05,chestLift:.09};
+    status.grabTorsoCorrection={hipForward:.16,hipTowardGrab:.15,hipDrop:.05,chestLift:.12};
    }else status.grabTorsoCorrection=null;
    // Unlike an ollie, a shallow transition vert air carries the whole board
    // with both soles. Avoid the ordinary 12-27cm ollie-foot separation that
