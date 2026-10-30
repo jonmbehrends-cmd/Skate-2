@@ -52,7 +52,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
   for(const n of [...container.meshes,...container.transformNodes])if(!n.parent)n.parent=rig;
   const nodes=new Map(container.transformNodes.map(n=>[n.name,n]));
   function joint(name){const n=nodes.get(name);if(!n)throw Error('Missing skater joint: '+name);return n}
-  const pelvis=joint('Hips'),spine=joint('Chest');
+  const pelvis=joint('Hips'),spine=joint('Chest'),head=nodes.get('Head');
   const legs=[['L','UpperLeg.L','LowerLeg.L','LowerLeg.L_end'],['R','UpperLeg.R','LowerLeg.R','LowerLeg.R_end']].map(([side,...names])=>({side,n:names.map(joint)}));
   const detachedFeet=[joint('Foot.L'),joint('Foot.R')];
   const toeEnds=[joint('Foot.L_end'),joint('Foot.R_end')];
@@ -136,7 +136,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    node.position.addInPlace(localDelta);node.computeWorldMatrix(true);
   }
   function orient(node,q){const pq=B.Quaternion.Identity(),parentQ=B.Quaternion.Identity();node.parent.computeWorldMatrix(true).decompose(undefined,pq);parent.computeWorldMatrix(true).decompose(undefined,parentQ);node.rotationQuaternion=pq.conjugate().multiply(parentQ.multiply(q));node.computeWorldMatrix(true)}
-  const status={ready:true,mode:'idle',height:2.05,bones:container.skeletons[0].bones.length,source:DEFAULT_URL,feet:[],hands:[],meshes:meshes.length,shadowFillMaterials,apparelContrastMaterials};
+  const status={ready:true,mode:'idle',height:2.05,bones:container.skeletons[0].bones.length,source:DEFAULT_URL,feet:[],hands:[],meshes:meshes.length,shadowFillMaterials,apparelContrastMaterials,headJoint:!!head};
   let wasGrounded=true,landing=0,takeoff=0;
   function update(state,pose,actions={}){
    const dt=clamp(actions.dt||1/60,0,.05);
@@ -205,6 +205,12 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     .multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?.18:actions.grinding?-.05:-landingHinge*.4-pushLean))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pushingNow?(pose.contact||0)*.07:0)))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Z,-grindLean*.4));
+   // Counter-pitch the imported head joint to look toward the landing;
+   // this changes only the skinned gaze, not the deck, hands or physics.
+   const headGazePitch=actions.grabbing?-.20:0;
+   status.headGazePitch=headGazePitch;
+   if(head)head.rotationQuaternion=rest.get(head).q.multiply(
+    B.Quaternion.RotationAxis(B.Axis.X,headGazePitch));
    // A grab hinges the actual pelvis/torso toward the rail instead of
    // translating the chest down through the hips to make the wrist reach.
    // The aim only changes skinned joints; the board and physics stay fixed.
@@ -213,7 +219,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.24,.55,-.31),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):
     v(.24,.55,-.31)):null;
    if(grabTarget){
-    const shoulderGoal=grabTarget.add(v(.12,.59,.10));
+    const shoulderGoal=grabTarget.add(v(.12,.55,.10));
     aim(pelvis,arms[1].n[0],shoulderGoal);
     // Rebalance the actual skinned torso under the reaching shoulder.
     // Move hips toward the chest, lift the chest, and retain both shoulder
