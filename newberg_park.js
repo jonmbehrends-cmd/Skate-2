@@ -312,10 +312,19 @@ function install(B,scene,c){
  // Keep the existing light count, shadow direction and riding surfaces.
  scene.imageProcessingConfiguration.vignetteWeight=.08;scene.imageProcessingConfiguration.contrast=1.02;scene.imageProcessingConfiguration.exposure=1.35;
  const sky=scene.getLightByName('sky'),sun=scene.getLightByName('sun');if(sky){sky.intensity=1.08;sky.diffuse=new B.Color3(.93,.97,1);}if(sun){sun.direction=new B.Vector3(-.32,-1,.26);sun.diffuse=new B.Color3(1,.97,.91);sun.intensity=1.45;}
- camera.radius=9;camera.heightOffset=3.6;camera.rotationOffset=165;
+ camera.radius=8.5;camera.heightOffset=2.2;camera.rotationOffset=180;
  overview.setTarget(new B.Vector3(0,-.7,0));overview.alpha=-1.08;overview.beta=.83;overview.fov=.95;
  const fitOverview=()=>{overview.radius=205*Math.max(1,1/scene.getEngine().getAspectRatio(overview));};fitOverview();root.addEventListener('resize',fitOverview);
- const place=()=>{Object.assign(state,{x:-22,z:-19,dir:.3,y:height(-22,-19),groundY:height(-22,-19),airCameraHeading:.3});skater.position.set(state.x,state.y+.045,state.z);};place();
+ // Snap arrivals to the same torso/look-ahead frame used while riding.
+ const snapCamera=(x,y,z,dir)=>{
+  cameraAnchor.position.set(x+Math.sin(dir)*1.2,y+.045+1.15,z+Math.cos(dir)*1.2);
+  cameraAnchor.rotation.y=dir;
+  const yaw=dir+camera.rotationOffset*Math.PI/180;
+  camera.position.set(cameraAnchor.position.x+Math.sin(yaw)*camera.radius,
+   cameraAnchor.position.y+camera.heightOffset,cameraAnchor.position.z+Math.cos(yaw)*camera.radius);
+  camera.setTarget(cameraAnchor.position);
+ };
+ const place=()=>{Object.assign(state,{x:-22,z:-19,dir:.3,y:height(-22,-19),groundY:height(-22,-19),airCameraHeading:.3});skater.position.set(state.x,state.y+.045,state.z);snapCamera(state.x,state.y,state.z,state.dir);};place();
  document.querySelector('#restart').addEventListener('click',place);
  const view=document.querySelector('#halfpipe');view.textContent='PARK VIEW';view.setAttribute('aria-label','View Newberg skatepark');view.addEventListener('click',()=>{place();state.halfpipePreviewUntil=Infinity;scene.activeCamera=overview;document.querySelector('#msg').textContent='CHEHALEM — PUSH TO RIDE';});
  // The expanded park has distinct districts. These flat, unobstructed
@@ -362,12 +371,7 @@ function install(B,scene,c){
    // Snap the *existing* camera and its independent heading anchor once,
    // then return all regular camera smoothing and obstacle handling to the
    // unchanged game loop.
-   cameraAnchor.position.copyFrom(skater.position);
-   cameraAnchor.rotation.y=spot.dir;
-   const followYaw=spot.dir+camera.rotationOffset*Math.PI/180;
-   camera.position.set(spot.x+Math.sin(followYaw)*camera.radius,
-    ground+camera.heightOffset,spot.z+Math.cos(followYaw)*camera.radius);
-   camera.setTarget(new B.Vector3(spot.x,ground+1.15,spot.z));
+   snapCamera(spot.x,ground,spot.z,spot.dir);
    scene.activeCamera=camera;
    const message=document.querySelector('#msg');
    message.textContent=spot.label+' — PUSH TO RIDE';
