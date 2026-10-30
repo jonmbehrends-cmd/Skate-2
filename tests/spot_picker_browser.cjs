@@ -35,11 +35,11 @@ let browser;
    'District preflight: nonflat arrival or camera behind perimeter: '+JSON.stringify(safety));
   assert.equal(await page.locator('#spotsPanel').isVisible(),false);
   assert.equal(await page.locator('#spotsToggle').getAttribute('aria-expanded'),'false');
-  const layout=await page.evaluate(()=>{
+  const layout=await page.evaluate((mobile)=>{
    const rect=id=>{const r=document.querySelector(id).getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height}};
    const a=rect(mobile?'#solMenuToggle':'#spotsToggle'),b=rect('#halfpipe'),c=rect('#restart'),d=rect('[data-t="grind"]'),e=rect('[data-t="boardslide"]'),overlap=(r,s)=>r.x<s.x+s.w&&r.x+r.w>s.x&&r.y<s.y+s.h&&r.y+r.h>s.y;
    return {spots:a,park:b,restart:c,grind:d,boardslide:e,overlaps:[b,c,d,e].some(o=>overlap(a,o))};
-  });
+  },mobile);
   assert(!layout.overlaps,'District menu obstructs existing fixed controls: '+JSON.stringify(layout));
   const tap=async locator=>{if(mobile)await locator.tap();else await locator.click();};
   const utilityTap=async selector=>{
