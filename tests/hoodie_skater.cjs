@@ -204,6 +204,7 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  // This guards the antipodal aim and collinear IK-pole fallbacks without
  // changing the physical board or the ordinary ride/grab acceptance.
  const savedParentRotation=parent.rotation.clone();
+ let previousInvertedJoints=null;
  for(const angle of [Math.PI-1e-5,Math.PI,Math.PI+1e-5]){
   parent.rotation.set(angle,1.3,-.2);
   board.rotationQuaternion=B.Quaternion.FromEulerAngles(angle,.12,-.11);
@@ -212,6 +213,13 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
    ...rig.status.legGeometry.flatMap(g=>[g.hip,g.knee,g.foot])];
   assert(joints.flat().every(Number.isFinite),
    'Inverted fakie grab must retain finite GLB joints at '+angle);
+  if(previousInvertedJoints){
+   const maxJump=Math.max(...joints.map((p,i)=>
+    Math.hypot(...p.map((v,j)=>v-previousInvertedJoints[i][j]))));
+   assert(maxJump<.08,
+    'Near-antipodal terrain/board perturbation must not snap hoodie joints: '+maxJump);
+  }
+  previousInvertedJoints=joints.map(p=>p.slice());
   assert(rig.status.legGeometry.every(g=>g.upper>.01&&g.lower>.01&&
    Number.isFinite(g.upper)&&Number.isFinite(g.lower)),
    'Inverted grab must retain nonzero finite limb lengths at '+angle);
