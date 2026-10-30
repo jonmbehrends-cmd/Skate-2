@@ -138,6 +138,60 @@ let browser;
    return records;
   });
   await page.keyboard.up('KeyW');
+  // In addition to the two flat perimeter promenades, exercise the actual
+  // gameplay loop inside all four recessed districts. The skater starts once
+  // in each zone, then every subsequent movement is physics-driven. We do
+  // not assert that a bowl ride stays grounded or moves in a straight line.
+  await page.keyboard.down('KeyW');
+  const zoneLines=await page.evaluate(()=>{
+   const d=__SOL_DIAGNOSTICS__,p=SOLNewberg,s=d.state,loop=d.engine._activeRenderLoops[0],render=d.scene.render;
+   d.engine.stopRenderLoop();const descriptor=Object.getOwnPropertyDescriptor(performance,'now');let clock=performance.now();
+   Object.defineProperty(performance,'now',{configurable:true,value:()=>clock});d.scene.render=()=>{};
+   const records=[];
+   try{
+    loop();
+    for(const zone of [
+     {name:'west flow bowl',x:-65,z:10,dir:Math.PI/2},
+     {name:'east bowl',x:61,z:20,dir:-Math.PI/2},
+     {name:'north snake',x:0,z:-44,dir:0},
+     {name:'south surf',x:0,z:46,dir:Math.PI}
+    ]){
+     const ground=p.height(zone.x,zone.z);
+     Object.assign(s,{x:zone.x,z:zone.z,dir:zone.dir,y:ground,groundY:ground,speed:8,
+      grounded:true,grinding:false,grindRail:null,grindRequestUntil:0,grindCooldown:0,
+      rampCooldown:0,vy:0,travelSign:1,bowlAir:null,airVX:null,airVZ:null,
+      controlSteer:0,controlThrottle:0,pushBurstUntil:0,rollAngle:0,
+      rollVelocity:0,yawAngle:0,yawVelocity:0});
+     let pathDistance=0,maxHorizontalStep=0,maxVerticalStep=0,groundedFrames=0,airFrames=0;
+     let maxAbsX=Math.abs(s.x),maxAbsZ=Math.abs(s.z);
+     for(let i=0;i<160;i++){
+      const before={x:s.x,y:s.y,z:s.z};clock+=25;loop();
+      if(![s.x,s.y,s.z,s.speed,s.vy].every(Number.isFinite))throw Error(zone.name+' nonfinite state at frame '+i);
+      const horizontal=Math.hypot(s.x-before.x,s.z-before.z);
+      pathDistance+=horizontal;maxHorizontalStep=Math.max(maxHorizontalStep,horizontal);
+      maxVerticalStep=Math.max(maxVerticalStep,Math.abs(s.y-before.y));
+      maxAbsX=Math.max(maxAbsX,Math.abs(s.x));maxAbsZ=Math.max(maxAbsZ,Math.abs(s.z));
+      if(s.grounded)groundedFrames++;else airFrames++;
+     }
+     records.push({name:zone.name,pathDistance,maxHorizontalStep,maxVerticalStep,
+      groundedFrames,airFrames,maxAbsX,maxAbsZ});
+    }
+   }finally{
+    if(descriptor)Object.defineProperty(performance,'now',descriptor);else delete performance.now;
+    d.scene.render=render;d.engine.runRenderLoop(loop);
+   }
+   return records;
+  });
+  await page.keyboard.up('KeyW');
+  assert.equal(zoneLines.length,4,'Every recessed district must receive a real physics traversal');
+  for(const line of zoneLines){
+   assert(line.pathDistance>2,'District must remain traversable, not soft-lock: '+JSON.stringify(line));
+   assert(line.maxHorizontalStep<=17*.025+.001,'District motion teleported: '+JSON.stringify(line));
+   assert(line.maxVerticalStep<1.5,'District vertical position snapped: '+JSON.stringify(line));
+   assert(line.maxAbsX<=geometry.width/2-.299&&line.maxAbsZ<=geometry.depth/2-.299,
+    'District route crossed the world boundary: '+JSON.stringify(line));
+   assert.equal(line.groundedFrames+line.airFrames,160,'Missing physics frames: '+JSON.stringify(line));
+  }
   for(const route of routes){
    assert(route.end[route.axis]>=route.minimum,'Old bounds blocked expanded route: '+JSON.stringify(route));
    assert(route.maxStep<=17*.025+.001,'Movement exceeded physical step budget: '+JSON.stringify(route));
@@ -156,9 +210,9 @@ let browser;
    },{zone,x,z});
    await page.screenshot({path:path.join(out,label+'-'+zone+'.png')});
   }
-  assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);results.push({label,geometry,flatbars,input:{held,pointers},routes});await page.close();
+  assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);results.push({label,geometry,flatbars,input:{held,pointers},routes,zoneLines});await page.close();
  }
  const screenshots=Object.fromEntries(fs.readdirSync(out).filter(f=>f.endsWith('.png')).map(f=>[f,createHash('sha256').update(fs.readFileSync(path.join(out,f))).digest('hex')]));
  fs.writeFileSync(path.join(out,'result.json'),JSON.stringify({result:'PASS',source,trackedChanges,sourceHashes,browser:browser.version(),results,screenshots},null,2));
- console.log('PASS expanded terrain render/contact, seams, uncovered bowls, mobile touch ownership, production-loop traversals and desktop/mobile gallery');
+ console.log('PASS expanded terrain render/contact, seams, uncovered bowls, mobile touch ownership, four-zone production-loop traversals and desktop/mobile gallery');
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(async()=>{if(browser)await browser.close();server.close()});
