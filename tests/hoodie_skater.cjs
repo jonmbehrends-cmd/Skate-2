@@ -9,6 +9,19 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  const url='data:;base64,'+fs.readFileSync('assets/quaternius-hoodie/hoodie-character.glb').toString('base64');
  const rig=await SOLHoodieSkater.attach(B,scene,parent,[fallback],{url,board});
  assert.equal(rig.status.bones,62);assert(rig.meshes.length>=4);assert.equal(fallback.isVisible,false);
+ // The shadow-readability pass must actually affect imported GLB apparel,
+ // preserve its opacity and leave the source rig/board animation untouched.
+ const importedMaterials=[...new Set(rig.meshes.flatMap(mesh=>{
+  const material=mesh.material;
+  return material?(material.subMaterials||[material]).filter(Boolean):[];
+ }))];
+ assert(rig.status.shadowFillMaterials>0&&rig.status.shadowFillMaterials<=importedMaterials.length,
+  'Hoodie material-local shadow fill must reach real skinned apparel');
+ assert(importedMaterials.some(material=>material.emissiveColor&&
+  Math.max(material.emissiveColor.r,material.emissiveColor.g,material.emissiveColor.b)>.03),
+  'Dark apparel must receive a subtle visible emissive floor');
+ assert(importedMaterials.every(material=>material.alpha===1),
+  'Shadow readability must not make opaque hoodie apparel transparent');
  const state={grounded:true,speed:4,travelSign:1},pose={crouch:0};
  rig.update(state,pose);assert.equal(rig.status.mode,'ride');
  assert(rig.status.athleticCompression>.02&&rig.status.athleticCompression<.045,
