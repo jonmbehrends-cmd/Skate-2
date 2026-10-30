@@ -17,7 +17,7 @@ let browser;
  await page.keyboard.down('w');await page.keyboard.down('a');await page.keyboard.up('a');
  await page.waitForFunction(()=>window.__SOL_DIAGNOSTICS__.state.controlThrottle<-.8);
  assert.equal(await page.evaluate(()=>window.__SOL_DIAGNOSTICS__.input().keyboard.y),-1);
- await page.keyboard.up('w');await page.locator('#solMenuToggle').click();await page.locator('#restart').click();
+ await page.keyboard.up('w');if(await page.locator('#solMenuToggle').isVisible())await page.locator('#solMenuToggle').click();await page.locator('#restart').click();
  const rect=await page.locator('[data-t="push"]').boundingBox();await page.mouse.move(rect.x+rect.width/2,rect.y+rect.height/2);await page.mouse.down();await page.mouse.move(5,200);await page.mouse.up();
  assert.equal(await page.evaluate(()=>window.__SOL_DIAGNOSTICS__.input().pushHeld),false,'Outside release must end PUSH');
  await page.evaluate(()=>{window.__qaPad={index:0,connected:true,id:'Xbox Wireless Controller',axes:[0,0,0,0],buttons:Array.from({length:17},()=>({pressed:false}))};window.__qaControllerSamples=[];const poll=window.SOLPad.poll;window.SOLPad.poll=function(...args){const input=poll.apply(this,args);window.__qaControllerSamples.push({connected:input.connected,boost:input.boost,grabHeld:input.grabHeld});if(window.__qaControllerSamples.length>100)window.__qaControllerSamples.shift();return input};Object.defineProperty(navigator,'getGamepads',{configurable:true,value:()=>[window.__qaPad]})});
@@ -25,7 +25,7 @@ let browser;
  await page.evaluate(()=>window.__qaPad.buttons[4].pressed=true);await page.waitForFunction(()=>window.__SOL_DIAGNOSTICS__.state.grindRequestUntil>performance.now());
  await page.evaluate(()=>{window.__qaPad.buttons[4].pressed=false;window.__qaPad.buttons[5].pressed=true});await page.waitForFunction(()=>window.__SOL_DIAGNOSTICS__.state.grabHeld);
  await page.evaluate(()=>window.__qaPad.buttons[5].pressed=false);await page.waitForFunction(()=>!window.__SOL_DIAGNOSTICS__.state.grabHeld&&window.__SOL_DIAGNOSTICS__.state.grabUntil===0);
- await page.locator('#solMenuToggle').click();await page.locator('#restart').click();
+ if(await page.locator('#solMenuToggle').isVisible())await page.locator('#solMenuToggle').click();await page.locator('#restart').click();
  await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
   Object.assign(s,{grounded:true,y:0,groundY:0,vy:0,speed:0,count:0,combo:0,
    flip:0,spin:0,name:'',grabUntil:0,grabHeld:false,padGrabHeld:false});
