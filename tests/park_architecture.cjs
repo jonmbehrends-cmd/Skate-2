@@ -4,7 +4,7 @@ class Material{constructor(name){this.name=name;materials.push(this)}dispose(){t
 class Texture{
  constructor(){textures.push(this)}
  dispose(){this.disposed=true}
- getContext(){const noop=()=>{};return {fillRect:noop,save:noop,restore:noop,translate:noop,rotate:noop,beginPath:noop,moveTo:noop,lineTo:noop,stroke:noop,fillText:noop}}
+ getContext(){const noop=()=>{};return {fillRect:noop,save:noop,restore:noop,translate:noop,rotate:noop,beginPath:noop,moveTo:noop,lineTo:noop,stroke:noop,fillText:noop,strokeText:noop,arc:noop,closePath:noop,fill:noop}}
  update(){}
 }
 function mesh(name){const m={name,position:{set(x,y,z){this.x=x;this.y=y;this.z=z}},rotation:{},scaling:{x:1,y:1,z:1},dispose(){this.disposed=true}};meshes.push(m);return m}
