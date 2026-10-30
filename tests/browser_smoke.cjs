@@ -1168,6 +1168,10 @@ const server=http.createServer((req,res)=>{
   // actual Chromium/WebGL. This tests the render-loop wiring as well as the
   // isolated adapter, without claiming a physical Bluetooth test.
   await page.evaluate(()=>{
+    // Earlier clean-scene screenshots hide the joystick inline. Restore the
+    // normal touch UI before asserting controller connect/disconnect behavior.
+    document.querySelector('#stick').style.display='';
+    document.querySelector('#buttons').style.display='';
     document.querySelector('#restart').click();
     const buttons=Array.from({length:17},()=>({pressed:false,value:0}));
     window.__qaPad={index:0,id:'Xbox Wireless Controller',connected:true,mapping:'standard',axes:[0,0,0,0],buttons};
