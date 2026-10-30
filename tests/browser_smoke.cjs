@@ -122,9 +122,12 @@ const server=http.createServer((req,res)=>{
   for(const [width,height] of [[320,568],[360,740],[390,844],[430,932],[667,375],[844,390]]){
    await page.setViewportSize({width,height});
    const targets=await page.evaluate(()=>{
-    const ids=['#halfpipe','#restart','#spotsToggle','#controls-help-toggle','#audio-feedback-toggle'];
+    const ids=['#halfpipe','#restart','#controls-help-toggle','#audio-feedback-toggle'];
     const controls=[...document.querySelectorAll('#buttons button'),...ids.map(id=>document.querySelector(id))];
-    if(controls.some(el=>!el))throw Error('A touch control or utility button is missing');
+    if(controls.some(el=>!el))throw Error('A required touch control or utility button is missing');
+    // SPOTS belongs to the Newberg park and is intentionally absent in classic.
+    const spots=document.querySelector('#spotsToggle');
+    if(spots)controls.push(spots);
     const stick=document.querySelector('#stick').getBoundingClientRect();
     const dock=document.querySelector('#buttons').getBoundingClientRect();
     const docked=stick.right<innerWidth*.48&&dock.left>innerWidth*.50;
