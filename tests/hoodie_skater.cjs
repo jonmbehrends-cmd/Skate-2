@@ -199,6 +199,33 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  assert.equal(JSON.stringify({p:board.position.asArray(),q:board.rotationQuaternion.asArray()}),boardPoseBefore,
   'Skin-only grab solver must not write board transforms');
  board.position.set(0,0,0);board.rotationQuaternion=B.Quaternion.Identity();
+ // Real imported GLB joints must remain finite through nearly inverted
+ // deck/terrain orientations, including fakie and near-180-degree turns.
+ // This guards the antipodal aim and collinear IK-pole fallbacks without
+ // changing the physical board or the ordinary ride/grab acceptance.
+ const savedParentRotation=parent.rotation.clone();
+ let previousInvertedJoints=null;
+ for(const angle of [Math.PI-1e-5,Math.PI,Math.PI+1e-5]){
+  parent.rotation.set(angle,1.3,-.2);
+  board.rotationQuaternion=B.Quaternion.FromEulerAngles(angle,.12,-.11);
+  rig.update({...state,grounded:false,travelSign:-1},pose,{grabbing:true});
+  const joints=[...rig.status.feet,...rig.status.hands,
+   ...rig.status.legGeometry.flatMap(g=>[g.hip,g.knee,g.foot])];
+  assert(joints.flat().every(Number.isFinite),
+   'Inverted fakie grab must retain finite GLB joints at '+angle);
+  if(previousInvertedJoints){
+   const maxJump=Math.max(...joints.map((p,i)=>
+    Math.hypot(...p.map((v,j)=>v-previousInvertedJoints[i][j]))));
+   assert(maxJump<.08,
+    'Near-antipodal terrain/board perturbation must not snap hoodie joints: '+maxJump);
+  }
+  previousInvertedJoints=joints.map(p=>p.slice());
+  assert(rig.status.legGeometry.every(g=>g.upper>.01&&g.lower>.01&&
+   Number.isFinite(g.upper)&&Number.isFinite(g.lower)),
+   'Inverted grab must retain nonzero finite limb lengths at '+angle);
+ }
+ parent.rotation.copyFrom(savedParentRotation);
+ board.rotationQuaternion=B.Quaternion.Identity();
  rig.update({...state,grounded:false},pose,{grinding:true});assert.equal(rig.status.mode,'grind');
  assert(rig.status.armPose.grindCounter>.08,'Forward 50-50 grind needs asymmetric arm balance');
  assert(rig.status.armPose.spread>.75,'Grind arms should spread for lateral stability');
