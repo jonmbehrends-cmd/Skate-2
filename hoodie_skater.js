@@ -359,6 +359,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     hipClearance:Math.min(...status.legGeometry.map(g=>g.hip[1]-g.foot[1])),
     kneeLift:Math.min(...status.legGeometry.map(g=>g.knee[1]-g.hip[1])),
     chestAboveHip:localPosition(spine).y-localPosition(pelvis).y,
+    torsoForward:localPosition(spine).x-localPosition(pelvis).x,
     reachShift:grabReachShift
    }:null;
   }
