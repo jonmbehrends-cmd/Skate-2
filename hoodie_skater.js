@@ -34,10 +34,11 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    // and shoes. The material-local fill preserves the licensed GLB textures,
    // opacity and original highlights while improving contrast in bowl shade.
    // Light/skin materials and texture-white PBR bases keep the old baseline.
-   const luminance=base.r*.2126+base.g*.7152+base.b*.0722;
-   const chroma=Math.max(base.r,base.g,base.b)-Math.min(base.r,base.g,base.b);
-   const coloredFabric=chroma>.065&&luminance>.07&&luminance<.55;
-   const floor=base.scale(coloredFabric?.17:.08).add(new B.Color3(.014,.014,.014));
+   // The licensed GLB names its purple hoodie material "Purple".
+   // Do not infer fabric from saturation: the imported "Skin" material is
+   // also chromatic and must never receive a clothing-only color boost.
+   const coloredFabric=material.name==='Purple';
+   const floor=base.scale(coloredFabric?.24:.08).add(new B.Color3(.014,.014,.014));
    const cap=coloredFabric?.15:.10;
    material.emissiveColor=new B.Color3(
     Math.max(previous.r,Math.min(cap,floor.r)),
