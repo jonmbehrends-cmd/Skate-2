@@ -68,16 +68,38 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
   function aim(node,child,target){
    node.computeWorldMatrix(true);child.computeWorldMatrix(true);
    const inv=B.Matrix.Invert(node.parent.computeWorldMatrix(true));
-   const from=B.Vector3.TransformCoordinates(child.getAbsolutePosition(),inv).subtract(node.position).normalize();
-   const to=B.Vector3.TransformCoordinates(world(target),inv).subtract(node.position).normalize();
-   const delta=B.Quaternion.Identity();B.Quaternion.FromUnitVectorsToRef(from,to,delta);
+   const from=B.Vector3.TransformCoordinates(child.getAbsolutePosition(),inv).subtract(node.position);
+   const to=B.Vector3.TransformCoordinates(world(target),inv).subtract(node.position);
+   // A zero-length direction has no meaningful orientation. Retain the
+   // previous bone frame rather than feeding NaNs into the skinned rig.
+   if(from.lengthSquared()<1e-12||to.lengthSquared()<1e-12)return;
+   from.normalize();to.normalize();
+   const delta=B.Quaternion.Identity();
+   if(B.Vector3.Dot(from,to)<-.9999){
+    // At 180 degrees the shortest-arc axis is ambiguous. Choose it from
+    // the bone's parent-local axes, not frame-dependent cross-product noise.
+    const reference=Math.abs(from.y)<.85?B.Axis.Y:B.Axis.X;
+    const stableAxis=B.Vector3.Cross(from,reference).normalize();
+    delta.copyFrom(B.Quaternion.RotationAxis(stableAxis,Math.PI));
+   }else B.Quaternion.FromUnitVectorsToRef(from,to,delta);
    node.rotationQuaternion=delta.multiply(node.rotationQuaternion);node.computeWorldMatrix(true);
   }
   function solve(chain,target,pole){
    const [a,b,c]=chain,origin=localPosition(a),mid=localPosition(b),end=localPosition(c);
    const l1=B.Vector3.Distance(origin,mid),l2=B.Vector3.Distance(mid,end);
-   const axis=target.subtract(origin),d=clamp(axis.length(),.001,l1+l2-.0001);axis.normalize();
-   const bend=pole.subtract(origin);bend.subtractInPlace(axis.scale(B.Vector3.Dot(bend,axis))).normalize();
+   const axis=target.subtract(origin),distance=axis.length();
+   const d=clamp(distance,.001,l1+l2-.0001);
+   if(distance<1e-6)axis.copyFrom(mid.subtract(origin));
+   if(axis.lengthSquared()<1e-12)axis.copyFrom(B.Axis.Y);
+   axis.normalize();
+   const perpendicular=direction=>direction.subtract(axis.scale(B.Vector3.Dot(direction,axis)));
+   let bend=perpendicular(pole.subtract(origin));
+   // When a knee/elbow pole aligns with its target, the bend plane is
+   // undefined. Prefer the actual current joint direction, then a fixed
+   // stance-space axis, so near-vertical grabs cannot flip the limb.
+   if(bend.lengthSquared()<1e-10)bend=perpendicular(mid.subtract(origin));
+   if(bend.lengthSquared()<1e-10)bend=perpendicular(Math.abs(axis.y)<.85?B.Axis.Y:B.Axis.X);
+   bend.normalize();
    const along=(l1*l1-l2*l2+d*d)/(2*d),height=Math.sqrt(Math.max(0,l1*l1-along*along));
    const knee=origin.add(axis.scale(along)).add(bend.scale(height));
    aim(a,b,knee);aim(b,c,origin.add(axis.scale(d)));
