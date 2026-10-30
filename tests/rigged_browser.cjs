@@ -109,9 +109,9 @@ let browser;
     });
     assert(Object.values(anatomy).flat().every(Number.isFinite),
      'Actual GLB grab joint positions must be finite: '+JSON.stringify(anatomy));
-    assert(anatomy.hipAboveDeck>.10,
-     'Airborne grab pelvis must stay above the deck, not seated on it: '+JSON.stringify(anatomy));
-    assert(anatomy.chestAboveHip>.06,
+    assert(anatomy.hipAboveDeck>.23,
+     'Airborne grab pelvis must have visibly athletic deck clearance: '+JSON.stringify(anatomy));
+    assert(anatomy.chestAboveHip>.10,
      'Grab torso must not collapse below the pelvis: '+JSON.stringify(anatomy));
     grabAnatomy.grab={...anatomy,handToRail:dist,reachShift:evidence.status.grabReachShift};
    }
