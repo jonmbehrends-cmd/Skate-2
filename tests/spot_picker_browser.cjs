@@ -37,12 +37,16 @@ let browser;
   assert.equal(await page.locator('#spotsToggle').getAttribute('aria-expanded'),'false');
   const layout=await page.evaluate(()=>{
    const rect=id=>{const r=document.querySelector(id).getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height}};
-   const a=rect('#spotsToggle'),b=rect('#halfpipe'),c=rect('#restart'),d=rect('[data-t="grind"]'),e=rect('[data-t="boardslide"]'),overlap=(r,s)=>r.x<s.x+s.w&&r.x+r.w>s.x&&r.y<s.y+s.h&&r.y+r.h>s.y;
+   const a=rect(mobile?'#solMenuToggle':'#spotsToggle'),b=rect('#halfpipe'),c=rect('#restart'),d=rect('[data-t="grind"]'),e=rect('[data-t="boardslide"]'),overlap=(r,s)=>r.x<s.x+s.w&&r.x+r.w>s.x&&r.y<s.y+s.h&&r.y+r.h>s.y;
    return {spots:a,park:b,restart:c,grind:d,boardslide:e,overlaps:[b,c,d,e].some(o=>overlap(a,o))};
   });
   assert(!layout.overlaps,'District menu obstructs existing fixed controls: '+JSON.stringify(layout));
   const tap=async locator=>{if(mobile)await locator.tap();else await locator.click();};
-  await tap(page.locator('#spotsToggle'));
+  const utilityTap=async selector=>{
+   if(mobile&&await page.locator('#solMenuPanel').evaluate(el=>el.hidden))await tap(page.locator('#solMenuToggle'));
+   await tap(page.locator(selector));
+  };
+  await utilityTap('#spotsToggle');
   assert(await page.locator('#spotsPanel').isVisible());
   assert.equal(await page.locator('#spotsToggle').getAttribute('aria-expanded'),'true');
   await page.screenshot({path:path.join(out,label+'-menu.png')});
@@ -51,10 +55,10 @@ let browser;
   const trials=[];
   // Jump out of park overview and preserve the prior earned score. Every spot
   // must land on solid flat terrain without retaining a grind or a stale push.
-  await tap(page.locator('#halfpipe'));
+  await utilityTap('#halfpipe');
   for(const spot of spots){
    await page.evaluate(()=>{const s=__SOL_DIAGNOSTICS__.state;s.score=1250;s.speed=0;s.vy=0;s.grindRequestType='50-50';s.grindRequestUntil=performance.now()+1200;s.pushBurstUntil=performance.now()+1500;});
-   await tap(page.locator('#spotsToggle'));
+   await utilityTap('#spotsToggle');
    await tap(page.locator('#spotsPanel [data-spot="'+spot.id+'"]'));
    assert.equal(await page.locator('#spotsPanel').isVisible(),false,'Selection must close after travel');
    await page.waitForTimeout(130); // Let the active FollowCamera render the jumped district.
@@ -92,7 +96,7 @@ let browser;
    if(spot.id==='competition'){await page.waitForTimeout(300);await page.screenshot({path:path.join(out,label+'-competition-riding.png')});}
   }
   // RESTART must still return to the original Chehalem start after travel.
-  await tap(page.locator('#restart'));
+  await utilityTap('#restart');
   const reset=await page.evaluate(()=>({x:__SOL_DIAGNOSTICS__.state.x,z:__SOL_DIAGNOSTICS__.state.z}));
   assert(Math.abs(reset.x+22)<.02&&Math.abs(reset.z+19)<.02,'Restart no longer returns to the original spawn: '+JSON.stringify(reset));
   assert.deepEqual(errors,[],'Uncaught browser errors');
