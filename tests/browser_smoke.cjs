@@ -122,7 +122,7 @@ const server=http.createServer((req,res)=>{
   for(const [width,height] of [[320,568],[360,740],[390,844],[430,932],[667,375],[844,390]]){
    await page.setViewportSize({width,height});
    const targets=await page.evaluate(()=>{
-    const ids=['#halfpipe','#restart','#controls-help-toggle','#audio-feedback-toggle'];
+    const ids=['#solMenuToggle'];
     const controls=[...document.querySelectorAll('#buttons button'),...ids.map(id=>document.querySelector(id))];
     if(controls.some(el=>!el))throw Error('A required touch control or utility button is missing');
     // SPOTS belongs to the Newberg park and is intentionally absent in classic.
@@ -144,6 +144,21 @@ const server=http.createServer((req,res)=>{
    assert(targets.docked,'Touch docks must stay outside the center view at '+width+'x'+height);
    const blocked=targets.controls.filter(t=>!t.visible||!t.inside||!t.tappable||!t.size);
    assert.deepEqual(blocked,[],'Mobile touch controls blocked or too small at '+width+'x'+height+': '+JSON.stringify(blocked));
+   // MENU utilities must be tappable and scroll into view at all mobile sizes.
+   await page.locator('#solMenuToggle').click();
+   assert.equal(await page.locator('#solMenuPanel').isVisible(),true,'MENU must expand at '+width+'x'+height);
+   for(const id of ['#restart','#halfpipe','#controls-help-toggle','#audio-feedback-toggle']){
+    const action=page.locator(id);
+    await action.scrollIntoViewIfNeeded();
+    const hit=await action.evaluate(el=>{
+     const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;
+     return {width:r.width,height:r.height,inside:x>=0&&y>=0&&x<=innerWidth&&y<=innerHeight,
+      tappable:document.elementFromPoint(x,y)===el};
+    });
+    assert(hit.width>=44&&hit.height>=44&&hit.inside&&hit.tappable,
+     'MENU utility inaccessible '+id+' at '+width+'x'+height+': '+JSON.stringify(hit));
+   }
+   await page.locator('#solMenuToggle').click();
    touchHitTargets.push({width,height,controls:targets.controls.length});
    if((width===390&&height===844)||(width===844&&height===390)){
     fs.mkdirSync('test-artifacts',{recursive:true});
@@ -559,7 +574,7 @@ const server=http.createServer((req,res)=>{
    clickFallback.y>clickFallback.groundY&&clickFallback.name==='OLLIE'&&
    clickFallback.flip===0&&clickFallback.spin===0,
    'Mobile click fallback must activate OLLIE once: '+JSON.stringify(clickFallback));
-  await page.locator('#restart').click();
+  if(await page.locator('#solMenuPanel').evaluate(el=>el.hidden))await page.locator('#solMenuToggle').click();await page.locator('#restart').click();
   // Exercise the actual mobile boardslide button while it is visible.
   await page.evaluate(()=>{const d=window.__SOL_DIAGNOSTICS__,s=d.state;
    Object.assign(s,{x:0,z:19,y:0,groundY:0,dir:0,speed:5,travelSign:1,grounded:true,grinding:false,vy:0,grindCooldown:0,grindRequestType:null});
@@ -583,7 +598,7 @@ const server=http.createServer((req,res)=>{
    'Touch boardslide must launch upward before continuing or catching its rail: '+JSON.stringify(boardLaunch));
   // Regression: GRIND and BOARD SLIDE both launch a real ollie before rail
   // capture, but GRIND must remain a 50-50 rather than a boardslide.
-  await page.locator('#restart').click();
+  if(await page.locator('#solMenuPanel').evaluate(el=>el.hidden))await page.locator('#solMenuToggle').click();await page.locator('#restart').click();
   await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
    Object.assign(s,{x:0,z:19,y:0,groundY:0,dir:0,speed:5,travelSign:1,
     grounded:true,grinding:false,vy:0,grindCooldown:0,grindRequestType:null});
@@ -689,7 +704,7 @@ const server=http.createServer((req,res)=>{
   assert(grindInput.attached===true&&grindInput.type==='50-50'&&grindInput.rail==='rail',
    'GRIND must automatically land a real 50-50 on the rail after takeoff: '+JSON.stringify(grindInput));
   const grindTelemetry=await page.evaluate(()=>window.__qa5050Telemetry);
-  await page.locator('#restart').click();
+  if(await page.locator('#solMenuPanel').evaluate(el=>el.hidden))await page.locator('#solMenuToggle').click();await page.locator('#restart').click();
   const armedGrind=await clickAndCaptureLaunch('grind');
   const armedGrindClick=armedGrind.clicks?.find(event=>event.button==='grind');
   assert(armedGrind.dispatch.request==='50-50'&&
@@ -704,7 +719,7 @@ const server=http.createServer((req,res)=>{
    armedGrindClick.count===1&&armedGrindClick.name==='OLLIE',
    'GRIND away from a rail must ollie and arm a 50-50, not teleport or score: '+JSON.stringify(armedGrind));
   // RESTART must cancel pending airborne grind lockout, not just movement.
-  await page.locator('#restart').click();
+  if(await page.locator('#solMenuPanel').evaluate(el=>el.hidden))await page.locator('#solMenuToggle').click();await page.locator('#restart').click();
   const resetState=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
    return {grounded:s.grounded,speed:s.speed,grindAirborneUntil:s.grindAirborneUntil,
     request:s.grindRequestType,combo:s.combo,grabHeld:s.grabHeld};});
@@ -717,7 +732,7 @@ const server=http.createServer((req,res)=>{
     grindRequestType:'50-50',grindRequestUntil:now+5000,grindAirborneUntil:now+5000,
     pushBurstUntil:now+5000,grabUntil:now+5000,grabHeld:true,manualActive:true});});
   // Move into the real connected halfpipe and confirm actual travel.
-  await page.locator('#halfpipe').click();
+  if(await page.locator('#solMenuPanel').evaluate(el=>el.hidden))await page.locator('#solMenuToggle').click();await page.locator('#halfpipe').click();
   const teleportState=await page.evaluate(()=>{const s=window.__SOL_DIAGNOSTICS__.state;
    return {x:s.x,z:s.z,score:s.score,combo:s.combo,count:s.count,flip:s.flip,spin:s.spin,
     grounded:s.grounded,grinding:s.grinding,request:s.grindRequestType,
