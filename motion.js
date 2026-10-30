@@ -24,6 +24,9 @@ function step(state,steer,throttle,boost,dt){
     clearAir(state);
     // RT delivers impulse only during the planted-foot half of each push.
     // Phase advances in simulation time, so physics and animation stay synchronized.
+    // INTENTIONAL: foot-push is suppressed on ramps/banks/transitions (state.onRamp).
+    // On slopes the intended speed source is the pump mechanic, not the foot-push.
+    // See issue #99 — this is by design, not a touch-input or mobile failure.
     state.pushPhase=Number.isFinite(state.pushPhase)?state.pushPhase:0;
     const pushing=!!boost&&!state.onRamp&&speed<16;
     if(pushing)state.pushPhase=(state.pushPhase+h*6.5)%(Math.PI*2);
