@@ -23,6 +23,26 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
   return ['r','g','b'].some(channel=>base[channel]>.01&&
    material.emissiveColor[channel]>=Math.min(.10,base[channel]*.08+.014)-1e-6);
  }), 'Imported apparel must receive a color-proportional shadow fill');
+ // Check the imported GLB's real material palette, not an invented mesh
+ // color. The contrast pass must remain material-local and preserve opacity.
+ const coloredMaterials=importedMaterials.filter(material=>{
+  const base=material.albedoColor||material.diffuseColor;
+  if(!base)return false;
+  const luminance=base.r*.2126+base.g*.7152+base.b*.0722;
+  const chroma=Math.max(base.r,base.g,base.b)-Math.min(base.r,base.g,base.b);
+  return chroma>.065&&luminance>.07&&luminance<.55;
+ });
+ assert.equal(rig.status.apparelContrastMaterials,coloredMaterials.length,
+  'Hoodie contrast material selection must match imported GLB colors');
+ assert(coloredMaterials.every(material=>{
+  const base=material.albedoColor||material.diffuseColor;
+  return ['r','g','b'].every(channel=>
+   material.emissiveColor[channel]>=Math.min(.15,base[channel]*.17+.014)-1e-6);
+ }), 'Colored fabric must retain its hue and extra midtone shadow fill');
+ console.log('Hoodie imported material palette:',JSON.stringify(importedMaterials.map(m=>({
+  name:m.name,base:(m.albedoColor||m.diffuseColor)?.asArray(),
+  emissive:m.emissiveColor?.asArray(),colored:coloredMaterials.includes(m)
+ }))));
  assert(importedMaterials.every(material=>material.alpha===1),
   'Shadow readability must not make opaque hoodie apparel transparent');
  const state={grounded:true,speed:4,travelSign:1},pose={crouch:0};
