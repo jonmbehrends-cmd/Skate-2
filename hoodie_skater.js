@@ -25,19 +25,26 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    if(!material)continue;
    for(const part of material.subMaterials||[material])if(part)skinnedMaterials.add(part);
   }
-  let shadowFillMaterials=0;
+  let shadowFillMaterials=0,apparelContrastMaterials=0;
   for(const material of skinnedMaterials){
    const base=material.albedoColor||material.diffuseColor;
    const previous=material.emissiveColor;
    if(!base||!previous)continue;
-   // A tiny neutral baseline keeps nearly-black dyed fabric from vanishing;
-   // the color-proportional term retains its original hue in shadow.
-   const floor=base.scale(.08).add(new B.Color3(.014,.014,.014));
+   // Lift colored midtone fabric a little more than nearly-black trousers
+   // and shoes. The material-local fill preserves the licensed GLB textures,
+   // opacity and original highlights while improving contrast in bowl shade.
+   // Light/skin materials and texture-white PBR bases keep the old baseline.
+   const luminance=base.r*.2126+base.g*.7152+base.b*.0722;
+   const chroma=Math.max(base.r,base.g,base.b)-Math.min(base.r,base.g,base.b);
+   const coloredFabric=chroma>.065&&luminance>.07&&luminance<.55;
+   const floor=base.scale(coloredFabric?.17:.08).add(new B.Color3(.014,.014,.014));
+   const cap=coloredFabric?.15:.10;
    material.emissiveColor=new B.Color3(
-    Math.max(previous.r,Math.min(.10,floor.r)),
-    Math.max(previous.g,Math.min(.10,floor.g)),
-    Math.max(previous.b,Math.min(.10,floor.b)));
+    Math.max(previous.r,Math.min(cap,floor.r)),
+    Math.max(previous.g,Math.min(cap,floor.g)),
+    Math.max(previous.b,Math.min(cap,floor.b)));
    shadowFillMaterials++;
+   if(coloredFabric)apparelContrastMaterials++;
   }
   for(const a of container.animationGroups)a.stop();
   rig=new B.TransformNode('rigged skater',scene);
@@ -122,7 +129,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
   
   function placeDetached(node,target){const inv=B.Matrix.Invert(node.parent.computeWorldMatrix(true));node.position.copyFrom(B.Vector3.TransformCoordinates(world(target),inv));node.computeWorldMatrix(true)}
   function orient(node,q){const pq=B.Quaternion.Identity(),parentQ=B.Quaternion.Identity();node.parent.computeWorldMatrix(true).decompose(undefined,pq);parent.computeWorldMatrix(true).decompose(undefined,parentQ);node.rotationQuaternion=pq.conjugate().multiply(parentQ.multiply(q));node.computeWorldMatrix(true)}
-  const status={ready:true,mode:'idle',height:2.05,bones:container.skeletons[0].bones.length,source:DEFAULT_URL,feet:[],hands:[],meshes:meshes.length,shadowFillMaterials};
+  const status={ready:true,mode:'idle',height:2.05,bones:container.skeletons[0].bones.length,source:DEFAULT_URL,feet:[],hands:[],meshes:meshes.length,shadowFillMaterials,apparelContrastMaterials};
   let wasGrounded=true,landing=0,takeoff=0;
   function update(state,pose,actions={}){
    const dt=clamp(actions.dt||1/60,0,.05);
