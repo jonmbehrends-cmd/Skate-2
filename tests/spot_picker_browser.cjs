@@ -59,7 +59,20 @@ let browser;
   for(const spot of spots){
    await page.evaluate(()=>{const s=__SOL_DIAGNOSTICS__.state;s.score=1250;s.combo=0;s.count=0;s.flip=0;s.spin=0;s.name='';s.speed=0;s.vy=0;s.grindRequestType='50-50';s.grindRequestUntil=performance.now()+1200;s.pushBurstUntil=performance.now()+1500;});
    await utilityTap('#spotsToggle');
+   // A live game may finish an earned trick between assigning the test score
+   // and opening the spot menu. Capture the actual score at the trusted click,
+   // before production's spot handler runs, rather than assuming 1250 persists.
+   await page.evaluate(()=>{
+    window.__SOL_SPOT_SCORE_AT_CLICK__=null;
+    document.querySelector('#spotsPanel').addEventListener('click',event=>{
+     if(event.target.closest('[data-spot]'))
+      window.__SOL_SPOT_SCORE_AT_CLICK__=__SOL_DIAGNOSTICS__.state.score;
+    },{capture:true,once:true});
+   });
    await tap(page.locator('#spotsPanel [data-spot="'+spot.id+'"]'));
+   const earnedAtClick=await page.evaluate(()=>window.__SOL_SPOT_SCORE_AT_CLICK__);
+   assert(Number.isFinite(earnedAtClick)&&earnedAtClick>=1250,
+    'Could not capture earned score before spot travel: '+earnedAtClick);
    assert.equal(await page.locator('#spotsPanel').isVisible(),false,'Selection must close after travel');
    await page.waitForTimeout(130); // Let the active FollowCamera render the jumped district.
    const state=await page.evaluate(()=>{
@@ -79,8 +92,8 @@ let browser;
    assert(Math.abs(state.dir-spot.dir)<.05,'Travel must face into selected riding area: '+JSON.stringify({spot,state}));
    assert(Math.abs(state.y-state.ground)<.02,'Travel must land on authoritative concrete: '+JSON.stringify({spot,state}));
    assert(Math.abs(state.ground)<.05,'District spawn should be on a level deck, not partway up a transition: '+JSON.stringify({spot,state}));
-   assert(state.score===1250&&state.grounded&&!state.grinding&&!state.air&&!state.grindRail,
-    'Travel did not safely reset previous run while preserving score: '+JSON.stringify(state));
+   assert(state.score===earnedAtClick&&state.grounded&&!state.grinding&&!state.air&&!state.grindRail,
+    'Travel did not safely reset previous run while preserving earned score: '+JSON.stringify({earnedAtClick,state}));
    assert(state.speed<.1&&!state.pushHeld&&state.pushBurstUntil===0,'Input/momentum was carried into a new district: '+JSON.stringify(state));
    if(spot.id==='river'||spot.id==='competition'){
     await page.screenshot({path:path.join(out,label+'-'+spot.id+'-after-jump.png')});
@@ -92,7 +105,7 @@ let browser;
    // Actual rider visibility at river/competition must be accepted by
    // inspecting the saved real Chromium screenshot gallery.
    assert(state.hoodie.includes('quaternius-hoodie')&&state.bones===62,'Licensed skater missing after travel');
-   trials.push({id:spot.id,x:state.x,y:state.y,z:state.z,score:state.score});
+   trials.push({id:spot.id,x:state.x,y:state.y,z:state.z,score:state.score,earnedAtClick});
    if(spot.id==='competition'){await page.waitForTimeout(300);await page.screenshot({path:path.join(out,label+'-competition-riding.png')});}
   }
   // RESTART must still return to the original Chehalem start after travel.
