@@ -85,6 +85,8 @@ let browser;
      'Real hoodie grind must keep both shoes on the board');
    }
    if(mode==='grab'){
+    assert(evidence.status.headJoint&&evidence.status.headGazePitch<-.15,
+     'Actual Chromium GLB Head joint must counter-pitch during grab');
     assert(evidence.status.feet.every(f=>Math.abs(f[1]-.47)<.04),
      'Actual Chromium grab shoes must remain planted near deck: '+JSON.stringify(evidence.status.feet));
     const dist=Math.hypot(...evidence.status.hands[1].map((n,i)=>n-evidence.status.grip[i]));assert(dist<.12,'Hoodie hand must touch board: '+JSON.stringify({dist,hands:evidence.status.hands,grip:evidence.status.grip,feet:evidence.status.feet}));
