@@ -193,6 +193,8 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  assert(Math.abs(rig.status.flipFootPitch)<.001&&Math.abs(rig.status.toeDirections[0][1])<.1,
   'Flip ankle must settle flat before landing');
  rig.update({...state,grounded:false},pose,{grabbing:true});assert.equal(rig.status.mode,'grab');
+ assert(rig.status.feet.every(f=>Math.abs(f[1]-.47)<.035),
+  'Grab shoes must stay close to deck grip instead of floating 12cm above it: '+JSON.stringify(rig.status.feet));
  const gripDistance=B.Vector3.Distance(B.Vector3.FromArray(rig.status.hands[1]),B.Vector3.FromArray(rig.status.grip));assert(gripDistance<.1,'Hand must reach board: '+JSON.stringify({gripDistance,hands:rig.status.hands,grip:rig.status.grip,feet:rig.status.feet,legGeometry:rig.status.legGeometry}));
  assert(Math.abs(rig.status.grip[2]+.31)<.01&&Math.abs(rig.status.grip[0]-.24)<.01&&Math.abs(rig.status.grip[1]-.55)<.01,
   'Grab wrist must hover above deck-top side rail for finger contact without deck penetration');
