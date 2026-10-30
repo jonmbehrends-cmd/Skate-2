@@ -325,7 +325,20 @@ console.error(e)}})();
  document.addEventListener('pointerdown',e=>{
   if(!menu.contains(e.target)&&!panel.hidden){panel.hidden=true;toggle.setAttribute('aria-expanded','false')}
  });
- document.addEventListener('DOMContentLoaded',()=>{if(matchMedia('(pointer:coarse)').matches)relocate();});
+ function positionMenu(){
+  if(!matchMedia('(pointer:coarse)').matches)return;
+  const bottom=document.getElementById('status')?.getBoundingClientRect().bottom||0;
+  const top=Math.min(Math.max(54,bottom+10),Math.max(0,innerHeight-55));
+  menu.style.top=top+'px';
+  panel.style.maxHeight=Math.max(88,innerHeight-top-55)+'px';
+ }
+ document.addEventListener('DOMContentLoaded',()=>{
+  if(!matchMedia('(pointer:coarse)').matches)return;
+  relocate();positionMenu();
+  const status=document.getElementById('status');
+  if(status&&typeof ResizeObserver==='function')new ResizeObserver(positionMenu).observe(status);
+  addEventListener('resize',positionMenu);
+ });
 })();
 
 </script><script src="controls-help.js?v=r16"></script><script src="audio-feedback.js"></script></body></html>
