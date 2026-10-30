@@ -221,11 +221,11 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     // The leg solver below replants both shoes. No gameplay forces change.
     const chestBefore=localPosition(spine);
     const shouldersBefore=arms.map(arm=>localPosition(arm.n[0]));
-    shiftJoint(pelvis,v(.10,-.035,0));
-    shiftJoint(spine,chestBefore.add(v(0,.065,0)).subtract(localPosition(spine)));
+    shiftJoint(pelvis,v(.10,-.05,0));
+    shiftJoint(spine,chestBefore.add(v(0,.09,0)).subtract(localPosition(spine)));
     for(let i=0;i<arms.length;i++)
      shiftJoint(arms[i].n[0],shouldersBefore[i].subtract(localPosition(arms[i].n[0])));
-    status.grabTorsoCorrection={hipForward:.10,hipDrop:.035,chestLift:.065};
+    status.grabTorsoCorrection={hipForward:.10,hipDrop:.05,chestLift:.09};
    }else status.grabTorsoCorrection=null;
    // Unlike an ollie, a shallow transition vert air carries the whole board
    // with both soles. Avoid the ordinary 12-27cm ollie-foot separation that
