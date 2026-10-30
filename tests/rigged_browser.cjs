@@ -114,6 +114,8 @@ let browser;
      'Actual GLB grab joint positions must be finite: '+JSON.stringify(anatomy));
     assert(anatomy.hipAboveDeck>.35,
      'Airborne grab pelvis must have visibly athletic deck clearance: '+JSON.stringify(anatomy));
+    assert(evidence.status.grabAnatomy.balanceHandReach<.65,
+     'Actual GLB free grab arm should counterbalance near torso');
     assert(Math.abs(anatomy.chest[2]-anatomy.hip[2])<.12,
      'Actual GLB chest must balance above pelvis across the board: '+JSON.stringify(anatomy));
     assert(anatomy.chestAboveHip>.19,
