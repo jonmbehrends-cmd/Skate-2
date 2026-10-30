@@ -158,6 +158,10 @@ const server=http.createServer((req,res)=>{
     assert(hit.width>=44&&hit.height>=44&&hit.inside&&hit.tappable,
      'MENU utility inaccessible '+id+' at '+width+'x'+height+': '+JSON.stringify(hit));
    }
+   if((width===390&&height===844)||(width===844&&height===390)){
+    fs.mkdirSync('test-artifacts',{recursive:true});
+    await page.screenshot({path:'test-artifacts/mobile-menu-'+(width===390?'portrait':'landscape')+'.png',animations:'disabled'});
+   }
    await page.locator('#solMenuToggle').click();
    touchHitTargets.push({width,height,controls:targets.controls.length});
    if((width===390&&height===844)||(width===844&&height===390)){
