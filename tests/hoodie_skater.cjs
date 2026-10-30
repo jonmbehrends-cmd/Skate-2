@@ -17,9 +17,12 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  }))];
  assert(rig.status.shadowFillMaterials>0&&rig.status.shadowFillMaterials<=importedMaterials.length,
   'Hoodie material-local shadow fill must reach real skinned apparel');
- assert(importedMaterials.some(material=>material.emissiveColor&&
-  Math.max(material.emissiveColor.r,material.emissiveColor.g,material.emissiveColor.b)>.03),
-  'Dark apparel must receive a subtle visible emissive floor');
+ assert(importedMaterials.some(material=>{
+  const base=material.albedoColor||material.diffuseColor;
+  if(!base||!material.emissiveColor)return false;
+  return ['r','g','b'].some(channel=>base[channel]>.01&&
+   material.emissiveColor[channel]>=Math.min(.08,base[channel]*.055)-1e-6);
+ }), 'Imported apparel must receive a color-proportional shadow fill');
  assert(importedMaterials.every(material=>material.alpha===1),
   'Shadow readability must not make opaque hoodie apparel transparent');
  const state={grounded:true,speed:4,travelSign:1},pose={crouch:0};
