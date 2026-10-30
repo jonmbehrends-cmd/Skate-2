@@ -83,9 +83,34 @@ function build(B,scene,ramps){
   ink.strokeStyle=i%2?'#a4b2ac':'#27363b';ink.lineWidth=1;
   ink.beginPath();ink.moveTo(x,y);ink.lineTo(x+13+(i%5)*6,y-2);ink.stroke();
  }
+ // Paint overspray, chipped stencil edges and short gravity drips are baked
+ // into the existing opaque wall atlas. No new geometry, collision or alpha
+ // blending: the halfpipe and perimeter walls keep correct depth ordering.
+ for(const [cx,cy,color] of [[208,94,'#37a6ad'],[756,111,'#ec8754'],[514,183,'#e2bb68']]){
+  for(let i=0;i<190;i++){
+   const angle=random()*Math.PI*2,rad=8+Math.sqrt(random())*88;
+   const x=cx+Math.cos(angle)*rad,y=cy+Math.sin(angle)*rad*.38;
+   ink.fillStyle=color;ink.globalAlpha=.12+random()*.23;
+   ink.fillRect(x,y,random()*2.3+.5,random()*2.3+.5);
+  }
+  ink.globalAlpha=1;
+ }
+ for(const [x,y,length,color] of [[248,127,25,'#2b8b94'],[332,119,15,'#2b8b94'],
+  [721,147,23,'#bd6049'],[834,138,30,'#bd6049'],[490,187,12,'#b88e48']]){
+  ink.fillStyle=color;
+  ink.beginPath();ink.moveTo(x-2,y);ink.lineTo(x+2,y);
+  ink.lineTo(x+1.6,y+length-3);
+  ink.arc(x,y+length-3,1.6,0,Math.PI);ink.closePath();ink.fill();
+ }
  ink.fillStyle='#d3c9ad';ink.fillRect(22,24,980,6);ink.fillRect(22,222,980,5);
  for(const x of [28,958]){ink.fillStyle='#c18a48';for(let i=0;i<5;i++){ink.save();ink.translate(x+i*8,185);ink.rotate(-.45);ink.fillRect(0,0,7,42);ink.restore();}}
- ink.font='bold 112px sans-serif';ink.textAlign='center';ink.fillStyle='#e9e0c9';ink.fillText('SOL SKATE',512,147);
+ // High-contrast hand-cut letter outlines stay readable over fresh paint.
+ ink.font='bold 112px sans-serif';ink.textAlign='center';
+ ink.lineJoin='round';ink.lineWidth=8;ink.strokeStyle='#263239';
+ ink.strokeText('SOL SKATE',512,147);
+ ink.lineWidth=2;ink.strokeStyle='#69c3c3';
+ ink.strokeText('SOL SKATE',512,147);
+ ink.fillStyle='#e9e0c9';ink.fillText('SOL SKATE',512,147);
  ink.font='bold 28px sans-serif';ink.fillStyle='#c69c64';ink.fillText('CONCRETE  /  COPING  /  FLOW',512,198);
  muralTexture.update();
  const muralMat=new B.StandardMaterial('architectural skatepark mural',scene);
