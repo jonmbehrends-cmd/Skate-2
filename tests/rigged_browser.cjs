@@ -121,14 +121,20 @@ let browser;
    }
    if(mode==='push'){
     assert(evidence.status.feet[1][1]<.25,'Hoodie pushing foot must reach pavement');
+    // The actual imported toe joint and ankle must clear the -.275m deck
+    // rail. An IK target alone can pass while the rendered shoe clips.
+    assert(evidence.status.feet[1][0]<-.30&&evidence.status.toePositions[1][0]<-.275,
+     'Rendered GLB PUSH shoe must clear deck edge: '+JSON.stringify({feet:evidence.status.feet,toes:evidence.status.toePositions}));
+    assert(evidence.status.toeDirections[1][2]>.85,
+     'Pavement shoe should face the travel line, not across the grip');
     assert(evidence.status.pushLean>.05&&evidence.status.pushLean<.09,'Hoodie chest must balance the push without excessive hunch');
    }
    if(mode==='push-toe-lift'){
     assert.equal(evidence.status.mode,'push');
     assert(evidence.status.pushFootRoll>.12&&evidence.status.pushFootRoll<.15,
      'Shoe must roll during airborne push return in real WebGL');
-    assert(evidence.status.toeDirections[1][1]>.1,
-     'Imported GLB toes must lift, not point downward: '+JSON.stringify(evidence.status.toeDirections));
+    assert(evidence.status.toeDirections[1][1]>.1&&evidence.status.toeDirections[1][2]>.6,
+     'Imported GLB toes must lift while yawing back from forward-facing contact: '+JSON.stringify(evidence.status.toeDirections));
     assert(evidence.status.feet[1][1]>.26&&evidence.status.feet[1][1]<.4,
      'Recovery roll should occur while the pushing shoe is rising');
    }
