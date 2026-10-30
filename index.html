@@ -321,7 +321,7 @@ console.error(e)}})();
  toggle.addEventListener('click',()=>{
   const open=panel.hidden;panel.hidden=!open;toggle.setAttribute('aria-expanded',String(open));
  });
- panel.addEventListener('click',e=>{if(e.target.closest('button')){panel.hidden=true;toggle.setAttribute('aria-expanded','false')}});
+ panel.addEventListener('click',e=>{const button=e.target.closest('button');if(button&&button.id!=='controls-help-toggle'){panel.hidden=true;toggle.setAttribute('aria-expanded','false')}});
  document.addEventListener('pointerdown',e=>{
   if(!menu.contains(e.target)&&!panel.hidden){panel.hidden=true;toggle.setAttribute('aria-expanded','false')}
  });
