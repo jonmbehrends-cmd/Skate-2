@@ -1,7 +1,14 @@
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('node:http'),path=require('node:path'),{execFileSync}=require('node:child_process'),{createHash}=require('node:crypto');
 const {chromium}=require('playwright'),root=path.resolve(__dirname,'..'),out=path.join(root,'test-artifacts/newberg/realism');
-const baseline=execFileSync('git',['show','f9e37f0c700739fef7271c109b5d36024365e6f4:newberg_park.js'],{cwd:root,maxBuffer:1024*1024}).toString();
+// Compare presentation on/off against the SAME geometry revision. A fixed
+// historical park script is not a valid baseline for an intentional 20%
+// heightfield change: it conflates terrain design with surface rendering.
+// Only suppress the art hook; leave every basin, contact sample and rail in
+// the geometry-only comparison byte-for-byte identical to the candidate.
+const candidate=fs.readFileSync(path.join(root,'newberg_park.js'),'utf8');
+const baseline=candidate.replaceAll('root.SOLParkSurfaceArt?.','undefined?.');
+assert.notEqual(baseline,candidate,'Presentation baseline must disable the art hook');
 const server=http.createServer((req,res)=>{const p=path.resolve(root,'.'+new URL(req.url,'http://localhost').pathname.replace(/\/$/,'/index.html'));if(!p.startsWith(root+path.sep))return res.writeHead(403).end();fs.readFile(p,(e,d)=>{res.writeHead(e?404:200,{'Content-Type':p.endsWith('.js')?'application/javascript':p.endsWith('.glb')?'model/gltf-binary':'text/html'});res.end(e?'':d);});});
 let browser;
 (async()=>{
@@ -37,6 +44,6 @@ let browser;
  for(let i=0;i<rows.length;i+=2){assert.equal(rows[i].signature,rows[i+1].signature,'Presentation pass changed terrain/contact/rail geometry');assert(rows[i+1].geometry.meshCount<=rows[i].geometry.meshCount+2,'Presentation added excessive draw objects');}
  const source=execFileSync('git',['rev-parse','HEAD'],{cwd:root}).toString().trim(),dirty=execFileSync('git',['status','--porcelain','--untracked-files=no'],{cwd:root}).toString().trim();
  const sourceHashes=Object.fromEntries(['index.html','newberg_park.js','park_surface_art.js','tests/park_realism_browser.cjs'].map(f=>[f,createHash('sha256').update(fs.readFileSync(path.join(root,f))).digest('hex')]));
- fs.writeFileSync(path.join(out,'result.json'),JSON.stringify({result:'PASS',source,dirty,sourceHashes,baseline:'f9e37f0c700739fef7271c109b5d36024365e6f4',browser:browser.version(),rows},null,2));
- console.log('PASS paired desktop/mobile realism images, identical terrain/contact/rails, bounded texture memory and mesh count');
+ fs.writeFileSync(path.join(out,'result.json'),JSON.stringify({result:'PASS',source,dirty,sourceHashes,baseline:'current geometry, art hook disabled',browser:browser.version(),rows},null,2));
+ console.log('PASS paired desktop/mobile realism images, presentation-independent geometry/contact/rails, bounded texture memory and mesh count');
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(async()=>{if(browser)await browser.close();server.close();});

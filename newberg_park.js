@@ -13,17 +13,19 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 // Hand-shaped from the builder's oblique aerial, NOT a measured plan. Each
 // connected area has one rim: overlapping primitive bowls made artificial
 // ridges and internal coping across the deep return and shallow flow channel.
+// Twenty percent deeper transitions use the authoritative heightfield:
+// render meshes, ground contact and gravity remain one continuous surface.
 const basins=[
- {name:'deep end',depth:3.9,run:6.5,knots:[[28,10],[28,16],[26,19.5],[20,20],[12,21],[3,21],[-1,18],[-1,14],[3,11],[9,10],[10,5],[10,1],[12,-2],[16,-3],[21,-2],[26,1],[28,5]]},
- {name:'west kidney and snake run',depth:1.5,run:4.4,knots:[[-27,5],[-25,-.5],[-21,-3],[-16,-2],[-13,1],[-10,5.2],[-4,5.2],[2,4],[5,7],[3,10],[-3,11],[-9,12],[-14,14],[-20,15],[-25,12]]},
- {name:'shallow capsule',depth:1.5,run:4.2,knots:[[4,-12],[5,-16],[10,-18],[20,-18],[25,-16],[26,-12],[25,-8],[20,-6],[10,-6],[5,-8]]},
- {name:'beginner pocket',depth:.95,run:3.6,knots:[[-27,-11],[-26,-15],[-22,-17.5],[-17,-17.5],[-12,-15],[-10.5,-11],[-12,-7],[-17,-5],[-22,-5],[-26,-7]]},
+ {name:'deep end',depth:4.68,run:6.5,knots:[[28,10],[28,16],[26,19.5],[20,20],[12,21],[3,21],[-1,18],[-1,14],[3,11],[9,10],[10,5],[10,1],[12,-2],[16,-3],[21,-2],[26,1],[28,5]]},
+ {name:'west kidney and snake run',depth:1.8,run:4.4,knots:[[-27,5],[-25,-.5],[-21,-3],[-16,-2],[-13,1],[-10,5.2],[-4,5.2],[2,4],[5,7],[3,10],[-3,11],[-9,12],[-14,14],[-20,15],[-25,12]]},
+ {name:'shallow capsule',depth:1.8,run:4.2,knots:[[4,-12],[5,-16],[10,-18],[20,-18],[25,-16],[26,-12],[25,-8],[20,-6],[10,-6],[5,-8]]},
+ {name:'beginner pocket',depth:1.14,run:3.6,knots:[[-27,-11],[-26,-15],[-22,-17.5],[-17,-17.5],[-12,-15],[-10.5,-11],[-12,-7],[-17,-5],[-22,-5],[-26,-7]]},
  // Original expansion, not a claim about the real Chehalem site. Every area
  // has one continuous rim and ample flat connections around both ends.
- {name:'west river flow',depth:4.2,run:5.4,knots:[[-39,-10],[-39,8],[-47,21],[-59,27],[-75,24],[-84,13],[-84,-5],[-77,-21],[-65,-27],[-53,-23],[-47,-14]]},
- {name:'east competition bowl',depth:6.1,run:7.2,knots:[[84,-12],[85,10],[81,30],[70,38],[53,36],[42,26],[39,11],[42,-4],[40,-19],[49,-30],[65,-32],[78,-26]]},
- {name:'north long snake',depth:3.2,run:4.2,knots:[[-73,-43],[-65,-54],[-48,-58],[-27,-54],[-9,-48],[9,-52],[28,-58],[49,-56],[67,-48],[72,-39],[61,-35],[47,-41],[29,-45],[12,-39],[-7,-35],[-25,-40],[-46,-47],[-61,-42]]},
- {name:'south surf basin',depth:4.6,run:5.6,knots:[[-42,41],[-24,34],[-5,36],[12,33],[29,38],[37,47],[31,57],[15,61],[-5,57],[-26,61],[-43,56],[-50,48]]}
+ {name:'west river flow',depth:5.04,run:5.4,knots:[[-39,-10],[-39,8],[-47,21],[-59,27],[-75,24],[-84,13],[-84,-5],[-77,-21],[-65,-27],[-53,-23],[-47,-14]]},
+ {name:'east competition bowl',depth:7.32,run:7.2,knots:[[84,-12],[85,10],[81,30],[70,38],[53,36],[42,26],[39,11],[42,-4],[40,-19],[49,-30],[65,-32],[78,-26]]},
+ {name:'north long snake',depth:3.84,run:4.2,knots:[[-73,-43],[-65,-54],[-48,-58],[-27,-54],[-9,-48],[9,-52],[28,-58],[49,-56],[67,-48],[72,-39],[61,-35],[47,-41],[29,-45],[12,-39],[-7,-35],[-25,-40],[-46,-47],[-61,-42]]},
+ {name:'south surf basin',depth:5.52,run:5.6,knots:[[-42,41],[-24,34],[-5,36],[12,33],[29,38],[37,47],[31,57],[15,61],[-5,57],[-26,61],[-43,56],[-50,48]]}
 ];
 function rimPoint(knots,t){
  const n=knots.length,u=((t%1)+1)%1*n,i=Math.floor(u),f=u-i;
@@ -103,7 +105,7 @@ function vertLaunch(s,previous,contact){
  let requiredGrade=1.2;
  if(grade>0&&grade<requiredGrade){
   for(const b of basins){
-   if(b.depth>1.5)continue;
+   if(b.depth>1.8)continue;
    const edge=rimDistance(b,s.x,s.z);
    if(edge>=0&&edge<=Math.max(.5,Math.min(.9,s.speed*.05))){
     requiredGrade=Math.min(requiredGrade,Math.max(.42,.70*2.4*b.depth/b.run));
@@ -378,7 +380,7 @@ function install(B,scene,c){
  root.addEventListener('keydown',e=>{if(e.key==='Escape'&&!spotsPanel.hidden){closeSpots();spotsToggle.focus();}});
  root.addEventListener('keydown',e=>{if(e.code==='KeyR'&&!e.repeat&&!e.ctrlKey&&!e.metaKey&&!e.altKey)place();});
  document.querySelector('#hud span').textContent='CHEHALEM + SOL EXPANSION';
- root.SOLBowl={bowl:{x:0,z:0,radius:0,depth:3.9},height,gradient,sample,groundTravel,roll,vertLaunch,guideAir,land,mesh:()=>terrain};
+ root.SOLBowl={bowl:{x:0,z:0,radius:0,depth:4.68},height,gradient,sample,groundTravel,roll,vertLaunch,guideAir,land,mesh:()=>terrain};
  installGrinds();
  // Batch repeated static box fixtures by material; rider/skinned meshes,
  // culled terrain tiles, coping and named light/trunk diagnostics are isolated.
