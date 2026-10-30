@@ -47,7 +47,7 @@ async function loadGame(browser, viewport, touch) {
     waitUntil: 'domcontentloaded'
   });
   await page.waitForFunction(() => !!window.__SOL_DIAGNOSTICS__, null, { timeout: 30000 });
-  await page.locator('#controls-help-toggle').waitFor();
+  await page.locator('#controls-help-toggle').waitFor({state:'attached'});
   await page.evaluate(()=>{
     window.__helpSamples=[];
     window.__SOL_DIAGNOSTICS__.scene.onAfterRenderObservable.add(()=>{
@@ -65,7 +65,7 @@ async function assertNoOverlap(page) {
       const { x, y, width, height } = element.getBoundingClientRect();
       return { x, y, right: x + width, bottom: y + height };
     };
-    const help = rect(document.querySelector('#controls-help-toggle'));
+    const help = rect(document.querySelector(matchMedia('(pointer:coarse)').matches?'#solMenuToggle':'#controls-help-toggle'));
     return [...document.querySelectorAll('#status, #restart, #halfpipe, #stick, #hud, #buttons button')]
       .map(element => {
       const other = rect(element);
@@ -179,6 +179,7 @@ async function main() {
 
     const mobile = await loadGame(browser, { width: 390, height: 844 }, true);
     await assertNoOverlap(mobile);
+    await mobile.locator('#solMenuToggle').tap();
     const mobileToggle = mobile.locator('#controls-help-toggle');
     const mobileDialog = mobile.locator('#controls-help-dialog');
     const toggleBounds = await mobileToggle.boundingBox();
@@ -223,6 +224,7 @@ async function main() {
     await mobile.mouse.move(stick.x + stick.width * .8, stick.y + stick.height * .5);
     await mobile.mouse.down();
     await mobile.waitForFunction(() => window.__SOL_DIAGNOSTICS__.input().joy.x > .2);
+    if(await mobile.locator('#solMenuPanel').evaluate(el=>el.hidden))await mobile.locator('#solMenuToggle').tap();
     await mobileToggle.evaluate(el => el.click());
     await mobile.waitForFunction(() => document.querySelector('#controls-help-dialog').open);
     const mobileState = await mobile.evaluate(() => ({
@@ -240,6 +242,7 @@ async function main() {
       'Touch close must return focus to the help toggle');
     await mobile.locator('[data-t="push"]').dispatchEvent('pointerdown', { pointerId: 99 });
     await mobile.waitForFunction(() => window.__SOL_DIAGNOSTICS__.input().pushHeld);
+    if(await mobile.locator('#solMenuPanel').evaluate(el=>el.hidden))await mobile.locator('#solMenuToggle').tap();
     await mobileToggle.evaluate(el => el.click());
     await mobile.waitForFunction(() => document.querySelector('#controls-help-dialog').open);
     assert.equal(await mobile.evaluate(() => window.__SOL_DIAGNOSTICS__.input().pushHeld), false,
@@ -258,6 +261,7 @@ async function main() {
 
     const landscape = await loadGame(browser, { width: 844, height: 390 }, true);
     await assertNoOverlap(landscape);
+    await landscape.locator('#solMenuToggle').tap();
     const landscapeToggle = landscape.locator('#controls-help-toggle');
     await landscapeToggle.tap();
     await landscape.waitForFunction(() => document.querySelector('#controls-help-dialog').open);

@@ -49,12 +49,12 @@ let browser;
   assert.equal(geometry.name,'Newberg / Chehalem');assert.equal(geometry.oldCity,0);assert.equal(geometry.version,'8.32.1');assert(geometry.materialsReady);assert(geometry.maxContactError<.00002,JSON.stringify(geometry));assert(geometry.volcano>1.3&&geometry.deep< -3.5&&geometry.shallow< -.8);assert(geometry.curveRails>=6);
   await page.screenshot({path:path.join(out,label+'-entrance.png')});
   const push=await page.locator('[data-t="push"]').boundingBox();await page.mouse.move(push.x+push.width/2,push.y+push.height/2);await page.mouse.down();await page.waitForFunction(()=>__SOL_DIAGNOSTICS__.state.speed>.3);await page.mouse.up();
-  await page.locator('#restart').click();
+  if(await page.locator('#solMenuToggle').isVisible())await page.locator('#solMenuToggle').click();await page.locator('#restart').click();
   await page.evaluate(()=>{document.addEventListener('pointerdown',e=>{if(e.target.closest('[data-t="ollie"]')){const s=__SOL_DIAGNOSTICS__.state;window.__newbergLaunch={trusted:e.isTrusted,vy:s.vy,count:s.count,grounded:s.grounded,y:s.y};}});});
   if(mobile)await page.locator('[data-t="ollie"]').tap();else await page.locator('[data-t="ollie"]').click();
   const launch=await page.evaluate(()=>window.__newbergLaunch);assert(launch.trusted&&launch.vy>0&&launch.count===1&&!launch.grounded,JSON.stringify(launch));
   await page.waitForFunction(()=>__SOL_DIAGNOSTICS__.state.grounded,null,{timeout:10000});
-  await page.locator('#halfpipe').click();const overviewPng=await page.screenshot({path:path.join(out,label+'-overview.png')});
+  if(await page.locator('#solMenuToggle').isVisible())await page.locator('#solMenuToggle').click();await page.locator('#halfpipe').click();const overviewPng=await page.screenshot({path:path.join(out,label+'-overview.png')});
   // Real WebGL desktop/mobile evidence from both sides of the park.
   // Keep the camera outside bowl riding lines; restore the overview before
   // the existing pixel, physics and collision acceptance checks.

@@ -49,8 +49,12 @@ async function openGame(browser, name, viewport, touch) {
     waitUntil: 'domcontentloaded'
   });
   await page.waitForFunction(() => !!window.__SOL_DIAGNOSTICS__?.audio, null, { timeout: 30000 });
-  await page.locator('#audio-feedback-toggle').waitFor();
+  await page.locator('#audio-feedback-toggle').waitFor({state:'attached'});
   return { name, context, page, errors };
+}
+
+async function showUtilities(page,touch) {
+  if(touch && await page.locator('#solMenuPanel').evaluate(el=>el.hidden))await page.locator('#solMenuToggle').tap();
 }
 
 async function status(page) {
@@ -59,7 +63,7 @@ async function status(page) {
 
 async function assertNoOverlap(page) {
   const overlaps = await page.evaluate(() => {
-    const audio = document.querySelector('#audio-feedback-toggle').getBoundingClientRect();
+    const audio = document.querySelector(matchMedia('(pointer:coarse)').matches?'#solMenuToggle':'#audio-feedback-toggle').getBoundingClientRect();
     return [...document.querySelectorAll('#status, #restart, #halfpipe, #controls-help-toggle, #stick, #hud, #buttons button')]
       .filter(element => {
         const box = element.getBoundingClientRect();
@@ -83,6 +87,7 @@ async function testLayout(browser, name, viewport, touch) {
     assert.equal(initial.contextState, 'uninitialized', 'Startup must not create or start audio');
     assert.equal(await page.evaluate(() => window.__audioContextCount), 0);
 
+    await showUtilities(page,touch);
     await toggle.click();
     await page.waitForFunction(() => window.__SOL_DIAGNOSTICS__.audio.status().muted);
     await page.waitForFunction(() => window.__SOL_DIAGNOSTICS__.audio.status().contextState === 'suspended');
@@ -97,6 +102,7 @@ async function testLayout(browser, name, viewport, touch) {
       'A saved mute preference must not start audio on page load');
     assert.equal(await page.evaluate(() => window.__audioContextCount), 0);
 
+    await showUtilities(page,touch);
     await toggle.focus();
     assert.equal(await page.evaluate(() => document.activeElement.id), 'audio-feedback-toggle');
     await page.keyboard.press('Space');
@@ -146,6 +152,7 @@ async function testLayout(browser, name, viewport, touch) {
       'Gameplay feedback must reuse the unlocked AudioContext');
 
     const controls = page.locator('#controls-help-toggle');
+    await showUtilities(page,touch);
     if (touch) await controls.tap();
     else await controls.click();
     await page.waitForFunction(() => window.__SOL_DIAGNOSTICS__.audio.status().contextState === 'suspended');

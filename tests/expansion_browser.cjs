@@ -113,7 +113,7 @@ let browser;
   await page.waitForFunction(()=>!__SOL_DIAGNOSTICS__.input().pushHeld);
   const pointers=await page.evaluate(()=>__expansionPointers);
   assert.equal(pointers.length,2);assert(pointers.every(e=>e.trusted&&e.pointerType===(mobile?'touch':'mouse')));assert(held.held&&held.speed>.3);
-  await page.locator('#restart').click();
+  if(mobile)await page.locator('#solMenuToggle').click();await page.locator('#restart').click();
 
   // Set each route start once. Every later position is produced by the real
   // loop with a held W input; assertions catch old bounds and state teleports.
@@ -203,7 +203,7 @@ let browser;
    assert(route.groundedSteps===700&&route.maxGroundError<.00001,'Flat route lost support: '+JSON.stringify(route));
    assert(route.maxAbsX<=geometry.width/2-.299&&route.maxAbsZ<=geometry.depth/2-.299,'Expanded boundary failed: '+JSON.stringify(route));
   }
-  await page.locator('#restart').click();await page.locator('#halfpipe').click();
+  if(mobile)await page.locator('#solMenuToggle').click();await page.locator('#restart').click();if(mobile)await page.locator('#solMenuToggle').click();await page.locator('#halfpipe').click();
   await page.screenshot({path:path.join(out,label+'-overview.png')});
   for(const [zone,x,z]of [['west-flow',-65,0],['east-bowl',61,10],['north-snake',0,-44],['south-surf',0,46]]){
    await page.evaluate(({zone,x,z})=>{
