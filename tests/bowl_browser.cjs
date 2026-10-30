@@ -12,7 +12,7 @@ let browser;
  await page.route('https://cdn.babylonjs.com/babylon.js',r=>r.fulfill({path:require.resolve('babylonjs'),contentType:'application/javascript'}));
  await page.goto('http://127.0.0.1:'+server.address().port+'/?park=classic',{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>window.__SOL_DIAGNOSTICS__,null,{timeout:60000});
- await page.locator('#restart').click();
+ await page.locator('#solMenuToggle').click();await page.locator('#restart').click();
  await page.evaluate(()=>{
   const d=window.__SOL_DIAGNOSTICS__,s=d.state,b=SOLBowl.bowl;
   // One initial placement only. The next ten airs use ordinary held forward input.
