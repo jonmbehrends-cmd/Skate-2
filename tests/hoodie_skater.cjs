@@ -192,7 +192,14 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  rig.update({...state,grounded:false,flip:1,airTime:.42},pose);
  assert(Math.abs(rig.status.flipFootPitch)<.001&&Math.abs(rig.status.toeDirections[0][1])<.1,
   'Flip ankle must settle flat before landing');
+ const head=scene.getTransformNodeByName('Head');
+ assert(head&&rig.status.headJoint,'Production GLB must expose the skinned Head joint');
+ const neutralHead=head.rotationQuaternion.clone();
  rig.update({...state,grounded:false},pose,{grabbing:true});assert.equal(rig.status.mode,'grab');
+ assert(rig.status.headGazePitch<-.18&&rig.status.headGazePitch>-.30,
+  'Grab should counter-pitch the head to look toward landing');
+ assert(Math.abs(B.Quaternion.Dot(neutralHead,head.rotationQuaternion))<.996,
+  'Real imported Head joint must rotate during grab gaze correction');
  const gripDistance=B.Vector3.Distance(B.Vector3.FromArray(rig.status.hands[1]),B.Vector3.FromArray(rig.status.grip));assert(gripDistance<.1,'Hand must reach board: '+JSON.stringify({gripDistance,hands:rig.status.hands,grip:rig.status.grip,feet:rig.status.feet,legGeometry:rig.status.legGeometry}));
  assert(Math.abs(rig.status.grip[2]+.31)<.01&&Math.abs(rig.status.grip[0]-.24)<.01&&Math.abs(rig.status.grip[1]-.55)<.01,
   'Grab wrist must hover above deck-top side rail for finger contact without deck penetration');

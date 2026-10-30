@@ -52,7 +52,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
   for(const n of [...container.meshes,...container.transformNodes])if(!n.parent)n.parent=rig;
   const nodes=new Map(container.transformNodes.map(n=>[n.name,n]));
   function joint(name){const n=nodes.get(name);if(!n)throw Error('Missing skater joint: '+name);return n}
-  const pelvis=joint('Hips'),spine=joint('Chest');
+  const pelvis=joint('Hips'),spine=joint('Chest'),head=nodes.get('Head');
   const legs=[['L','UpperLeg.L','LowerLeg.L','LowerLeg.L_end'],['R','UpperLeg.R','LowerLeg.R','LowerLeg.R_end']].map(([side,...names])=>({side,n:names.map(joint)}));
   const detachedFeet=[joint('Foot.L'),joint('Foot.R')];
   const toeEnds=[joint('Foot.L_end'),joint('Foot.R_end')];
@@ -130,7 +130,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
   
   function placeDetached(node,target){const inv=B.Matrix.Invert(node.parent.computeWorldMatrix(true));node.position.copyFrom(B.Vector3.TransformCoordinates(world(target),inv));node.computeWorldMatrix(true)}
   function orient(node,q){const pq=B.Quaternion.Identity(),parentQ=B.Quaternion.Identity();node.parent.computeWorldMatrix(true).decompose(undefined,pq);parent.computeWorldMatrix(true).decompose(undefined,parentQ);node.rotationQuaternion=pq.conjugate().multiply(parentQ.multiply(q));node.computeWorldMatrix(true)}
-  const status={ready:true,mode:'idle',height:2.05,bones:container.skeletons[0].bones.length,source:DEFAULT_URL,feet:[],hands:[],meshes:meshes.length,shadowFillMaterials,apparelContrastMaterials};
+  const status={ready:true,mode:'idle',height:2.05,bones:container.skeletons[0].bones.length,source:DEFAULT_URL,feet:[],hands:[],meshes:meshes.length,shadowFillMaterials,apparelContrastMaterials,headJoint:!!head};
   let wasGrounded=true,landing=0,takeoff=0;
   function update(state,pose,actions={}){
    const dt=clamp(actions.dt||1/60,0,.05);
@@ -199,6 +199,15 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     .multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?.18:actions.grinding?-.05:-landingHinge*.4-pushLean))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pushingNow?(pose.contact||0)*.07:0)))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Z,-grindLean*.4));
+   // Keep the face looking toward the landing during a deck grab. The
+   // existing hip/shoulder reach makes the head follow a steep torso hinge;
+   // a small local counter-pitch restores a readable gaze without moving
+   // the neck, hand target, feet, board, collision body or camera.
+   // This is a skinned-head adjustment only; all other poses use bind pitch.
+   const headGazePitch=actions.grabbing?-.24:0;
+   status.headGazePitch=headGazePitch;
+   if(head)head.rotationQuaternion=rest.get(head).q.multiply(
+    B.Quaternion.RotationAxis(B.Axis.X,headGazePitch));
    // A grab hinges the actual pelvis/torso toward the rail instead of
    // translating the chest down through the hips to make the wrist reach.
    // The aim only changes skinned joints; the board and physics stay fixed.
