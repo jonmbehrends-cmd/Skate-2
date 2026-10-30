@@ -14,6 +14,31 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
   const meshes=container.meshes.filter(m=>m.getTotalVertices()>0);
   if(!container.skeletons.length||meshes.filter(m=>m.skeleton).length<4)throw Error('Hoodie character missing skinned apparel meshes');
   container.addAllToScene();
+  // Keep the licensed hoodie's skinned face, hands and dark fabrics legible
+  // inside bowls without changing the park's daylight or gameplay lighting.
+  // A small material-local emissive floor retains imported albedo textures,
+  // shading, silhouettes and existing stronger emission. Never force alpha
+  // or disable back-face culling on the actual GLB apparel.
+  const skinnedMaterials=new Set();
+  for(const mesh of meshes){
+   const material=mesh.material;
+   if(!material)continue;
+   for(const part of material.subMaterials||[material])if(part)skinnedMaterials.add(part);
+  }
+  let shadowFillMaterials=0;
+  for(const material of skinnedMaterials){
+   const base=material.albedoColor||material.diffuseColor;
+   const previous=material.emissiveColor;
+   if(!base||!previous)continue;
+   // A tiny neutral baseline keeps nearly-black dyed fabric from vanishing;
+   // the color-proportional term retains its original hue in shadow.
+   const floor=base.scale(.08).add(new B.Color3(.014,.014,.014));
+   material.emissiveColor=new B.Color3(
+    Math.max(previous.r,Math.min(.10,floor.r)),
+    Math.max(previous.g,Math.min(.10,floor.g)),
+    Math.max(previous.b,Math.min(.10,floor.b)));
+   shadowFillMaterials++;
+  }
   for(const a of container.animationGroups)a.stop();
   rig=new B.TransformNode('rigged skater',scene);
   for(const n of [...container.meshes,...container.transformNodes])if(!n.parent)n.parent=rig;
@@ -75,7 +100,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
   
   function placeDetached(node,target){const inv=B.Matrix.Invert(node.parent.computeWorldMatrix(true));node.position.copyFrom(B.Vector3.TransformCoordinates(world(target),inv));node.computeWorldMatrix(true)}
   function orient(node,q){const pq=B.Quaternion.Identity(),parentQ=B.Quaternion.Identity();node.parent.computeWorldMatrix(true).decompose(undefined,pq);parent.computeWorldMatrix(true).decompose(undefined,parentQ);node.rotationQuaternion=pq.conjugate().multiply(parentQ.multiply(q));node.computeWorldMatrix(true)}
-  const status={ready:true,mode:'idle',height:2.05,bones:container.skeletons[0].bones.length,source:DEFAULT_URL,feet:[],hands:[],meshes:meshes.length};
+  const status={ready:true,mode:'idle',height:2.05,bones:container.skeletons[0].bones.length,source:DEFAULT_URL,feet:[],hands:[],meshes:meshes.length,shadowFillMaterials};
   let wasGrounded=true,landing=0,takeoff=0;
   function update(state,pose,actions={}){
    const dt=clamp(actions.dt||1/60,0,.05);
