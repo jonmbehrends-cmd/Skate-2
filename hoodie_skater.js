@@ -202,7 +202,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     .multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?.24:actions.grinding?.07:landingHinge-pushLean*.5))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Z,grindLean));
    spine.rotationQuaternion=rest.get(spine).q
-    .multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?.10:actions.grinding?-.05:-landingHinge*.4-pushLean))
+    .multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.05:actions.grinding?-.05:-landingHinge*.4-pushLean))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pushingNow?(pose.contact||0)*.07:0)))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Z,-grindLean*.4));
    // Counter-pitch the imported head joint to look toward the landing;
@@ -219,7 +219,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.24,.55,-.31),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):
     v(.24,.55,-.31)):null;
    if(grabTarget){
-    const shoulderGoal=grabTarget.add(v(.12,.55,.10));
+    const shoulderGoal=grabTarget.add(v(.12,.42,.10));
     aim(pelvis,arms[1].n[0],shoulderGoal);
     // Rebalance the actual skinned torso under the reaching shoulder.
     // Move hips toward the chest, lift the chest, and retain both shoulder
