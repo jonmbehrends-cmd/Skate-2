@@ -218,21 +218,54 @@ function install(B,scene,c){
  const jointMesh=B.MeshBuilder.CreateLineSystem('concrete saw-cut slab joints',{lines:joints,useVertexAlpha:true},scene);jointMesh.color=new B.Color3(.42,.43,.40);jointMesh.alpha=.22;jointMesh.isPickable=false;objects.push(jointMesh);
  // Painted navigation, built into the flat promenades. Shared atlas and one
  // merged mesh keep markings inexpensive; clipping avoids any raised ground.
- const routeTex=new B.DynamicTexture('SOL route stencil atlas',{width:1024,height:256},scene,true),paint=routeTex.getContext();paint.clearRect(0,0,1024,256);paint.fillStyle='#457a78';paint.font='900 88px sans-serif';paint.textAlign='center';paint.fillText('SOL  /  KEEP FLOWING  >',512,159);routeTex.update();
+ const routeTex=new B.DynamicTexture('SOL route stencil atlas',{width:1024,height:256},scene,true),paint=routeTex.getContext();paint.translate(1024,256);paint.rotate(Math.PI);paint.clearRect(0,0,1024,256);paint.fillStyle='#457a78';paint.font='900 88px sans-serif';paint.textAlign='center';paint.fillText('SOL  /  KEEP FLOWING  >',512,159);routeTex.update();
  const routeMat=material('worn promenade stencil','#ffffff');routeMat.diffuseTexture=routeTex;routeMat.diffuseTexture.hasAlpha=true;routeMat.useAlphaFromDiffuseTexture=true;routeMat.transparencyMode=B.Material.MATERIAL_ALPHABLEND;routeMat.backFaceCulling=false;routeMat.zOffset=-1;
- const stencils=[];for(const [x,z,w,d,turn]of [[0,-62,15,3,0],[86,-35,15,3,Math.PI/2],[0,65,15,3,Math.PI],[-89,0,15,3,-Math.PI/2]]){const m=B.MeshBuilder.CreateGround('promenade wayfinding',{width:w,height:d},scene);m.position.set(x,.009,z);m.rotation.y=turn;m.material=routeMat;m.isPickable=false;stencils.push(m);}
+ const stencils=[];for(const [x,z,w,d,turn]of [[0,-62,15,3,0],[86,-35,15,3,-Math.PI/2],[0,65,15,3,Math.PI],[-89,0,15,3,Math.PI/2]]){const m=B.MeshBuilder.CreateGround('promenade wayfinding',{width:w,height:d},scene);m.position.set(x,.009,z);m.rotation.y=turn;m.material=routeMat;m.isPickable=false;stencils.push(m);}
  const stencilBatch=B.Mesh.MergeMeshes(stencils,true,true,undefined,false,false);if(stencilBatch){stencilBatch.name='SOL promenade painted wayfinding';stencilBatch.isPickable=false;objects.push(stencilBatch);}
  const streetPath=[[-75,1.19,45],[-63,1.19,45]],streetTube=B.MeshBuilder.CreateTube('street island top grind edge',{path:streetPath.map(p=>new B.Vector3(...p)),radius:.045,tessellation:8},scene);streetTube.material=coping;objects.push(streetTube);const streetRail=railPath(streetPath);streetRail.raised=true;rails.push(streetRail);
  // Visible perimeter and physical board bounds share the same inner edge.
  for(const [x,z,w,d]of [[-93.4,0,.8,D],[93.4,0,.8,D],[0,-69.4,W,.8],[0,69.4,W,.8]]){const wall=box('expansion perimeter seat wall',x,.3,z,w,.6,d,stone);c.cameraObstacles.add(wall.name);}
  function wallArt(name,x,z,w,turn,label,accent){
-  const t=new B.DynamicTexture(name+' mural',{width:1024,height:256},scene,true),g=t.getContext();g.fillStyle='#263c3a';g.fillRect(0,0,1024,256);
+  const t=new B.DynamicTexture(name+' mural',{width:1024,height:256},scene,true),g=t.getContext();
+  // Babylon's interior-facing box UVs rotate the atlas 180 degrees. Counter-
+  // rotate the paint once so lettering reads upright from the skating surface.
+  g.translate(1024,256);g.rotate(Math.PI);g.fillStyle='#263c3a';g.fillRect(0,0,1024,256);
   // Original river/contour graphics, painted onto the existing wall panels.
   // Subdued pigments and uneven coverage replace repeated hazard stripes.
   g.strokeStyle=accent;g.lineWidth=27;g.globalAlpha=.72;
   for(let j=0;j<3;j++){g.beginPath();for(let i=0;i<=80;i++){const x=i*1024/80,y=80+j*57+Math.sin(i*.12+j*.8)*37;if(i)g.lineTo(x,y);else g.moveTo(x,y);}g.stroke();}
   g.globalAlpha=.95;g.fillStyle='#203534';g.fillRect(175,66,674,124);g.fillStyle='#eee5ce';g.textAlign='center';g.font='700 65px sans-serif';g.fillText(label,512,149);
   g.font='18px sans-serif';g.fillText('S O L   /   O R I G I N A L   E X P A N S I O N',512,179);
+  // Each district has its own original, restrained spray-painted silhouette.
+  // Draw directly into the existing mural atlas: no extra mesh, billboard,
+  // collider, transparency layer, external asset or additional draw call.
+  // Keep the readable center lettering unobstructed on both wall faces.
+  const district=name.startsWith('north')?'snake':name.startsWith('south')?'surf':name.startsWith('west')?'river':'competition';
+  for(const mirrored of [false,true]){
+   g.save();g.translate(mirrored?1024:0,0);if(mirrored)g.scale(-1,1);
+   g.strokeStyle=accent;g.lineWidth=12;g.lineCap='round';g.lineJoin='round';g.globalAlpha=.83;
+   g.beginPath();
+   if(district==='snake'){
+    g.moveTo(46,208);g.bezierCurveTo(160,201,37,156,149,141);
+    g.bezierCurveTo(193,130,51,87,156,51);
+   }else if(district==='surf'){
+    g.moveTo(38,184);g.bezierCurveTo(62,91,130,79,162,149);
+    g.bezierCurveTo(138,131,118,151,117,177);
+    g.bezierCurveTo(101,203,67,214,38,184);
+   }else if(district==='river'){
+    g.moveTo(58,34);g.bezierCurveTo(156,75,42,122,146,165);
+    g.bezierCurveTo(179,183,117,212,79,224);
+   }else{
+    g.moveTo(100,32);g.lineTo(100,73);g.moveTo(49,61);g.lineTo(76,88);
+    g.moveTo(151,61);g.lineTo(124,88);g.moveTo(40,129);g.lineTo(75,129);
+    g.moveTo(160,129);g.lineTo(125,129);g.moveTo(100,95);
+    g.lineTo(125,129);g.lineTo(100,164);g.lineTo(75,129);g.closePath();
+   }
+   g.stroke();
+   g.globalAlpha=.32;g.lineWidth=3;g.strokeStyle='#e5e4d4';
+   g.stroke();g.restore();
+  }
+  g.globalAlpha=1;
   for(let i=0;i<3100;i++){const x=hash(i,19)*1024,y=hash(i,43)*256;g.globalAlpha=.04+hash(i,71)*.13;g.fillStyle=hash(i,91)>.5?'#e7e0d0':'#263c3a';g.fillRect(x,y,1+hash(i,3)*4,1+hash(i,7)*2);}
   g.globalAlpha=1;t.update();
   const m=material(name+' ink','#ffffff');m.diffuseTexture=t;m.emissiveColor=new B.Color3(.08,.08,.08);const panel=box(name,x,1.3,z,w,2.1,.18,m);panel.rotation.y=turn;
