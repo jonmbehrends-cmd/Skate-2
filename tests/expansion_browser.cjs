@@ -62,7 +62,7 @@ let browser;
    if(!trunks)throw Error('Missing perimeter tree trunk batch');
    const positions=trunks.getVerticesData(B.VertexBuffer.PositionKind),world=trunks.computeWorldMatrix(true);
    for(let i=0;i<positions.length;i+=3){const v=B.Vector3.TransformCoordinates(new B.Vector3(positions[i],positions[i+1],positions[i+2]),world);if(!outside(v.x,v.z))throw Error('Noncolliding tree trunk inside riding rectangle');}
-   return {width:p.width,depth:p.depth,tiles:meshes.length,coreVertices:d.park.terrain.getTotalVertices(),basins:p.basins.length,samples,maxError,maxSeamStep,minHeight,floors,
+   return {width:p.width,depth:p.depth,tiles:meshes.length,coreVertices:d.park.terrain.getTotalVertices(),basins:p.basins.length,deepestBasin:Math.max(...p.basins.map(b=>b.depth)),samples,maxError,maxSeamStep,minHeight,floors,
     opaque:meshes.every(m=>m.isReady(true)&&m.material.alpha===1&&m.material.transparencyMode===B.Material.MATERIAL_OPAQUE),
     hoodieSource:d.rig.status.source,hoodieBones:d.rig.status.bones};
   });
@@ -70,7 +70,12 @@ let browser;
   assert(geometry.opaque&&geometry.maxError<.00004,'Render/contact mismatch: '+JSON.stringify(geometry));
   assert(geometry.maxSeamStep<.025,'Tile seam has a vertical step: '+JSON.stringify(geometry));
   assert(geometry.floors.every(f=>f.height<-.5),'Expansion must contain actual recessed terrain: '+JSON.stringify(geometry.floors));
-  assert(geometry.minHeight>=-6.10001&&geometry.minHeight< -5.9,'Large bowl depth missing or invalid');
+  // The tallest transition is now the 7.32 m East Competition bowl.
+  // Check both the authoritative basin depth and the actual sampled surface:
+  // updating the expected depth must not mask missing or capped geometry.
+  assert.equal(geometry.deepestBasin,7.32,'East Competition depth must be 20% taller');
+  assert(geometry.minHeight>=-geometry.deepestBasin-.00001&&geometry.minHeight< -geometry.deepestBasin+.2,
+   'Expanded bowl floor must reach the new authoritative depth: '+JSON.stringify(geometry));
   assert(geometry.hoodieSource.includes('quaternius-hoodie')&&geometry.hoodieBones===62,'Production licensed rider missing');
   const flatbars=await page.evaluate(()=>{
    const p=SOLNewberg,bars=__SOL_DIAGNOSTICS__.park.rails.filter(r=>r.raised&&r.path.length===2),records=[];
