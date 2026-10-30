@@ -224,6 +224,7 @@ async function main() {
     await mobile.mouse.move(stick.x + stick.width * .8, stick.y + stick.height * .5);
     await mobile.mouse.down();
     await mobile.waitForFunction(() => window.__SOL_DIAGNOSTICS__.input().joy.x > .2);
+    if(await mobile.locator('#solMenuPanel').evaluate(el=>el.hidden))await mobile.locator('#solMenuToggle').tap();
     await mobileToggle.evaluate(el => el.click());
     await mobile.waitForFunction(() => document.querySelector('#controls-help-dialog').open);
     const mobileState = await mobile.evaluate(() => ({
@@ -241,6 +242,7 @@ async function main() {
       'Touch close must return focus to the help toggle');
     await mobile.locator('[data-t="push"]').dispatchEvent('pointerdown', { pointerId: 99 });
     await mobile.waitForFunction(() => window.__SOL_DIAGNOSTICS__.input().pushHeld);
+    if(await mobile.locator('#solMenuPanel').evaluate(el=>el.hidden))await mobile.locator('#solMenuToggle').tap();
     await mobileToggle.evaluate(el => el.click());
     await mobile.waitForFunction(() => document.querySelector('#controls-help-dialog').open);
     assert.equal(await mobile.evaluate(() => window.__SOL_DIAGNOSTICS__.input().pushHeld), false,
