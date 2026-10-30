@@ -323,6 +323,7 @@ console.error(e)}})();
  });
  panel.addEventListener('click',e=>{const button=e.target.closest('button');if(button&&button.id!=='controls-help-toggle'){panel.hidden=true;toggle.setAttribute('aria-expanded','false')}});
  document.addEventListener('pointerdown',e=>{
+  if(e.target.closest('#controls-help-dialog'))return;
   if(!menu.contains(e.target)&&!panel.hidden){panel.hidden=true;toggle.setAttribute('aria-expanded','false')}
  });
  function positionMenu(){
