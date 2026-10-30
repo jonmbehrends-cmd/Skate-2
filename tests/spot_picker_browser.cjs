@@ -57,7 +57,7 @@ let browser;
   // must land on solid flat terrain without retaining a grind or a stale push.
   await utilityTap('#halfpipe');
   for(const spot of spots){
-   await page.evaluate(()=>{const s=__SOL_DIAGNOSTICS__.state;s.score=1250;s.speed=0;s.vy=0;s.grindRequestType='50-50';s.grindRequestUntil=performance.now()+1200;s.pushBurstUntil=performance.now()+1500;});
+   await page.evaluate(()=>{const s=__SOL_DIAGNOSTICS__.state;s.score=1250;s.combo=0;s.count=0;s.flip=0;s.spin=0;s.name='';s.speed=0;s.vy=0;s.grindRequestType='50-50';s.grindRequestUntil=performance.now()+1200;s.pushBurstUntil=performance.now()+1500;});
    await utilityTap('#spotsToggle');
    await tap(page.locator('#spotsPanel [data-spot="'+spot.id+'"]'));
    assert.equal(await page.locator('#spotsPanel').isVisible(),false,'Selection must close after travel');
