@@ -156,7 +156,7 @@ function install(B,scene,c){
  pads.length=0;pads.push({x:-69,z:45,w:14,d:12,h:1.15});
  const mats=[],objects=[];
  function material(name,color){const m=new B.StandardMaterial(name,scene);m.diffuseColor=B.Color3.FromHexString(color);m.specularColor=new B.Color3(.04,.04,.04);m.alpha=1;m.transparencyMode=B.Material.MATERIAL_OPAQUE;mats.push(m);return m;}
- const concrete=material('Newberg weathered pale concrete','#d5d0c5'),coping=material('Newberg worn iron coping','#707974'),grass=material('Ewing Young grass','#647754'),trunk=material('Oregon tree bark','#655245'),leaf=material('Oregon deciduous canopy','#899157'),pine=material('Oregon evergreen canopy','#3d5f4a'),steel=material('Newberg black entrance rails','#424744'),roof=material('Newberg shelter roof','#7e8279');
+ const concrete=material('Newberg weathered pale concrete','#dfdbd1'),coping=material('Newberg worn iron coping','#707974'),grass=material('Ewing Young grass','#739752'),trunk=material('Oregon tree bark','#655245'),leaf=material('Oregon deciduous canopy','#99ae58'),pine=material('Oregon evergreen canopy','#487b51'),steel=material('Newberg black entrance rails','#424744'),roof=material('Newberg shelter roof','#7e8279');
  coping.specularColor=new B.Color3(.45,.46,.43);coping.specularPower=48;
  // Three shared textures, including mipmaps, total approximately 3 MiB.
  // Terrain topology and the shared wheel-contact heightfield are unchanged.
@@ -308,10 +308,10 @@ function install(B,scene,c){
  const shadeBatch=B.Mesh.MergeMeshes(treeShadows,true,true,undefined,false,false);if(shadeBatch){shadeBatch.name='Ewing Young woodland contact shade';shadeBatch.isPickable=false;objects.push(shadeBatch);}
  const signTex=new B.DynamicTexture('Chehalem entrance sign',{width:1024,height:256},scene,false),ink=signTex.getContext();ink.fillStyle='#354d42';ink.fillRect(0,0,1024,256);ink.fillStyle='#f1e9d3';ink.textAlign='center';ink.font='bold 100px sans-serif';ink.fillText('SOL SKATE',512,115);ink.font='36px sans-serif';ink.fillText('CHEHALEM CORE / ORIGINAL EXPANSION',512,193);signTex.update();const signMat=material('Chehalem park sign','#ffffff');signMat.diffuseTexture=signTex;signMat.emissiveColor=new B.Color3(.12,.12,.12);box('Chehalem entrance sign',-99,1.35,-40,6,1.5,.1,signMat);
  scene.clearColor=new B.Color4(.73,.82,.86,1);scene.fogColor=new B.Color3(.73,.82,.86);scene.fogDensity=.0018;
- // Copilot daylight proposal: lift shaded concrete midtones while retaining
- // the warm directional key, texture detail and the existing light count.
- scene.imageProcessingConfiguration.vignetteWeight=.18;scene.imageProcessingConfiguration.contrast=1.05;scene.imageProcessingConfiguration.exposure=1.12;
- const sky=scene.getLightByName('sky'),sun=scene.getLightByName('sun');if(sky){sky.intensity=.82;sky.diffuse=new B.Color3(.87,.94,1);}if(sun){sun.direction=new B.Vector3(-.32,-1,.26);sun.diffuse=new B.Color3(1,.94,.83);sun.intensity=1.28;}
+ // Bright midday fill opens shaded bowls; ACES retains sunlit texture detail.
+ // Keep the existing light count, shadow direction and riding surfaces.
+ scene.imageProcessingConfiguration.vignetteWeight=.08;scene.imageProcessingConfiguration.contrast=1.02;scene.imageProcessingConfiguration.exposure=1.35;
+ const sky=scene.getLightByName('sky'),sun=scene.getLightByName('sun');if(sky){sky.intensity=1.08;sky.diffuse=new B.Color3(.93,.97,1);}if(sun){sun.direction=new B.Vector3(-.32,-1,.26);sun.diffuse=new B.Color3(1,.97,.91);sun.intensity=1.45;}
  camera.radius=9;camera.heightOffset=3.6;camera.rotationOffset=165;
  overview.setTarget(new B.Vector3(0,-.7,0));overview.alpha=-1.08;overview.beta=.83;overview.fov=.95;
  const fitOverview=()=>{overview.radius=205*Math.max(1,1/scene.getEngine().getAspectRatio(overview));};fitOverview();root.addEventListener('resize',fitOverview);
