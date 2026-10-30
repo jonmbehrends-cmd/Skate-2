@@ -72,7 +72,7 @@ body.controller-active #stick,body.controller-active #buttons{display:none!impor
    Original button nodes are moved, not cloned, preserving their event listeners. */
 #solMenu{display:none;position:fixed;right:max(8px,env(safe-area-inset-right));top:calc(env(safe-area-inset-top) + 54px);z-index:30}
 #solMenuToggle{width:94px;height:44px;border-radius:10px;background:#172b3eea;color:#fff;font-size:12px;border:1px solid #ffffff99}
-#solMenuPanel{position:absolute;right:0;top:49px;width:190px;max-height:calc(100dvh - 120px);overflow:auto;padding:8px;background:#142333f5;border:1px solid #ffffff77;border-radius:12px;box-shadow:0 8px 28px #0009;display:grid;gap:6px}
+#solMenuPanel{position:absolute;right:0;top:49px;width:190px;max-height:calc(100dvh - 120px);overflow:auto;overscroll-behavior:contain;touch-action:pan-y!important;padding:8px;background:#142333f5;border:1px solid #ffffff77;border-radius:12px;box-shadow:0 8px 28px #0009;display:grid;gap:6px}
 #solMenuPanel[hidden]{display:none!important}
 #solMenuPanel > button{position:static!important;inset:auto!important;top:auto!important;right:auto!important;left:auto!important;bottom:auto!important;transform:none!important;display:block!important;width:100%!important;min-width:0!important;height:44px!important;margin:0!important;padding:0 8px!important;border-radius:8px!important;font-size:12px!important;line-height:1.2!important;z-index:auto!important}
 @media (pointer:coarse){
