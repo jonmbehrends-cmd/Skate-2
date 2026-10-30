@@ -114,9 +114,9 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    const mode=actions.grinding?'grind':actions.grabbing?'grab':flip?'flip':air&&takeoff>.05?'ollie':air?'air':landing>.05?'landing':pushingNow?'push':(pose.crouch||0)>.1?'crouch':Math.abs(state.speed)>1?'ride':'idle';
    status.mode=mode;
    for(const [n,r] of rest){n.position.copyFrom(r.p);n.rotationQuaternion=r.q.clone()}
-   // In a grab, tuck the knees up toward the deck instead of curling the
-   // spine forward. Keep the chest comparatively upright as the hips lower;
-   // hip/chest lean and arm IK still bring the hand onto the moving deck.
+   // Airborne grabs need clearance under the hips and visibly tucked knees.
+   // Do not lower the pelvis all the way to the deck: that made the hoodie
+   // appear seated even though the wrist was precisely on its IK target.
    // Absorb impact through both knees rather than landing stiff-legged. The
    // landing pulse is visual-only and decays to neutral riding in ~0.2s.
    const landingCompression=landing*.15;
@@ -127,7 +127,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    const athleticCompression=state.grounded&&!actions.grinding&&!pushingNow&&landing<=.05?
     clamp(Math.abs(state.speed||0)/7,0,1)*.045:0;
    status.athleticCompression=athleticCompression;
-   const crouch=clamp((pose.crouch||0)*.20+landingCompression+athleticCompression+takeoff*.06+(actions.grabbing?.65:0)+(actions.grinding?.12:0),0,.78);
+   const crouch=clamp((pose.crouch||0)*.20+landingCompression+athleticCompression+takeoff*.06+(actions.grabbing?.22:0)+(actions.grinding?.12:0),0,.78);
    // Settle the pelvis into an athletic, knee-flexed stance instead of a
    // locked-knee upright pose. Feet remain IK-planted on the deck.
    // The ground-reaching push shoe sits below the deck. Compress the hips
@@ -163,18 +163,29 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    const grindLean=actions.grinding?travel*.085:0;
    status.grindLean=grindLean;
    pelvis.rotationQuaternion=rest.get(pelvis).q
-    .multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.12:actions.grinding?.07:landingHinge-pushLean*.5))
+    .multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?.38:actions.grinding?.07:landingHinge-pushLean*.5))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Z,grindLean));
    spine.rotationQuaternion=rest.get(spine).q
-    .multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.12:actions.grinding?-.05:-landingHinge*.4-pushLean))
+    .multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?.18:actions.grinding?-.05:-landingHinge*.4-pushLean))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pushingNow?(pose.contact||0)*.07:0)))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Z,-grindLean*.4));
+   // A grab hinges the actual pelvis/torso toward the rail instead of
+   // translating the chest down through the hips to make the wrist reach.
+   // The aim only changes skinned joints; the board and physics stay fixed.
+   // Use the board's current pivot so the hinge follows banked/fakie grabs.
+   const grabTarget=actions.grabbing?(options.board?
+    B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.24,.55,-.31),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):
+    v(.24,.55,-.31)):null;
+   if(grabTarget){
+    const shoulderGoal=grabTarget.add(v(.12,.52,.10));
+    aim(pelvis,arms[1].n[0],shoulderGoal);
+   }
    // Unlike an ollie, a shallow transition vert air carries the whole board
    // with both soles. Avoid the ordinary 12-27cm ollie-foot separation that
    // makes the skater visibly float above the board immediately at takeoff.
    // Deep vert, grabs, flips, grinds, pushing and all physics are unchanged.
    const shallowVertAir=air&&!!state.bowlAir?.shallow;
-   const lift=air?(shallowVertAir?.02:flip?.22:actions.grabbing?.10:.15+takeoff*.12):0;
+   const lift=air?(shallowVertAir?.02:flip?.22:actions.grabbing?.12:.15+takeoff*.12):0;
    // Ollie pop starts at the tail: the rear knee tucks first, then the front
    // knee levels the board. A kickflip briefly flicks the leading shoe out.
    // These are skin-only targets and never change deck rotation or collision.
@@ -240,9 +251,12 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     // Fade the bend plane back to the ordinary deck stance during recovery;
     // otherwise releasing PUSH would snap the knee even though the ankle is
     // already replanted. groundStroke is eased and continuous at phase wrap.
+    // On an airborne grab bend both knees inward toward the deck rather than
+    // lifting them above the chest or splaying into a wide seated squat.
+    // The two-bone solver still preserves imported limb lengths.
     const kneePole=pushing?
      B.Vector3.Lerp(v(.8,.65,side*.50),v(.36,.65,-.82),groundStroke):
-     v(.8,.65,side*.50);
+     actions.grabbing?v(.34,.76,side*.26):v(.8,.65,side*.50);
     solve(legs[i].n,foot,kneePole);
     placeDetached(detachedFeet[i],localPosition(legs[i].n[2]));
     orient(detachedFeet[i],shoeRotation);
@@ -264,7 +278,10 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    if(actions.grabbing){
     // Grip the near-side deck rail, rather than reaching across the middle;
     // the hand tracks the moving board even during a simultaneous flip.
-    targets[1]=options.board?B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.18,.34,-.31),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):v(.18,.34,-.31);
+    // The grab wrist stays 10 cm above the deck-top rail so fingers can touch without wrist penetration.
+    // This improves clearance and shortens reach without
+    // stretching arms or moving the board/physics body.
+    targets[1]=grabTarget.clone();
    }
    let grabReachShift=0;
    if(actions.grabbing){
@@ -291,6 +308,12 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    status.legGeometry=legs.map(l=>{const p=l.n.map(localPosition);return {hip:p[0].asArray(),knee:p[1].asArray(),foot:p[2].asArray(),upper:B.Vector3.Distance(p[0],p[1]),lower:B.Vector3.Distance(p[1],p[2])}});
    status.grip=actions.grabbing?targets[1].asArray():null;
    status.grabReachShift=grabReachShift;
+   status.grabAnatomy=actions.grabbing?{
+    hipClearance:Math.min(...status.legGeometry.map(g=>g.hip[1]-g.foot[1])),
+    kneeLift:Math.min(...status.legGeometry.map(g=>g.knee[1]-g.hip[1])),
+    chestAboveHip:localPosition(spine).y-localPosition(pelvis).y,
+    reachShift:grabReachShift
+   }:null;
   }
   update({grounded:true,speed:0},{crouch:0});
   for(const mesh of meshes){mesh.receiveShadows=true;mesh.alwaysSelectAsActiveMesh=true;options.shadow?.addShadowCaster(mesh)}

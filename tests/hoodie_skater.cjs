@@ -173,8 +173,14 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
   'Flip ankle must settle flat before landing');
  rig.update({...state,grounded:false},pose,{grabbing:true});assert.equal(rig.status.mode,'grab');
  const gripDistance=B.Vector3.Distance(B.Vector3.FromArray(rig.status.hands[1]),B.Vector3.FromArray(rig.status.grip));assert(gripDistance<.1,'Hand must reach board: '+JSON.stringify({gripDistance,hands:rig.status.hands,grip:rig.status.grip,feet:rig.status.feet,legGeometry:rig.status.legGeometry}));
- assert(Math.abs(rig.status.grip[2]+.31)<.01,'Grab should reach the near-side deck rail, not across the deck');
- assert(Number.isFinite(rig.status.grabReachShift)&&rig.status.grabReachShift<.45,
+ assert(Math.abs(rig.status.grip[2]+.31)<.01&&Math.abs(rig.status.grip[0]-.24)<.01&&Math.abs(rig.status.grip[1]-.55)<.01,
+  'Grab wrist must hover above deck-top side rail for finger contact without deck penetration');
+ const grabAnatomy=rig.status.grabAnatomy;
+ assert(grabAnatomy&&Object.values(grabAnatomy).every(Number.isFinite),
+  'Grab must expose actual imported joint measurements');
+ assert(grabAnatomy.hipClearance>.35,
+  'Airborne grab hips must clear both planted shoes instead of sitting on the deck: '+JSON.stringify(grabAnatomy));
+ assert(Number.isFinite(rig.status.grabReachShift)&&rig.status.grabReachShift<.30,
   'Grab should not translate the chest excessively: '+rig.status.grabReachShift);
  // Rotate and offset the actual board relative to the skater's stance while
  // the whole stance is banked in world space. The grip must follow the deck
@@ -184,7 +190,7 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  const boardPoseBefore=JSON.stringify({p:board.position.asArray(),q:board.rotationQuaternion.asArray()});
  rig.update({...state,grounded:false,travelSign:-1},pose,{grabbing:true});
  const expectedGrip=B.Vector3.TransformCoordinates(
-  B.Vector3.TransformCoordinates(new B.Vector3(.18,.34,-.31),board.computeWorldMatrix(true)),
+  B.Vector3.TransformCoordinates(new B.Vector3(.24,.55,-.31),board.computeWorldMatrix(true)),
   B.Matrix.Invert(parent.computeWorldMatrix(true)));
  assert(B.Vector3.Distance(B.Vector3.FromArray(rig.status.grip),expectedGrip)<.002,
   'Grab target must track the pitched, yawed, offset board pivot in stance space');
