@@ -199,6 +199,10 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  const grabAnatomy=rig.status.grabAnatomy;
  assert(grabAnatomy&&Object.values(grabAnatomy).every(Number.isFinite),
   'Grab must expose actual imported joint measurements');
+ assert(grabAnatomy.chestAboveHip>.19,
+  'Grab torso must rise over the pelvis instead of collapsing onto the deck: '+JSON.stringify(grabAnatomy));
+ assert(rig.status.grabTorsoCorrection?.hipForward>.09,
+  'Actual skinned pelvis must rebalance forward beneath the chest');
  assert(grabAnatomy.hipClearance>.35,
   'Airborne grab hips must clear both planted shoes instead of sitting on the deck: '+JSON.stringify(grabAnatomy));
  assert(Number.isFinite(rig.status.grabReachShift)&&rig.status.grabReachShift<.30,
