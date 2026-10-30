@@ -65,7 +65,7 @@ async function assertNoOverlap(page) {
       const { x, y, width, height } = element.getBoundingClientRect();
       return { x, y, right: x + width, bottom: y + height };
     };
-    const help = rect(document.querySelector('#controls-help-toggle'));
+    const help = rect(document.querySelector(matchMedia('(pointer:coarse)').matches?'#solMenuToggle':'#controls-help-toggle'));
     return [...document.querySelectorAll('#status, #restart, #halfpipe, #stick, #hud, #buttons button')]
       .map(element => {
       const other = rect(element);
@@ -179,6 +179,7 @@ async function main() {
 
     const mobile = await loadGame(browser, { width: 390, height: 844 }, true);
     await assertNoOverlap(mobile);
+    await mobile.locator('#solMenuToggle').tap();
     const mobileToggle = mobile.locator('#controls-help-toggle');
     const mobileDialog = mobile.locator('#controls-help-dialog');
     const toggleBounds = await mobileToggle.boundingBox();
@@ -258,6 +259,7 @@ async function main() {
 
     const landscape = await loadGame(browser, { width: 844, height: 390 }, true);
     await assertNoOverlap(landscape);
+    await landscape.locator('#solMenuToggle').tap();
     const landscapeToggle = landscape.locator('#controls-help-toggle');
     await landscapeToggle.tap();
     await landscape.waitForFunction(() => document.querySelector('#controls-help-dialog').open);
