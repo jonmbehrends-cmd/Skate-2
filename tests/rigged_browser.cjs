@@ -111,6 +111,8 @@ let browser;
      'Actual GLB grab joint positions must be finite: '+JSON.stringify(anatomy));
     assert(anatomy.hipAboveDeck>.35,
      'Airborne grab pelvis must have visibly athletic deck clearance: '+JSON.stringify(anatomy));
+    assert(anatomy.chestAboveHip>.19,
+     'Real GLB grab chest must clear the hips by at least 19 cm: '+JSON.stringify(anatomy));
     assert(anatomy.chestAboveHip>.10,
      'Grab torso must not collapse below the pelvis: '+JSON.stringify(anatomy));
     assert(anatomy.shoulder[0]-anatomy.hip[0]>.16,
