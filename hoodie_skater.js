@@ -102,7 +102,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    const athleticCompression=state.grounded&&!actions.grinding&&!pushingNow&&landing<=.05?
     clamp(Math.abs(state.speed||0)/7,0,1)*.045:0;
    status.athleticCompression=athleticCompression;
-   const crouch=clamp((pose.crouch||0)*.20+landingCompression+athleticCompression+takeoff*.06+(actions.grabbing?.38:0)+(actions.grinding?.12:0),0,.78);
+   const crouch=clamp((pose.crouch||0)*.20+landingCompression+athleticCompression+takeoff*.06+(actions.grabbing?.22:0)+(actions.grinding?.12:0),0,.78);
    // Settle the pelvis into an athletic, knee-flexed stance instead of a
    // locked-knee upright pose. Feet remain IK-planted on the deck.
    // The ground-reaching push shoe sits below the deck. Compress the hips
@@ -144,6 +144,17 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     .multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?.18:actions.grinding?-.05:-landingHinge*.4-pushLean))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pushingNow?(pose.contact||0)*.07:0)))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Z,-grindLean*.4));
+   // A grab hinges the actual pelvis/torso toward the rail instead of
+   // translating the chest down through the hips to make the wrist reach.
+   // The aim only changes skinned joints; the board and physics stay fixed.
+   // Use the board's current pivot so the hinge follows banked/fakie grabs.
+   const grabTarget=actions.grabbing?(options.board?
+    B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.24,.55,-.31),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):
+    v(.24,.55,-.31)):null;
+   if(grabTarget){
+    const shoulderGoal=grabTarget.add(v(.12,.52,.10));
+    aim(pelvis,arms[1].n[0],shoulderGoal);
+   }
    // Unlike an ollie, a shallow transition vert air carries the whole board
    // with both soles. Avoid the ordinary 12-27cm ollie-foot separation that
    // makes the skater visibly float above the board immediately at takeoff.
@@ -238,7 +249,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     // The grab wrist stays 10 cm above the deck-top rail so fingers can touch without wrist penetration.
     // This improves clearance and shortens reach without
     // stretching arms or moving the board/physics body.
-    targets[1]=options.board?B.Vector3.TransformCoordinates(B.Vector3.TransformCoordinates(v(.24,.55,-.31),options.board.computeWorldMatrix(true)),B.Matrix.Invert(parent.computeWorldMatrix(true))):v(.24,.55,-.31);
+    targets[1]=grabTarget.clone();
    }
    let grabReachShift=0;
    if(actions.grabbing){
