@@ -199,7 +199,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
      1-clamp(pose.recovery||0,0,1):phase<=Math.PI?
      smoothStep(phase/(Math.PI/3)):
      1-smoothStep((phase-Math.PI)/(Math.PI*.5));
-    const foot=v(pushing?.015-.245*groundStroke:.015,
+    const foot=v(pushing?.015-.36*groundStroke:.015,
       .45+lift+(back?rearPop:frontLevel),side*.36+(back?0:frontFlick));
     if(pushing){
      foot.y=.45-.28*groundStroke;
@@ -223,9 +223,16 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     const flipFootPitch=flip&&!actions.grabbing&&!back?
      Math.sign(state.flip)*.16*Math.sin(Math.PI*clamp((state.airTime||0)/.42,0,1)):0;
     if(!back)status.flipFootPitch=flipFootPitch;
-    const shoeRotation=footRoll||flipFootPitch?
-     B.Quaternion.RotationAxis(B.Axis.Z,flipFootPitch-footRoll).multiply(deckFootRotations[i]):
+    // A pavement push points the rear shoe down the travel line, not
+    // sideways into the deck. Ease yaw with the existing ground stroke so
+    // plant, recovery and the phase wrap remain continuous in stance space.
+    const pushYaw=pushing?-travel*Math.PI*.5*groundStroke:0;
+    const plantedRotation=pushYaw?
+     B.Quaternion.RotationAxis(B.Axis.Y,pushYaw).multiply(deckFootRotations[i]):
      deckFootRotations[i];
+    const shoeRotation=footRoll||flipFootPitch?
+     B.Quaternion.RotationAxis(B.Axis.Z,flipFootPitch-footRoll).multiply(plantedRotation):
+     plantedRotation;
     // During pavement contact the rear knee should track behind the hip,
     // rather than jut forward across the nose of the skateboard. Change only
     // the visual IK bend plane: ankle targets, fixed limb lengths, physics,
@@ -279,6 +286,8 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    for(let i=0;i<arms.length;i++)solve(arms[i].n,targets[i],v(.65,1.0-crouch,i===0?.6:-.6));
    status.feet=legs.map(l=>localPosition(l.n[2]).asArray());status.hands=arms.map(l=>localPosition(l.n[2]).asArray());
    status.toeDirections=detachedFeet.map((foot,i)=>localPosition(toeEnds[i]).subtract(localPosition(foot)).normalize().asArray());
+   // Actual imported GLB toe joints in stance space, for board-edge QA.
+   status.toePositions=toeEnds.map(n=>localPosition(n).asArray());
    status.legGeometry=legs.map(l=>{const p=l.n.map(localPosition);return {hip:p[0].asArray(),knee:p[1].asArray(),foot:p[2].asArray(),upper:B.Vector3.Distance(p[0],p[1]),lower:B.Vector3.Distance(p[1],p[2])}});
    status.grip=actions.grabbing?targets[1].asArray():null;
    status.grabReachShift=grabReachShift;

@@ -78,13 +78,20 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
   return B.Vector3.FromArray(rig.status.feet[1]);
  };
  const phaseStart=phaseFoot(0),phaseContact=phaseFoot(Math.PI/2);
+ const contactToe=rig.status.toePositions[1],contactDirection=rig.status.toeDirections[1];
+ // Measure actual imported ankle and toe joints, not only the IK target:
+ // the deck spans x=-.275..+.275 in the stance frame.
+ assert(phaseContact.x<-.30&&contactToe[0]<-.275,
+  'Rear shoe joints must clear the deck during pavement contact: '+JSON.stringify({ankle:phaseContact.asArray(),toe:contactToe}));
+ assert(contactDirection[2]>.85&&Math.abs(contactDirection[0])<.2,
+  'Pushing shoe must face down the travel line instead of pointing into the deck: '+JSON.stringify(contactDirection));
  assert.equal(rig.status.pushFootRoll,0,'Pavement-contact shoe must stay flat');
  const phaseRecovery=phaseFoot(Math.PI*1.25);
  assert(phaseRecovery.y>.26&&phaseRecovery.y<.4,'Toe roll should occur while the shoe is lifting off pavement');
  assert(rig.status.pushFootRoll>.12&&rig.status.pushFootRoll<.15,
   'Return stroke must briefly roll the pushing shoe upward');
- assert(rig.status.toeDirections[1][1]>.1&&rig.status.toeDirections[1][0]>.9,
-  'Actual GLB toe joints must lift in the recovery stroke without twisting sideways: '+JSON.stringify(rig.status.toeDirections));
+ assert(rig.status.toeDirections[1][1]>.1&&rig.status.toeDirections[1][0]>.6&&rig.status.toeDirections[1][2]>.6,
+  'Actual GLB toes must lift while smoothly yawing back toward deck stance: '+JSON.stringify(rig.status.toeDirections));
  const phaseEnd=phaseFoot(2*Math.PI-.001);
  assert.equal(rig.status.pushFootRoll,0,'Push recovery must replant a flat sole before the phase wraps');
  assert(Math.abs(rig.status.toeDirections[1][1])<.1,'Replanted shoe must be level with the grip');
@@ -100,6 +107,11 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  }
  assert(B.Vector3.Distance(phaseFoot(2*Math.PI-.001),phaseFoot(0))<.005,
   'Push phase wrap must not introduce an ankle jump');
+ // Fakie reverses the pushing shoe's fore/aft yaw without changing the
+ // lateral rail clearance or flipping the controller's steering direction.
+ rig.update({...state,travelSign:-1},{...pose,pushing:true,pushPhase:Math.PI/2,contact:1});
+ assert(rig.status.feet[1][0]<-.30&&rig.status.toePositions[1][0]<-.275&&rig.status.toeDirections[1][2]<-.85,
+  'Fakie PUSH must clear the same deck edge while the toe points backward: '+JSON.stringify({feet:rig.status.feet,toes:rig.status.toePositions,directions:rig.status.toeDirections}));
  assert(phaseContact.y<.25,'Contact half-cycle must lower trailing shoe to pavement');
  assert(Math.abs(phaseStart.y-.45)<.035&&Math.abs(phaseEnd.y-.45)<.035,
   'Both sides of push-cycle wrap must have planted deck foot');
