@@ -119,23 +119,36 @@ const server=http.createServer((req,res)=>{
   // across compact Android screens. A visually present but covered button is
   // functionally broken (as the original HALFPIPE/RESTART overlap showed).
   const touchHitTargets=[];
-  for(const [width,height] of [[320,568],[360,740],[390,844],[430,932]]){
+  for(const [width,height] of [[320,568],[360,740],[390,844],[430,932],[667,375],[844,390]]){
    await page.setViewportSize({width,height});
    const targets=await page.evaluate(()=>{
-    const controls=[...document.querySelectorAll('#buttons button'),'#halfpipe','#restart']
-      .map(el=>typeof el==='string'?document.querySelector(el):el);
-    return controls.map(el=>{
+    const ids=['#halfpipe','#restart','#controls-help-toggle','#audio-feedback-toggle'];
+    const controls=[...document.querySelectorAll('#buttons button'),...ids.map(id=>document.querySelector(id))];
+    if(controls.some(el=>!el))throw Error('A required touch control or utility button is missing');
+    // SPOTS belongs to the Newberg park and is intentionally absent in classic.
+    const spots=document.querySelector('#spotsToggle');
+    if(spots)controls.push(spots);
+    const stick=document.querySelector('#stick').getBoundingClientRect();
+    const dock=document.querySelector('#buttons').getBoundingClientRect();
+    const docked=stick.right<innerWidth*.48&&dock.left>innerWidth*.50;
+    return {docked,controls:controls.map(el=>{
      const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;
      const hit=document.elementFromPoint(x,y);
      return {name:el.dataset.t||el.id,x:Math.round(x),y:Math.round(y),
       visible:getComputedStyle(el).visibility!=='hidden'&&getComputedStyle(el).display!=='none',
       inside:r.left>=0&&r.top>=0&&r.right<=innerWidth&&r.bottom<=innerHeight,
-      tappable:hit===el||el.contains(hit),cover:hit?.id||hit?.dataset?.t||hit?.tagName};
-    });
+      tappable:hit===el||el.contains(hit),size:r.width>=44&&r.height>=44,
+      cover:hit?.id||hit?.dataset?.t||hit?.tagName};
+    })};
    });
-   const blocked=targets.filter(t=>!t.visible||!t.inside||!t.tappable);
-   assert.deepEqual(blocked,[],'Mobile touch controls blocked at '+width+'x'+height+': '+JSON.stringify(blocked));
-   touchHitTargets.push({width,height,controls:targets.length});
+   assert(targets.docked,'Touch docks must stay outside the center view at '+width+'x'+height);
+   const blocked=targets.controls.filter(t=>!t.visible||!t.inside||!t.tappable||!t.size);
+   assert.deepEqual(blocked,[],'Mobile touch controls blocked or too small at '+width+'x'+height+': '+JSON.stringify(blocked));
+   touchHitTargets.push({width,height,controls:targets.controls.length});
+   if((width===390&&height===844)||(width===844&&height===390)){
+    fs.mkdirSync('test-artifacts',{recursive:true});
+    await page.screenshot({path:'test-artifacts/mobile-touch-'+(width===390?'portrait':'landscape')+'.png',animations:'disabled'});
+   }
   }
   await page.setViewportSize({width:390,height:844});
   await page.waitForTimeout(1200);
@@ -1155,6 +1168,10 @@ const server=http.createServer((req,res)=>{
   // actual Chromium/WebGL. This tests the render-loop wiring as well as the
   // isolated adapter, without claiming a physical Bluetooth test.
   await page.evaluate(()=>{
+    // Earlier clean-scene screenshots hide the joystick inline. Restore the
+    // normal touch UI before asserting controller connect/disconnect behavior.
+    document.querySelector('#stick').style.display='';
+    document.querySelector('#buttons').style.display='';
     document.querySelector('#restart').click();
     const buttons=Array.from({length:17},()=>({pressed:false,value:0}));
     window.__qaPad={index:0,id:'Xbox Wireless Controller',connected:true,mapping:'standard',axes:[0,0,0,0],buttons};
@@ -1167,6 +1184,13 @@ const server=http.createServer((req,res)=>{
     return false;
   },null,{timeout:8000});
   const xboxPush=await page.evaluate(()=>window.__qaXboxPush);
+  const hiddenWithController=await page.evaluate(()=>({
+    active:document.body.classList.contains('controller-active'),
+    stick:getComputedStyle(document.querySelector('#stick')).display,
+    buttons:getComputedStyle(document.querySelector('#buttons')).display
+  }));
+  assert(hiddenWithController.active&&hiddenWithController.stick==='none'&&hiddenWithController.buttons==='none',
+    'Connecting Xbox must hide all touch driving/trick controls: '+JSON.stringify(hiddenWithController));
   assert(xboxPush.speed>.3&&xboxPush.status.includes('Xbox connected'),
     'Emulated Xbox analog RT must actually accelerate the skater: '+JSON.stringify(xboxPush));
   await page.evaluate(()=>{
@@ -1195,6 +1219,13 @@ const server=http.createServer((req,res)=>{
   // observable input-state transition, not a fixed 250 ms wall-clock delay.
   await page.waitForFunction(()=>document.querySelector('#status')?.textContent.includes('Press a controller button'),null,{timeout:3000});
   const xboxDisconnect=await page.locator('#status').textContent();
+  const restoredAfterDisconnect=await page.evaluate(()=>({
+    active:document.body.classList.contains('controller-active'),
+    stick:getComputedStyle(document.querySelector('#stick')).display,
+    buttons:getComputedStyle(document.querySelector('#buttons')).display
+  }));
+  assert(!restoredAfterDisconnect.active&&restoredAfterDisconnect.stick!=='none'&&restoredAfterDisconnect.buttons!=='none',
+    'Disconnect must restore touch controls: '+JSON.stringify(restoredAfterDisconnect));
   assert(xboxDisconnect.includes('Press a controller button'),
     'Disconnect must return to touch-friendly input status: '+xboxDisconnect);
   const gamepadIntegration={result:'PASS',xboxPush,xboxOllie,xboxDisconnect};

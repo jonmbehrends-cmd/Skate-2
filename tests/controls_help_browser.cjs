@@ -36,6 +36,7 @@ async function loadGame(browser, viewport, touch) {
       id: 'Xbox Wireless Controller',
       index: 0
     };
+    window.__helpPad=pad;
     Object.defineProperty(navigator, 'getGamepads', {
       configurable: true,
       value: () => [pad]
@@ -205,7 +206,19 @@ async function main() {
     assert.equal(await mobile.evaluate(() => document.activeElement.id), 'controls-help-toggle',
       'Touch close must return focus to the help toggle');
 
-    await mobile.waitForFunction(() => window.__SOL_DIAGNOSTICS__.state.controlSteer > .2);
+    // A connected Xbox deliberately hides the touch dock. Verify the new
+    // behavior, then disconnect before exercising joystick/help input release.
+    await mobile.waitForFunction(() => document.body.classList.contains('controller-active'));
+    assert.equal(await mobile.locator('#stick').isVisible(),false,
+      'Connected gamepad must hide the touch joystick');
+    assert.equal(await mobile.locator('#buttons').isVisible(),false,
+      'Connected gamepad must hide touch trick buttons');
+    await mobile.evaluate(() => { window.__helpPad.connected=false; });
+    await mobile.waitForFunction(() => !document.body.classList.contains('controller-active'));
+    assert.equal(await mobile.locator('#stick').isVisible(),true,
+      'Disconnect must restore the touch joystick');
+    assert.equal(await mobile.locator('#buttons').isVisible(),true,
+      'Disconnect must restore touch trick buttons');
     const stick = await mobile.locator('#stick').boundingBox();
     await mobile.mouse.move(stick.x + stick.width * .8, stick.y + stick.height * .5);
     await mobile.mouse.down();
