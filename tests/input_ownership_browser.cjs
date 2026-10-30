@@ -346,6 +346,7 @@ async function main() {
     await scenario('help reset releases and clears pointer ownership', async () => {
       await reset(mobilePage);
       await touchStart(301, '[data-t="push"]');
+      if(await mobilePage.locator('#solMenuPanel').evaluate(el=>el.hidden))await mobilePage.locator('#solMenuToggle').click();
       await mobilePage.locator('#controls-help-toggle').click();
       await mobilePage.waitForFunction(() => document.querySelector('#controls-help-dialog').open);
       assert.equal(await mobilePage.evaluate(() => window.__SOL_DIAGNOSTICS__.input().pushHeld), false);
@@ -380,6 +381,7 @@ async function main() {
     });
 
     await scenario('held Enter Controls behavior is observed independently', async () => {
+      if(await mobilePage.locator('#solMenuPanel').evaluate(el=>el.hidden))await mobilePage.locator('#solMenuToggle').click();
       const toggle = mobilePage.locator('#controls-help-toggle');
       await toggle.click();
       const dialog = mobilePage.locator('#controls-help-dialog');
