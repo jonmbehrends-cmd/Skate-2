@@ -50,7 +50,7 @@ let browser;
   await page.evaluate(()=>{const d=__SOL_DIAGNOSTICS__,B=BABYLON;d.engine.stopRenderLoop();d.skater.position.set(0,0,0);d.skater.rotation.set(0,0,0);d.scene.activeCamera=new B.ArcRotateCamera('rig QA',-.9,1.25,4.3,new B.Vector3(0,1.2,0),d.scene);d.scene.getTransformNodeByName('rider terrain stance').rotation.set(0,0,0);d.scene.getTransformNodeByName('board pivot').rotation.set(0,0,0)});
   // Let the previous gameplay landing recovery finish before asserting a new PUSH pose.
   await page.evaluate(()=>{for(let i=0;i<40;i++)__SOL_DIAGNOSTICS__.rig.update({grounded:true,speed:5},{crouch:0},{dt:1/60})});
-  const signatures=new Map();
+  const signatures=new Map(),grabAnatomy={};
   for(const mode of ['ride','push','push-toe-lift','push-recovery','push-cycle-end','crouch','ollie','push-ollie','flip','heelflip','grab','grind','landing']){
    const evidence=await page.evaluate(mode=>{const d=__SOL_DIAGNOSTICS__,state={grounded:['ride','push','push-toe-lift','push-recovery','push-cycle-end','crouch','landing'].includes(mode),speed:5,travelSign:1,flip:mode==='heelflip'?-1:mode==='flip'?1:0,airTime:['flip','heelflip'].includes(mode)?.21:0};const pose={crouch:mode==='crouch'?.23:.1,pushing:['push','push-toe-lift','push-recovery','push-cycle-end','push-ollie'].includes(mode),contact:mode==='push-toe-lift'||mode==='push-recovery'||mode==='push-cycle-end'?0:.8,recovery:mode==='push-toe-lift'?.7:mode==='push-recovery'?1:0,pushPhase:mode==='push'?Math.PI/2:mode==='push-toe-lift'?Math.PI*1.25:mode==='push-recovery'?Math.PI*1.5:mode==='push-cycle-end'?2*Math.PI-.001:undefined};d.rig.update(state,pose,{grabbing:mode==='grab',grinding:mode==='grind'});d.scene.render();return {status:d.rig.status,matrices:Array.from(d.rig.skeletons[0].getTransformMatrices(d.rig.meshes[0])),vertices:d.rig.meshes[0].getTotalVertices()};},mode);
    assert(evidence.vertices>100);assert(evidence.matrices.every(Number.isFinite));
@@ -86,6 +86,30 @@ let browser;
    }
    if(mode==='grab'){const dist=Math.hypot(...evidence.status.hands[1].map((n,i)=>n-evidence.status.grip[i]));assert(dist<.12,'Hoodie hand must touch board: '+JSON.stringify({dist,hands:evidence.status.hands,grip:evidence.status.grip,feet:evidence.status.feet}));
     assert(evidence.status.grabReachShift<.45,'Grab must not require extreme chest displacement: '+evidence.status.grabReachShift);
+    // Capture real imported GLB joint positions in the board/stance frame.
+    // The hand-to-rail check alone previously passed even when screenshots
+    // showed a seated or prone torso. These measurements make that visual
+    // failure diagnosable without declaring an uncalibrated anatomy threshold.
+    const anatomy=await page.evaluate(()=>{
+     const d=__SOL_DIAGNOSTICS__,B=BABYLON;
+     const stance=d.scene.getTransformNodeByName('rider terrain stance');
+     if(!stance)throw Error('Missing stance frame for grab anatomy');
+     const inv=B.Matrix.Invert(stance.computeWorldMatrix(true));
+     const local=name=>{
+      const node=d.scene.getTransformNodeByName(name);
+      if(!node)throw Error('Missing production hoodie joint: '+name);
+      node.computeWorldMatrix(true);
+      return B.Vector3.TransformCoordinates(node.getAbsolutePosition(),inv).asArray();
+     };
+     const hip=local('Hips'),chest=local('Chest'),
+      shoulder=local('UpperArm.R'),wrist=local('Wrist.R');
+     return {hip,chest,shoulder,wrist,
+      hipAboveDeck:hip[1]-.45,chestAboveHip:chest[1]-hip[1],
+      shoulderToWrist:Math.hypot(...shoulder.map((v,i)=>v-wrist[i]))};
+    });
+    assert(Object.values(anatomy).flat().every(Number.isFinite),
+     'Actual GLB grab joint positions must be finite: '+JSON.stringify(anatomy));
+    grabAnatomy.grab={...anatomy,handToRail:dist,reachShift:evidence.status.grabReachShift};
    }
    if(mode==='push-ollie'){
     assert.equal(evidence.status.mode,'ollie','Held PUSH must transition into airborne ollie');
@@ -128,7 +152,7 @@ let browser;
   }
   assert(new Set(signatures.values()).size>=6,'Skate, crouch, ollie, flip, grab and landing must deform the skin differently');
   assert.deepEqual(errors,[]);assert.deepEqual(requests,[]);
-  results.push({label,result:'PASS',ready,distinctPoses:new Set(signatures.values()).size});await page.close();
+  results.push({label,result:'PASS',ready,distinctPoses:new Set(signatures.values()).size,grabAnatomy});await page.close();
  }
  // A synthetic pointerdown can bypass mobile hit-testing and release timing.
  // Exercise an actual Chromium touch tap on the visible PUSH button in both
