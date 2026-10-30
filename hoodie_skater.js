@@ -138,10 +138,10 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    const grindLean=actions.grinding?travel*.085:0;
    status.grindLean=grindLean;
    pelvis.rotationQuaternion=rest.get(pelvis).q
-    .multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.12:actions.grinding?.07:landingHinge-pushLean*.5))
+    .multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.38:actions.grinding?.07:landingHinge-pushLean*.5))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Z,grindLean));
    spine.rotationQuaternion=rest.get(spine).q
-    .multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.12:actions.grinding?-.05:-landingHinge*.4-pushLean))
+    .multiply(B.Quaternion.RotationAxis(B.Axis.X,actions.grabbing?-.18:actions.grinding?-.05:-landingHinge*.4-pushLean))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Y,(actions.grabbing?.18:.07)+(pushingNow?(pose.contact||0)*.07:0)))
     .multiply(B.Quaternion.RotationAxis(B.Axis.Z,-grindLean*.4));
    // Unlike an ollie, a shallow transition vert air carries the whole board
