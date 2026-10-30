@@ -331,7 +331,9 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    if(actions.grabbing){
     // The free arm stays bent alongside the rider as a compact counterbalance,
     // rather than pointing rigidly backwards across the entire board.
-    targets[0]=v(.16,1.15-crouch*.35,.34);
+    // Bend the balancing elbow in front of the rib cage rather than leaving
+    // the hand extended behind the skater during a rail grab.
+    targets[0]=v(.32,1.09-crouch*.24,.20);
     // Grip the near-side deck rail, rather than reaching across the middle;
     // the hand tracks the moving board even during a simultaneous flip.
     // The grab wrist stays 10 cm above the deck-top rail so fingers can touch without wrist penetration.
