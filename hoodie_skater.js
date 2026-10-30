@@ -129,6 +129,12 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
   });
   
   function placeDetached(node,target){const inv=B.Matrix.Invert(node.parent.computeWorldMatrix(true));node.position.copyFrom(B.Vector3.TransformCoordinates(world(target),inv));node.computeWorldMatrix(true)}
+  // Move a skin joint in the moving board's stance frame, not global axes.
+  function shiftJoint(node,delta){
+   const worldDelta=B.Vector3.TransformNormal(delta,parent.computeWorldMatrix(true));
+   const localDelta=B.Vector3.TransformNormal(worldDelta,B.Matrix.Invert(node.parent.computeWorldMatrix(true)));
+   node.position.addInPlace(localDelta);node.computeWorldMatrix(true);
+  }
   function orient(node,q){const pq=B.Quaternion.Identity(),parentQ=B.Quaternion.Identity();node.parent.computeWorldMatrix(true).decompose(undefined,pq);parent.computeWorldMatrix(true).decompose(undefined,parentQ);node.rotationQuaternion=pq.conjugate().multiply(parentQ.multiply(q));node.computeWorldMatrix(true)}
   const status={ready:true,mode:'idle',height:2.05,bones:container.skeletons[0].bones.length,source:DEFAULT_URL,feet:[],hands:[],meshes:meshes.length,shadowFillMaterials,apparelContrastMaterials};
   let wasGrounded=true,landing=0,takeoff=0;
@@ -209,7 +215,18 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
    if(grabTarget){
     const shoulderGoal=grabTarget.add(v(.12,.52,.10));
     aim(pelvis,arms[1].n[0],shoulderGoal);
-   }
+    // Rebalance the actual skinned torso under the reaching shoulder.
+    // Move hips toward the chest, lift the chest, and retain both shoulder
+    // origins so fixed-length arm IK can still grip the moving board rail.
+    // The leg solver below replants both shoes. No gameplay forces change.
+    const chestBefore=localPosition(spine);
+    const shouldersBefore=arms.map(arm=>localPosition(arm.n[0]));
+    shiftJoint(pelvis,v(.10,-.035,0));
+    shiftJoint(spine,chestBefore.add(v(0,.065,0)).subtract(localPosition(spine)));
+    for(let i=0;i<arms.length;i++)
+     shiftJoint(arms[i].n[0],shouldersBefore[i].subtract(localPosition(arms[i].n[0])));
+    status.grabTorsoCorrection={hipForward:.10,hipDrop:.035,chestLift:.065};
+   }else status.grabTorsoCorrection=null;
    // Unlike an ollie, a shallow transition vert air carries the whole board
    // with both soles. Avoid the ordinary 12-27cm ollie-foot separation that
    // makes the skater visibly float above the board immediately at takeoff.
