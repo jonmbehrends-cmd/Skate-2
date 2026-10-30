@@ -23,6 +23,27 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
   return ['r','g','b'].some(channel=>base[channel]>.01&&
    material.emissiveColor[channel]>=Math.min(.10,base[channel]*.08+.014)-1e-6);
  }), 'Imported apparel must receive a color-proportional shadow fill');
+ // Check the imported GLB's real material palette, not an invented mesh
+ // color. The contrast pass must remain material-local and preserve opacity.
+ const coloredMaterials=importedMaterials.filter(material=>material.name==='Purple');
+ assert.equal(coloredMaterials.length,1,
+  'Licensed Quaternius GLB must contain exactly one Purple hoodie material');
+ assert.equal(rig.status.apparelContrastMaterials,coloredMaterials.length,
+  'Hoodie contrast material selection must match imported GLB colors');
+ assert(coloredMaterials.every(material=>{
+  const base=material.albedoColor||material.diffuseColor;
+  return ['r','g','b'].every(channel=>
+   material.emissiveColor[channel]>=Math.min(.15,base[channel]*.24+.014)-1e-6);
+ }), 'Colored fabric must retain its hue and extra midtone shadow fill');
+ assert(importedMaterials.filter(material=>material.name==='Skin').every(material=>{
+  const base=material.albedoColor||material.diffuseColor;
+  return ['r','g','b'].every(channel=>
+   material.emissiveColor[channel]<=Math.max(.10,base[channel]*.08+.014)+1e-6);
+ }), 'Skin must not receive the purple hoodie-only emissive boost');
+ console.log('Hoodie imported material palette:',JSON.stringify(importedMaterials.map(m=>({
+  name:m.name,base:(m.albedoColor||m.diffuseColor)?.asArray(),
+  emissive:m.emissiveColor?.asArray(),colored:coloredMaterials.includes(m)
+ }))));
  assert(importedMaterials.every(material=>material.alpha===1),
   'Shadow readability must not make opaque hoodie apparel transparent');
  const state={grounded:true,speed:4,travelSign:1},pose={crouch:0};
