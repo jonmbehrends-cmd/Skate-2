@@ -323,6 +323,9 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
                   v(.08-swing,1.25-crouch+armLift-armDrop-pushCounter-grindCounter,-balance)];
    status.armPose={spread:balance,lift:armLift,drop:armDrop,counter:pushCounter,grindCounter};
    if(actions.grabbing){
+    // The free arm stays bent alongside the rider as a compact counterbalance,
+    // rather than pointing rigidly backwards across the entire board.
+    targets[0]=v(.16,1.15-crouch*.35,.34);
     // Grip the near-side deck rail, rather than reaching across the middle;
     // the hand tracks the moving board even during a simultaneous flip.
     // The grab wrist stays 10 cm above the deck-top rail so fingers can touch without wrist penetration.
@@ -361,6 +364,7 @@ async function attach(B,scene,parent,legacyMeshes,options={}){
     chestAboveHip:localPosition(spine).y-localPosition(pelvis).y,
     torsoForward:localPosition(spine).x-localPosition(pelvis).x,
     torsoLateral:localPosition(spine).z-localPosition(pelvis).z,
+    balanceHandReach:B.Vector3.Distance(localPosition(arms[0].n[2]),localPosition(spine)),
     reachShift:grabReachShift
    }:null;
   }
