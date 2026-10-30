@@ -85,7 +85,7 @@ let browser;
      'Real hoodie grind must keep both shoes on the board');
    }
    if(mode==='grab'){const dist=Math.hypot(...evidence.status.hands[1].map((n,i)=>n-evidence.status.grip[i]));assert(dist<.12,'Hoodie hand must touch board: '+JSON.stringify({dist,hands:evidence.status.hands,grip:evidence.status.grip,feet:evidence.status.feet}));
-    assert(evidence.status.grabReachShift<.45,'Grab must not require extreme chest displacement: '+evidence.status.grabReachShift);
+    assert(evidence.status.grabReachShift<.36,'Grab must not drag the chest down more than 36 cm: '+evidence.status.grabReachShift);
     // Capture real imported GLB joint positions in the board/stance frame.
     // The hand-to-rail check alone previously passed even when screenshots
     // showed a seated or prone torso. These measurements make that visual
@@ -113,6 +113,10 @@ let browser;
      'Airborne grab pelvis must have visibly athletic deck clearance: '+JSON.stringify(anatomy));
     assert(anatomy.chestAboveHip>.10,
      'Grab torso must not collapse below the pelvis: '+JSON.stringify(anatomy));
+    assert(anatomy.shoulder[0]-anatomy.hip[0]>.16,
+     'Grab shoulder must hinge forward of the hips rather than form an upright seated pose: '+JSON.stringify(anatomy));
+    assert(Math.max(...evidence.status.legGeometry.map(g=>g.knee[1]))<anatomy.shoulder[1]+.04,
+     'Grab knees must stay below the shoulders instead of poking up beside the face: '+JSON.stringify(evidence.status.legGeometry));
     grabAnatomy.grab={...anatomy,handToRail:dist,reachShift:evidence.status.grabReachShift};
    }
    if(mode==='push-ollie'){
