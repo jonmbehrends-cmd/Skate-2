@@ -1,0 +1,7 @@
+{
+  "status": "not_configured",
+  "source": "ALT Sports Data",
+  "updatedAt": null,
+  "events": [],
+  "message": "Set ALTSports API key in GitHub Actions secrets to activate live data."
+}
