@@ -1,7 +1,7 @@
 {
   "status": "not_configured",
   "source": "ALT Sports Data",
-  "updatedAt": null,
+  "updatedAt": "2026-10-31T01:19:46.094Z",
   "events": [],
-  "message": "Set ALTSports API key in GitHub Actions secrets to activate live data."
+  "message": "ALTSPORTS_API_KEY secret not configured. No scores are being reported."
 }
