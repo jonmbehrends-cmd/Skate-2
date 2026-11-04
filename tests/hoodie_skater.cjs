@@ -192,13 +192,32 @@ require('babylonjs-loaders');require('../hoodie_skater.js');
  rig.update({...state,grounded:false,flip:1,airTime:.42},pose);
  assert(Math.abs(rig.status.flipFootPitch)<.001&&Math.abs(rig.status.toeDirections[0][1])<.1,
   'Flip ankle must settle flat before landing');
+ const importedHead=scene.getTransformNodeByName('Head');
+ assert(importedHead&&rig.status.headJoint,'Production GLB must expose skinned Head');
+ const neutralHead=importedHead.rotationQuaternion.clone();
  rig.update({...state,grounded:false},pose,{grabbing:true});assert.equal(rig.status.mode,'grab');
+ assert(rig.status.headGazePitch<-.15&&rig.status.headGazePitch>-.25,
+  'Grab must counter-pitch the imported head toward the landing');
+ assert(Math.abs(B.Quaternion.Dot(neutralHead,importedHead.rotationQuaternion))<.999,
+  'Real GLB Head joint must rotate for grab gaze');
+ assert(rig.status.feet.every(f=>Math.abs(f[1]-.47)<.035),
+  'Grab shoes must stay close to deck grip instead of floating 12cm above it: '+JSON.stringify(rig.status.feet));
  const gripDistance=B.Vector3.Distance(B.Vector3.FromArray(rig.status.hands[1]),B.Vector3.FromArray(rig.status.grip));assert(gripDistance<.1,'Hand must reach board: '+JSON.stringify({gripDistance,hands:rig.status.hands,grip:rig.status.grip,feet:rig.status.feet,legGeometry:rig.status.legGeometry}));
  assert(Math.abs(rig.status.grip[2]+.31)<.01&&Math.abs(rig.status.grip[0]-.24)<.01&&Math.abs(rig.status.grip[1]-.55)<.01,
   'Grab wrist must hover above deck-top side rail for finger contact without deck penetration');
  const grabAnatomy=rig.status.grabAnatomy;
  assert(grabAnatomy&&Object.values(grabAnatomy).every(Number.isFinite),
   'Grab must expose actual imported joint measurements');
+ assert(grabAnatomy.balanceHandReach<.65,
+  'Free grab arm should bend near the chest, not stretch rigidly backward: '+JSON.stringify(grabAnatomy));
+ assert(Math.abs(grabAnatomy.torsoLateral)<.12,
+  'Grab torso should stay over pelvis laterally instead of folding toward rear rail: '+JSON.stringify(grabAnatomy));
+ assert(grabAnatomy.torsoForward<.23,
+  'Grab torso must be supported over hips, not folded horizontally: '+JSON.stringify(grabAnatomy));
+ assert(grabAnatomy.chestAboveHip>.19,
+  'Grab torso must rise over the pelvis instead of collapsing onto the deck: '+JSON.stringify(grabAnatomy));
+ assert(rig.status.grabTorsoCorrection?.hipForward>.09,
+  'Actual skinned pelvis must rebalance forward beneath the chest');
  assert(grabAnatomy.hipClearance>.35,
   'Airborne grab hips must clear both planted shoes instead of sitting on the deck: '+JSON.stringify(grabAnatomy));
  assert(Number.isFinite(rig.status.grabReachShift)&&rig.status.grabReachShift<.30,
