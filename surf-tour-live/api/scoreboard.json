@@ -1,7 +1,7 @@
 {
   "status": "not_configured",
   "source": "ALT Sports Data",
-  "updatedAt": "2026-11-06T21:41:48.422Z",
+  "updatedAt": "2026-11-06T22:22:49.605Z",
   "events": [],
   "message": "ALTSPORTS_API_KEY secret not configured. No scores are being reported."
 }
